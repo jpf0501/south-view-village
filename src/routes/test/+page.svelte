@@ -3,9 +3,9 @@
 
 	async function clickHandler() {
 		const result = await sendEmail({
-			to: 'kyleandradebasquena@gmail.com',
-			subject: 'Testing svelte email',
-			html: '<h1>Hello World</ht>'
+			to: 'rodelgerodias25@gmail.com',
+			subject: 'Southview Homes 3 Notice',
+			html: '<h1>This is a test message</ht>'
 		});
         console.log(JSON.stringify(result)); 
         alert("Email sent successfuly");
