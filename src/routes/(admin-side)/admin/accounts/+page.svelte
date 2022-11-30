@@ -13,8 +13,11 @@
             user
         },
         {
-            user 
+            user
+        },{
+            user
         },
+        
     ];
 </script>
 
@@ -27,7 +30,7 @@
          <div class="flex justify-between m-3">
             <h1 class="px-1 text-xl font-semibold">Users</h1>
             <input type="search" placeholder="Search here">
-            <a class="mr-36 px-1 text-base bg-blue-400 rounded-full hover:bg-blue-800 flex items-center" href="/admin/accounts/create">Add User</a>
+            <a class="px-1 text-base bg-blue-400 rounded-full hover:bg-blue-800 flex items-center" href="/admin/accounts/create">Add User</a>
          </div>
          <div>
             <table class="border-2 border-black ">
