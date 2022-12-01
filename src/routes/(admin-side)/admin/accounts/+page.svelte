@@ -7,7 +7,6 @@
         role: 'Admin',
         status: 'Paid'
     };
-    
     let listOfUsers = [
         {
             user

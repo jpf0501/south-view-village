@@ -16,6 +16,7 @@
     }
     function closeYesChanges(){
         yesChanges = false;
+        saveChanges = false;
         goto('/admin/accounts')
     }
 </script>
@@ -55,7 +56,7 @@
                             </select>
                         </div>
                         <div class="">
-                            <label for="">New Password</label>
+                            <label for="">Password</label>
                             <input type="text" placeholder="New Password">
                             <label for="">Confirm Password</label>
                             <input type="text" placeholder="Confirm Password">
