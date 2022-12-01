@@ -28,13 +28,13 @@
 		</div>
 		<div class="grid grid-cols-1 gap-6 mt-4 md:grid-cols-2">
 			<div class="form-control">
-				<label for="fname" class="label">
+				<label for="email" class="label">
 					<span class="label-text">E-mail Address</span>
 				</label>
 				<input type="text" placeholder="juandelacruz@gmail.com" name="email" class="input input-bordered" required/>
 			</div>
 			<div class="form-control">
-				<label for="lname" class="label">
+				<label for="contact" class="label">
 					<span class="label-text">Contact No.</span>
 				</label>
 				<input type="tel" placeholder="09123456789" name="contact" class="input input-bordered" required/>
