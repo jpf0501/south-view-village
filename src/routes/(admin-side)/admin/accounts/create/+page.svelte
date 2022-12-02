@@ -1,23 +1,67 @@
 <script>
     import { goto } from '$app/navigation';
-    let saveChanges = false;
-    let yesChanges = false;
+    // let saveChanges = false;
+    // let yesChanges = false;
 
-     function openSaveChanges(){
-        saveChanges = true;
-    }
+   
+    let email = "";
+    let password = "";
+    let passwordcheck = "";
+    let firstname = "";
+    let lastname = "";
+    let addressBlock = "";
+    let addressLot = "";
+    let addressStreet = "";
+    let contactNumber = "";
+    let role = "";
 
-    function closeSaveChanges(){
-        saveChanges = false;
-    }
 
-    function openYesChanges(){
-        yesChanges = true;
-    }
-    function closeYesChanges(){
-        yesChanges = false;
-        saveChanges = false;
-        goto('/admin/accounts')
+    //  function openSaveChanges(){
+    //     saveChanges = true;
+    // }
+
+    // function closeSaveChanges(){
+    //     saveChanges = false;
+    // }
+
+    // function openYesChanges(){
+    //     yesChanges = true;
+    // }
+    // async function closeYesChanges(){
+    //     yesChanges = false;
+    //     saveChanges = false;
+    //     await goto('/admin/accounts')
+    // }
+
+    async function submitHandler(){
+        try {
+            if(password != passwordcheck){
+                throw "Passwords do not match";
+            }
+            // console.log(email);
+            // console.log(password);
+            // console.log(passwordcheck);
+            // console.log(firstname);
+            // console.log(lastname);
+            // console.log(addressBlock);
+            // console.log(addressLot);
+            // console.log(addressStreet);
+            // console.log(contactNumber);
+            // console.log(role);
+            const response = await fetch('/api/accounts', {
+			method: 'POST',
+			body: JSON.stringify({ email, password })
+        
+		})
+            const result = await response.json();
+            console.log(result);
+
+            alert("Save success");
+        } catch (error) {
+            console.log(error);
+            alert(error);
+        }
+        
     }
 </script>
 
@@ -29,41 +73,46 @@
                 <div>
                     <h1 class="text-xl font-bold bg-gray-300 px-1 py-3">Add User</h1>
                 </div>
-                <form action="" class="p-10">
+                <form 
+                on:submit|preventDefault={submitHandler}
+                 class="p-10">
                         <div class="">
                             <label for="">First Name</label>
-                            <input type="text"placeholder="firstname">
+                            <input type="text"placeholder="firstname" required bind:value={firstname}>
                             <label for="">Last Name</label>
-                            <input type="text" placeholder="lastname">                       
+                            <input type="text" placeholder="lastname" required bind:value={lastname}>                       
                         </div>
                         <div>
                             <label for="">Email Address</label>
-                            <input type="text" placeholder="email">
+                            <input type="email" placeholder="email" required bind:value={email}>
                         </div>
                         <div>
                             <label for="">Block</label>
-                            <input type="text" placeholder="Block">
+                            <input type="text" placeholder="Block" required bind:value={addressBlock}>
                             <label for="">Lot</label>
-                            <input type="text" placeholder="Lot">
+                            <input type="text" placeholder="Lot" required bind:value={addressLot}> 
                             <label for="">Street</label>
-                            <input type="text" placeholder="Street">
+                            <input type="text" placeholder="Street" required bind:value={addressStreet}>
                             <label for="">Contact No.</label>
-                            <input type="number" placeholder="Contact No.">
+                            <input type="number" placeholder="Contact No." required bind:value={contactNumber}>
                             <label for="">Role</label>
-                            <select>
-                                <option value="">Admin</option>
-                                <option value="">Resident</option>
+                            <select bind:value={role}>
+                                <option value="Admin">Admin</option>
+                                <option value="Resident">Resident</option>
                             </select>
                         </div>
                         <div class="">
                             <label for="">Password</label>
-                            <input type="text" placeholder="New Password">
+                            <input type="password" placeholder="New Password" required bind:value={password}>
                             <label for="">Confirm Password</label>
-                            <input type="text" placeholder="Confirm Password">
+                            <input type="password" placeholder="Confirm Password" required bind:value={passwordcheck}>
+                            {#if password != passwordcheck && passwordcheck != ""}
+                                <p class="text-red-500">Password doesnt match</p>
+                            {/if}
                         </div>
                         <div class="flex justify-between">
-                            <button on:click|preventDefault={openSaveChanges} class="bg-blue-500 px-10 py-2 text-white">Save</button>
-                            <button on:click|preventDefault={closeYesChanges} class="bg-red-500 px-10 py-2 text-white">Cancel</button>
+                            <button type="submit" class="bg-blue-500 px-10 py-2 text-white">Save</button>
+                            <a class="bg-red-500 px-10 py-2 text-white" href="/admin/accounts">Cancel</a>
                         </div>
                 </form>
             </div>  
@@ -72,7 +121,7 @@
 </main>
 
 
-{#if saveChanges == true}
+<!-- {#if saveChanges == true}
 <div class="fixed inset-0  grid place-items-center">
     <main class="flex justify-between items-start w-1/6 h-1/6 bg-white border-4 border-black">
         <div class="">
@@ -96,4 +145,4 @@
         </div>    
     </main>
 </div>
-{/if}
+{/if} -->
