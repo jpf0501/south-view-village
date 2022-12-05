@@ -1,4 +1,5 @@
 <script>
+
 	import {userStore} from '$lib/store.js';
 	import {auth} from '$lib/firebase/client.js';
 	import {signOut} from 'firebase/auth';
@@ -12,7 +13,6 @@
 		}
 	}
 	
-
 </script>
 
 <div class="navbar bg-base-100">
