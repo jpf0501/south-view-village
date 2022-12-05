@@ -42,7 +42,7 @@
 		</div>
 		<div class="flex justify-end mt-8">
 			<button class="btn btn-primary mx-1">Save</button>
-			<button class="btn btn-warning mx-1">Change Password</button>
+			<a class="btn btn-warning mx-1">Change Password</a>
 		</div>
 	</form>
 	</div>
