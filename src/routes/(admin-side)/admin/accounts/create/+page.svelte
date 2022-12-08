@@ -43,57 +43,94 @@
 </script>
 
 <main>
-    <div>
-        <div class="grid place-items-center py-10">
-            <div class="w-11/12  bg-white">
-                <div>
-                    <h1 class="text-xl font-bold bg-gray-300 px-1 py-3">Add User</h1>
+    <div class="min-h-screen hero bg-base-200">
+        <div class="w-full max-w-4xl p-6 mx-auto shadow-2xl border rounded-xl bg-base-100">
+        <div class="mt-2">
+            <h1 class="text-2xl">Create Account</h1>
+        </div>
+        <form
+        on:submit|preventDefault={submitHandler}>
+            <div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2">
+                <div class="form-control">
+                    <label for="fname" class="label">
+                        <span class="label-text">First Name</span>
+                    </label>
+                    <input type="text" placeholder="Juan" name="fname" class="input input-bordered" required bind:value={firstname}>
                 </div>
-                <form 
-                on:submit|preventDefault={submitHandler}
-                 class="p-10">
-                        <div class="">
-                            <label for="">First Name</label>
-                            <input type="text"placeholder="First Name" required bind:value={firstname}>
-                            <label for="">Last Name</label>
-                            <input type="text" placeholder="Last Name" required bind:value={lastname}>                       
+                <div class="form-control">
+                    <label for="lname" class="label">
+                        <span class="label-text">Last Name</span>
+                    </label>
+                    <input type="text" placeholder="Dela Cruz" name="lname" class="input input-bordered" required bind:value={lastname}/>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 gap-6 mt-4 md:grid-cols-5">
+                <div class="form-control">
+                    <label for="Block" class="label">
+                        <span class="label-text">Block</span>
+                    </label>
+                    <input type="number" placeholder="1" name="Block" class="input input-bordered" required bind:value={addressBlock}/>
+                </div>
+                <div class="form-control">
+                    <label for="Lot" class="label">
+                        <span class="label-text">Lot</span>
+                    </label>
+                    <input type="number" placeholder="1" name="Lot" class="input input-bordered" required bind:value={addressLot}/>
+                </div>
+                <div class="form-control">
+                    <label for="Street" class="label">
+                        <span class="label-text">Street</span>
+                    </label>
+                    <input type="text" placeholder="1" name="Street" class="input input-bordered" required bind:value={addressStreet}/>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 gap-6 mt-4 md:grid-cols-2">
+                <div class="form-control">
+                    <label for="fname" class="label">
+                        <span class="label-text">E-mail Address</span>
+                    </label>
+                    <input type="text" placeholder="juandelacruz@gmail.com" name="email" class="input input-bordered" required bind:value={email}/>
+                    <div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2">
+                        <div class="form-control">
+                            <label for="password" class="label">
+                                <span class="label-text">Password</span>
+                            </label>
+                            <input class="input input-bordered" type="password" placeholder="New Password" required bind:value={password}>
                         </div>
-                        <div>
-                            <label for="">Email Address</label>
-                            <input type="email" placeholder="Email" required bind:value={email}>
-                        </div>
-                        <div>
-                            <label for="">Block</label>
-                            <input type="number" placeholder="Block" required bind:value={addressBlock}>
-                            <label for="">Lot</label>
-                            <input type="number" placeholder="Lot" required bind:value={addressLot}> 
-                            <label for="">Street</label>
-                            <input type="text" placeholder="Street" required bind:value={addressStreet}>
-                            <label for="">Contact No.</label>
-                            <input type="text" pattern="[09][0-9]{9}" maxlength="11" placeholder="Contact No." required  bind:value={contactNumber}>
-                            <label for="">Role</label>
-                            <select bind:value={role}>                               
-                                <option value="">Resident</option>
-                                <option value="">Admin</option>
-                            </select>
-                        </div>
-                        <div class="">
-                            <label for="">Password</label>
-                            <input type="password" placeholder="Password" required bind:value={password}>
-                            <label for="">Confirm Password</label>
-                            <input type="password" placeholder="Confirm Password" required bind:value={passwordcheck}>
+                        <div class="form-control">
+                            <label for="cpassword" class="label">
+                                <span class="label-text">Confirm Password</span>
+                            </label>
+                            <input class="input input-bordered" type="password" placeholder="Confirm Password" required bind:value={passwordcheck}>
                             {#if password != passwordcheck && passwordcheck != ""}
-                                <p class="text-red-500">Password doesnt match</p>
-                            {/if}
+                                    <p class="text-red-500 mt-3">Password doesnt match</p>
+                                {/if}
+                        </div>              
+                    <div class="form-control">
+                        <span class="label-text mb-3">Role</span>  
+                        <div class="mb-3">
+                          <select class="form-select appearance-none block w-full px-3 py-1.5 text-base border rounded-xl border-gray-300" aria-label="Default select example" required bind:value={role}>
+                              <option value="Resident">Resident</option>
+                              <option value="Admin">Admin</option>
+                          </select>
                         </div>
-                        <div class="flex justify-between">
-                            <button type="submit" class="bg-blue-500 px-10 py-2 text-white">Save</button>
-                            <a href="/admin/accounts" class="bg-red-500 px-10 py-2 text-white">Cancel</a>
-                        </div>
-                </form>
-            </div>  
+                      </div>
+                </div>
+                <div class="form-control">
+                    <label for="lname" class="label">
+                        <span class="label-text">Contact No.</span>
+                    </label>
+                    <input type="tel" placeholder="09123456789" name="contact" class="input input-bordered" required bind:value={contactNumber}/>
+                </div>
+            </div>
+            <div class="flex justify-end mt-8">
+                <button type="submit" class="btn btn-primary mx-1">Save</button>
+                <a href="/admin/accounts" class="btn btn-error mx-1">Cancel</a>
+            </div>
+        </form>
         </div>
     </div>
+    
 </main>
 
 
