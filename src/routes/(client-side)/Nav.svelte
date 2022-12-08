@@ -14,10 +14,11 @@
 		>Community</a
 	>
 	<a class="font-medium tab tab-lg" href="/hoas" class:tab-active={pathname === '/hoas'}>HOAs</a>
-	<a class="font-medium tab tab-lg" href="/about" class:tab-active={pathname === '/about'}>About</a>
+	
 
 	
 	{#if $userStore}
 	<a class="font-medium tab tab-lg" href="/payment" class:tab-active={pathname === '/payment'}>Payment</a>
+	<a class="font-medium tab tab-lg" href="/profile" class:tab-active={pathname === '/profile'}>Profile</a>
 	{/if}
 </nav>
