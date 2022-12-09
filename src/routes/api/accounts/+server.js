@@ -1,6 +1,6 @@
 import { error, json } from '@sveltejs/kit';
 import { adminAuth } from '$lib/firebase/admin.server';
-import { setDoc, doc } from 'firebase/firestore';
+import { setDoc, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '$lib/firebase/client.js';
 
 // /** @type {import('./$types').RequestHandler} */
@@ -35,5 +35,18 @@ export async function POST({ request }) {
 	} catch (err) {
 		console.log(err);
 		throw error(400, err);
+	}
+}
+
+export async function DELETE({ request }) {
+	try {
+		const { uid } = await request.json();
+		console.log(uid);
+		await adminAuth.deleteUser(uid)
+		await deleteDoc(doc(db, "accounts", uid))
+		return json({message:"asdasd"})
+	} catch (err) {
+		console.log(err);
+		throw error(400, err); 
 	}
 }

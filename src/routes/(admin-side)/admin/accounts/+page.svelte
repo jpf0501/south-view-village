@@ -50,7 +50,8 @@
                         <td class="py-2 px-32 text-left bg-red-200">{user.addressBlock}{user.addressLot}{user.addressStreet}</td>
                         <td class="py-2 px-28 text-left bg-green-200">{user.contactNumber}</td>
                         <td class="py-2 px-10 text-center">{user.role}</td>
-                        <a class="py-2 px-10" href="/admin/accounts">Edit</a>
+                        <a class="py-2 px-10" href={"/admin/accounts/edit/" + user.id}>Edit</a>
+                        
                         <!-- <h1>{ JSON.stringify(user) }</h1> -->
                     </tr>
                     {/each}
