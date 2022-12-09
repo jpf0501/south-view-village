@@ -28,6 +28,7 @@ export async function POST({ request }) {
 			addressStreet:createUserRequest.addressStreet,
 			contactNumber:createUserRequest.contactNumber,
             role:createUserRequest.role,
+			email:createUserRequest.email,
 		 })
 		// return json(userRecord);
 		// console.log(userRecord);

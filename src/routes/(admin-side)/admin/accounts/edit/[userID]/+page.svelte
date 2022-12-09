@@ -148,7 +148,7 @@
 					<button on:click={deleteUser} type="submit" class="btn btn-primary mx-1 bg-red-500"
 						>Delete</button
 					>
-					<a href="/admin/accounts" class="btn btn-error mx-1">Cancel</a>
+					<a href="/admin/accounts" class="btn btn-error mx-1 ">Cancel</a>
 				</div>
 			</div>
 		</div>

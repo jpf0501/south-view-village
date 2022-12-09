@@ -1,6 +1,7 @@
 <script>
 	import { auth } from '$lib/firebase/client.js';
 	import { signInWithEmailAndPassword } from 'firebase/auth';
+	import { goto } from '$app/navigation';
 
 	let user = '';
 	let password = '';
@@ -12,6 +13,7 @@
 			const cred = await signInWithEmailAndPassword(auth, user, password);
 			// console.log(cred);
 			alert("Login success");
+			goto('/admin');
 		} catch (error) {
 			console.log(error);
 			alert(error);
