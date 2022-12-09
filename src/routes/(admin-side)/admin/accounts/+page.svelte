@@ -39,7 +39,7 @@
 							<td class="text-left text-base bg-gray-300">{user.firstname + ' ' + user.lastname}</td
 							>
 							<td class="text-left text-base bg-gray-300"
-								>{user.addressBlock + ' ' + user.addressLot + ' ' + user.addressStreet}</td
+								>{'Block ' + user.addressBlock + ' Lot ' + user.addressLot + ' ' + user.addressStreet + ' Street'}</td
 							>
 							<td class="text-left text-base bg-gray-300">{user.email}</td>
 							<td class="text-left text-base bg-gray-300">{user.role}</td>
