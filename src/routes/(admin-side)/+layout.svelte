@@ -11,7 +11,6 @@
 		const snapshot = await getDoc(doc(db, "accounts", id))
 		const role = snapshot.get("role")
 		const isAdmin = "Admin" === role
-		console.log(isAdmin);
 		if (!isAdmin) {
 			await goto("/")
 		} else {
