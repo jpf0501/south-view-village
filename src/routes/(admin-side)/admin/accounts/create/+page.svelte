@@ -17,24 +17,25 @@
             if(password != passwordcheck){
                 throw "Passwords do not match";
             }
-            console.log(email);
-            console.log(password);
-            console.log(passwordcheck);
-            console.log(firstname);
-            console.log(lastname);
-            console.log(addressBlock);
-            console.log(addressLot);
-            console.log(addressStreet);
-            console.log(contactNumber);
-            console.log(role);
+            // console.log(email);
+            // console.log(password);
+            // console.log(passwordcheck);
+            // console.log(firstname);
+            // console.log(lastname);
+            // console.log(addressBlock);
+            // console.log(addressLot);
+            // console.log(addressStreet);
+            // console.log(contactNumber);
+            // console.log(role);
             const response = await fetch('/api/accounts', {
 			method: 'POST',
-			body: JSON.stringify({ email, password })  
+			body: JSON.stringify({ email, password, firstname, lastname, addressBlock, addressLot, addressStreet, contactNumber
+            , role})  
 		})
             const result = await response.json();
             console.log(result);
 
-            alert("Save success");
+            alert("Save success " + result.uid);
         } catch (error) {
             console.log(error);
             alert(error);

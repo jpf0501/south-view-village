@@ -1,5 +1,7 @@
 import { error, json } from '@sveltejs/kit';
 import { adminAuth } from '$lib/firebase/admin.server';
+import { setDoc, doc } from 'firebase/firestore';
+import { db } from '$lib/firebase/client.js';
 
 // /** @type {import('./$types').RequestHandler} */
 // export async function GET() {
@@ -16,10 +18,20 @@ import { adminAuth } from '$lib/firebase/admin.server';
 export async function POST({ request }) {
 	try {
         const createUserRequest = await request.json();
-        console.log(createUserRequest);
-        // const userRecord = await adminAuth.createUser({ email:createUserRequest.email, password:createUserRequest.password });
+        // console.log(createUserRequest);
+        const userRecord = await adminAuth.createUser({ email:createUserRequest.email, password:createUserRequest.password });
+		await setDoc(doc(db, "accounts", userRecord.uid), { 
+			firstname:createUserRequest.firstname, 
+			lastname:createUserRequest.lastname, 
+			addressBlock:createUserRequest.addressBlock,
+			addressLot:createUserRequest.addressBlock,
+			addressStreet:createUserRequest.addressStreet,
+			contactNumber:createUserRequest.contactNumber,
+            role:createUserRequest.role,
+		 })
 		// return json(userRecord);
-        return json({name: "rodel"})
+		// console.log(userRecord);
+        return json({ uid:userRecord.uid })
 	} catch (err) {
 		console.log(err);
 		throw error(400, err);
