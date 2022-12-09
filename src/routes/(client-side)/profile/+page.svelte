@@ -1,3 +1,27 @@
+<script>
+	import { userStore } from '$lib/store';
+	import { getDoc, doc } from 'firebase/firestore';
+	import { db } from '$lib/firebase/client';
+	import { goto } from '$app/navigation';
+
+	let user = null;
+
+	async function getUser() {
+		if (!$userStore) {
+			console.log("status 0")
+			return
+		}
+		const snapshot = await getDoc(doc(db, 'accounts', $userStore.uid));
+		user = snapshot.data();
+		console.log("Status 1");
+	}
+	getUser();
+
+	
+
+</script>
+
+{#if user}
 <div class="min-h-screen hero bg-base-200">
 	<div class="w-full max-w-4xl p-6 mx-auto shadow-2xl border rounded-xl bg-base-100">
 	<div class="mt-2">
@@ -6,44 +30,32 @@
 	<form>
 		<div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2">
 			<div class="form-control">
-				<label for="fname" class="label">
-					<span class="label-text">First Name</span>
-				</label>
-				<input type="text" placeholder="Juan" name="fname" class="input input-bordered" disabled/>
+				<span class="label-text">Name</span>
+				<h1>{user.firstname} {user.lastname}</h1>
+				<!-- <input type="text" bind:value={user.firstname} name="fname" class="input input-bordered" disabled/> -->
 			</div>
 			<div class="form-control">
-				<label for="lname" class="label">
-					<span class="label-text">Last Name</span>
-				</label>
-				<input type="text" placeholder="Dela Cruz" name="lname" class="input input-bordered" disabled/>
-			</div>
-		</div>
-		<div class="grid grid-cols-1 gap-6 mt-4">
-			<div class="form-control">
-				<label for="address" class="label">
-					<span class="label-text">Address</span>
-				</label>
-				<input type="text" placeholder="Block 1 Lot 2 Hibiscus Street" name="address" class="input input-bordered" disabled/>
+				<span class="label-text">Address</span>
+				<h1>Block {user.addressBlock} Lot {user.addressLot} {user.addressStreet} Street</h1>
+				<!-- <input type="text" bind:value={user.lastname} name="lname" class="input input-bordered" disabled/> -->
 			</div>
 		</div>
 		<div class="grid grid-cols-1 gap-6 mt-4 md:grid-cols-2">
 			<div class="form-control">
-				<label for="email" class="label">
-					<span class="label-text">E-mail Address</span>
-				</label>
-				<input type="text" placeholder="juandelacruz@gmail.com" name="email" class="input input-bordered" required/>
+				<span class="label-text">E-mail Address</span>
+				<h1>{user.email}</h1>
+				<!-- <input type="text" placeholder="juandelacruz@gmail.com" name="email" class="input input-bordered" required/> -->
 			</div>
 			<div class="form-control">
-				<label for="contact" class="label">
-					<span class="label-text">Contact No.</span>
-				</label>
-				<input type="tel" placeholder="09123456789" name="contact" class="input input-bordered" required/>
+				<span class="label-text">Contact No.</span>
+				<h1>{user.contactNumber}</h1>
+				<!-- <input type="tel" placeholder="09123456789" name="contact" class="input input-bordered" required/> -->
 			</div>
 		</div>
 		<div class="flex justify-end mt-8">
-			<button class="btn btn-primary mx-1">Save</button>
-			<a class="btn btn-warning mx-1">Change Password</a>
+			<a href="/profile/edit" class="btn btn-primary mx-1">Edit Info</a>
 		</div>
 	</form>
 	</div>
 </div>
+{/if}
