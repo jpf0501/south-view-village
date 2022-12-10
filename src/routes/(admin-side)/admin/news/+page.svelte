@@ -1,46 +1,45 @@
+<script>
+	import { onSnapshot, query, collection, snapshotEqual } from 'firebase/firestore';
+	import { db } from '$lib/firebase/client';
+	import { onDestroy } from 'svelte';
+
+	let listOfNews = [];
+
+	const newsQuery = query(collection(db, 'news'));
+	const unsubscribe = onSnapshot(newsQuery, (querySnapshot) => {
+		listOfNews = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+	});
+	onDestroy(() => unsubscribe());
+	
+</script>
+
 <main>
 	<div>
 		<div>
 			<h1 class="text-3xl font-bold mt-5 mb-16 ml-5">News</h1>
 		</div>
 		<div>
-			<div class="mb-5">
-				<div class="flex justify-between border-2 border-black text-2xl">
-					<h1 class="">Title</h1>
-					<p>Description</p>
-					<h1 class="">Date</h1>
-					<a
-						class="px-1 text-sm bg-blue-400 rounded-full hover:bg-blue-800 flex items-center border-blue-700"
-						href="/admin/news/create">Add News</a
-					>
-				</div>
-			</div>
-			<div>
-				<ul>
-					<li class="border-2 border-black pb-5">
-						<div class="flex justify-between">
-							<span>Tiltle</span>
-							<span>Description</span>
-							<span>Date</span>
-							<button>Edit</button>
-						</div>
-					</li>
-				</ul>
-			</div>
-			<div>
-				<div class="flex justify-center mt-5">
-					<div>
-						<div class="bg-blue-500">
-							<ul>
-								<a href="/admin/news" class="border border-black">1</a>
-								<a href="/admin/news" class="border border-black">2</a>
-								<a href="/admin/news" class="border border-black">3</a>
-								<a href="/admin/news" class="border border-black">4</a>
-								<a href="/admin/news" class="border border-black">5</a>
-							</ul>
-						</div>
-					</div>
-				</div>
+			<div class="px-10 py-5">
+				<table class="border-2 border-black w-full">
+					<thead>
+						<tr class="font-bold bg-gray-500">
+							<th class="text-left text-base">Name</th>
+							<th class="text-left text-base">Date</th>
+							<th class="text-left text-base">Time</th>
+						</tr>
+					</thead>
+					<tbody>
+						{#each listOfNews as news}
+							<tr class="text-base text-center border-t-2 border-black">
+								<td class="text-left text-base bg-gray-300">{news.title}</td>
+								<td class="text-left text-base bg-gray-300">{news.date}</td>
+								<td class="text-left text-base bg-gray-300">{news.time}</td>
+								<a class="" href={'/admin/news/edit/' + news.id}>Edit</a>
+								<!-- <h1>{ JSON.stringify(user) }</h1> -->
+							</tr>
+						{/each}
+					</tbody>
+				</table>
 			</div>
 		</div>
 	</div>
