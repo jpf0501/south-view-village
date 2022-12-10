@@ -1,6 +1,6 @@
 <script>
 	import { db } from '$lib/firebase/client';
-	import { getDoc, deleteDoc, doc } from 'firebase/firestore';
+	import { getDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
 	import { goto } from '$app/navigation';
 
 	/** @type {import('./$types').PageData} */
