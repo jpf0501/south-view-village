@@ -6,13 +6,13 @@
 	let user = '';
 	let password = '';
 
-	async function submitHandler(){
+	async function submitHandler() {
 		// console.log(user),
 		// console.log(password)
 		try {
 			const cred = await signInWithEmailAndPassword(auth, user, password);
 			// console.log(cred);
-			alert("Login success");
+			alert('Login success');
 			goto('/admin');
 		} catch (error) {
 			console.log(error);
@@ -31,23 +31,39 @@
 			</p>
 		</div>
 		<form
-		on:submit|preventDefault={submitHandler}
-		class="flex-shrink-0 w-full max-w-sm shadow-2xl card bg-base-100">
+			on:submit|preventDefault={submitHandler}
+			class="flex-shrink-0 w-full max-w-sm shadow-2xl card bg-base-100"
+		>
 			<div class="card-body">
 				<div class="form-control">
 					<label for="email" class="label">
 						<span class="label-text">Email</span>
 					</label>
-					<input type="email" placeholder="email" name="email" class="input input-bordered" required bind:value={user}/>
+					<input
+						type="email"
+						placeholder="email"
+						name="email"
+						class="input input-bordered"
+						required
+						bind:value={user}
+					/>
 				</div>
 				<div class="form-control">
 					<label for="password" class="label">
 						<span class="label-text">Password</span>
 					</label>
-					<input type="password" placeholder="password" name="password" class="input input-bordered" required bind:value={password}/>
+					<input
+						type="password"
+						placeholder="password"
+						name="password"
+						class="input input-bordered"
+						required
+						bind:value={password}
+					/>
 				</div>
 				<div class="mt-6 form-control">
 					<button class="btn btn-primary">Login</button>
+					<a href="/forgot_Password" class="mx-auto my-3">Forgot Password</a>
 				</div>
 			</div>
 		</form>
