@@ -46,9 +46,7 @@
 	<main>
 		<div class="min-h-screen hero bg-base-200">
 			<div class="w-full max-w-4xl p-6 mx-auto shadow-2xl border rounded-xl bg-base-100">
-				<div class="mt-2">
-					<h1 class="text-2xl">Edit Account</h1>
-				</div>
+				<h1 class="text-2xl mt-2">Edit Account</h1>
 				<div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2">
 					<div class="form-control">
 						<label for="fname" class="label">
@@ -148,7 +146,7 @@
 					<button on:click={deleteUser} type="submit" class="btn btn-primary mx-1 bg-red-500"
 						>Delete</button
 					>
-					<a href="/admin/accounts" class="btn btn-error mx-1 ">Cancel</a>
+					<a href="/admin/accounts" class="btn btn-error mx-1">Cancel</a>
 				</div>
 			</div>
 		</div>
