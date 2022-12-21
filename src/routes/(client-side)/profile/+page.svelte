@@ -43,8 +43,8 @@
 				</div>
 				<div class="grid grid-cols-1 gap-6 mt-4 md:grid-cols-2">
 					<div class="form-control">
-						<span class="label-text mt-2">E-mail Address</span>
-						<h1 class="border-2 rounded-lg p-3">{user.email}</h1>
+						<span class="label-text">E-mail Address</span>
+						<h1 class="border-2 rounded-lg p-3 mt-2">{user.email}</h1>
 						<!-- <input type="text" placeholder="juandelacruz@gmail.com" name="email" class="input input-bordered" required/> -->
 					</div>
 					<div class="form-control">
