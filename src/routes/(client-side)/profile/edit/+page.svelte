@@ -1,6 +1,6 @@
 <script>
 	import { userStore } from '$lib/store';
-	import { getDoc, doc } from 'firebase/firestore';
+	import { getDoc, doc, updateDoc } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { goto } from '$app/navigation';
 	import ChangePassword from './ChangePassword.svelte';
@@ -19,13 +19,23 @@
 	} else if ($userStore === null) {
 		goto('/');
 	}
+	async function updateInfo() {
+		try {
+			await updateDoc(doc(db, 'accounts', $userStore.uid), user);
+			alert('Update info success');
+			await goto('/profile');
+		} catch (error) {
+			console.log(error);
+			alert('Error updating');
+		}
+	}
 </script>
 
 {#if user}
 	<div class="min-h-screen hero bg-base-200">
 		<div class="w-full max-w-4xl p-6 mx-auto shadow-2xl border rounded-xl bg-base-100">
 			<h1 class="text-2xl mt-2">Edit Profile</h1>
-			<form>
+			<form on:submit|preventDefault={updateInfo}>
 				<div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2">
 					<div class="form-control">
 						<span class="label-text">Name</span>
