@@ -48,6 +48,9 @@
 					bind:value={newPasswordCheck}
 					required
 				/>
+				{#if newPassword != newPasswordCheck && newPasswordCheck != ''}
+					<p class="text-red-500 mt-3">Password doesnt match</p>
+				{/if}
 			</div>
 		</div>
 		<div class="flex justify-end mt-8">
