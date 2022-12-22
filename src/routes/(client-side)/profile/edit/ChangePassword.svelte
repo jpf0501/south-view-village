@@ -1,6 +1,7 @@
 <script>
 	import { auth } from '$lib/firebase/client';
 	import { updatePassword } from 'firebase/auth';
+	import { goto } from '$app/navigation';
 	let showChangePassword;
 	let newPassword = '';
 	let newPasswordCheck = '';
@@ -10,10 +11,10 @@
 			alert('Password not match');
 			return;
 		}
-
 		try {
 			await updatePassword(auth.currentUser, newPassword);
 			alert('Update password success');
+			goto('/profile');
 		} catch (error) {
 			console.log(error);
 			alert('Error in updating password');
@@ -21,9 +22,12 @@
 	}
 </script>
 
-<button class="btn btn-primary mx-1" on:click={() => (showChangePassword = true)}
-	>Change Password</button
->
+{#if !showChangePassword}
+	<button class="btn btn-primary mx-1" on:click={() => (showChangePassword = true)}
+		>Change Password</button
+	>
+{/if}
+
 {#if showChangePassword}
 	<form on:submit={changePassword}>
 		<div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2">
