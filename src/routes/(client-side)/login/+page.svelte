@@ -41,7 +41,7 @@
 					</label>
 					<input
 						type="email"
-						placeholder="email"
+						placeholder="Email"
 						name="email"
 						class="input input-bordered"
 						required
@@ -54,7 +54,7 @@
 					</label>
 					<input
 						type="password"
-						placeholder="password"
+						placeholder="Password"
 						name="password"
 						class="input input-bordered"
 						required
@@ -63,7 +63,7 @@
 				</div>
 				<div class="mt-6 form-control">
 					<button class="btn btn-primary">Login</button>
-					<a href="/forgot_Password" class="mx-auto my-3">Forgot Password</a>
+					<a href="/forgot_Password" class="mx-auto my-3">Forgot Password?</a>
 				</div>
 			</div>
 		</form>
