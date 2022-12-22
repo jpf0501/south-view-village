@@ -1,16 +1,18 @@
 <script>
-	import {userStore} from '$lib/store.js';
-	import {auth} from '$lib/firebase/client.js';
-	import {signOut} from 'firebase/auth';
+	import { userStore } from '$lib/store.js';
+	import { auth } from '$lib/firebase/client.js';
+	import { signOut } from 'firebase/auth';
+	import { goto } from '$app/navigation';
 
-async function logOut(){
-	try {
-		await signOut(auth);
-	} catch (error) {
-		console.log(error);
-		alert(error);
+	async function logOut() {
+		try {
+			await signOut(auth);
+			goto('/');
+		} catch (error) {
+			console.log(error);
+			alert('Signing out error');
+		}
 	}
-}
 </script>
 
 <div class="navbar bg-base-100">
@@ -22,9 +24,7 @@ async function logOut(){
 		/>
 	</div>
 	<div class="flex-none">
-		<button
-		on:click={logOut}
-			 class="gap-2 btn btn-outline"
+		<button on:click={logOut} class="gap-2 btn btn-outline"
 			>Logout <svg
 				xmlns="http://www.w3.org/2000/svg"
 				fill="none"
