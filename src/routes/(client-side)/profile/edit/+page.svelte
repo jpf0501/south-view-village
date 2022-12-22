@@ -39,35 +39,23 @@
 				<div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2">
 					<div class="form-control">
 						<span class="label-text">Name</span>
-						<input
-							type="text"
-							bind:value={user.firstname}
-							name="fname"
-							class="input input-bordered mt-2"
-							disabled
-						/>
+						<h1 class="border-2 rounded-lg p-3 mt-2 bg-gray-200" disabled>
+							{user.firstname}
+							{user.lastname}
+						</h1>
 					</div>
 					<div class="form-control">
 						<span class="label-text">Address</span>
-						<input
-							type="text"
-							bind:value={user.lastname}
-							name="lname"
-							class="input input-bordered mt-2"
-							disabled
-						/>
+						<h1 class="border-2 rounded-lg p-3 mt-2 bg-gray-200">
+							Block {user.addressBlock} Lot {user.addressLot}
+							{user.addressStreet} Street
+						</h1>
 					</div>
 				</div>
 				<div class="grid grid-cols-1 gap-6 mt-4 md:grid-cols-2">
 					<div class="form-control">
 						<span class="label-text">E-mail Address</span>
-						<input
-							type="email"
-							name="email"
-							bind:value={user.email}
-							class="input input-bordered mt-2"
-							disabled
-						/>
+						<h1 class="border-2 rounded-lg p-3 mt-2 bg-gray-200">{user.email}</h1>
 					</div>
 					<div class="form-control">
 						<span class="label-text">Contact No.</span>
