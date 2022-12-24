@@ -1,5 +1,5 @@
 <script>
-	import { onSnapshot, query, collection, snapshotEqual } from 'firebase/firestore';
+	import { onSnapshot, query, collection, snapshotEqual, orderBy } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
 
@@ -10,6 +10,42 @@
 		listOfUsers = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 	});
 	onDestroy(() => unsubscribe());
+
+	let userSort = '';
+
+	async function sortBy() {
+		if (userSort == 'Name') {
+			const sortByNameQuery = query(collection(db, 'accounts'), orderBy('firstname', 'asc'));
+			const unsubscribe = onSnapshot(sortByNameQuery, (querySnapshot) => {
+				listOfUsers = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+			});
+			onDestroy(() => unsubscribe());
+		} else if (userSort == 'Block') {
+			const sortByBlockQuery = query(collection(db, 'accounts'), orderBy('addressBlock', 'asc'));
+			const unsubscribe = onSnapshot(sortByBlockQuery, (querySnapshot) => {
+				listOfUsers = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+			});
+			onDestroy(() => unsubscribe());
+		} else if (userSort == 'Lot') {
+			const sortByLotQuery = query(collection(db, 'accounts'), orderBy('addressLot', 'asc'));
+			const unsubscribe = onSnapshot(sortByLotQuery, (querySnapshot) => {
+				listOfUsers = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+			});
+			onDestroy(() => unsubscribe());
+		} else if (userSort == 'Street') {
+			const sortByStreetQuery = query(collection(db, 'accounts'), orderBy('addressStreet', 'asc'));
+			const unsubscribe = onSnapshot(sortByStreetQuery, (querySnapshot) => {
+				listOfUsers = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+			});
+			onDestroy(() => unsubscribe());
+		} else if (userSort == 'Email') {
+			const sortByEmailQuery = query(collection(db, 'accounts'), orderBy('email', 'asc'));
+			const unsubscribe = onSnapshot(sortByEmailQuery, (querySnapshot) => {
+				listOfUsers = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+			});
+			onDestroy(() => unsubscribe());
+		}
+	}
 </script>
 
 <div class="min-w-full min-h-full bg-base-200 px-12">
@@ -17,6 +53,16 @@
 	<div class="flex justify-between">
 		<h1 class="text-2xl font-semibold">Users</h1>
 		<input type="search" placeholder="Search here" />
+		<form on:submit|preventDefault={sortBy}>
+			<select bind:value={userSort} on:click={sortBy} name="" id="">
+				<option value="" disabled selected>Sort By</option>
+				<option value="Name">Name</option>
+				<option value="Block">Block</option>
+				<option value="Lot">Lot</option>
+				<option value="Street">Street</option>
+				<option value="Email">Email</option>
+			</select>
+		</form>
 		<a
 			class="px-1 text-base bg-gray-400 rounded-full hover:bg-gray-300 flex items-center border-gray-700"
 			href="/admin/accounts/create">Add User</a
