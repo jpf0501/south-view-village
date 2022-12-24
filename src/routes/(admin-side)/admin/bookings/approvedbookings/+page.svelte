@@ -15,6 +15,8 @@
 <div class="min-w-full min-h-full bg-base-200 px-12">
 	<h1 class="text-3xl font-semibold py-12">Approved Books</h1>
 	<a href="/admin/bookings" class="">Go back to Bookings</a>
+	<br>
+	<a href="/admin/bookings/disapprovedbookings" class="">Go to Dissaproved Bookings</a>
 	<div class="py-5">
 		<table class="border-2 border-black bg-white w-full">
 			<thead>
