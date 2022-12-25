@@ -2,6 +2,7 @@
 	import { onSnapshot, query, collection, snapshotEqual, updateDoc, doc } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
+	import { sendEmail } from '$lib/utils';
 
 	let listOfBooking = [];
 
@@ -11,13 +12,13 @@
 	});
 	onDestroy(() => unsubscribe());
 
-	function approveBook(bookingId) {
+	async function approveBook(bookingId) {
 		try {
 			const bookref = doc(db, 'booking', bookingId);
 			const data = {
 				status: 'Approved'
 			};
-			updateDoc(bookref, data);
+			await updateDoc(bookref, data);
 			alert('Booking has been Approved');
 		} catch (error) {
 			console.log(error);
@@ -31,11 +32,27 @@
 			const data = {
 				status: 'Disapproved'
 			};
-			updateDoc(bookref, data);
+			await updateDoc(bookref, data);
 			alert('Booking has been Disapproved');
 		} catch (error) {
 			console.log(error);
 			alert('Error Disapproving Book');
+		}
+	}
+
+	async function sendPaymentEmail(bookEmail) {
+		// console.log(bookEmail);
+		try {
+			const result = await sendEmail({
+				to: bookEmail,
+				subject: 'Southview Homes 3 Payment Method',
+				html: '<h1>This is a the link for payment for reservation in booking</ht>'
+			});
+			console.log(JSON.stringify(result));
+			alert('Email for payment method sent successfuly');
+		} catch (error) {
+			console.log(error);
+			alert('Error in sending payment method');
 		}
 	}
 </script>
@@ -76,6 +93,11 @@
 								on:click={disapproveBook(book.id)}
 								type="button"
 								class="py-2 px-10 text-red-500">Dissaprove</button
+							>
+							<button
+								on:click={sendPaymentEmail(book.email)}
+								type="button"
+								class="py-2 px-10 text-blue-500">Send Payment Method to Email</button
 							>
 						</tr>
 					{/if}
