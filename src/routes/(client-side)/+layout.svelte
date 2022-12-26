@@ -6,9 +6,9 @@
 
 
 <main class="flex flex-col min-h-full">
-	<Header />
-	<Nav />
+	<Header/>
+	<Nav/>
 	<slot/>
-	<Footer />
+	<Footer/>
 </main>
 
