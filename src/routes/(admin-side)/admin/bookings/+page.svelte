@@ -1,5 +1,5 @@
 <script>
-	import { onSnapshot, query, collection, snapshotEqual, updateDoc, doc } from 'firebase/firestore';
+	import { onSnapshot, query, collection, snapshotEqual, updateDoc, doc, orderBy } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
 	import { sendEmail } from '$lib/utils';
@@ -18,31 +18,31 @@
 		if (requestSort == 'Name') {
 			const sortByNameQuery = query(collection(db, 'booking'), orderBy('firstName', 'asc'));
 			const unsubscribe = onSnapshot(sortByNameQuery, (querySnapshot) => {
-				listOfUsers = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+				listOfBooking = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 			});
 			onDestroy(() => unsubscribe());
 		} else if (requestSort == 'Email') {
 			const sortByEmailQuery = query(collection(db, 'booking'), orderBy('email', 'asc'));
 			const unsubscribe = onSnapshot(sortByEmailQuery, (querySnapshot) => {
-				listOfUsers = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+				listOfBooking = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 			});
 			onDestroy(() => unsubscribe());
 		} else if (requestSort == 'Event') {
 			const sortByEventQuery = query(collection(db, 'booking'), orderBy('eventType', 'asc'));
 			const unsubscribe = onSnapshot(sortByEventQuery, (querySnapshot) => {
-				listOfUsers = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+				listOfBooking = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 			});
 			onDestroy(() => unsubscribe());
 		} else if (requestSort == 'Date') {
 			const sortByDateQuery = query(collection(db, 'booking'), orderBy('date', 'asc'));
 			const unsubscribe = onSnapshot(sortByDateQuery, (querySnapshot) => {
-				listOfUsers = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+				listOfBooking = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 			});
 			onDestroy(() => unsubscribe());
 		} else if (requestSort == 'Time') {
 			const sortByTimeQuery = query(collection(db, 'booking'), orderBy('time', 'asc'));
 			const unsubscribe = onSnapshot(sortByTimeQuery, (querySnapshot) => {
-				listOfUsers = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+				listOfBooking = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 			});
 			onDestroy(() => unsubscribe());
 		}
