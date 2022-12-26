@@ -53,16 +53,14 @@
 	<div class="flex justify-between">
 		<h1 class="text-xl font-semibold">Users</h1>
 		<input type="search" placeholder="Search here" />
-		<form>
-			<select bind:value={userSort} on:click={sortBy} name="" id="">
-				<option value="" disabled selected>Sort By</option>
-				<option value="Name">Name</option>
-				<option value="Block">Block</option>
-				<option value="Lot">Lot</option>
-				<option value="Street">Street</option>
-				<option value="Email">Email</option>
-			</select>
-		</form>
+		<select bind:value={userSort} on:click={sortBy} name="" id="">
+			<option value="" disabled selected>Sort By</option>
+			<option value="Name">Name</option>
+			<option value="Block">Block</option>
+			<option value="Lot">Lot</option>
+			<option value="Street">Street</option>
+			<option value="Email">Email</option>
+		</select>
 		<a
 			class="px-1 text-sm bg-gray-400 rounded-full hover:bg-gray-300 flex items-center border-gray-700"
 			href="/admin/accounts/create">Add User</a
