@@ -1,8 +1,9 @@
 <script>
 	import { userStore } from '$lib/store.js';
-	import { auth } from '$lib/firebase/client.js';
+	import { auth, db } from '$lib/firebase/client.js';
 	import { signOut } from 'firebase/auth';
 	import { goto } from '$app/navigation';
+	import { getDoc, doc } from 'firebase/firestore';
 
 	async function logOut() {
 		try {
@@ -12,6 +13,21 @@
 			console.log(error);
 			alert('Signing out error');
 		}
+	}
+
+	let user = '';
+
+	async function getUser() {
+		if (!$userStore) {
+			return;
+		}
+		const snapshot = await getDoc(doc(db, 'accounts', $userStore.uid));
+		user = snapshot.data();
+	}
+	$: if ($userStore) {
+		getUser();
+	} else if ($userStore === null) {
+		goto('/');
 	}
 </script>
 
@@ -24,8 +40,9 @@
 		/>
 	</div>
 	<div class="flex-none">
+		<p class="p-3 mx-5 font-bold">Hello {user.firstname}</p>
 		<button on:click={logOut} class="gap-2 btn btn-outline"
-			>Logout <svg
+			>Logout<svg
 				xmlns="http://www.w3.org/2000/svg"
 				fill="none"
 				viewBox="0 0 24 24"
