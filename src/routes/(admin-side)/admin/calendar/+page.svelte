@@ -111,5 +111,5 @@
 			</main>
 		</section>
 	</main>
-	<a href="/calendar/scheduleEvent" class="mx-auto btn btn-primary btn-wide">Edit Calendar</a>
+	<a href="/admin/calendar/addevent" class="mx-auto btn btn-primary btn-wide">Add Event in Calendar</a>
 </div>
