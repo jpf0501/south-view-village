@@ -53,7 +53,7 @@
 	<div class="flex justify-between">
 		<h1 class="text-xl font-semibold">Users</h1>
 		<input type="search" placeholder="Search here" />
-		<form on:submit|preventDefault={sortBy}>
+		<form>
 			<select bind:value={userSort} on:click={sortBy} name="" id="">
 				<option value="" disabled selected>Sort By</option>
 				<option value="Name">Name</option>
