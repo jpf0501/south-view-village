@@ -1,25 +1,22 @@
 <script>
 	import { db } from '$lib/firebase/client';
-	import { addDoc, collection } from 'firebase/firestore';
+	import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 	import { goto } from '$app/navigation';
+	import { now } from 'svelte/internal';
 
-    let title = '';
-    let content = '';
-    let date = '';
-    let time = '';
+    let news = {
+        title: '',
+        content: '',
+    }
 
     async function submitHandler() {
 		try {
 			await addDoc(collection(db, 'news'), {
-                title: title,
-                content: content,
-                date: date,
-                time: time,
+                title: news.title,
+                content: news.content,
+                dateCreated: serverTimestamp(),
+                dateModified: serverTimestamp(),
             });
-            // console.log(title);
-            // console.log(content);
-            // console.log(date);
-            // console.log(time);
 			alert('News entry created');
 			await goto('/admin/news');
 		} catch (error) {
@@ -40,30 +37,16 @@
                     <div class="">
                         <label for="title">Title</label>
                         <br>
-                        <input type="text" class="w-1/2" required bind:value={title}> 
+                        <input type="text" class="w-1/2" required bind:value={news.title}> 
                     </div>   
                     <div >
                         <label for="content">Content</label>
                         <br>
-                        <textarea class="h-60 w-5/6" required bind:value={content}></textarea>
+                        <textarea class="h-60 w-5/6" required bind:value={news.content}></textarea>
                     </div>            
-                    <div >
-                        <label for="date">Date</label>
-                        <br>
-                        <!-- Temporary -->
-                        <input type="text" class="w-1/2" required bind:value={date}>
-                        <!-- Temporary -->
-                    </div> 
-                    <div >
-                        <label for="time">Time</label>
-                        <br>
-                        <!-- Temporary -->
-                        <input type="text" class="w-1/2" required bind:value={time}>
-                        <!-- Temporary -->
-                    </div> 
                     <div class="grid place-items-center my-10">
                         <div class="flex gap-5">
-                            <button type="submit" class="bg-blue-500 px-10 py-2">Submit</button>
+                            <button type="submit" class="bg-blue-500 px-10 py-2">Add Entry</button>
                             <a href="/admin/news" class="bg-red-500 px-10 py-2">Cancel</a>
                         </div>          
                     </div>

@@ -1,6 +1,6 @@
 <script>
 	import { db } from '$lib/firebase/client';
-	import { getDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
+	import { getDoc, updateDoc, deleteDoc, doc, serverTimestamp, deleteField } from 'firebase/firestore';
 	import { goto } from '$app/navigation';
 
 	/** @type {import('./$types').PageData} */
@@ -16,9 +16,12 @@
 	getNews();
 
 	async function updateNews() {
-		// console.log(user);
 		try {
-			await updateDoc(doc(db, 'news', newsID), news);
+			await updateDoc(doc(db, 'news', newsID), news), {
+				title: news.title,
+				content: news.content,
+				dateModified: serverTimestamp(),
+			}
 			alert('News content updated');
 			await goto('/admin/news');
 		} catch (error) {
@@ -57,24 +60,10 @@
 						<br />
 						<textarea class="h-60 w-5/6" required bind:value={news.content} />
 					</div>
-					<div>
-						<label for="date">Date</label>
-						<br />
-						<!-- Temporary -->
-						<input type="text" class="w-1/2" required bind:value={news.date} />
-						<!-- Temporary -->
-					</div>
-					<div>
-						<label for="time">Time</label>
-						<br />
-						<!-- Temporary -->
-						<input type="text" class="w-1/2" required bind:value={news.time} />
-						<!-- Temporary -->
-					</div>
 					<div class="grid place-items-center my-10">
 						<div class="flex gap-5">
 							<button on:click={updateNews} type="submit" class="bg-blue-500 px-10 py-2"
-								>Confirm Edit</button
+								>Save</button
 							>
 							<button on:click={deleteNews} type="submit" class="bg-red-500 px-10 py-2"
 								>Delete</button
