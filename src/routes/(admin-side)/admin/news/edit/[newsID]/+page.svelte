@@ -12,16 +12,14 @@
 	async function getNews() {
 		const snapshot = await getDoc(doc(db, 'news', newsID));
 		news = snapshot.data();
+
 	}
 	getNews();
 
 	async function updateNews() {
 		try {
-			await updateDoc(doc(db, 'news', newsID), news), {
-				title: news.title,
-				content: news.content,
-				dateModified: serverTimestamp(),
-			}
+			news.dateModified = serverTimestamp();
+			await updateDoc(doc(db, 'news', newsID), news);
 			alert('News content updated');
 			await goto('/admin/news');
 		} catch (error) {
@@ -60,6 +58,7 @@
 						<br />
 						<textarea class="h-60 w-5/6" required bind:value={news.content} />
 					</div>
+					<input type="hidden" bind:value={news.dateModified} />
 					<div class="grid place-items-center my-10">
 						<div class="flex gap-5">
 							<button on:click={updateNews} type="submit" class="bg-blue-500 px-10 py-2"
