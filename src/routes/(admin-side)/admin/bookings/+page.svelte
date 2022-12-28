@@ -94,7 +94,10 @@
 </script>
 
 <div class="min-w-full min-h-full bg-base-200 px-12">
-	<h1 class="text-3xl font-semibold py-12">Booking</h1>
+	<div class="flex justify-between">
+		<h1 class="text-3xl font-semibold py-12">Booking</h1>
+		<a href="/admin/bookings/bookingsHistory" class="hover:underline">Go to History</a>
+	</div>
 	<div class="flex justify-between">
 		<h1 class="text-xl font-semibold">Requests</h1>
 		<input type="search" placeholder="Search here" />
