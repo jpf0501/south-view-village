@@ -2,7 +2,6 @@
 	import { db } from '$lib/firebase/client';
 	import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 	import { goto } from '$app/navigation';
-	import { now } from 'svelte/internal';
 
     let news = {
         title: '',

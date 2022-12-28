@@ -58,7 +58,6 @@
 						<br />
 						<textarea class="h-60 w-5/6" required bind:value={news.content} />
 					</div>
-					<input type="hidden" bind:value={news.dateModified} />
 					<div class="grid place-items-center my-10">
 						<div class="flex gap-5">
 							<button on:click={updateNews} type="submit" class="bg-blue-500 px-10 py-2"
