@@ -15,41 +15,36 @@
 	let requestSort = '';
 
 	async function sortBy() {
-		try {
-			if (requestSort == 'Name') {
-				const sortByNameQuery = query(collection(db, 'booking'), orderBy('firstName', 'asc'));
-				const unsubscribe = onSnapshot(sortByNameQuery, (querySnapshot) => {
-					listOfBooking = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-				});
-				onDestroy(() => unsubscribe());
-			} else if (requestSort == 'Email') {
-				const sortByEmailQuery = query(collection(db, 'booking'), orderBy('email', 'asc'));
-				const unsubscribe = onSnapshot(sortByEmailQuery, (querySnapshot) => {
-					listOfBooking = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-				});
-				onDestroy(() => unsubscribe());
-			} else if (requestSort == 'Event') {
-				const sortByEventQuery = query(collection(db, 'booking'), orderBy('eventType', 'asc'));
-				const unsubscribe = onSnapshot(sortByEventQuery, (querySnapshot) => {
-					listOfBooking = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-				});
-				onDestroy(() => unsubscribe());
-			} else if (requestSort == 'Date') {
-				const sortByDateQuery = query(collection(db, 'booking'), orderBy('date', 'asc'));
-				const unsubscribe = onSnapshot(sortByDateQuery, (querySnapshot) => {
-					listOfBooking = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-				});
-				onDestroy(() => unsubscribe());
-			} else if (requestSort == 'Time') {
-				const sortByTimeQuery = query(collection(db, 'booking'), orderBy('time', 'asc'));
-				const unsubscribe = onSnapshot(sortByTimeQuery, (querySnapshot) => {
-					listOfBooking = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-				});
-				onDestroy(() => unsubscribe());
-			}
-		} catch (error) {
-			console.log(error);
-			// alert('Error in sorting');
+		if (requestSort == 'Name') {
+			const sortByNameQuery = query(collection(db, 'booking'), orderBy('firstName', 'asc'));
+			const unsubscribe = onSnapshot(sortByNameQuery, (querySnapshot) => {
+				listOfBooking = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+			});
+			onDestroy(() => unsubscribe());
+		} else if (requestSort == 'Email') {
+			const sortByEmailQuery = query(collection(db, 'booking'), orderBy('email', 'asc'));
+			const unsubscribe = onSnapshot(sortByEmailQuery, (querySnapshot) => {
+				listOfBooking = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+			});
+			onDestroy(() => unsubscribe());
+		} else if (requestSort == 'Event') {
+			const sortByEventQuery = query(collection(db, 'booking'), orderBy('eventType', 'asc'));
+			const unsubscribe = onSnapshot(sortByEventQuery, (querySnapshot) => {
+				listOfBooking = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+			});
+			onDestroy(() => unsubscribe());
+		} else if (requestSort == 'Date') {
+			const sortByDateQuery = query(collection(db, 'booking'), orderBy('date', 'asc'));
+			const unsubscribe = onSnapshot(sortByDateQuery, (querySnapshot) => {
+				listOfBooking = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+			});
+			onDestroy(() => unsubscribe());
+		} else if (requestSort == 'Time') {
+			const sortByTimeQuery = query(collection(db, 'booking'), orderBy('time', 'asc'));
+			const unsubscribe = onSnapshot(sortByTimeQuery, (querySnapshot) => {
+				listOfBooking = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+			});
+			onDestroy(() => unsubscribe());
 		}
 	}
 
@@ -99,10 +94,7 @@
 </script>
 
 <div class="min-w-full min-h-full bg-base-200 px-12">
-	<div class="flex justify-between">
-		<h1 class="text-3xl font-semibold py-12">Booking</h1>
-		<a href="/admin/bookings/bookingsHistory" class="hover:underline">Go to History</a>
-	</div>
+	<h1 class="text-3xl font-semibold py-12">Booking</h1>
 	<div class="flex justify-between">
 		<h1 class="text-xl font-semibold">Requests</h1>
 		<input type="search" placeholder="Search here" />
@@ -118,47 +110,53 @@
 
 	<!-- Medium to large screen -->
 	<div class="my-5 p-5 overflow-auto shadow-lg border rounded-xl bg-gray-300 hidden md:block">
-		<table class="border-2 border-black bg-white w-full text-center">
+		<table class="border-2 border-black bg-white w-full">
 			<thead class="font-bold bg-gray-500">
 				<tr>
-					<th class="p-3 text-sm tracking-wide">Name</th>
-					<th class="p-3 text-sm tracking-wide">E-mail Address</th>
-					<th class="p-3 text-sm tracking-wide">Contact No.</th>
-					<th class="p-3 text-sm tracking-wide">Type of Event</th>
-					<th class="p-3 text-sm tracking-wide">Date</th>
-					<th class="p-3 text-sm tracking-wide">Time</th>
-					<th class="p-3 text-sm tracking-wide" colspan="3" />
+					<th class="p-3 text-sm tracking-wide text-left">Name</th>
+					<th class="p-3 text-sm tracking-wide text-left">E-mail Address</th>
+					<th class="p-3 text-sm tracking-wide text-left">Contact No.</th>
+					<th class="p-3 text-sm tracking-wide text-left">Type of Event</th>
+					<th class="p-3 text-sm tracking-wide text-left">Date</th>
+					<th class="p-3 text-sm tracking-wide text-left">Time</th>
+					<th class="p-3 text-sm tracking-wide text-left" />
+					<th class="p-3 text-sm tracking-wide text-left" />
+					<th class="p-3 text-sm tracking-wide text-left" />
 				</tr>
 			</thead>
 			<tbody>
 				{#each listOfBooking as book}
-					<tr class="border-t-2 border-black">
-						<td class="p-3 text-sm whitespace-nowrap">{book.firstName + ' ' + book.lastName}</td>
-						<td class="p-3 text-sm whitespace-nowrap">{book.email}</td>
-						<td class="p-3 text-sm whitespace-nowrap">{book.contactNumber}</td>
-						<td class="p-3 text-sm whitespace-nowrap">{book.eventType}</td>
-						<td class="p-3 text-sm whitespace-nowrap">{book.date}</td>
-						<td class="p-3 text-sm whitespace-nowrap">{book.time}</td>
-						<td class="p-3 text-sm whitespace-nowrap">
-							<button on:click={approveBook(book.id)} type="button" class="py-2 px-2 text-green-500"
-								>Approve</button
-							>
-						</td>
-						<td class="p-3 text-sm whitespace-nowrap">
-							<button
-								on:click={disapproveBook(book.id)}
-								type="button"
-								class="py-2 px-2 text-red-500">Dissaprove</button
-							>
-						</td>
-						<td class="p-3 text-sm whitespace-nowrap">
-							<button
-								on:click={sendPaymentEmail(book.email)}
-								type="button"
-								class="py-2 px-2 text-blue-500">Send Payment</button
-							>
-						</td>
-					</tr>
+					{#if book.status == 'Pending'}
+						<tr class="border-t-2 border-black">
+							<td class="p-3 text-sm whitespace-nowrap">{book.firstName + ' ' + book.lastName}</td>
+							<td class="p-3 text-sm whitespace-nowrap">{book.email}</td>
+							<td class="p-3 text-sm whitespace-nowrap">{book.contactNumber}</td>
+							<td class="p-3 text-sm whitespace-nowrap">{book.eventType}</td>
+							<td class="p-3 text-sm whitespace-nowrap">{book.date}</td>
+							<td class="p-3 text-sm whitespace-nowrap">{book.time}</td>
+							<td class="p-3 text-sm whitespace-nowrap">
+								<button
+									on:click={approveBook(book.id)}
+									type="button"
+									class="py-2 px-2 text-green-500">Approve</button
+								>
+							</td>
+							<td class="p-3 text-sm whitespace-nowrap">
+								<button
+									on:click={disapproveBook(book.id)}
+									type="button"
+									class="py-2 px-2 text-red-500">Dissaprove</button
+								>
+							</td>
+							<td class="p-3 text-sm whitespace-nowrap">
+								<button
+									on:click={sendPaymentEmail(book.email)}
+									type="button"
+									class="py-2 px-2 text-blue-500">Send Payment</button
+								>
+							</td>
+						</tr>
+					{/if}
 				{/each}
 			</tbody>
 		</table>
@@ -192,11 +190,15 @@
 						{book.time}
 					</div>
 					<div>
-						<button on:click={approveBook(book.id)} type="button" class="py-2 px-2 text-green-500"
-							>Approve</button
+						<button
+							on:click={approveBook(book.id)}
+							type="button"
+							class="py-2 px-2 text-green-500">Approve</button
 						>
-						<button on:click={disapproveBook(book.id)} type="button" class="py-2 px-2 text-red-500"
-							>Dissaprove</button
+						<button
+							on:click={disapproveBook(book.id)}
+							type="button"
+							class="py-2 px-2 text-red-500">Dissaprove</button
 						>
 						<button
 							on:click={sendPaymentEmail(book.email)}
