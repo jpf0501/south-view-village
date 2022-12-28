@@ -120,6 +120,7 @@
 			</thead>
 			<tbody>
 				{#each listOfBooking as book}
+					{#if book.status == 'Approved' || book.status == 'Disapproved'}
 					<tr class="border-t-2 border-black">
 						<td class="p-3 text-sm whitespace-nowrap">{book.firstName + ' ' + book.lastName}</td>
 						<td class="p-3 text-sm whitespace-nowrap">{book.email}</td>
@@ -135,6 +136,7 @@
 							<td class="p-3 text-sm whitespace-nowrap">{book.status}</td>
 						{/if}
 					</tr>
+					{/if}
 				{/each}
 			</tbody>
 		</table>
