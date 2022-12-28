@@ -40,7 +40,7 @@
 		/>
 	</div>
 	<div class="flex-none">
-		<p class="p-3 mx-5 font-bold">Hello {user.firstname}</p>
+		<p class="p-3 mx-5 font-bold">Hello, {user.firstname}</p>
 		<button on:click={logOut} class="gap-2 btn btn-outline"
 			>Logout<svg
 				xmlns="http://www.w3.org/2000/svg"
