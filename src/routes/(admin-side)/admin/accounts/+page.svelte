@@ -1,65 +1,59 @@
 <script>
-	import { onSnapshot, query, collection, snapshotEqual, orderBy } from 'firebase/firestore';
+	import { onSnapshot, query, collection, snapshotEqual, orderBy, where } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
 
 	let listOfUsers = [];
+	let sortByField = '';
+	let searchByField = '';
+	let searchByValue = '';
+	let accountsQuery = query(collection(db, 'accounts'));
 
-	const accountsQuery = query(collection(db, 'accounts'));
-	const unsubscribe = onSnapshot(accountsQuery, (querySnapshot) => {
-		listOfUsers = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-	});
-	onDestroy(() => unsubscribe());
-
-	let userSort = '';
-
-	async function sortBy() {
-		if (userSort == 'Name') {
-			const sortByNameQuery = query(collection(db, 'accounts'), orderBy('firstname', 'asc'));
-			const unsubscribe = onSnapshot(sortByNameQuery, (querySnapshot) => {
-				listOfUsers = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-			});
-			onDestroy(() => unsubscribe());
-		} else if (userSort == 'Block') {
-			const sortByBlockQuery = query(collection(db, 'accounts'), orderBy('addressBlock', 'asc'));
-			const unsubscribe = onSnapshot(sortByBlockQuery, (querySnapshot) => {
-				listOfUsers = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-			});
-			onDestroy(() => unsubscribe());
-		} else if (userSort == 'Lot') {
-			const sortByLotQuery = query(collection(db, 'accounts'), orderBy('addressLot', 'asc'));
-			const unsubscribe = onSnapshot(sortByLotQuery, (querySnapshot) => {
-				listOfUsers = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-			});
-			onDestroy(() => unsubscribe());
-		} else if (userSort == 'Street') {
-			const sortByStreetQuery = query(collection(db, 'accounts'), orderBy('addressStreet', 'asc'));
-			const unsubscribe = onSnapshot(sortByStreetQuery, (querySnapshot) => {
-				listOfUsers = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-			});
-			onDestroy(() => unsubscribe());
-		} else if (userSort == 'Email') {
-			const sortByEmailQuery = query(collection(db, 'accounts'), orderBy('email', 'asc'));
-			const unsubscribe = onSnapshot(sortByEmailQuery, (querySnapshot) => {
-				listOfUsers = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-			});
-			onDestroy(() => unsubscribe());
-		}
+	async function getAccounts(accountsQuery) {
+		// if (sortByField) accountsQuery = query(collection(db, 'accounts'));
+		// else accountsQuery = query(collection(db, 'accounts'), orderBy(sortByField, 'asc'));
+		const unsubscribe = onSnapshot(accountsQuery, (querySnapshot) => {
+			listOfUsers = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+		});
+		onDestroy(() => unsubscribe());
 	}
+
+	async function changeSortBy() {
+		accountsQuery = query(collection(db, 'accounts'), orderBy(sortByField, 'asc'));
+	}
+
+	async function searchAccounts() {
+		accountsQuery = query(
+			collection(db, 'accounts'),
+			where(searchByField, '>=', searchByValue),
+			where(searchByField, '<=', searchByValue + '~')
+		);
+	}
+
+	$: getAccounts(accountsQuery);
 </script>
 
 <div class="min-w-full min-h-full bg-base-200 px-12">
 	<h1 class="text-3xl font-semibold py-12">Accounts</h1>
 	<div class="flex justify-between">
-		<h1 class="text-xl font-semibold">Users</h1>
-		<input type="search" placeholder="Search here" />
-		<select bind:value={userSort} on:click={sortBy} name="" id="">
+		<form on:submit|preventDefault={searchAccounts}>
+			<select bind:value={searchByField} required>
+				<option value="" disabled selected>Search Filter</option>
+				<option value="firstname">Name</option>
+				<option value="addressBlock">Block</option>
+				<option value="addressLot">Lot</option>
+				<option value="addressStreet">Street</option>
+				<option value="email">Email</option>
+			</select>
+			<input type="search" placeholder="Search here" required bind:value={searchByValue} />
+		</form>
+		<select bind:value={sortByField} on:change={changeSortBy}>
 			<option value="" disabled selected>Sort By</option>
-			<option value="Name">Name</option>
-			<option value="Block">Block</option>
-			<option value="Lot">Lot</option>
-			<option value="Street">Street</option>
-			<option value="Email">Email</option>
+			<option value="firstname">Name</option>
+			<option value="addressBlock">Block</option>
+			<option value="addressLot">Lot</option>
+			<option value="addressStreet">Street</option>
+			<option value="email">Email</option>
 		</select>
 		<a
 			class="px-1 text-sm bg-gray-400 rounded-full hover:bg-gray-300 flex items-center border-gray-700"
@@ -69,14 +63,14 @@
 
 	<!-- Medium to large screen -->
 	<div class="my-5 p-5 overflow-auto shadow-lg border rounded-xl bg-gray-300 hidden md:block">
-		<table class="border-2 border-black bg-white w-full">
+		<table class="border-2 border-black bg-white w-full text-center">
 			<thead class="font-bold bg-gray-500">
 				<tr>
-					<th class="p-3 text-sm tracking-wide text-left">Name</th>
-					<th class="p-3 text-sm tracking-wide text-left">Address</th>
-					<th class="p-3 text-sm tracking-wide text-left">Email</th>
-					<th class="p-3 text-sm tracking-wide text-left">Role</th>
-					<th class="p-3 text-sm tracking-wide text-left" />
+					<th class="p-3 text-sm tracking-wide">Name</th>
+					<th class="p-3 text-sm tracking-wide">Address</th>
+					<th class="p-3 text-sm tracking-wide">Email</th>
+					<th class="p-3 text-sm tracking-wide">Role</th>
+					<th class="p-3 text-sm tracking-wide" />
 				</tr>
 			</thead>
 			<tbody>

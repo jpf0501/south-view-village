@@ -1,52 +1,58 @@
 <script>
-	import { onSnapshot, query, collection, snapshotEqual, orderBy } from 'firebase/firestore';
+	import { onSnapshot, query, collection, snapshotEqual, orderBy, where } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
 
 	let listOfNews = [];
+	let sortByField = '';
+	let searchByField = '';
+	let searchByValue = '';
+	let newsQuery = query(collection(db, 'news'));
 
-	const newsQuery = query(collection(db, 'news'));
-	const unsubscribe = onSnapshot(newsQuery, (querySnapshot) => {
-		listOfNews = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-	});
-	onDestroy(() => unsubscribe());
+	async function getNews(newsQuery) {
+		const unsubscribe = onSnapshot(newsQuery, (querySnapshot) => {
+			listOfNews = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+		});
+		onDestroy(() => unsubscribe());
+	}
 
-	let newsSort = '';
+	async function changeSortBy() {
+		newsQuery = query(collection(db, 'news'), orderBy(sortByField, 'asc'));
+	}
 
-	async function sortBy() {
-		if (newsSort == 'Title') {
-			const sortByTitleQuery = query(collection(db, 'news'), orderBy('title', 'asc'));
-			const unsubscribe = onSnapshot(sortByTitleQuery, (querySnapshot) => {
-				listOfNews = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-			});
-			onDestroy(() => unsubscribe());
-			// placeholder for timestamp sort
-		} else if (newsSort == 'Date') {
-			const sortByDateQuery = query(collection(db, 'news'), orderBy('content', 'asc'));
-			const unsubscribe = onSnapshot(sortByDateQuery, (querySnapshot) => {
-				listOfNews = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-			});
-			onDestroy(() => unsubscribe());
-		} else if (newsSort == 'Update') {
-			const sortByUpdateQuery = query(collection(db, 'news'), orderBy('content', 'desc'));
-			const unsubscribe = onSnapshot(sortByUpdateQuery, (querySnapshot) => {
-				listOfNews = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-			});
-			onDestroy(() => unsubscribe());
+	async function searchNews() {
+		if (searchByValue == '') {
+			newsQuery = query(collection(db, 'news'));
+		} else {
+			newsQuery = query(
+				collection(db, 'news'),
+				where(searchByField, '>=', searchByValue),
+				where(searchByField, '<=', searchByValue + '~')
+			);
 		}
 	}
+
+	$: getNews(newsQuery);
+
 </script>
 
 <div class="min-w-full min-h-full bg-base-200 px-12">
 	<h1 class="text-3xl font-semibold py-12">News</h1>
 	<div class="flex justify-between">
-		<h1 class="text-xl font-semibold">Entries</h1>
-		<input type="search" placeholder="Search here" />
-		<select bind:value={newsSort} on:click={sortBy} name="" id="">
+		<form on:submit|preventDefault={searchNews}>
+			<select bind:value={searchByField} required>
+				<option value="" disabled selected>Search Filter</option>
+				<option value="title">Title</option>
+				<option value="dateCreated">Date Created</option>
+				<option value="dateModified">Date Modified</option>
+			</select>
+			<input type="search" placeholder="Search here" required bind:value={searchByValue} />
+		</form>
+		<select bind:value={sortByField} on:change={changeSortBy}>
 			<option value="" disabled selected>Sort By</option>
-			<option value="Title">Title</option>
-			<option value="Date">Date Created</option>
-			<option value="Update">Last Updated</option>
+			<option value="title">Title</option>
+			<option value="dateCreated">Date Created</option>
+			<option value="dateModified">Last Updated</option>
 		</select>
 		<a
 			class="px-1 text-sm bg-gray-400 rounded-full hover:bg-gray-300 flex items-center border-gray-700"

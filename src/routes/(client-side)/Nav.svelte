@@ -14,11 +14,18 @@
 		>Community</a
 	>
 	<a class="font-medium tab tab-lg" href="/hoas" class:tab-active={pathname === '/hoas'}>HOAs</a>
-	
+	<a
+		class="font-medium tab tab-lg"
+		href="/reservation"
+		class:tab-active={pathname === '/reservation'}>Reservation</a
+	>
 
-	
 	{#if $userStore}
-	<a class="font-medium tab tab-lg" href="/payment" class:tab-active={pathname === '/payment'}>Payment</a>
-	<a class="font-medium tab tab-lg" href="/profile" class:tab-active={pathname === '/profile'}>Profile</a>
+		<a class="font-medium tab tab-lg" href="/payment" class:tab-active={pathname === '/payment'}
+			>Payment</a
+		>
+		<a class="font-medium tab tab-lg" href="/profile" class:tab-active={pathname === '/profile'}
+			>Profile</a
+		>
 	{/if}
 </nav>

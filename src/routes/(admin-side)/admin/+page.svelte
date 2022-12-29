@@ -9,7 +9,7 @@
 		try {
 			const collectionOfPendingBooks = query(
 				collection(db, 'booking'),
-				where('status', '==', 'Pending')
+				where('status', '==', 'pending')
 			);
 			const snapshot = await getCountFromServer(collectionOfPendingBooks);
 			countOfPendingBooks = snapshot.data().count;

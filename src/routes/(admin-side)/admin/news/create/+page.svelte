@@ -11,7 +11,7 @@
     async function submitHandler() {
 		try {
 			await addDoc(collection(db, 'news'), {
-                title: news.title,
+                title: news.title.trim().toLowerCase(),
                 content: news.content,
                 dateCreated: serverTimestamp(),
                 dateModified: serverTimestamp(),

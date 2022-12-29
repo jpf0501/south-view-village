@@ -111,5 +111,4 @@
 			</main>
 		</section>
 	</main>
-	<a href="/calendar/scheduleEvent" class="mx-auto btn btn-primary btn-wide">Schedule an event</a>
 </div>

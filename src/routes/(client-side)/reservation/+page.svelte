@@ -5,16 +5,16 @@
 	import { goto } from '$app/navigation';
 
 	let user = null;
-	
+
 	let guest = {
 		firstname: '',
 		lastname: '',
 		email: '',
 		contactNumber: '',
-		status: 'Pending',
+		status: 'pending',
 		eventType: '',
 		date: '',
-		time: '',
+		time: ''
 	};
 
 	async function getUser() {
@@ -25,21 +25,20 @@
 		getUser();
 	}
 
-    async function submitHandler() {
-		if (user != null) {
+	async function submitHandler() {
+		if (user !== null) {
 			try {
 				await addDoc(collection(db, 'booking'), {
-           			firstName: user.firstname,
-					lastName: user.lastname,
+					firstname: user.firstname,
+					lastname: user.lastname,
 					email: user.email,
 					contactNumber: user.contactNumber,
 					status: guest.status,
-					eventType: guest.eventType,
-					date: guest.date,
-					time: guest.time,
-            	});
-				alert('Schedule request submitted');
-				await goto('/calendar');
+					eventType: guest.eventType.trim(),
+					bookDate: new Date(guest.date + ' ' + guest.time)
+				});
+				alert('Reservation form submitted');
+				await goto('/');
 			} catch (error) {
 				console.log(error);
 				alert('Error sending request');
@@ -47,15 +46,14 @@
 		} else {
 			try {
 				await addDoc(collection(db, 'booking'), {
-           			firstName: guest.firstname,
-					lastName: guest.lastname,
-					email: guest.email,
+					firstname: guest.firstname.trim().toLowerCase(),
+					lastname: guest.lastname.trim().toLowerCase(),
+					email: guest.email.trim().toLowerCase(),
 					contactNumber: guest.contactNumber,
 					status: guest.status,
-					eventType: guest.eventType,
-					date: guest.date,
-					time: guest.time,
-            	});
+					eventType: guest.eventType.trim(),
+					bookDate: new Date(guest.date + ' ' + guest.time)
+				});
 				alert('Schedule request submitted');
 				await goto('/calendar');
 			} catch (error) {
@@ -64,73 +62,148 @@
 			}
 		}
 	}
-
 </script>
 
 <div class="min-h-screen hero bg-base-200">
 	<div class="w-full max-w-4xl p-6 mx-auto shadow-2xl border rounded-xl bg-base-100">
-		<h1 class="text-2xl mt-2">Schedule an Event</h1>
+		<h1 class="text-2xl mt-2">Clubhouse Reservation Form</h1>
 		<form on:submit|preventDefault={submitHandler}>
 			{#if user}
 				<div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2">
 					<div class="form-control">
 						<span class="label-text">First Name</span>
-						<input type="text" class="border-2 rounded-lg p-3 mt-2" bind:value={user.firstname} required />
+						<input
+							type="text"
+							class="border-2 rounded-lg p-3 mt-2"
+							bind:value={user.firstname}
+							required
+						/>
 					</div>
 					<div class="form-control">
 						<span class="label-text">Last Name</span>
-						<input type="text" class="border-2 rounded-lg p-3 mt-2" bind:value={user.lastname} required />
+						<input
+							type="text"
+							class="border-2 rounded-lg p-3 mt-2"
+							bind:value={user.lastname}
+							required
+						/>
 					</div>
 					<div class="form-control ">
 						<span class="label-text">E-mail Address</span>
-						<input type="text" class="border-2 rounded-lg p-3 mt-2" bind:value={user.email} required />
+						<input
+							type="text"
+							class="border-2 rounded-lg p-3 mt-2"
+							bind:value={user.email}
+							required
+						/>
 					</div>
 					<div class="form-control">
 						<span class="label-text">Contact No.</span>
-						<input type="text" class="border-2 rounded-lg p-3 mt-2" bind:value={user.contactNumber} required />
+						<input
+							type="text"
+							class="border-2 rounded-lg p-3 mt-2"
+							bind:value={user.contactNumber}
+							required
+						/>
 					</div>
 					<div class="form-control">
 						<span class="label-text">Type of Event</span>
-						<input type="text" class="border-2 rounded-lg p-3 mt-2" bind:value={guest.eventType} required />
+						<input
+							type="text"
+							class="border-2 rounded-lg p-3 mt-2"
+							bind:value={guest.eventType}
+							required
+						/>
 					</div>
 					<div class="form-control">
 						<span class="label-text">Date</span>
-						<input type="date" class="border-2 rounded-lg p-3 mt-2" bind:value={guest.date} required />
+						<input
+							type="date"
+							class="border-2 rounded-lg p-3 mt-2"
+							bind:value={guest.date}
+							required
+						/>
 					</div>
 					<div class="form-control">
 						<span class="label-text">Time</span>
-						<input type="time" min="8:00" max="19:00" class="border-2 rounded-lg p-3 mt-2" bind:value={guest.time} required />
+						<input
+							type="time"
+							min="8:00"
+							max="19:00"
+							class="border-2 rounded-lg p-3 mt-2"
+							bind:value={guest.time}
+							required
+						/>
 					</div>
 				</div>
 			{:else}
 				<div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2">
 					<div class="form-control">
 						<span class="label-text">First Name</span>
-						<input type="text" bind:value={guest.firstname} class="border-2 rounded-lg p-3 mt-2" required />
+						<input
+							type="text"
+							bind:value={guest.firstname}
+							class="border-2 rounded-lg p-3 mt-2"
+							required
+						/>
 					</div>
 					<div class="form-control">
 						<span class="label-text">Last Name</span>
-						<input type="text" bind:value={guest.lastname} class="border-2 rounded-lg p-3 mt-2" required />
+						<input
+							type="text"
+							bind:value={guest.lastname}
+							class="border-2 rounded-lg p-3 mt-2"
+							required
+						/>
 					</div>
 					<div class="form-control">
 						<span class="label-text">E-mail Address</span>
-						<input type="email" bind:value={guest.email} name="email" class="input input-bordered" required />
+						<input
+							type="email"
+							bind:value={guest.email}
+							name="email"
+							class="border-2 rounded-lg p-3 mt-2"
+							required
+						/>
 					</div>
 					<div class="form-control">
 						<span class="label-text">Contact No.</span>
-						<input type="text" bind:value={guest.contactNumber} name="email" class="input input-bordered" required />
+						<input
+							type="text"
+							bind:value={guest.contactNumber}
+							name="email"
+							class="border-2 rounded-lg p-3 mt-2"
+							required
+						/>
 					</div>
 					<div class="form-control">
 						<span class="label-text">Type of Event</span>
-						<input type="text" class="border-2 rounded-lg p-3 mt-2" bind:value={guest.eventType} required />
+						<input
+							type="text"
+							class="border-2 rounded-lg p-3 mt-2"
+							bind:value={guest.eventType}
+							required
+						/>
 					</div>
 					<div class="form-control">
 						<span class="label-text">Date</span>
-						<input type="date" class="border-2 rounded-lg p-3 mt-2" bind:value={guest.date} required />
+						<input
+							type="date"
+							class="border-2 rounded-lg p-3 mt-2"
+							bind:value={guest.date}
+							required
+						/>
 					</div>
 					<div class="form-control">
 						<span class="label-text">Time</span>
-						<input type="time" min="8:00" max="19:00" class="border-2 rounded-lg p-3 mt-2" bind:value={guest.time} required />
+						<input
+							type="time"
+							min="8:00"
+							max="19:00"
+							class="border-2 rounded-lg p-3 mt-2"
+							bind:value={guest.time}
+							required
+						/>
 					</div>
 				</div>
 			{/if}
