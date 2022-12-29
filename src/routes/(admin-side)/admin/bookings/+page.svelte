@@ -30,15 +30,11 @@
 	}
 
 	async function searchBookings() {
-		if (searchByValue == '') {
-			bookingsQuery = query(collection(db, 'booking'));
-		} else {
-			bookingsQuery = query(
-				collection(db, 'booking'),
-				where(searchByField, '>=', searchByValue),
-				where(searchByField, '<=', searchByValue + '~')
-			);
-		}
+		bookingsQuery = query(
+			collection(db, 'booking'),
+			where(searchByField, '>=', searchByValue),
+			where(searchByField, '<=', searchByValue + '~')
+		);
 	}
 
 	$: getBookings(bookingsQuery);
@@ -47,7 +43,7 @@
 		try {
 			const bookref = doc(db, 'booking', bookingId);
 			const data = {
-				status: 'Approved'
+				status: 'approved'
 			};
 			await updateDoc(bookref, data);
 			alert('Booking request has been approved');
@@ -61,7 +57,7 @@
 		try {
 			const bookref = doc(db, 'booking', bookingId);
 			const data = {
-				status: 'Disapproved'
+				status: 'disapproved'
 			};
 			await updateDoc(bookref, data);
 			alert('Booking request has been disapproved');
@@ -105,7 +101,7 @@
 			<input type="search" placeholder="Search here" required bind:value={searchByValue} />
 		</form>
 		<select bind:value={sortByField} on:change={changeSortBy}>
-			<option value="" disabled selected>Search Filter</option>
+			<option value="" disabled selected>Sort By</option>
 			<option value="firstname">Name</option>
 			<option value="email">E-mail Address</option>
 			<option value="eventType">Type of Event</option>

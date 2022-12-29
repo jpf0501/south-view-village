@@ -23,15 +23,11 @@
 	}
 
 	async function searchAccounts() {
-		if (searchByValue == '') {
-			accountsQuery = query(collection(db, 'accounts'));
-		} else {
-			accountsQuery = query(
-				collection(db, 'accounts'),
-				where(searchByField, '>=', searchByValue),
-				where(searchByField, '<=', searchByValue + '~')
-			);
-		}
+		accountsQuery = query(
+			collection(db, 'accounts'),
+			where(searchByField, '>=', searchByValue),
+			where(searchByField, '<=', searchByValue + '~')
+		);
 	}
 
 	$: getAccounts(accountsQuery);

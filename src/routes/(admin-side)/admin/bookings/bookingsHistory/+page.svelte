@@ -34,15 +34,11 @@
 	}
 
 	async function searchBookings() {
-		if (searchByValue == '') {
-			bookingsQuery = query(collection(db, 'booking'));
-		} else {
-			bookingsQuery = query(
-				collection(db, 'booking'),
-				where(searchByField, '>=', searchByValue),
-				where(searchByField, '<=', searchByValue + '~')
-			);
-		}
+		bookingsQuery = query(
+			collection(db, 'booking'),
+			where(searchByField, '>=', searchByValue),
+			where(searchByField, '<=', searchByValue + '~')
+		);
 	}
 
 	$: getBookings(bookingsQuery);
@@ -54,7 +50,7 @@
 		<a href="/admin/bookings" class="hover:underline">Go to Bookings</a>
 	</div>
 	<div class="flex justify-between">
-		<form on:submit|preventDefault={searchBookings} required >
+		<form on:submit|preventDefault={searchBookings} required>
 			<select bind:value={searchByField}>
 				<option value="" disabled selected>Search Filter</option>
 				<option value="firstname">Name</option>
@@ -65,7 +61,7 @@
 			<input type="search" placeholder="Search here" required bind:value={searchByValue} />
 		</form>
 		<select bind:value={sortByField} on:change={changeSortBy}>
-			<option value="" disabled selected>Search Filter</option>
+			<option value="" disabled selected>Sort By</option>
 			<option value="firstname">Name</option>
 			<option value="email">E-mail Address</option>
 			<option value="eventType">Type of Event</option>
@@ -73,8 +69,8 @@
 		</select>
 		<select bind:value={sortByStatus} on:change={changeSortByStatus}>
 			<option value="" selected>Status</option>
-			<option value="Approved">Approved</option>
-			<option value="Disapproved">Disapproved</option>
+			<option value="approved">Approved</option>
+			<option value="disapproved">Disapproved</option>
 		</select>
 	</div>
 
@@ -92,7 +88,7 @@
 			</thead>
 			<tbody>
 				{#each listOfBooking as book}
-					{#if book.status == 'Approved' || book.status == 'Disapproved'}
+					{#if book.status == 'approved' || book.status == 'disapproved'}
 						<tr class="border-t-2 border-black">
 							<td class="p-3 text-sm whitespace-nowrap">{book.firstname + ' ' + book.lastname}</td>
 							<td class="p-3 text-sm whitespace-nowrap">{book.email}</td>
@@ -103,9 +99,9 @@
 									' at ' +
 									book.bookDate.toDate().toLocaleTimeString()}</td
 							>
-							{#if book.status == 'Approved'}
+							{#if book.status == 'approved'}
 								<td class="p-3 text-sm whitespace-nowrap text-green-500">{book.status}</td>
-							{:else if book.status == 'Disapproved'}
+							{:else if book.status == 'disapproved'}
 								<td class="p-3 text-sm whitespace-nowrap text-red-500">{book.status}</td>
 							{:else}
 								<td class="p-3 text-sm whitespace-nowrap">{book.status}</td>
