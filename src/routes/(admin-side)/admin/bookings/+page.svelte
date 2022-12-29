@@ -139,21 +139,21 @@
 								<button
 									on:click={approveBook(book.id)}
 									type="button"
-									class="py-2 px-2 text-green-500">Approve</button
+									class="py-2 px-2 text-green-500 font-bold">Approve</button
 								>
 							</td>
 							<td class="p-3 text-sm whitespace-nowrap">
 								<button
 									on:click={disapproveBook(book.id)}
 									type="button"
-									class="py-2 px-2 text-red-500">Dissaprove</button
+									class="py-2 px-2 text-red-500 font-bold">Dissaprove</button
 								>
 							</td>
 							<td class="p-3 text-sm whitespace-nowrap">
 								<button
 									on:click={sendPaymentEmail(book.email)}
 									type="button"
-									class="py-2 px-2 text-blue-500">Send Payment</button
+									class="py-2 px-2 text-blue-500 font-bold hover:underline">Send Payment</button
 								>
 							</td>
 						</tr>
@@ -185,22 +185,28 @@
 					<div>
 						<span class="font-bold text-sm">Type of Event: </span>
 						{book.eventType}
-						<span class="font-bold text-sm">Date: </span>
-						{book.date}
-						<span class="font-bold text-sm">Time: </span>
-						{book.time}
 					</div>
 					<div>
-						<button on:click={approveBook(book.id)} type="button" class="py-2 px-2 text-green-500"
-							>Approve</button
+						<span class="font-bold text-sm">Date and Time </span>
+						{book.bookDate.toDate().toLocaleDateString() +
+							' at ' +
+							book.bookDate.toDate().toLocaleTimeString()}
+					</div>
+					<div>
+						<button
+							on:click={approveBook(book.id)}
+							type="button"
+							class="py-2 px-2 text-green-500 font-bold">Approve</button
 						>
-						<button on:click={disapproveBook(book.id)} type="button" class="py-2 px-2 text-red-500"
-							>Dissaprove</button
+						<button
+							on:click={disapproveBook(book.id)}
+							type="button"
+							class="py-2 px-2 text-red-500 font-bold">Dissaprove</button
 						>
 						<button
 							on:click={sendPaymentEmail(book.email)}
 							type="button"
-							class="py-2 px-2 text-blue-500">Send Payment</button
+							class="py-2 px-2 text-blue-500 font-bold hover:underline">Send Payment</button
 						>
 					</div>
 				</div>

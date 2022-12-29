@@ -100,11 +100,17 @@
 									book.bookDate.toDate().toLocaleTimeString()}</td
 							>
 							{#if book.status == 'approved'}
-								<td class="p-3 text-sm whitespace-nowrap text-green-500">{book.status}</td>
+								<td class="p-3 text-sm whitespace-nowrap text-green-500 font-bold"
+									>{book.status.substring(0, 1).toUpperCase() + book.status.substring(1)}</td
+								>
 							{:else if book.status == 'disapproved'}
-								<td class="p-3 text-sm whitespace-nowrap text-red-500">{book.status}</td>
+								<td class="p-3 text-sm whitespace-nowrap text-red-500 font-bold"
+									>{book.status.substring(0, 1).toUpperCase() + book.status.substring(1)}</td
+								>
 							{:else}
-								<td class="p-3 text-sm whitespace-nowrap">{book.status}</td>
+								<td class="p-3 text-sm whitespace-nowrap"
+									>{book.status.substring(0, 1).toUpperCase() + book.status.substring(1)}</td
+								>
 							{/if}
 						</tr>
 					{/if}
@@ -140,8 +146,22 @@
 					{book.date}
 					<span class="font-bold text-sm">Time: </span>
 					{book.time}
-					<span class="font-bold text-sm">Status: </span>
-					{book.status}
+				</div>
+				<div class="font-bold">
+					Status:
+					{#if book.status == 'approved'}
+						<span class="text-sm text-green-500"
+							>{book.status.substring(0, 1).toUpperCase() + book.status.substring(1)}</span
+						>
+					{:else if book.status == 'disapproved'}
+						<span class="text-sm text-red-500"
+							>{book.status.substring(0, 1).toUpperCase() + book.status.substring(1)}</span
+						>
+					{:else}
+						<span class="text-sm"
+							>{book.status.substring(0, 1).toUpperCase() + book.status.substring(1)}</span
+						>
+					{/if}
 				</div>
 			</div>
 			<br />
