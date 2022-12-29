@@ -1,52 +1,47 @@
 <script>
-	import { onSnapshot, query, collection, updateDoc, doc, orderBy } from 'firebase/firestore';
+	import {
+		onSnapshot,
+		query,
+		collection,
+		updateDoc,
+		doc,
+		orderBy,
+		where
+	} from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
 	import { sendEmail } from '$lib/utils';
 
 	let listOfBooking = [];
+	let sortByField = '';
+	let searchByField = '';
+	let searchByValue = '';
+	let bookingsQuery = query(collection(db, 'booking'));
 
-	const bookingQuery = query(collection(db, 'booking'));
-	const unsubscribe = onSnapshot(bookingQuery, (querySnapshot) => {
-		listOfBooking = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-	});
-	onDestroy(() => unsubscribe());
+	async function getBookings(bookingsQuery) {
+		const unsubscribe = onSnapshot(bookingsQuery, (querySnapshot) => {
+			listOfBooking = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+		});
+		onDestroy(() => unsubscribe());
+	}
 
-	let requestSort = '';
+	async function changeSortBy() {
+		bookingsQuery = query(collection(db, 'booking'), orderBy(sortByField, 'asc'));
+	}
 
-	async function sortBy() {
-		if (requestSort == 'Name') {
-			const sortByNameQuery = query(collection(db, 'booking'), orderBy('firstName', 'asc'));
-			const unsubscribe = onSnapshot(sortByNameQuery, (querySnapshot) => {
-				listOfBooking = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-			});
-			onDestroy(() => unsubscribe());
-		} else if (requestSort == 'Email') {
-			const sortByEmailQuery = query(collection(db, 'booking'), orderBy('email', 'asc'));
-			const unsubscribe = onSnapshot(sortByEmailQuery, (querySnapshot) => {
-				listOfBooking = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-			});
-			onDestroy(() => unsubscribe());
-		} else if (requestSort == 'Event') {
-			const sortByEventQuery = query(collection(db, 'booking'), orderBy('eventType', 'asc'));
-			const unsubscribe = onSnapshot(sortByEventQuery, (querySnapshot) => {
-				listOfBooking = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-			});
-			onDestroy(() => unsubscribe());
-		} else if (requestSort == 'Date') {
-			const sortByDateQuery = query(collection(db, 'booking'), orderBy('date', 'asc'));
-			const unsubscribe = onSnapshot(sortByDateQuery, (querySnapshot) => {
-				listOfBooking = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-			});
-			onDestroy(() => unsubscribe());
-		} else if (requestSort == 'Time') {
-			const sortByTimeQuery = query(collection(db, 'booking'), orderBy('time', 'asc'));
-			const unsubscribe = onSnapshot(sortByTimeQuery, (querySnapshot) => {
-				listOfBooking = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-			});
-			onDestroy(() => unsubscribe());
+	async function searchBookings() {
+		if (searchByValue == '') {
+			bookingsQuery = query(collection(db, 'booking'));
+		} else {
+			bookingsQuery = query(
+				collection(db, 'booking'),
+				where(searchByField, '>=', searchByValue),
+				where(searchByField, '<=', searchByValue + '~')
+			);
 		}
 	}
+
+	$: getBookings(bookingsQuery);
 
 	async function approveBook(bookingId) {
 		try {
@@ -99,32 +94,36 @@
 		<a href="/admin/bookings/bookingsHistory" class="hover:underline">Go to History</a>
 	</div>
 	<div class="flex justify-between">
-		<h1 class="text-xl font-semibold">Requests</h1>
-		<input type="search" placeholder="Search here" />
-		<select bind:value={requestSort} on:click={sortBy} name="" id="">
-			<option value="" disabled selected>Select Option</option>
-			<option value="Name">Name</option>
-			<option value="Email">E-mail Address</option>
-			<option value="Event">Type of Event</option>
-			<option value="Date">Date</option>
-			<option value="Time">Time</option>
+		<form on:submit|preventDefault={searchBookings}>
+			<select bind:value={searchByField} required>
+				<option value="" disabled selected>Search Filter</option>
+				<option value="firstName">Name</option>
+				<option value="email">E-mail Address</option>
+				<option value="eventType">Type of Event</option>
+				<option value="bookDate">Date and Time</option>
+			</select>
+			<input type="search" placeholder="Search here" required bind:value={searchByValue} />
+		</form>
+		<select bind:value={sortByField} on:change={changeSortBy}>
+			<option value="" disabled selected>Search Filter</option>
+			<option value="firstName">Name</option>
+			<option value="email">E-mail Address</option>
+			<option value="eventType">Type of Event</option>
+			<option value="bookDate">Date and Time</option>
 		</select>
 	</div>
 
 	<!-- Medium to large screen -->
 	<div class="my-5 p-5 overflow-auto shadow-lg border rounded-xl bg-gray-300 hidden md:block">
-		<table class="border-2 border-black bg-white w-full">
+		<table class="border-2 border-black bg-white w-full text-center">
 			<thead class="font-bold bg-gray-500">
 				<tr>
-					<th class="p-3 text-sm tracking-wide text-left">Name</th>
-					<th class="p-3 text-sm tracking-wide text-left">E-mail Address</th>
-					<th class="p-3 text-sm tracking-wide text-left">Contact No.</th>
-					<th class="p-3 text-sm tracking-wide text-left">Type of Event</th>
-					<th class="p-3 text-sm tracking-wide text-left">Date</th>
-					<th class="p-3 text-sm tracking-wide text-left">Time</th>
-					<th class="p-3 text-sm tracking-wide text-left" />
-					<th class="p-3 text-sm tracking-wide text-left" />
-					<th class="p-3 text-sm tracking-wide text-left" />
+					<th class="p-3 text-sm tracking-wide">Name</th>
+					<th class="p-3 text-sm tracking-wide">E-mail Address</th>
+					<th class="p-3 text-sm tracking-wide">Contact No.</th>
+					<th class="p-3 text-sm tracking-wide">Type of Event</th>
+					<th class="p-3 text-sm tracking-wide">Date and Time</th>
+					<th class="p-3 text-sm tracking-wide" colspan="3" />
 				</tr>
 			</thead>
 			<tbody>
@@ -135,7 +134,11 @@
 							<td class="p-3 text-sm whitespace-nowrap">{book.email}</td>
 							<td class="p-3 text-sm whitespace-nowrap">{book.contactNumber}</td>
 							<td class="p-3 text-sm whitespace-nowrap">{book.eventType}</td>
-							<td class="p-3 text-sm whitespace-nowrap">{book.bookDate.toDate()}</td>
+							<td class="p-3 text-sm whitespace-nowrap"
+								>{book.bookDate.toDate().toLocaleDateString() +
+									' at ' +
+									book.bookDate.toDate().toLocaleTimeString()}</td
+							>
 							<td class="p-3 text-sm whitespace-nowrap">
 								<button
 									on:click={approveBook(book.id)}
@@ -192,15 +195,11 @@
 						{book.time}
 					</div>
 					<div>
-						<button
-							on:click={approveBook(book.id)}
-							type="button"
-							class="py-2 px-2 text-green-500">Approve</button
+						<button on:click={approveBook(book.id)} type="button" class="py-2 px-2 text-green-500"
+							>Approve</button
 						>
-						<button
-							on:click={disapproveBook(book.id)}
-							type="button"
-							class="py-2 px-2 text-red-500">Dissaprove</button
+						<button on:click={disapproveBook(book.id)} type="button" class="py-2 px-2 text-red-500"
+							>Dissaprove</button
 						>
 						<button
 							on:click={sendPaymentEmail(book.email)}

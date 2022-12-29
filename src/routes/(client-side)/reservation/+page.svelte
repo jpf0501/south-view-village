@@ -52,8 +52,7 @@
 					contactNumber: guest.contactNumber,
 					status: guest.status,
 					eventType: guest.eventType,
-					date: guest.date,
-					time: guest.time
+					bookDate: new Date(guest.date + ' ' + guest.time)
 				});
 				alert('Schedule request submitted');
 				await goto('/calendar');

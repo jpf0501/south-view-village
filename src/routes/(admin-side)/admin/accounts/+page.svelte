@@ -2,7 +2,6 @@
 	import { onSnapshot, query, collection, snapshotEqual, orderBy, where } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
-	import { prevent_default } from 'svelte/internal';
 
 	let listOfUsers = [];
 	let sortByField = '';
@@ -14,9 +13,9 @@
 		// if (sortByField) accountsQuery = query(collection(db, 'accounts'));
 		// else accountsQuery = query(collection(db, 'accounts'), orderBy(sortByField, 'asc'));
 		const unsubscribe = onSnapshot(accountsQuery, (querySnapshot) => {
-		listOfUsers = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-	});
-	onDestroy(() => unsubscribe());
+			listOfUsers = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+		});
+		onDestroy(() => unsubscribe());
 	}
 
 	async function changeSortBy() {
@@ -24,11 +23,18 @@
 	}
 
 	async function searchAccounts() {
-		accountsQuery = query(collection(db, 'accounts'), where(searchByField, '>=', searchByValue), where(searchByField, '<=', searchByValue + '~'));
+		if (searchByValue == '') {
+			accountsQuery = query(collection(db, 'accounts'));
+		} else {
+			accountsQuery = query(
+				collection(db, 'accounts'),
+				where(searchByField, '>=', searchByValue),
+				where(searchByField, '<=', searchByValue + '~')
+			);
+		}
 	}
 
-	$:getAccounts(accountsQuery);	
-
+	$: getAccounts(accountsQuery);
 </script>
 
 <div class="min-w-full min-h-full bg-base-200 px-12">
@@ -42,8 +48,8 @@
 				<option value="addressLot">Lot</option>
 				<option value="addressStreet">Street</option>
 				<option value="email">Email</option>
-			</select>	
-		<input type="search" placeholder="Search here" required bind:value={searchByValue}/>
+			</select>
+			<input type="search" placeholder="Search here" required bind:value={searchByValue} />
 		</form>
 		<select bind:value={sortByField} on:change={changeSortBy}>
 			<option value="" disabled selected>Sort By</option>
@@ -61,14 +67,14 @@
 
 	<!-- Medium to large screen -->
 	<div class="my-5 p-5 overflow-auto shadow-lg border rounded-xl bg-gray-300 hidden md:block">
-		<table class="border-2 border-black bg-white w-full">
+		<table class="border-2 border-black bg-white w-full text-center">
 			<thead class="font-bold bg-gray-500">
 				<tr>
-					<th class="p-3 text-sm tracking-wide text-left">Name</th>
-					<th class="p-3 text-sm tracking-wide text-left">Address</th>
-					<th class="p-3 text-sm tracking-wide text-left">Email</th>
-					<th class="p-3 text-sm tracking-wide text-left">Role</th>
-					<th class="p-3 text-sm tracking-wide text-left" />
+					<th class="p-3 text-sm tracking-wide">Name</th>
+					<th class="p-3 text-sm tracking-wide">Address</th>
+					<th class="p-3 text-sm tracking-wide">Email</th>
+					<th class="p-3 text-sm tracking-wide">Role</th>
+					<th class="p-3 text-sm tracking-wide" />
 				</tr>
 			</thead>
 			<tbody>
