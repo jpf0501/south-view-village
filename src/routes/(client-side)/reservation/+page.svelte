@@ -29,8 +29,8 @@
 		if (user !== null) {
 			try {
 				await addDoc(collection(db, 'booking'), {
-					firstName: user.firstname,
-					lastName: user.lastname,
+					firstname: user.firstname,
+					lastname: user.lastname,
 					email: user.email,
 					contactNumber: user.contactNumber,
 					status: guest.status,
@@ -46,8 +46,8 @@
 		} else {
 			try {
 				await addDoc(collection(db, 'booking'), {
-					firstName: guest.firstname.trim().toLowerCase(),
-					lastName: guest.lastname.trim().toLowerCase(),
+					firstname: guest.firstname.trim().toLowerCase(),
+					lastname: guest.lastname.trim().toLowerCase(),
 					email: guest.email.trim().toLowerCase(),
 					contactNumber: guest.contactNumber,
 					status: guest.status,

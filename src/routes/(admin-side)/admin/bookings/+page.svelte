@@ -97,7 +97,7 @@
 		<form on:submit|preventDefault={searchBookings}>
 			<select bind:value={searchByField} required>
 				<option value="" disabled selected>Search Filter</option>
-				<option value="firstName">Name</option>
+				<option value="firstname">Name</option>
 				<option value="email">E-mail Address</option>
 				<option value="eventType">Type of Event</option>
 				<option value="bookDate">Date and Time</option>
@@ -106,7 +106,7 @@
 		</form>
 		<select bind:value={sortByField} on:change={changeSortBy}>
 			<option value="" disabled selected>Search Filter</option>
-			<option value="firstName">Name</option>
+			<option value="firstname">Name</option>
 			<option value="email">E-mail Address</option>
 			<option value="eventType">Type of Event</option>
 			<option value="bookDate">Date and Time</option>
@@ -128,9 +128,9 @@
 			</thead>
 			<tbody>
 				{#each listOfBooking as book}
-					{#if book.status == 'Pending'}
+					{#if book.status == 'pending'}
 						<tr class="border-t-2 border-black">
-							<td class="p-3 text-sm whitespace-nowrap">{book.firstName + ' ' + book.lastName}</td>
+							<td class="p-3 text-sm whitespace-nowrap">{book.firstname + ' ' + book.lastname}</td>
 							<td class="p-3 text-sm whitespace-nowrap">{book.email}</td>
 							<td class="p-3 text-sm whitespace-nowrap">{book.contactNumber}</td>
 							<td class="p-3 text-sm whitespace-nowrap">{book.eventType}</td>
@@ -170,12 +170,12 @@
 	<!-- Small screen -->
 	<div class="bg-gray-300 my-5 p-5  selection:grid grid-cols-1 gap-4 md:hidden rounded-lg shadow">
 		{#each listOfBooking as book}
-			{#if book.status == 'Pending'}
+			{#if book.status == 'pending'}
 				<div class="bg-white space-y-3 p-4 border-2 border-black">
 					<div class="flex items-center space-x-2  text-sm">
 						<div>
 							<span class="font-bold text-sm">Name: </span>
-							{book.firstName + ' ' + book.lastName}
+							{book.firstname + ' ' + book.lastname}
 						</div>
 					</div>
 					<div>

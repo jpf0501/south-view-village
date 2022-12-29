@@ -57,7 +57,7 @@
 		<form on:submit|preventDefault={searchBookings} required >
 			<select bind:value={searchByField}>
 				<option value="" disabled selected>Search Filter</option>
-				<option value="firstName">Name</option>
+				<option value="firstname">Name</option>
 				<option value="email">E-mail Address</option>
 				<option value="eventType">Type of Event</option>
 				<option value="bookDate">Date and Time</option>
@@ -66,7 +66,7 @@
 		</form>
 		<select bind:value={sortByField} on:change={changeSortBy}>
 			<option value="" disabled selected>Search Filter</option>
-			<option value="firstName">Name</option>
+			<option value="firstname">Name</option>
 			<option value="email">E-mail Address</option>
 			<option value="eventType">Type of Event</option>
 			<option value="bookDate">Date and Time</option>
@@ -94,7 +94,7 @@
 				{#each listOfBooking as book}
 					{#if book.status == 'Approved' || book.status == 'Disapproved'}
 						<tr class="border-t-2 border-black">
-							<td class="p-3 text-sm whitespace-nowrap">{book.firstName + ' ' + book.lastName}</td>
+							<td class="p-3 text-sm whitespace-nowrap">{book.firstname + ' ' + book.lastname}</td>
 							<td class="p-3 text-sm whitespace-nowrap">{book.email}</td>
 							<td class="p-3 text-sm whitespace-nowrap">{book.contactNumber}</td>
 							<td class="p-3 text-sm whitespace-nowrap">{book.eventType}</td>
@@ -124,7 +124,7 @@
 				<div class="flex items-center space-x-2  text-sm">
 					<div>
 						<span class="font-bold text-sm">Name: </span>
-						{book.firstName + ' ' + book.lastName}
+						{book.firstname + ' ' + book.lastname}
 					</div>
 				</div>
 				<div>
