@@ -35,8 +35,7 @@
 					contactNumber: user.contactNumber,
 					status: guest.status,
 					eventType: guest.eventType,
-					date: guest.date,
-					time: guest.time
+					bookDate: new Date(guest.date + ' ' + guest.time)
 				});
 				alert('Reservation form submitted');
 				await goto('/');

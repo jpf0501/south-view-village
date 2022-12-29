@@ -135,8 +135,7 @@
 							<td class="p-3 text-sm whitespace-nowrap">{book.email}</td>
 							<td class="p-3 text-sm whitespace-nowrap">{book.contactNumber}</td>
 							<td class="p-3 text-sm whitespace-nowrap">{book.eventType}</td>
-							<td class="p-3 text-sm whitespace-nowrap">{book.date}</td>
-							<td class="p-3 text-sm whitespace-nowrap">{book.time}</td>
+							<td class="p-3 text-sm whitespace-nowrap">{book.bookDate.toDate()}</td>
 							<td class="p-3 text-sm whitespace-nowrap">
 								<button
 									on:click={approveBook(book.id)}
