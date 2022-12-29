@@ -11,7 +11,7 @@
 		lastname: '',
 		email: '',
 		contactNumber: '',
-		status: 'Pending',
+		status: 'pending',
 		eventType: '',
 		date: '',
 		time: ''
@@ -26,7 +26,7 @@
 	}
 
 	async function submitHandler() {
-		if (user != null) {
+		if (user !== null) {
 			try {
 				await addDoc(collection(db, 'booking'), {
 					firstName: user.firstname,
@@ -34,7 +34,7 @@
 					email: user.email,
 					contactNumber: user.contactNumber,
 					status: guest.status,
-					eventType: guest.eventType,
+					eventType: guest.eventType.trim(),
 					bookDate: new Date(guest.date + ' ' + guest.time)
 				});
 				alert('Reservation form submitted');
@@ -46,12 +46,12 @@
 		} else {
 			try {
 				await addDoc(collection(db, 'booking'), {
-					firstName: guest.firstname,
-					lastName: guest.lastname,
-					email: guest.email,
+					firstName: guest.firstname.trim().toLowerCase(),
+					lastName: guest.lastname.trim().toLowerCase(),
+					email: guest.email.trim().toLowerCase(),
 					contactNumber: guest.contactNumber,
 					status: guest.status,
-					eventType: guest.eventType,
+					eventType: guest.eventType.trim(),
 					bookDate: new Date(guest.date + ' ' + guest.time)
 				});
 				alert('Schedule request submitted');

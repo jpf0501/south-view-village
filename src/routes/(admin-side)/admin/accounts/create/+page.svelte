@@ -1,34 +1,36 @@
 <script>
 	import { goto } from '$app/navigation';
 
-	let email = '';
-	let password = '';
-	let passwordcheck = '';
-	let firstname = '';
-	let lastname = '';
-	let addressBlock = '';
-	let addressLot = '';
-	let addressStreet = '';
-	let contactNumber = '';
-	let role = '';
+	let account = {
+		email: '',
+		password: '',
+		passwordcheck: '',
+		firstname: '',
+		lastname: '',
+		addressBlock: '',
+		addressLot: '',
+		addressStreet: '',
+		contactNumber: '',
+		role: '',
+	}
 
 	async function submitHandler() {
 		try {
-			if (password != passwordcheck) {
+			if (account.password != account.passwordcheck) {
 				throw 'Passwords do not match';
 			}
 			const response = await fetch('/api/accounts', {
 				method: 'POST',
 				body: JSON.stringify({
-					email,
-					password,
-					firstname,
-					lastname,
-					addressBlock,
-					addressLot,
-					addressStreet,
-					contactNumber,
-					role
+					email: account.email,
+					password: account.password,
+					firstname: account.firstname.trim().toLowerCase(),
+					lastname: account.lastname.trim().toLowerCase(),
+					addressBlock: account.addressBlock,
+					addressLot: account.addressLot,
+					addressStreet: account.addressStreet.trim().toLowerCase(),
+					contactNumber: account.contactNumber,
+					role: account.role.trim().toLowerCase()
 				})
 			});
 			const result = await response.json();
@@ -60,7 +62,7 @@
 							name="fname"
 							class="input input-bordered"
 							required
-							bind:value={firstname}
+							bind:value={account.firstname}
 						/>
 					</div>
 					<div class="form-control">
@@ -73,7 +75,7 @@
 							name="lname"
 							class="input input-bordered"
 							required
-							bind:value={lastname}
+							bind:value={account.lastname}
 						/>
 					</div>
 				</div>
@@ -88,7 +90,7 @@
 							name="Block"
 							class="input input-bordered"
 							required
-							bind:value={addressBlock}
+							bind:value={account.addressBlock}
 						/>
 					</div>
 					<div class="form-control">
@@ -101,7 +103,7 @@
 							name="Lot"
 							class="input input-bordered"
 							required
-							bind:value={addressLot}
+							bind:value={account.addressLot}
 						/>
 					</div>
 					<div class="form-control">
@@ -114,7 +116,7 @@
 							name="Street"
 							class="input input-bordered"
 							required
-							bind:value={addressStreet}
+							bind:value={account.addressStreet}
 						/>
 					</div>
 				</div>
@@ -129,7 +131,7 @@
 							name="email"
 							class="input input-bordered"
 							required
-							bind:value={email}
+							bind:value={account.email}
 						/>
 						<div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2">
 							<div class="form-control">
@@ -141,7 +143,7 @@
 									type="password"
 									placeholder="New Password"
 									required
-									bind:value={password}
+									bind:value={account.password}
 								/>
 							</div>
 							<div class="form-control">
@@ -153,9 +155,9 @@
 									type="password"
 									placeholder="Confirm Password"
 									required
-									bind:value={passwordcheck}
+									bind:value={account.passwordcheck}
 								/>
-								{#if password != passwordcheck && passwordcheck != ''}
+								{#if account.password != account.passwordcheck && account.passwordcheck != ''}
 									<p class="text-red-500 mt-3">Password doesnt match</p>
 								{/if}
 							</div>
@@ -166,8 +168,9 @@
 										class="form-select appearance-none block w-full px-3 py-1.5 text-base border rounded-xl border-gray-300"
 										aria-label="Default select example"
 										required
-										bind:value={role}
+										bind:value={account.role}
 									>
+										<option value="" selected disabled>Select role</option>
 										<option value="Resident">Resident</option>
 										<option value="Admin">Admin</option>
 									</select>
@@ -184,7 +187,7 @@
 								name="contact"
 								class="input input-bordered"
 								required
-								bind:value={contactNumber}
+								bind:value={account.contactNumber}
 							/>
 						</div>
 					</div>
