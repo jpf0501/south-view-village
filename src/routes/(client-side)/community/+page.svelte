@@ -1,12 +1,12 @@
 <svelte:head>
-	<title>Community - Official Website of Southview Homes 3 Village</title>
+	<title>Community - Official Website of Southview Homes 3 Subdivision</title>
 </svelte:head>
 
 <main class="grid w-full max-w-5xl grid-cols-2 gap-8 p-8 mx-auto">
 	<section class="">
 		<!--  -->
 		<article class="flex flex-col gap-4">
-			<h1 class="text-xl">About our neighborhood</h1>
+			<h1 class="text-xl">About our Neighborhood</h1>
 			<p class="px-4">
 				At Southview Homes 3, we'll help you turn your vision into a reality. 
 				You can enjoy a high standard way of living without putting a strain on your finances.
@@ -21,7 +21,7 @@
 		</article>
 	</section>
 	<section class="">
-		<h1 class="text-xl">About our neighborhood</h1>
+		<h1 class="text-xl">Subdivision Map</h1>
 		<div class="mapouter">
 			<div class="gmap_canvas">
 				<!-- svelte-ignore a11y-missing-attribute -->

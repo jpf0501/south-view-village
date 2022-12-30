@@ -65,7 +65,7 @@
 </script>
 
 <svelte:head>
-	<title>Clubhouse Reservation - Official Website of Southview Homes 3 Village</title>
+	<title>Clubhouse Reservation - Official Website of Southview Homes 3 Subdivision</title>
 </svelte:head>
 
 <div class="min-h-screen hero bg-base-200">

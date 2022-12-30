@@ -22,7 +22,7 @@
 </script>
 
 <svelte:head>
-	<title>Profile - Official Website of Southview Homes 3 Village</title>
+	<title>Profile - Official Website of Southview Homes 3 Subdivision</title>
 </svelte:head>
 
 {#if user}

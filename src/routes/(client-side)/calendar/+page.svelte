@@ -55,7 +55,7 @@
 </script>
 
 <svelte:head>
-	<title>Event Calendar - Official Website of Southview Homes 3 Village</title>
+	<title>Event Calendar - Official Website of Southview Homes 3 Subdivision</title>
 </svelte:head>
 
 <div class="flex flex-col gap-4 py-8">

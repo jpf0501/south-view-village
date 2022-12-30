@@ -1,5 +1,5 @@
 <svelte:head>
-	<title>News - Official Website of Southview Homes 3 Village</title>
+	<title>News - Official Website of Southview Homes 3 Subdivision</title>
 </svelte:head>
 
 <main>

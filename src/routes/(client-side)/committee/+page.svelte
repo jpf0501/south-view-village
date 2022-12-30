@@ -1,5 +1,5 @@
 <svelte:head>
-	<title>Committee - Official Website of Southview Homes 3 Village</title>
+	<title>Committee - Official Website of Southview Homes 3 Subdivision</title>
 </svelte:head>
 
 <div class="flex flex-col items-center mb-5">

@@ -32,7 +32,7 @@
 </script>
 
 <svelte:head>
-	<title>Edit Profile - Official Website of Southview Homes 3 Village</title>
+	<title>Edit Profile - Official Website of Southview Homes 3 Subdivision</title>
 </svelte:head>
 
 {#if user}

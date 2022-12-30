@@ -22,7 +22,7 @@
 </script>
 
 <svelte:head>
-	<title>Login - Official Website of Southview Homes 3 Village</title>
+	<title>Login - Official Website of Southview Homes 3 Subdivision</title>
 </svelte:head>
 
 <div class="min-h-screen hero bg-base-200">
@@ -30,8 +30,7 @@
 		<div class="text-center lg:text-left">
 			<h1 class="text-5xl font-bold">Login now!</h1>
 			<p class="py-6">
-				Provident cupiditate voluptatem et in. Quaerat fugiat ut assumenda excepturi exercitationem
-				quasi. In deleniti eaque aut repudiandae et a id nisi.
+				To create an account, please contact a Southview Homes 3 committee member for requests and other inquiries.
 			</p>
 		</div>
 		<form
