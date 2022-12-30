@@ -33,6 +33,10 @@
 	$: getAccounts(accountsQuery);
 </script>
 
+<svelte:head>
+	<title>Accounts - Southview Homes 3 Admin Panel</title>
+</svelte:head>
+
 <div class="min-w-full min-h-full bg-base-200 px-12">
 	<h1 class="text-3xl font-semibold py-12">Accounts</h1>
 	<div class="flex justify-between">

@@ -39,10 +39,11 @@
 	}
 </script>
 
-<!-- <h1>{userID}</h1> -->
+<svelte:head>
+	<title>Edit Account - Southview Homes 3 Admin Panel</title>
+</svelte:head>
 
 {#if user}
-	<!-- <h1>{ JSON.stringify(user) }</h1> -->
 	<main>
 		<div class="min-h-screen hero bg-base-200">
 			<div class="w-full max-w-4xl p-6 mx-auto shadow-2xl border rounded-xl bg-base-100">

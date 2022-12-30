@@ -31,6 +31,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Edit Profile - Official Website of Southview Homes 3 Village</title>
+</svelte:head>
+
 {#if user}
 	<div class="min-h-screen hero bg-base-200">
 		<div class="w-full max-w-4xl p-6 mx-auto shadow-2xl border rounded-xl bg-base-100">

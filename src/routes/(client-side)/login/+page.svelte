@@ -21,6 +21,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Login - Official Website of Southview Homes 3 Village</title>
+</svelte:head>
+
 <div class="min-h-screen hero bg-base-200">
 	<div class="flex-col hero-content lg:flex-row-reverse">
 		<div class="text-center lg:text-left">

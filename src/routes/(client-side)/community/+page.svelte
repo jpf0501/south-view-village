@@ -1,3 +1,7 @@
+<svelte:head>
+	<title>Community - Official Website of Southview Homes 3 Village</title>
+</svelte:head>
+
 <main class="grid w-full max-w-5xl grid-cols-2 gap-8 p-8 mx-auto">
 	<section class="">
 		<!--  -->

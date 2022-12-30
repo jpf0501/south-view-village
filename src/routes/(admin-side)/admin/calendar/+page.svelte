@@ -54,6 +54,10 @@
 		new Date(year, month - 1, 1).getDay();
 </script>
 
+<svelte:head>
+	<title>Event Calendar - Southview Homes 3 Admin Panel</title>
+</svelte:head>
+
 <div class="flex flex-col gap-4 py-8">
 	<main>
 		<section>

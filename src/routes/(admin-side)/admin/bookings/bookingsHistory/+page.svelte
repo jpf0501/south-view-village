@@ -44,6 +44,10 @@
 	$: getBookings(bookingsQuery);
 </script>
 
+<svelte:head>
+	<title>Booking History - Southview Homes 3 Admin Panel</title>
+</svelte:head>
+
 <div class="min-w-full min-h-full bg-base-200 px-12">
 	<div class="flex justify-between">
 		<h1 class="text-3xl font-semibold py-12">Booking History</h1>

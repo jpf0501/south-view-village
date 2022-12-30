@@ -1,3 +1,7 @@
+<svelte:head>
+	<title>Southview Homes 3 - Official Website of Southview Homes 3 Village</title>
+</svelte:head>
+
 <!-- Hero -->
 <div class="min-h-screen hero" style="background-image: url(https://i.ibb.co/gF7DhBY/010.jpg);">
 	<div class="hero-overlay bg-opacity-70" />

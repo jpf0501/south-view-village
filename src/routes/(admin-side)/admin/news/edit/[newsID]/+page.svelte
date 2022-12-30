@@ -40,6 +40,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Edit Entry - Southview Homes 3 Admin Panel</title>
+</svelte:head>
+
 {#if news}
 	<div>
 		<div class="grid place-items-center py-10">

@@ -44,6 +44,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Create Account - Southview Homes 3 Admin Panel</title>
+</svelte:head>
+
 <main>
 	<div class="min-h-screen hero bg-base-200">
 		<div class="w-full max-w-4xl p-6 mx-auto shadow-2xl border rounded-xl bg-base-100">
