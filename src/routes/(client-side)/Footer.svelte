@@ -1,8 +1,9 @@
 <footer class="footer footer-center p-10 bg-base-200 text-base-content rounded">
-	<div class="grid grid-flow-col gap-4">
-		<a class="link link-hover" href="/community">About us</a>
-		<a class="link link-hover" href="/">Contact us</a>
-		<a class="link link-hover" href="/login">Log in</a>
+	<div class="grid grid-flow-col gap-8 mt-5">
+		<a class="link link-hover" href="/community">About Us</a>
+		<a class="link link-hover" href="/committee">Committee</a>
+		<a class="link link-hover" href="/news">News</a>
+		<a class="link link-hover" href="/calendar">Event Calendar</a>
 	</div>
 	<!-- <div>
 	  <div class="grid grid-flow-col gap-4">
@@ -11,7 +12,7 @@
 		<a href="/aboutus"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="fill-current"><path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"></path></svg></a>
 	  </div>
 	</div>  -->
-	<div>
-		<p>Copyright © 2022 Soutview Homes 3</p>
+	<div class="mt-5">
+		<p>Copyright © 2022 Soutview Homes 3 - All Rights Reserved</p>
 	</div>
 </footer>
