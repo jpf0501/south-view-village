@@ -29,7 +29,7 @@
 					width="600"
 					height="500"
 					id="gmap_canvas"
-					src="https://maps.google.com/maps?q=san%20pedro%20laguna%20ph&t=k&z=13&ie=UTF8&iwloc=&output=embed"
+					src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3865.3896864752137!2d121.04194319999999!3d14.3468456!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3397d72eef4c4fc3%3A0xc25dd1803d851577!2sSouthview%20Homes%203!5e0!3m2!1sen!2sph!4v1672412932649!5m2!1sen!2sph"
 					frameborder="0"
 					scrolling="no"
 					marginheight="0"
