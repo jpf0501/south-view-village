@@ -13,7 +13,7 @@
 	<a class="font-medium tab tab-lg" href="/community" class:tab-active={pathname === '/community'}
 		>Community</a
 	>
-	<a class="font-medium tab tab-lg" href="/hoas" class:tab-active={pathname === '/hoas'}>HOAs</a>
+	<a class="font-medium tab tab-lg" href="/committee" class:tab-active={pathname === '/committee'}>Committee</a>
 	<a
 		class="font-medium tab tab-lg"
 		href="/reservation"
