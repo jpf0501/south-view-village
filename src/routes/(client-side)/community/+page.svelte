@@ -4,19 +4,15 @@
 		<article class="flex flex-col gap-4">
 			<h1 class="text-xl">About our neighborhood</h1>
 			<p class="px-4">
-				Lorem ipsum dolor sit amet consectetur, adipisicing elit. Necessitatibus nesciunt minus
-				doloribus reiciendis. Omnis debitis, consequatur illo enim aliquid commodi laudantium
-				blanditiis odit itaque similique voluptatem in eum qui. Nesciunt?
+				At Southview Homes 3, we'll help you turn your vision into a reality. 
+				You can enjoy a high standard way of living without putting a strain on your finances.
 			</p>
 			<p class="px-4">
-				Lorem ipsum dolor sit amet consectetur adipisicing elit. Sed molestias natus nemo earum, nam
-				odit aspernatur fugit animi, sit illo provident accusamus, dolorem nisi accusantium
-				voluptates! Quas doloremque tempore illum?
+				The subdivision is a collaborative effort between Allied Community Builders and Development, Inc. and Tradition Homes Project Managers and Development, Inc., it displays contemporary homes with designs that are common for people upgrading their homes and beginning families. 
+				The location of this project is in Brgy. San Vicente, San Pedro, Laguna. 
 			</p>
 			<p class="px-4">
-				Lorem ipsum dolor sit amet consectetur adipisicing elit. Nemo voluptas sit earum quo quam
-				hic autem nisi ratione ab, harum, quisquam deserunt omnis enim quia aspernatur. Velit natus
-				debitis omnis.
+				The location of Southview Homes 3 allows for a very convenient access to all surrounding areas of including schools and shopping complexes, as well as reasonable prices. 
 			</p>
 		</article>
 	</section>
