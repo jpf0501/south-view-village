@@ -125,10 +125,18 @@
 				{#each listOfBooking as book}
 					{#if book.status == 'pending'}
 						<tr class="border-t-2 border-black">
-							<td class="p-3 text-sm whitespace-nowrap">{book.firstname + ' ' + book.lastname}</td>
+							<td class="p-3 text-sm whitespace-nowrap"
+								>{book.firstname.substring(0, 1).toUpperCase() +
+									book.firstname.substring(1) +
+									' ' +
+									book.lastname.substring(0, 1).toUpperCase() +
+									book.lastname.substring(1)}</td
+							>
 							<td class="p-3 text-sm whitespace-nowrap">{book.email}</td>
 							<td class="p-3 text-sm whitespace-nowrap">{book.contactNumber}</td>
-							<td class="p-3 text-sm whitespace-nowrap">{book.eventType}</td>
+							<td class="p-3 text-sm whitespace-nowrap"
+								>{book.eventType.substring(0, 1).toUpperCase() + book.eventType.substring(1)}</td
+							>
 							<td class="p-3 text-sm whitespace-nowrap"
 								>{book.bookDate.toDate().toLocaleDateString() +
 									' at ' +
@@ -170,7 +178,11 @@
 					<div class="flex items-center space-x-2  text-sm">
 						<div>
 							<span class="font-bold text-sm">Name: </span>
-							{book.firstname + ' ' + book.lastname}
+							{book.firstname.substring(0, 1).toUpperCase() +
+								book.firstname.substring(1) +
+								' ' +
+								book.lastname.substring(0, 1).toUpperCase() +
+								book.lastname.substring(1)}
 						</div>
 					</div>
 					<div>
@@ -183,7 +195,7 @@
 					</div>
 					<div>
 						<span class="font-bold text-sm">Type of Event: </span>
-						{book.eventType}
+						{book.eventType.substring(0, 1).toUpperCase() + book.eventType.substring(1)}
 					</div>
 					<div>
 						<span class="font-bold text-sm">Date and Time </span>

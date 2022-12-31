@@ -29,12 +29,12 @@
 		if (user !== null) {
 			try {
 				await addDoc(collection(db, 'booking'), {
-					firstname: user.firstname,
-					lastname: user.lastname,
-					email: user.email,
+					firstname: user.firstname.trim().toLowerCase(),
+					lastname: user.lastname.trim().toLowerCase(),
+					email: user.email.trim().toLowerCase(),
 					contactNumber: user.contactNumber,
 					status: guest.status,
-					eventType: guest.eventType.trim(),
+					eventType: guest.eventType.trim().toLowerCase(),
 					bookDate: new Date(guest.date + ' ' + guest.time)
 				});
 				alert('Reservation form submitted');
@@ -51,7 +51,7 @@
 					email: guest.email.trim().toLowerCase(),
 					contactNumber: guest.contactNumber,
 					status: guest.status,
-					eventType: guest.eventType.trim(),
+					eventType: guest.eventType.trim().toLowerCase(),
 					bookDate: new Date(guest.date + ' ' + guest.time)
 				});
 				alert('Schedule request submitted');
@@ -72,8 +72,8 @@
 	<div class="w-full max-w-4xl p-6 mx-auto shadow-2xl border rounded-xl bg-base-100">
 		<h1 class="text-2xl mt-2">Clubhouse Reservation Form</h1>
 		<form on:submit|preventDefault={submitHandler}>
-			{#if user}
-				<div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2">
+			<div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2">
+				{#if user}
 					<div class="form-control">
 						<span class="label-text">First Name</span>
 						<input
@@ -110,38 +110,7 @@
 							required
 						/>
 					</div>
-					<div class="form-control">
-						<span class="label-text">Type of Event</span>
-						<input
-							type="text"
-							class="border-2 rounded-lg p-3 mt-2"
-							bind:value={guest.eventType}
-							required
-						/>
-					</div>
-					<div class="form-control">
-						<span class="label-text">Date</span>
-						<input
-							type="date"
-							class="border-2 rounded-lg p-3 mt-2"
-							bind:value={guest.date}
-							required
-						/>
-					</div>
-					<div class="form-control">
-						<span class="label-text">Time</span>
-						<input
-							type="time"
-							min="8:00"
-							max="19:00"
-							class="border-2 rounded-lg p-3 mt-2"
-							bind:value={guest.time}
-							required
-						/>
-					</div>
-				</div>
-			{:else}
-				<div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2">
+				{:else}
 					<div class="form-control">
 						<span class="label-text">First Name</span>
 						<input
@@ -180,38 +149,37 @@
 							required
 						/>
 					</div>
-					<div class="form-control">
-						<span class="label-text">Type of Event</span>
-						<input
-							type="text"
-							class="border-2 rounded-lg p-3 mt-2"
-							bind:value={guest.eventType}
-							required
-						/>
-					</div>
-					<div class="form-control">
-						<span class="label-text">Date</span>
-						<input
-							type="date"
-							class="border-2 rounded-lg p-3 mt-2"
-							bind:value={guest.date}
-							required
-						/>
-					</div>
-					<div class="form-control">
-						<span class="label-text">Time</span>
-						<input
-							type="time"
-							min="8:00"
-							max="19:00"
-							class="border-2 rounded-lg p-3 mt-2"
-							bind:value={guest.time}
-							required
-						/>
-					</div>
+				{/if}
+				<div class="form-control">
+					<span class="label-text">Type of Event</span>
+					<input
+						type="text"
+						class="border-2 rounded-lg p-3 mt-2"
+						bind:value={guest.eventType}
+						required
+					/>
 				</div>
-			{/if}
-
+				<div class="form-control">
+					<span class="label-text">Date</span>
+					<input
+						type="date"
+						class="border-2 rounded-lg p-3 mt-2"
+						bind:value={guest.date}
+						required
+					/>
+				</div>
+				<div class="form-control">
+					<span class="label-text">Time</span>
+					<input
+						type="time"
+						min="8:00"
+						max="19:00"
+						class="border-2 rounded-lg p-3 mt-2"
+						bind:value={guest.time}
+						required
+					/>
+				</div>
+			</div>
 			<div class="flex justify-end mt-8">
 				<button type="submit" class="btn btn-primary">Submit Schedule</button>
 				<a href="/calendar" class="btn btn-error mx-1">Cancel</a>
