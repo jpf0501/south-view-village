@@ -14,4 +14,7 @@
 	>
 	<a class="font-medium tab tab-lg" href="/admin/news" class:tab-active={pathname === '/admin/news'}>News</a>
 	<a class="font-medium tab tab-lg" href="/admin/payment" class:tab-active={pathname === '/admin/payment'}>Payment</a>
+	<a class="font-medium tab tab-lg" href="/" class:tab-active={pathname === '/'}
+			>Go Back</a
+		>
 </nav>

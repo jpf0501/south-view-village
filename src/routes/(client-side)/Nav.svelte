@@ -1,7 +1,22 @@
 <script>
 	import { page } from '$app/stores';
 	import { userStore } from '$lib/store.js';
+	import { getDoc, doc } from 'firebase/firestore';
+	import { db } from '$lib/firebase/client.js';
+
+	let user = '';
+
+	async function getUser() {
+		if (!$userStore) {
+			return;
+		}
+		const snapshot = await getDoc(doc(db, 'accounts', $userStore.uid));
+		user = snapshot.data();
+	}
+
+	$: getUser();
 	$: pathname = $page.url.pathname;
+	
 </script>
 
 <nav class="tabs tabs-boxed">
@@ -27,5 +42,10 @@
 		<a class="font-medium tab tab-lg" href="/profile" class:tab-active={pathname === '/profile'}
 			>Profile</a
 		>
+		{#if $userStore && user.role == 'Admin'}
+		<a class="font-medium tab tab-lg" href="/admin" class:tab-active={pathname === '/admin'}
+			>Admin Panel</a
+		>
+		{/if}
 	{/if}
 </nav>
