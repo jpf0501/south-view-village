@@ -1,3 +1,7 @@
+<svelte:head>
+	<title>News - Official Website of Southview Homes 3 Subdivision</title>
+</svelte:head>
+
 <main>
 	<section>
 		<h1 class=" divider">

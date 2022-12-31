@@ -35,9 +35,10 @@
 	<div class="flex-1">
 		<img
 			class="mask mask-circle"
-			src="https://ui-avatars.com/api/?name=SVV?length=3?rounded=true"
-			alt="SV"
+			src="https://i.ibb.co/Q6Jmgpt/logo-01.jpg" 
+			alt="Southview Homes 3 Logo"
 		/>
+		<h1 class="font-semibold text-xl">Southview Homes 3</h1>
 	</div>
 	<div class="flex-none">
 		{#if !$userStore}

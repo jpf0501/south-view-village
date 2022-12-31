@@ -35,6 +35,10 @@
 	getCountOfAccounts();
 </script>
 
+<svelte:head>
+	<title>Southview Homes 3 Admin Panel</title>
+</svelte:head>
+
 <div class="min-w-full min-h-full bg-base-200">
 	<h1 class="text-3xl font-semibold p-12">Dashboard</h1>
 	<div class="flex flex-col md:flex-row pt-4">

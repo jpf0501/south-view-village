@@ -16,6 +16,7 @@
 	let sortByField = '';
 	let searchByField = '';
 	let searchByValue = '';
+	let newStatus = '';
 	let bookingsQuery = query(collection(db, 'booking'));
 
 	async function getBookings(bookingsQuery) {
@@ -39,31 +40,25 @@
 
 	$: getBookings(bookingsQuery);
 
-	async function approveBook(bookingId) {
-		try {
-			const bookref = doc(db, 'booking', bookingId);
-			const data = {
-				status: 'approved'
-			};
-			await updateDoc(bookref, data);
-			alert('Booking request has been approved');
-		} catch (error) {
-			console.log(error);
-			alert('Error approving request');
-		}
+	async function changeStatusToApproved() {
+		newStatus = 'approved';
 	}
 
-	async function disapproveBook(bookingId) {
+	async function changeStatusToDisapproved() {
+		newStatus = 'disapproved';
+	}
+
+	async function changeStatus(bookingId) {
 		try {
-			const bookref = doc(db, 'booking', bookingId);
+			// console.log(newStatus);
+			const bookRef = doc(db, 'booking', bookingId);
 			const data = {
-				status: 'disapproved'
+				status: newStatus
 			};
-			await updateDoc(bookref, data);
-			alert('Booking request has been disapproved');
+			await updateDoc(bookRef, data);
+			alert('Booking request has been ' + newStatus);
 		} catch (error) {
 			console.log(error);
-			alert('Error disapproving request');
 		}
 	}
 
@@ -83,6 +78,10 @@
 		}
 	}
 </script>
+
+<svelte:head>
+	<title>Booking Requests - Southview Homes 3 Admin Panel</title>
+</svelte:head>
 
 <div class="min-w-full min-h-full bg-base-200 px-12">
 	<div class="flex justify-between">
@@ -136,18 +135,18 @@
 									book.bookDate.toDate().toLocaleTimeString()}</td
 							>
 							<td class="p-3 text-sm whitespace-nowrap">
-								<button
-									on:click={approveBook(book.id)}
-									type="button"
-									class="py-2 px-2 text-green-500 font-bold">Approve</button
-								>
-							</td>
-							<td class="p-3 text-sm whitespace-nowrap">
-								<button
-									on:click={disapproveBook(book.id)}
-									type="button"
-									class="py-2 px-2 text-red-500 font-bold">Dissaprove</button
-								>
+								<form on:submit={changeStatus(book.id)}>
+									<button
+										on:click={changeStatusToApproved}
+										type="submit"
+										class="py-2 px-2 text-green-500 font-bold">Approve</button
+									>
+									<button
+										on:click={changeStatusToDisapproved}
+										type="submit"
+										class="py-2 px-2 text-red-500 font-bold">Dissaprove</button
+									>
+								</form>
 							</td>
 							<td class="p-3 text-sm whitespace-nowrap">
 								<button
@@ -193,16 +192,18 @@
 							book.bookDate.toDate().toLocaleTimeString()}
 					</div>
 					<div>
-						<button
-							on:click={approveBook(book.id)}
-							type="button"
-							class="py-2 px-2 text-green-500 font-bold">Approve</button
-						>
-						<button
-							on:click={disapproveBook(book.id)}
-							type="button"
-							class="py-2 px-2 text-red-500 font-bold">Dissaprove</button
-						>
+						<form on:submit={changeStatus(book.id)}>
+							<button
+								on:click={changeStatusToApproved}
+								type="submit"
+								class="py-2 px-2 text-green-500 font-bold">Approve</button
+							>
+							<button
+								on:click={changeStatusToDisapproved}
+								type="submit"
+								class="py-2 px-2 text-red-500 font-bold">Dissaprove</button
+							>
+						</form>
 						<button
 							on:click={sendPaymentEmail(book.email)}
 							type="button"

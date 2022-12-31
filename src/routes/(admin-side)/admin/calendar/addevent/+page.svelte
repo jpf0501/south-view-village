@@ -1,3 +1,7 @@
+<svelte:head>
+	<title>Add Event - Southview Homes 3 Admin Panel</title>
+</svelte:head>
+
 Add Event Page <br />
 Name of Event <br />
 Date of Event <br />
