@@ -118,7 +118,8 @@
 					<th class="p-3 text-sm tracking-wide">Contact No.</th>
 					<th class="p-3 text-sm tracking-wide">Type of Event</th>
 					<th class="p-3 text-sm tracking-wide">Date and Time</th>
-					<th class="p-3 text-sm tracking-wide" colspan="3" />
+					<th class="p-3 text-sm tracking-wide">Payment Status</th>
+					<th class="p-3 text-sm tracking-wide" colspan="2" />
 				</tr>
 			</thead>
 			<tbody>
@@ -142,6 +143,17 @@
 									' at ' +
 									book.bookDate.toDate().toLocaleTimeString()}</td
 							>
+							{#if book.paymentStatus == 'paid'}
+								<td class="p-3 text-sm whitespace-nowrap text-green-500 font-bold">
+									{book.paymentStatus.substring(0, 1).toUpperCase() +
+										book.paymentStatus.substring(1)}
+								</td>
+							{:else}
+								<td class="p-3 text-sm whitespace-nowrap text-red-500 font-bold">
+									{book.paymentStatus.substring(0, 1).toUpperCase() +
+										book.paymentStatus.substring(1)}
+								</td>
+							{/if}
 							<td class="p-3 text-sm whitespace-nowrap">
 								<form on:submit={changeStatus(book.id)}>
 									<button
@@ -202,6 +214,20 @@
 						{book.bookDate.toDate().toLocaleDateString() +
 							' at ' +
 							book.bookDate.toDate().toLocaleTimeString()}
+					</div>
+					<div class="font-bold">
+						Status:
+						{#if book.paymentStatus == 'paid'}
+							<span class="text-sm text-green-500"
+								>{book.paymentStatus.substring(0, 1).toUpperCase() +
+									book.paymentStatus.substring(1)}</span
+							>
+						{:else}
+							<span class="text-sm text-red-500"
+								>{book.paymentStatus.substring(0, 1).toUpperCase() +
+									book.paymentStatus.substring(1)}</span
+							>
+						{/if}
 					</div>
 					<div>
 						<form on:submit={changeStatus(book.id)}>

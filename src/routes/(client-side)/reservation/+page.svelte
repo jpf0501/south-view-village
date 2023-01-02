@@ -12,6 +12,7 @@
 		email: '',
 		contactNumber: '',
 		status: 'pending',
+		paymentStatus: 'unpaid',
 		eventType: '',
 		date: '',
 		time: ''
