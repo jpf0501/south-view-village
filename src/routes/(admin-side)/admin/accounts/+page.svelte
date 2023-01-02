@@ -117,12 +117,6 @@
 						<span class="font-bold text-sm">Role: </span>
 						{user.role}
 					</div>
-					<div>
-						<a
-							href={'/admin/accounts/edit/' + user.id}
-							class="text-blue-500 font-bold hover:underline">Edit</a
-						>
-					</div>
 				</div>
 				<div>
 					<span class="font-bold text-sm">Address: </span>
@@ -137,6 +131,12 @@
 				<div>
 					<span class="font-bold text-sm">Email: </span>
 					{user.email}
+				</div>
+				<div class="flex justify-end">
+					<a
+						href={'/admin/accounts/edit/' + user.id}
+						class="text-blue-500 font-bold hover:underline">Edit</a
+					>
 				</div>
 			</div>
 			<br />

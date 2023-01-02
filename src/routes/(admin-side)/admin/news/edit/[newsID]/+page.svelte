@@ -54,35 +54,31 @@
 	<div>
 		<div class="grid place-items-center py-10">
 			<div class="w-11/12">
-				<div>
-					<h1 class="text-xl font-bold bg-gray-300 px-1 py-3">Edit News</h1>
-				</div>
-				<form action="">
-					<div class="">
+				<h1 class="text-xl font-bold bg-gray-300 px-1 py-3">Edit News</h1>
+				<form>
+					<div class="my-2">
 						<label for="title">Title</label>
 						<br />
 						<input type="text" class="w-1/2" required bind:value={news.title} />
 					</div>
-					<div>
+					<div class="my-2">
 						<label for="content">Content</label>
 						<br />
 						<textarea class="h-60 w-5/6" style="resize:none" required bind:value={news.content} />
 					</div>
-					<div class="grid place-items-center my-10">
-						<div class="flex gap-5">
-							<button
-								on:click={updateNews}
-								type="submit"
-								class="btn btn-primary px-10 py-2 hover:bg-blue-900">Save</button
-							><a href="/admin/news" class="btn btn-error px-10 py-2 text-white hover:bg-red-900"
-								>Cancel</a
-							>
-							<button
-								on:click={deleteNews}
-								type="submit"
-								class="btn btn-warning text-white px-10 py-2 hover:bg-yellow-900">Delete</button
-							>
-						</div>
+					<div class="flex justify-end mt-8">
+						<button
+							on:click={updateNews}
+							type="submit"
+							class="btn btn-primary mx-1 px-5 bg-blue-500 hover:bg-blue-900">Save</button
+						><a href="/admin/news" class="btn btn-primary mx-1 px-4 bg-red-500 hover:bg-red-900"
+							>Cancel</a
+						>
+						<button
+							on:click={deleteNews}
+							type="submit"
+							class="btn btn-warning mx-1 hover:bg-red-900 text-white">Delete</button
+						>
 					</div>
 				</form>
 			</div>

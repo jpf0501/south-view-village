@@ -72,8 +72,11 @@
 					</div>
 				</div>
 				<div class="flex justify-end mt-8">
-					<button type="submit" class="btn btn-primary mx-1">Update Info</button>
-					<a href="/profile" class="btn btn-error mx-1 text-white">Cancel</a>
+					<button type="submit" class="btn btn-primary bg-blue-500 mx-1 hover:bg-blue-900"
+						>Update Info</button
+					>
+					<a href="/profile" class="btn btn-primary mx-1 px-4 bg-red-500 hover:bg-red-900">Cancel</a
+					>
 				</div>
 			</form>
 			<ChangePassword />

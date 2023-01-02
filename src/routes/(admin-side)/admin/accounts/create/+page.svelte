@@ -11,8 +11,8 @@
 		addressLot: '',
 		addressStreet: '',
 		contactNumber: '',
-		role: '',
-	}
+		role: ''
+	};
 
 	async function submitHandler() {
 		try {
@@ -28,9 +28,9 @@
 					lastname: account.lastname.trim().toLowerCase(),
 					addressBlock: account.addressBlock,
 					addressLot: account.addressLot,
-					addressStreet: account.addressStreet.trim().toLowerCase(),
+					addressStreet: account.addressStreet,
 					contactNumber: account.contactNumber,
-					role: account.role.trim().toLowerCase()
+					role: account.role
 				})
 			});
 			const result = await response.json();
@@ -195,10 +195,15 @@
 							/>
 						</div>
 					</div>
-					<div class="flex justify-end mt-8">
-						<button type="submit" class="btn btn-primary mx-1">Save</button>
-						<a href="/admin/accounts" class="btn btn-error mx-1">Cancel</a>
-					</div>
+				</div>
+				<div class="flex justify-end mt-8">
+					<button type="submit" class="btn btn-primary mx-1 px-6 bg-blue-500 hover:bg-blue-900"
+						>Create</button
+					>
+					<a
+						href="/admin/accounts"
+						class="btn btn-primary mx-1 bg-red-500 px-4 hover:bg-red-900 text-white">Cancel</a
+					>
 				</div>
 			</form>
 		</div>

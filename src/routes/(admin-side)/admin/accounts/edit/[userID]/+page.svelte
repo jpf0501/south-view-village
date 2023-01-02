@@ -141,13 +141,19 @@
 					/>
 				</div>
 				<div class="flex justify-end mt-8">
-					<button on:click={updateUser} type="submit" class="btn btn-primary mx-1 bg-blue-500"
-						>Save</button
+					<button
+						on:click={updateUser}
+						type="submit"
+						class="btn btn-primary mx-1 px-5 bg-blue-500 hover:bg-blue-900">Save</button
 					>
-					<button on:click={deleteUser} type="submit" class="btn btn-primary mx-1 bg-red-500"
-						>Delete</button
+					<a href="/admin/accounts" class="btn btn-primary mx-1 px-4 bg-red-500 hover:bg-red-900"
+						>Cancel</a
 					>
-					<a href="/admin/accounts" class="btn btn-error mx-1">Cancel</a>
+					<button
+						on:click={deleteUser}
+						type="submit"
+						class="btn btn-warning mx-1 hover:bg-red-900 text-white">Delete</button
+					>
 				</div>
 			</div>
 		</div>

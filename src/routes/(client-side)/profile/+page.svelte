@@ -58,7 +58,9 @@
 					</div>
 				</div>
 				<div class="flex justify-end mt-8">
-					<a href="/profile/edit" class="btn btn-primary mx-1">Edit Info</a>
+					<a href="/profile/edit" class="btn btn-primary bg-blue-500 mx-1 hover:bg-blue-900"
+						>Edit Info</a
+					>
 				</div>
 			</div>
 		</div>
