@@ -1,6 +1,13 @@
 <script>
 	import { db } from '$lib/firebase/client';
-	import { getDoc, updateDoc, deleteDoc, doc, serverTimestamp, deleteField } from 'firebase/firestore';
+	import {
+		getDoc,
+		updateDoc,
+		deleteDoc,
+		doc,
+		serverTimestamp,
+		deleteField
+	} from 'firebase/firestore';
 	import { goto } from '$app/navigation';
 
 	/** @type {import('./$types').PageData} */
@@ -12,7 +19,6 @@
 	async function getNews() {
 		const snapshot = await getDoc(doc(db, 'news', newsID));
 		news = snapshot.data();
-
 	}
 	getNews();
 
@@ -60,17 +66,22 @@
 					<div>
 						<label for="content">Content</label>
 						<br />
-						<textarea class="h-60 w-5/6" required bind:value={news.content} />
+						<textarea class="h-60 w-5/6" style="resize:none" required bind:value={news.content} />
 					</div>
 					<div class="grid place-items-center my-10">
 						<div class="flex gap-5">
-							<button on:click={updateNews} type="submit" class="bg-blue-500 px-10 py-2"
-								>Save</button
+							<button
+								on:click={updateNews}
+								type="submit"
+								class="btn btn-primary px-10 py-2 hover:bg-blue-900">Save</button
+							><a href="/admin/news" class="btn btn-error px-10 py-2 text-white hover:bg-red-900"
+								>Cancel</a
 							>
-							<button on:click={deleteNews} type="submit" class="bg-red-500 px-10 py-2"
-								>Delete</button
+							<button
+								on:click={deleteNews}
+								type="submit"
+								class="btn btn-warning text-white px-10 py-2 hover:bg-yellow-900">Delete</button
 							>
-							<a href="/admin/news" class="bg-green-500 px-10 py-2">Cancel</a>
 						</div>
 					</div>
 				</form>

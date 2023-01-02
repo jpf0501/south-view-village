@@ -3,19 +3,19 @@
 	import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 	import { goto } from '$app/navigation';
 
-    let news = {
-        title: '',
-        content: '',
-    }
+	let news = {
+		title: '',
+		content: ''
+	};
 
-    async function submitHandler() {
+	async function submitHandler() {
 		try {
 			await addDoc(collection(db, 'news'), {
-                title: news.title.trim().toLowerCase(),
-                content: news.content,
-                dateCreated: serverTimestamp(),
-                dateModified: serverTimestamp(),
-            });
+				title: news.title.trim().toLowerCase(),
+				content: news.content,
+				dateCreated: serverTimestamp(),
+				dateModified: serverTimestamp()
+			});
 			alert('News entry created');
 			await goto('/admin/news');
 		} catch (error) {
@@ -23,33 +23,36 @@
 			alert('Error updating');
 		}
 	}
-
 </script>
 
-    <div>
-        <div class="grid place-items-center py-10">
-            <div class="w-11/12">
-                <div>
-                    <h1 class="text-xl font-bold bg-gray-300 px-1 py-3">Add News</h1>              
-                </div>
-                <form on:submit|preventDefault={submitHandler}>
-                    <div class="">
-                        <label for="title">Title</label>
-                        <br>
-                        <input type="text" class="w-1/2" required bind:value={news.title}> 
-                    </div>   
-                    <div >
-                        <label for="content">Content</label>
-                        <br>
-                        <textarea class="h-60 w-5/6" required bind:value={news.content}></textarea>
-                    </div>            
-                    <div class="grid place-items-center my-10">
-                        <div class="flex gap-5">
-                            <button type="submit" class="bg-blue-500 px-10 py-2">Add Entry</button>
-                            <a href="/admin/news" class="bg-red-500 px-10 py-2">Cancel</a>
-                        </div>          
-                    </div>
-                </form>     
-            </div>         
-        </div>
-    </div> 
+<div>
+	<div class="grid place-items-center py-10">
+		<div class="w-11/12">
+			<div>
+				<h1 class="text-xl font-bold bg-gray-300 px-1 py-3">Add News</h1>
+			</div>
+			<form on:submit|preventDefault={submitHandler}>
+				<div class="">
+					<label for="title">Title</label>
+					<br />
+					<input type="text" class="w-1/2" required bind:value={news.title} />
+				</div>
+				<div>
+					<label for="content">Content</label>
+					<br />
+					<textarea class="h-60 w-5/6" style="resize:none" required bind:value={news.content} />
+				</div>
+				<div class="grid place-items-center my-10">
+					<div class="flex gap-5">
+						<button type="submit" class="btn btn-primary px-10 py-2 hover:bg-blue-900"
+							>Add News</button
+						>
+						<a href="/admin/news" class="btn btn-error px-10 py-2 text-white hover:bg-red-900"
+							>Cancel</a
+						>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
