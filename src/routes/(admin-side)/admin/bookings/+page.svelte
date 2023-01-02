@@ -16,7 +16,7 @@
 	let sortByField = '';
 	let searchByField = '';
 	let searchByValue = '';
-	let newStatus = '';
+	let bookingStatus = '';
 	let bookingsQuery = query(collection(db, 'booking'));
 
 	async function getBookings(bookingsQuery) {
@@ -40,23 +40,15 @@
 
 	$: getBookings(bookingsQuery);
 
-	async function changeStatusToApproved() {
-		newStatus = 'approved';
-	}
-
-	async function changeStatusToDisapproved() {
-		newStatus = 'disapproved';
-	}
-
 	async function changeStatus(bookingId) {
 		try {
-			// console.log(newStatus);
+			// console.log(bookingStatus);
 			const bookRef = doc(db, 'booking', bookingId);
 			const data = {
-				status: newStatus
+				status: bookingStatus
 			};
 			await updateDoc(bookRef, data);
-			alert('Booking request has been ' + newStatus);
+			alert('Booking request has been ' + bookingStatus);
 		} catch (error) {
 			console.log(error);
 		}
@@ -157,12 +149,12 @@
 							<td class="p-3 text-sm whitespace-nowrap">
 								<form on:submit={changeStatus(book.id)}>
 									<button
-										on:click={changeStatusToApproved}
+										on:click={() => (bookingStatus = 'approved')}
 										type="submit"
 										class="py-2 px-2 text-green-500 font-bold">Approve</button
 									>
 									<button
-										on:click={changeStatusToDisapproved}
+										on:click={() => (bookingStatus = 'disapproved')}
 										type="submit"
 										class="py-2 px-2 text-red-500 font-bold">Dissaprove</button
 									>
@@ -232,12 +224,12 @@
 					<div>
 						<form on:submit={changeStatus(book.id)}>
 							<button
-								on:click={changeStatusToApproved}
+								on:click={() => (bookingStatus = 'approved')}
 								type="submit"
 								class="py-2 px-2 text-green-500 font-bold">Approve</button
 							>
 							<button
-								on:click={changeStatusToDisapproved}
+								on:click={() => (bookingStatus = 'disapproved')}
 								type="submit"
 								class="py-2 px-2 text-red-500 font-bold">Dissaprove</button
 							>
