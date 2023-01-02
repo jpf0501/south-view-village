@@ -94,10 +94,18 @@
 				{#each listOfBooking as book}
 					{#if book.status == 'approved' || book.status == 'disapproved'}
 						<tr class="border-t-2 border-black">
-							<td class="p-3 text-sm whitespace-nowrap">{book.firstname + ' ' + book.lastname}</td>
+							<td class="p-3 text-sm whitespace-nowrap"
+								>{book.firstname.substring(0, 1).toUpperCase() +
+									book.firstname.substring(1) +
+									' ' +
+									book.lastname.substring(0, 1).toUpperCase() +
+									book.lastname.substring(1)}</td
+							>
 							<td class="p-3 text-sm whitespace-nowrap">{book.email}</td>
 							<td class="p-3 text-sm whitespace-nowrap">{book.contactNumber}</td>
-							<td class="p-3 text-sm whitespace-nowrap">{book.eventType}</td>
+							<td class="p-3 text-sm whitespace-nowrap"
+								>{book.eventType.substring(0, 1).toUpperCase() + book.eventType.substring(1)}</td
+							>
 							<td class="p-3 text-sm whitespace-nowrap"
 								>{book.bookDate.toDate().toLocaleDateString() +
 									' at ' +
@@ -126,49 +134,55 @@
 	<!-- Small screen -->
 	<div class="bg-gray-300 my-5 p-5  selection:grid grid-cols-1 gap-4 md:hidden rounded-lg shadow">
 		{#each listOfBooking as book}
-			<div class="bg-white space-y-3 p-4 border-2 border-black">
-				<div class="flex items-center space-x-2  text-sm">
+			{#if book.status == 'approved' || book.status == 'disapproved'}
+				<div class="bg-white space-y-3 p-4 border-2 border-black">
+					<div class="flex items-center space-x-2  text-sm">
+						<div>
+							<span class="font-bold text-sm">Name: </span>
+							{book.firstname.substring(0, 1).toUpperCase() +
+								book.firstname.substring(1) +
+								' ' +
+								book.lastname.substring(0, 1).toUpperCase() +
+								book.lastname.substring(1)}
+						</div>
+					</div>
 					<div>
-						<span class="font-bold text-sm">Name: </span>
-						{book.firstname + ' ' + book.lastname}
+						<span class="font-bold text-sm">E-mail Address: </span>
+						{book.email}
+					</div>
+					<div>
+						<span class="font-bold text-sm">Contact No: </span>
+						{book.contactNumber}
+					</div>
+					<div>
+						<span class="font-bold text-sm">Type of Event: </span>
+						{book.eventType.substring(0, 1).toUpperCase() + book.eventType.substring(1)}
+					</div>
+					<div>
+						<span class="font-bold text-sm">Date and Time: </span>
+						{book.bookDate.toDate().toLocaleDateString() +
+							' at ' +
+							book.bookDate.toDate().toLocaleTimeString()}
+					</div>
+					<div class="font-bold">
+						Status:
+						{#if book.status == 'approved'}
+							<span class="text-sm text-green-500"
+								>{book.status.substring(0, 1).toUpperCase() + book.status.substring(1)}</span
+							>
+						{:else if book.status == 'disapproved'}
+							<span class="text-sm text-red-500"
+								>{book.status.substring(0, 1).toUpperCase() + book.status.substring(1)}</span
+							>
+						{:else}
+							<span class="text-sm"
+								>{book.status.substring(0, 1).toUpperCase() + book.status.substring(1)}</span
+							>
+						{/if}
 					</div>
 				</div>
-				<div>
-					<span class="font-bold text-sm">E-mail Address: </span>
-					{book.email}
-				</div>
-				<div>
-					<span class="font-bold text-sm">Contact No: </span>
-					{book.contactNumber}
-				</div>
-				<div>
-					<span class="font-bold text-sm">Type of Event: </span>
-					{book.eventType}
-				</div>
-				<div>
-					<span class="font-bold text-sm">Date: </span>
-					{book.date}
-					<span class="font-bold text-sm">Time: </span>
-					{book.time}
-				</div>
-				<div class="font-bold">
-					Status:
-					{#if book.status == 'approved'}
-						<span class="text-sm text-green-500"
-							>{book.status.substring(0, 1).toUpperCase() + book.status.substring(1)}</span
-						>
-					{:else if book.status == 'disapproved'}
-						<span class="text-sm text-red-500"
-							>{book.status.substring(0, 1).toUpperCase() + book.status.substring(1)}</span
-						>
-					{:else}
-						<span class="text-sm"
-							>{book.status.substring(0, 1).toUpperCase() + book.status.substring(1)}</span
-						>
-					{/if}
-				</div>
-			</div>
-			<br />
+				<br />
+			{/if}
 		{/each}
 	</div>
 </div>
