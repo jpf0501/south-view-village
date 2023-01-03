@@ -21,6 +21,8 @@
 	async function getUser() {
 		const snapshot = await getDoc(doc(db, 'accounts', $userStore.uid));
 		user = snapshot.data();
+		guest.firstname = user.firstNameDisplay;
+		guest.lastname = user.lastNameDisplay;
 	}
 	$: if ($userStore) {
 		getUser();
@@ -30,12 +32,16 @@
 		if (user !== null) {
 			try {
 				await addDoc(collection(db, 'booking'), {
-					firstname: user.firstname.trim().toLowerCase(),
-					lastname: user.lastname.trim().toLowerCase(),
+					firstname: guest.firstname.trim().toLowerCase(),
+					firstNameDisplay: guest.firstname,
+					lastname: guest.lastname.trim().toLowerCase(),
+					lastNameDisplay: guest.lastname,
 					email: user.email.trim().toLowerCase(),
 					contactNumber: user.contactNumber,
 					status: guest.status,
+					paymentStatus: guest.paymentStatus,
 					eventType: guest.eventType.trim().toLowerCase(),
+					eventTypeDisplay: guest.eventType,
 					bookDate: new Date(guest.date + ' ' + guest.time)
 				});
 				alert('Reservation form submitted');
@@ -48,11 +54,15 @@
 			try {
 				await addDoc(collection(db, 'booking'), {
 					firstname: guest.firstname.trim().toLowerCase(),
+					firstNameDisplay: guest.firstname,
 					lastname: guest.lastname.trim().toLowerCase(),
+					lastNameDisplay: guest.lastname,
 					email: guest.email.trim().toLowerCase(),
 					contactNumber: guest.contactNumber,
 					status: guest.status,
+					paymentStatus: guest.paymentStatus,
 					eventType: guest.eventType.trim().toLowerCase(),
+					eventTypeDisplay: guest.eventType,
 					bookDate: new Date(guest.date + ' ' + guest.time)
 				});
 				alert('Schedule request submitted');
@@ -80,7 +90,7 @@
 						<input
 							type="text"
 							class="border-2 rounded-lg p-3 mt-2"
-							bind:value={user.firstname}
+							bind:value={guest.firstname}
 							required
 						/>
 					</div>
@@ -89,7 +99,7 @@
 						<input
 							type="text"
 							class="border-2 rounded-lg p-3 mt-2"
-							bind:value={user.lastname}
+							bind:value={guest.lastname}
 							required
 						/>
 					</div>

@@ -19,10 +19,12 @@
 	async function getNews() {
 		const snapshot = await getDoc(doc(db, 'news', newsID));
 		news = snapshot.data();
+		news.title = news.titleDisplay;
 	}
 	getNews();
 
 	async function updateNews() {
+		news.title = news.titleDisplay.toLowerCase();
 		try {
 			news.dateModified = serverTimestamp();
 			await updateDoc(doc(db, 'news', newsID), news);
@@ -59,7 +61,7 @@
 					<div class="my-2">
 						<label for="title">Title</label>
 						<br />
-						<input type="text" class="w-1/2" required bind:value={news.title} />
+						<input type="text" class="w-1/2" required bind:value={news.titleDisplay} />
 					</div>
 					<div class="my-2">
 						<label for="content">Content</label>

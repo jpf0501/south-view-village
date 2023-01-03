@@ -12,11 +12,14 @@
 	async function getUser() {
 		const snapshot = await getDoc(doc(db, 'accounts', userID));
 		user = snapshot.data();
+		user.firstname = user.firstNameDisplay;
+		user.lastname = user.lastNameDisplay;
 	}
 	getUser();
 
 	async function updateUser() {
-		// console.log(user);
+		user.firstname = user.firstNameDisplay.toLowerCase();
+		user.lastname = user.lastNameDisplay.toLowerCase();
 		try {
 			await updateDoc(doc(db, 'accounts', userID), user);
 			alert('User info updated');
@@ -58,7 +61,7 @@
 							name="fname"
 							class="input input-bordered"
 							required
-							bind:value={user.firstname}
+							bind:value={user.firstNameDisplay}
 						/>
 					</div>
 					<div class="form-control">
@@ -70,7 +73,7 @@
 							name="lname"
 							class="input input-bordered"
 							required
-							bind:value={user.lastname}
+							bind:value={user.lastNameDisplay}
 						/>
 					</div>
 				</div>

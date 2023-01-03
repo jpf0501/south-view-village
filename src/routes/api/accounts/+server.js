@@ -22,7 +22,9 @@ export async function POST({ request }) {
         const userRecord = await adminAuth.createUser({ email:createUserRequest.email, password:createUserRequest.password });
 		await setDoc(doc(db, "accounts", userRecord.uid), { 
 			firstname:createUserRequest.firstname, 
+			firstNameDisplay:createUserRequest.firstNameDisplay,
 			lastname:createUserRequest.lastname, 
+			lastNameDisplay:createUserRequest.lastNameDisplay,
 			addressBlock:createUserRequest.addressBlock,
 			addressLot:createUserRequest.addressBlock,
 			addressStreet:createUserRequest.addressStreet,

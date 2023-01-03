@@ -81,7 +81,7 @@
 			<tbody>
 				{#each listOfUsers as user}
 					<tr class="border-t-2 border-black">
-						<td class="p-3 text-sm whitespace-nowrap">{user.firstname + ' ' + user.lastname}</td>
+						<td class="p-3 text-sm whitespace-nowrap">{user.firstNameDisplay + ' ' + user.lastNameDisplay}</td>
 						<td class="p-3 text-sm whitespace-nowrap"
 							>{'Block ' +
 								user.addressBlock +
@@ -112,7 +112,7 @@
 				<div class="flex items-center space-x-2  text-sm">
 					<div>
 						<span class="font-bold text-sm">Name: </span>
-						{user.firstname + ' ' + user.lastname}
+						{user.firstNameDisplay + ' ' + user.lastNameDisplay}
 					</div>
 					<div>
 						<span class="font-bold text-sm">Role: </span>

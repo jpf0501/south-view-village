@@ -21,13 +21,14 @@
 	}
 
 	async function searchNews() {
+		let searchByValueCase = searchByValue.toLowerCase();
 		if (searchByValue == '') {
 			newsQuery = query(collection(db, 'news'));
 		} else {
 			newsQuery = query(
 				collection(db, 'news'),
-				where(searchByField, '>=', searchByValue),
-				where(searchByField, '<=', searchByValue + '~')
+				where(searchByField, '>=', searchByValueCase),
+				where(searchByField, '<=', searchByValueCase + '~')
 			);
 		}
 	}
@@ -47,7 +48,7 @@
 				<option value="" disabled selected>Search Filter</option>
 				<option value="title">Title</option>
 			</select>
-			<input type="search" placeholder="Search here" required bind:value={searchByValue} />
+			<input type="search" placeholder="Search here" bind:value={searchByValue} />
 		</form>
 		<select bind:value={sortByField} on:change={changeSortBy}>
 			<option value="" disabled selected>Sort By</option>
@@ -77,7 +78,7 @@
 			<tbody>
 				{#each listOfNews as news}
 					<tr class="border-t-2 border-black">
-						<td class="w-1/4 p-3 text-sm whitespace-nowrap">{news.title}</td>
+						<td class="w-1/4 p-3 text-sm whitespace-nowrap">{news.titleDisplay}</td>
 						<td class="w-1/4 p-3 text-sm whitespace-nowrap"
 							>{news.dateCreated.toDate().toLocaleDateString() +
 								' ' +
@@ -106,7 +107,7 @@
 			<div class="bg-white space-y-3 p-4 border-2 border-black">
 				<div>
 					<span class="font-bold text-sm">Title: </span>
-					{news.title}
+					{news.titleDisplay}
 				</div>
 				<div>
 					<span class="font-bold text-sm">Date Created: </span>
