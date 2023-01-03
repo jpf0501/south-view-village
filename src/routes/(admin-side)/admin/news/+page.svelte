@@ -46,8 +46,6 @@
 			<select bind:value={searchByField} required>
 				<option value="" disabled selected>Search Filter</option>
 				<option value="title">Title</option>
-				<option value="dateCreated">Date Created</option>
-				<option value="dateModified">Date Modified</option>
 			</select>
 			<input type="search" placeholder="Search here" required bind:value={searchByValue} />
 		</form>

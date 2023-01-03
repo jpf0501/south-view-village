@@ -23,10 +23,11 @@
 	}
 
 	async function searchAccounts() {
+		let searchByValueCase = searchByValue.toLowerCase();
 		accountsQuery = query(
 			collection(db, 'accounts'),
-			where(searchByField, '>=', searchByValue),
-			where(searchByField, '<=', searchByValue + '~')
+			where(searchByField, '>=', searchByValueCase),
+			where(searchByField, '<=', searchByValueCase + '~')
 		);
 	}
 

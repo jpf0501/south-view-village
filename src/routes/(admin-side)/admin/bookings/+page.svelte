@@ -31,10 +31,11 @@
 	}
 
 	async function searchBookings() {
+		let searchByValueCase = searchByValue.toLowerCase();
 		bookingsQuery = query(
 			collection(db, 'booking'),
-			where(searchByField, '>=', searchByValue),
-			where(searchByField, '<=', searchByValue + '~')
+			where(searchByField, '>=', searchByValueCase),
+			where(searchByField, '<=', searchByValueCase + '~')
 		);
 	}
 

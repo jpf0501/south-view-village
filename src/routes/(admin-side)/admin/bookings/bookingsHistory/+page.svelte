@@ -34,6 +34,7 @@
 	}
 
 	async function searchBookings() {
+		let searchByValueCase = searchByValue.toLowerCase();
 		bookingsQuery = query(
 			collection(db, 'booking'),
 			where(searchByField, '>=', searchByValue),
@@ -54,15 +55,15 @@
 		<a href="/admin/bookings" class="hover:underline">Go to Bookings</a>
 	</div>
 	<div class="flex justify-between">
-		<form on:submit|preventDefault={searchBookings} required>
-			<select bind:value={searchByField}>
+		<form on:submit|preventDefault={searchBookings}>
+			<select bind:value={searchByField} required>
 				<option value="" disabled selected>Search Filter</option>
 				<option value="firstname">Name</option>
 				<option value="email">E-mail Address</option>
 				<option value="eventType">Type of Event</option>
 				<option value="bookDate">Date and Time</option>
 			</select>
-			<input type="search" placeholder="Search here" required bind:value={searchByValue} />
+			<input type="search" placeholder="Search here" required bind:value={searchByValue}/>
 		</form>
 		<select bind:value={sortByField} on:change={changeSortBy}>
 			<option value="" disabled selected>Sort By</option>
