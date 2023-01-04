@@ -17,6 +17,7 @@
 	let searchByField = '';
 	let searchByValue = '';
 	let bookingStatus = '';
+	let bookingPaymentStatus = '';
 	let bookingsQuery = query(collection(db, 'booking'));
 
 	async function getBookings(bookingsQuery) {
@@ -41,14 +42,29 @@
 
 	$: getBookings(bookingsQuery);
 
-	async function changeStatus(bookingId) {
+	async function changeStatus(bookingId, paymentStatus) {
 		try {
 			const bookRef = doc(db, 'booking', bookingId);
 			const data = {
 				status: bookingStatus
 			};
+			if (paymentStatus == 'Unpaid' && bookingStatus == 'Approved') {
+				alert('Only paid bookings can be approved');
+			} else {
+				await updateDoc(bookRef, data);
+				alert('Booking request has been ' + bookingStatus);
+			}
+		} catch (error) {
+			console.log(error);
+		}
+	}
+	async function changePaymentStatus(bookingId) {
+		try {
+			const bookRef = doc(db, 'booking', bookingId);
+			const data = {
+				paymentStatus: bookingPaymentStatus
+			};
 			await updateDoc(bookRef, data);
-			alert('Booking request has been ' + bookingStatus);
 		} catch (error) {
 			console.log(error);
 		}
@@ -128,17 +144,25 @@
 									' at ' +
 									book.bookDate.toDate().toLocaleTimeString()}</td
 							>
-							{#if book.paymentStatus == 'Paid'}
-								<td class="p-3 text-sm whitespace-nowrap text-green-500 font-bold">
-									{book.paymentStatus}
-								</td>
-							{:else if book.paymentStatus == 'Unpaid'}
-								<td class="p-3 text-sm whitespace-nowrap text-red-500 font-bold">
-									{book.paymentStatus}
-								</td>
-							{/if}
+							<td>
+								<form on:submit|preventDefault={changePaymentStatus(book.id)}>
+									{#if book.paymentStatus == 'Paid'}
+										<button type="submit" on:click={() => (bookingPaymentStatus = 'Unpaid')}>
+											<span class="p-3 text-sm whitespace-nowrap text-green-500 font-bold">
+												{book.paymentStatus}
+											</span>
+										</button>
+									{:else if book.paymentStatus == 'Unpaid'}
+										<button type="submit" on:click={() => (bookingPaymentStatus = 'Paid')}>
+											<span class="p-3 text-sm whitespace-nowrap text-red-500 font-bold">
+												{book.paymentStatus}
+											</span>
+										</button>
+									{/if}
+								</form>
+							</td>
 							<td class="p-3 text-sm whitespace-nowrap">
-								<form on:submit={changeStatus(book.id)}>
+								<form on:submit|preventDefault={changeStatus(book.id, book.paymentStatus)}>
 									<button
 										on:click={() => (bookingStatus = 'Approved')}
 										type="submit"
@@ -196,14 +220,24 @@
 					</div>
 					<div class="font-bold">
 						Status:
-						{#if book.paymentStatus == 'Paid'}
-							<span class="text-sm text-green-500">{book.paymentStatus}</span>
-						{:else if book.paymentStatus == 'Unpaid'}
-							<span class="text-sm text-red-500">{book.paymentStatus}</span>
-						{/if}
+						<form on:submit|preventDefault={changePaymentStatus(book.id)}>
+							{#if book.paymentStatus == 'Paid'}
+								<button type="submit" on:click={() => (bookingPaymentStatus = 'Unpaid')}>
+									<span class="p-3 text-sm whitespace-nowrap text-green-500 font-bold">
+										{book.paymentStatus}
+									</span>
+								</button>
+							{:else if book.paymentStatus == 'Unpaid'}
+								<button type="submit" on:click={() => (bookingPaymentStatus = 'Paid')}>
+									<span class="p-3 text-sm whitespace-nowrap text-red-500 font-bold">
+										{book.paymentStatus}
+									</span>
+								</button>
+							{/if}
+						</form>
 					</div>
 					<div>
-						<form on:submit={changeStatus(book.id)}>
+						<form on:submit|preventDefault={changeStatus(book.id)}>
 							<button
 								on:click={() => (bookingStatus = 'Approved')}
 								type="submit"
