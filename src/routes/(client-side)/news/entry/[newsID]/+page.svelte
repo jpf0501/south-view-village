@@ -17,6 +17,10 @@
 
 </script>
 
+<svelte:head>
+	<title>News - Official Website of Southview Homes 3 Subdivision</title>
+</svelte:head>
+
 {#if news}
 <main class="p-8 w-full">
     <div class="pb-10"> 
@@ -32,7 +36,7 @@
         <h1 class="divider">           
         </h1>
         <article class="max-w-7xl text-justify mx-auto" style="white-space:pre-wrap">
-            <p>{news.content.replaceAll("\\n", "\n")}</p>
+            <p>{news.content}</p>
         </article>
     </section>
 </main>
