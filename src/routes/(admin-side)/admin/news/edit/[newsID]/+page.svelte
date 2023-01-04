@@ -66,7 +66,7 @@
 					<div class="my-2">
 						<label for="content">Content</label>
 						<br />
-						<textarea class="h-60 w-5/6" style="resize:none" required bind:value={news.content} />
+						<textarea class="h-60 w-5/6" style="white-space:pre-wrap; resize:none" required bind:value={news.content} />
 					</div>
 					<div class="flex justify-end mt-8">
 						<button

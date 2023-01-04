@@ -36,7 +36,7 @@
 						<h1 class="font-bold text-2xl p-4">{news.titleDisplay}</h1>
 						<h1 class="p-4">Posted {news.dateCreated.toDate().toLocaleDateString()}</h1>
 					</div>
-				<p class="p-4 text-justify">
+				<p class="p-4 text-justify" style="white-space:pre-wrap">
 					{news.content.substring(0, 250) + '...'}
 				</p>
 				<a href={'/news/entry/' + news.id} class="link link-hover link-info">Read more</a>

@@ -31,8 +31,8 @@
         <p>Posted on {news.dateCreated.toDate().toLocaleDateString()} at {news.dateCreated.toDate().toLocaleTimeString()} | Last Updated on {news.dateModified.toDate().toLocaleDateString()} at {news.dateModified.toDate().toLocaleTimeString()}</p>
         <h1 class="divider">           
         </h1>
-        <article class="max-w-7xl text-justify mx-auto">
-            <p>{news.content}</p>
+        <article class="max-w-7xl text-justify mx-auto" style="white-space:pre-wrap">
+            <p>{news.content.replaceAll("\\n", "\n")}</p>
         </article>
     </section>
 </main>
