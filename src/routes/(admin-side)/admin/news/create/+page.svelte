@@ -12,8 +12,8 @@
 		try {
 			await addDoc(collection(db, 'news'), {
 				title: news.title.trim().toLowerCase(),
-				titleDisplay: news.title,
-				content: news.content,
+				titleDisplay: news.title.trim(),
+				content: news.content.trim(),
 				dateCreated: serverTimestamp(),
 				dateModified: serverTimestamp()
 			});
