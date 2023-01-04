@@ -11,8 +11,8 @@
 		lastname: '',
 		email: '',
 		contactNumber: '',
-		status: 'pending',
-		paymentStatus: 'unpaid',
+		status: 'Pending',
+		paymentStatus: 'Unpaid',
 		eventType: '',
 		date: '',
 		time: ''

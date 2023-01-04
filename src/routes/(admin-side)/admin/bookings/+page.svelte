@@ -43,7 +43,6 @@
 
 	async function changeStatus(bookingId) {
 		try {
-			// console.log(bookingStatus);
 			const bookRef = doc(db, 'booking', bookingId);
 			const data = {
 				status: bookingStatus
@@ -56,7 +55,6 @@
 	}
 
 	async function sendPaymentEmail(bookEmail) {
-		// console.log(bookEmail);
 		try {
 			const result = await sendEmail({
 				to: bookEmail,
@@ -117,9 +115,11 @@
 			</thead>
 			<tbody>
 				{#each listOfBooking as book}
-					{#if book.status == 'pending'}
+					{#if book.status == 'Pending'}
 						<tr class="border-t-2 border-black">
-							<td class="p-3 text-sm whitespace-nowrap">{book.firstNameDisplay + ' ' + book.lastNameDisplay}</td>
+							<td class="p-3 text-sm whitespace-nowrap"
+								>{book.firstNameDisplay + ' ' + book.lastNameDisplay}</td
+							>
 							<td class="p-3 text-sm whitespace-nowrap">{book.email}</td>
 							<td class="p-3 text-sm whitespace-nowrap">{book.contactNumber}</td>
 							<td class="p-3 text-sm whitespace-nowrap">{book.eventTypeDisplay}</td>
@@ -128,26 +128,24 @@
 									' at ' +
 									book.bookDate.toDate().toLocaleTimeString()}</td
 							>
-							{#if book.paymentStatus == 'paid'}
+							{#if book.paymentStatus == 'Paid'}
 								<td class="p-3 text-sm whitespace-nowrap text-green-500 font-bold">
-									{book.paymentStatus.substring(0, 1).toUpperCase() +
-										book.paymentStatus.substring(1)}
+									{book.paymentStatus}
 								</td>
-							{:else}
+							{:else if book.paymentStatus == 'Unpaid'}
 								<td class="p-3 text-sm whitespace-nowrap text-red-500 font-bold">
-									{book.paymentStatus.substring(0, 1).toUpperCase() +
-										book.paymentStatus.substring(1)}
+									{book.paymentStatus}
 								</td>
 							{/if}
 							<td class="p-3 text-sm whitespace-nowrap">
 								<form on:submit={changeStatus(book.id)}>
 									<button
-										on:click={() => (bookingStatus = 'approved')}
+										on:click={() => (bookingStatus = 'Approved')}
 										type="submit"
 										class="py-2 px-2 text-green-500 font-bold">Approve</button
 									>
 									<button
-										on:click={() => (bookingStatus = 'disapproved')}
+										on:click={() => (bookingStatus = 'Disapproved')}
 										type="submit"
 										class="py-2 px-2 text-red-500 font-bold">Dissaprove</button
 									>
@@ -170,7 +168,7 @@
 	<!-- Small screen -->
 	<div class="bg-gray-300 my-5 p-5  selection:grid grid-cols-1 gap-4 md:hidden rounded-lg shadow">
 		{#each listOfBooking as book}
-			{#if book.status == 'pending'}
+			{#if book.status == 'Pending'}
 				<div class="bg-white space-y-3 p-4 border-2 border-black">
 					<div class="flex items-center space-x-2  text-sm">
 						<div>
@@ -198,27 +196,21 @@
 					</div>
 					<div class="font-bold">
 						Status:
-						{#if book.paymentStatus == 'paid'}
-							<span class="text-sm text-green-500"
-								>{book.paymentStatus.substring(0, 1).toUpperCase() +
-									book.paymentStatus.substring(1)}</span
-							>
-						{:else}
-							<span class="text-sm text-red-500"
-								>{book.paymentStatus.substring(0, 1).toUpperCase() +
-									book.paymentStatus.substring(1)}</span
-							>
+						{#if book.paymentStatus == 'Paid'}
+							<span class="text-sm text-green-500">{book.paymentStatus}</span>
+						{:else if book.paymentStatus == 'Unpaid'}
+							<span class="text-sm text-red-500">{book.paymentStatus}</span>
 						{/if}
 					</div>
 					<div>
 						<form on:submit={changeStatus(book.id)}>
 							<button
-								on:click={() => (bookingStatus = 'approved')}
+								on:click={() => (bookingStatus = 'Approved')}
 								type="submit"
 								class="py-2 px-2 text-green-500 font-bold">Approve</button
 							>
 							<button
-								on:click={() => (bookingStatus = 'disapproved')}
+								on:click={() => (bookingStatus = 'Disapproved')}
 								type="submit"
 								class="py-2 px-2 text-red-500 font-bold">Dissaprove</button
 							>

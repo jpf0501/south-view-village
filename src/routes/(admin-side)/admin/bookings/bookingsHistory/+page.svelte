@@ -63,7 +63,7 @@
 				<option value="eventType">Type of Event</option>
 				<option value="bookDate">Date and Time</option>
 			</select>
-			<input type="search" placeholder="Search here" required bind:value={searchByValue}/>
+			<input type="search" placeholder="Search here" required bind:value={searchByValue} />
 		</form>
 		<select bind:value={sortByField} on:change={changeSortBy}>
 			<option value="" disabled selected>Sort By</option>
@@ -74,8 +74,8 @@
 		</select>
 		<select bind:value={sortByStatus} on:change={changeSortByStatus}>
 			<option value="" selected>Status</option>
-			<option value="approved">Approved</option>
-			<option value="disapproved">Disapproved</option>
+			<option value="Approved">Approved</option>
+			<option value="Disapproved">Disapproved</option>
 		</select>
 	</div>
 
@@ -93,33 +93,26 @@
 			</thead>
 			<tbody>
 				{#each listOfBooking as book}
-					{#if book.status == 'approved' || book.status == 'disapproved'}
+					{#if book.status == 'Approved' || book.status == 'Disapproved'}
 						<tr class="border-t-2 border-black">
 							<td class="p-3 text-sm whitespace-nowrap"
-								>{book.firstNameDisplay + ' ' + book.lastNameDisplay }</td
+								>{book.firstNameDisplay + ' ' + book.lastNameDisplay}</td
 							>
 							<td class="p-3 text-sm whitespace-nowrap">{book.email}</td>
 							<td class="p-3 text-sm whitespace-nowrap">{book.contactNumber}</td>
-							<td class="p-3 text-sm whitespace-nowrap"
-								>{book.eventTypeDisplay}</td
-							>
+							<td class="p-3 text-sm whitespace-nowrap">{book.eventTypeDisplay}</td>
 							<td class="p-3 text-sm whitespace-nowrap"
 								>{book.bookDate.toDate().toLocaleDateString() +
 									' at ' +
 									book.bookDate.toDate().toLocaleTimeString()}</td
 							>
-							{#if book.status == 'approved'}
-								<td class="p-3 text-sm whitespace-nowrap text-green-500 font-bold"
-									>{book.status.substring(0, 1).toUpperCase() + book.status.substring(1)}</td
+							{#if book.status == 'Approved'}
+								<td class="p-3 text-sm whitespace-nowrap text-green-500 font-bold">{book.status}</td
 								>
-							{:else if book.status == 'disapproved'}
-								<td class="p-3 text-sm whitespace-nowrap text-red-500 font-bold"
-									>{book.status.substring(0, 1).toUpperCase() + book.status.substring(1)}</td
-								>
-							{:else}
-								<td class="p-3 text-sm whitespace-nowrap"
-									>{book.status.substring(0, 1).toUpperCase() + book.status.substring(1)}</td
-								>
+							{:else if book.status == 'Disapproved'}
+								<td class="p-3 text-sm whitespace-nowrap text-red-500 font-bold">{book.status}</td>
+							{:else if book.status == 'Pending'}
+								<td class="p-3 text-sm whitespace-nowrap">{book.status}</td>
 							{/if}
 						</tr>
 					{/if}
@@ -131,7 +124,7 @@
 	<!-- Small screen -->
 	<div class="bg-gray-300 my-5 p-5  selection:grid grid-cols-1 gap-4 md:hidden rounded-lg shadow">
 		{#each listOfBooking as book}
-			{#if book.status == 'approved' || book.status == 'disapproved'}
+			{#if book.status == 'Approved' || book.status == 'Disapproved'}
 				<div class="bg-white space-y-3 p-4 border-2 border-black">
 					<div class="flex items-center space-x-2  text-sm">
 						<div>
@@ -159,18 +152,10 @@
 					</div>
 					<div class="font-bold">
 						Status:
-						{#if book.status == 'approved'}
-							<span class="text-sm text-green-500"
-								>{book.status.substring(0, 1).toUpperCase() + book.status.substring(1)}</span
-							>
-						{:else if book.status == 'disapproved'}
-							<span class="text-sm text-red-500"
-								>{book.status.substring(0, 1).toUpperCase() + book.status.substring(1)}</span
-							>
-						{:else}
-							<span class="text-sm"
-								>{book.status.substring(0, 1).toUpperCase() + book.status.substring(1)}</span
-							>
+						{#if book.status == 'Approved'}
+							<span class="text-sm text-green-500">{book.status}</span>
+						{:else if book.status == 'Disapproved'}
+							<span class="text-sm text-red-500">{book.status}</span>
 						{/if}
 					</div>
 				</div>
