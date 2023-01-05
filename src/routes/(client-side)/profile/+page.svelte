@@ -33,7 +33,7 @@
 				<div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2">
 					<div class="form-control">
 						<span class="label-text">Name</span>
-						<h1 class="border-2 rounded-lg p-3 mt-2">{user.firstname} {user.lastname}</h1>
+						<h1 class="border-2 rounded-lg p-3 mt-2">{user.firstNameDisplay} {user.lastNameDisplay}</h1>
 						<!-- <input type="text" bind:value={user.firstname} name="fname" class="input input-bordered" disabled/> -->
 					</div>
 					<div class="form-control ">

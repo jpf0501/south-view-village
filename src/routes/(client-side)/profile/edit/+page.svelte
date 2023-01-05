@@ -44,8 +44,8 @@
 					<div class="form-control">
 						<span class="label-text">Name</span>
 						<h1 class="border-2 rounded-lg p-3 mt-2 bg-gray-200" disabled>
-							{user.firstname}
-							{user.lastname}
+							{user.firstNameDisplay}
+							{user.lastNameDisplay}
 						</h1>
 					</div>
 					<div class="form-control">
