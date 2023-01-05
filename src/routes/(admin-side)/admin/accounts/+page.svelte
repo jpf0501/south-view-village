@@ -23,10 +23,11 @@
 	}
 
 	async function searchAccounts() {
+		let searchByValueCase = searchByValue.toLowerCase();
 		accountsQuery = query(
 			collection(db, 'accounts'),
-			where(searchByField, '>=', searchByValue),
-			where(searchByField, '<=', searchByValue + '~')
+			where(searchByField, '>=', searchByValueCase),
+			where(searchByField, '<=', searchByValueCase + '~')
 		);
 	}
 
@@ -80,7 +81,7 @@
 			<tbody>
 				{#each listOfUsers as user}
 					<tr class="border-t-2 border-black">
-						<td class="p-3 text-sm whitespace-nowrap">{user.firstname + ' ' + user.lastname}</td>
+						<td class="p-3 text-sm whitespace-nowrap">{user.firstNameDisplay + ' ' + user.lastNameDisplay}</td>
 						<td class="p-3 text-sm whitespace-nowrap"
 							>{'Block ' +
 								user.addressBlock +
@@ -111,17 +112,11 @@
 				<div class="flex items-center space-x-2  text-sm">
 					<div>
 						<span class="font-bold text-sm">Name: </span>
-						{user.firstname + ' ' + user.lastname}
+						{user.firstNameDisplay + ' ' + user.lastNameDisplay}
 					</div>
 					<div>
 						<span class="font-bold text-sm">Role: </span>
 						{user.role}
-					</div>
-					<div>
-						<a
-							href={'/admin/accounts/edit/' + user.id}
-							class="text-blue-500 font-bold hover:underline">Edit</a
-						>
 					</div>
 				</div>
 				<div>
@@ -137,6 +132,12 @@
 				<div>
 					<span class="font-bold text-sm">Email: </span>
 					{user.email}
+				</div>
+				<div class="flex justify-end">
+					<a
+						href={'/admin/accounts/edit/' + user.id}
+						class="text-blue-500 font-bold hover:underline">Edit</a
+					>
 				</div>
 			</div>
 			<br />

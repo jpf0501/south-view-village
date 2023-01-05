@@ -33,7 +33,7 @@
 				<div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2">
 					<div class="form-control">
 						<span class="label-text">Name</span>
-						<h1 class="border-2 rounded-lg p-3 mt-2">{user.firstname} {user.lastname}</h1>
+						<h1 class="border-2 rounded-lg p-3 mt-2">{user.firstNameDisplay} {user.lastNameDisplay}</h1>
 						<!-- <input type="text" bind:value={user.firstname} name="fname" class="input input-bordered" disabled/> -->
 					</div>
 					<div class="form-control ">
@@ -58,7 +58,9 @@
 					</div>
 				</div>
 				<div class="flex justify-end mt-8">
-					<a href="/profile/edit" class="btn btn-primary mx-1">Edit Info</a>
+					<a href="/profile/edit" class="btn btn-primary bg-blue-500 mx-1 hover:bg-blue-900"
+						>Edit Info</a
+					>
 				</div>
 			</div>
 		</div>

@@ -21,19 +21,19 @@
 	}
 
 	async function searchNews() {
+		let searchByValueCase = searchByValue.toLowerCase();
 		if (searchByValue == '') {
 			newsQuery = query(collection(db, 'news'));
 		} else {
 			newsQuery = query(
 				collection(db, 'news'),
-				where(searchByField, '>=', searchByValue),
-				where(searchByField, '<=', searchByValue + '~')
+				where(searchByField, '>=', searchByValueCase),
+				where(searchByField, '<=', searchByValueCase + '~')
 			);
 		}
 	}
 
 	$: getNews(newsQuery);
-
 </script>
 
 <svelte:head>
@@ -47,10 +47,8 @@
 			<select bind:value={searchByField} required>
 				<option value="" disabled selected>Search Filter</option>
 				<option value="title">Title</option>
-				<option value="dateCreated">Date Created</option>
-				<option value="dateModified">Date Modified</option>
 			</select>
-			<input type="search" placeholder="Search here" required bind:value={searchByValue} />
+			<input type="search" placeholder="Search here" bind:value={searchByValue} />
 		</form>
 		<select bind:value={sortByField} on:change={changeSortBy}>
 			<option value="" disabled selected>Sort By</option>
@@ -65,7 +63,9 @@
 	</div>
 
 	<!-- Medium to large screen -->
-	<div class="my-5 p-5 overflow-auto shadow-lg border rounded-xl bg-gray-300 hidden md:block text-center">
+	<div
+		class="my-5 p-5 overflow-auto shadow-lg border rounded-xl bg-gray-300 hidden md:block text-center"
+	>
 		<table class="border-2 border-black bg-white w-full">
 			<thead class="font-bold bg-gray-500">
 				<tr>
@@ -78,9 +78,17 @@
 			<tbody>
 				{#each listOfNews as news}
 					<tr class="border-t-2 border-black">
-						<td class="w-1/4 p-3 text-sm whitespace-nowrap">{news.title}</td>
-						<td class="w-1/4 p-3 text-sm whitespace-nowrap">{news.dateCreated.toDate().toLocaleDateString() + ' ' + news.dateCreated.toDate().toLocaleTimeString()}</td>
-						<td class="w-1/4 p-3 text-sm whitespace-nowrap">{news.dateModified.toDate().toLocaleDateString() + ' ' + news.dateModified.toDate().toLocaleTimeString()}</td>
+						<td class="w-1/4 p-3 text-sm whitespace-nowrap">{news.titleDisplay}</td>
+						<td class="w-1/4 p-3 text-sm whitespace-nowrap"
+							>{news.dateCreated.toDate().toLocaleDateString() +
+								' ' +
+								news.dateCreated.toDate().toLocaleTimeString()}</td
+						>
+						<td class="w-1/4 p-3 text-sm whitespace-nowrap"
+							>{news.dateModified.toDate().toLocaleDateString() +
+								' ' +
+								news.dateModified.toDate().toLocaleTimeString()}</td
+						>
 						<td class="w-1/4 p-3 text-sm whitespace-nowrap">
 							<a
 								href={'/admin/news/edit/' + news.id}
@@ -97,21 +105,26 @@
 	<div class="bg-gray-300 my-5 p-5  selection:grid grid-cols-1 gap-4 md:hidden rounded-lg shadow">
 		{#each listOfNews as news}
 			<div class="bg-white space-y-3 p-4 border-2 border-black">
-				<div class="flex items-center space-x-2  text-sm">
-					<div>
-						<span class="font-bold text-sm">Title: </span>
-						{news.title}
-					</div>
-					<div>
-						<a
-							href={'/admin/news/edit/' + news.id}
-							class="text-blue-500 font-bold hover:underline">Edit</a
-						>
-					</div>
+				<div>
+					<span class="font-bold text-sm">Title: </span>
+					{news.titleDisplay}
 				</div>
 				<div>
 					<span class="font-bold text-sm">Date Created: </span>
-					{news.dateCreated.toDate().toLocaleDateString() + ' ' + news.dateCreated.toDate().toLocaleTimeString()}
+					{news.dateCreated.toDate().toLocaleDateString() +
+						' ' +
+						news.dateCreated.toDate().toLocaleTimeString()}
+				</div>
+				<div>
+					<span class="font-bold text-sm">Last Updated: </span>
+					{news.dateModified.toDate().toLocaleDateString() +
+						' ' +
+						news.dateModified.toDate().toLocaleTimeString()}
+				</div>
+				<div class="flex justify-end">
+					<a href={'/admin/news/edit/' + news.id} class="text-blue-500 font-bold hover:underline"
+						>Edit</a
+					>
 				</div>
 			</div>
 			<br />

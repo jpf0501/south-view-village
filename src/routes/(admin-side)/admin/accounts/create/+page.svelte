@@ -11,8 +11,8 @@
 		addressLot: '',
 		addressStreet: '',
 		contactNumber: '',
-		role: '',
-	}
+		role: ''
+	};
 
 	async function submitHandler() {
 		try {
@@ -25,12 +25,14 @@
 					email: account.email,
 					password: account.password,
 					firstname: account.firstname.trim().toLowerCase(),
+					firstNameDisplay: account.firstname,
 					lastname: account.lastname.trim().toLowerCase(),
+					lastNameDisplay: account.lastname,
 					addressBlock: account.addressBlock,
 					addressLot: account.addressLot,
-					addressStreet: account.addressStreet.trim().toLowerCase(),
+					addressStreet: account.addressStreet,
 					contactNumber: account.contactNumber,
-					role: account.role.trim().toLowerCase()
+					role: account.role
 				})
 			});
 			const result = await response.json();
@@ -187,7 +189,10 @@
 							</label>
 							<input
 								type="tel"
+								onkeypress="return event.charCode >= 48 && event.charCode <= 57"
+								minlength="11" maxlength="11"
 								placeholder="09123456789"
+								pattern={String.raw`^(09)\d{9}$`}
 								name="contact"
 								class="input input-bordered"
 								required
@@ -195,10 +200,15 @@
 							/>
 						</div>
 					</div>
-					<div class="flex justify-end mt-8">
-						<button type="submit" class="btn btn-primary mx-1">Save</button>
-						<a href="/admin/accounts" class="btn btn-error mx-1">Cancel</a>
-					</div>
+				</div>
+				<div class="flex justify-end mt-8">
+					<button type="submit" class="btn btn-primary mx-1 px-6 bg-blue-500 hover:bg-blue-900"
+						>Create</button
+					>
+					<a
+						href="/admin/accounts"
+						class="btn btn-primary mx-1 bg-red-500 px-4 hover:bg-red-900 text-white">Cancel</a
+					>
 				</div>
 			</form>
 		</div>

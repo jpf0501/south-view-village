@@ -5,34 +5,28 @@
 	let countOfPendingBooks = '';
 	let countOfAccounts = '';
 
-	async function getCountOfPendingBooks() {
+	async function getCount() {
 		try {
-			const collectionOfPendingBooks = query(
+			// Get count of pending books
+			const collectionOfPendingBooksQuery = query(
 				collection(db, 'booking'),
-				where('status', '==', 'pending')
+				where('status', '==', 'Pending')
 			);
-			const snapshot = await getCountFromServer(collectionOfPendingBooks);
-			countOfPendingBooks = snapshot.data().count;
-			// return countOfPendingBooks;
+			const snapshotOfCountOfPendingBookings = await getCountFromServer(
+				collectionOfPendingBooksQuery
+			);
+			countOfPendingBooks = snapshotOfCountOfPendingBookings.data().count;
+			// Get count of number of accounts
+			const collectionOfAccountsQuery = collection(db, 'accounts');
+			const snapshotOfCountOfAccounts = await getCountFromServer(collectionOfAccountsQuery);
+			countOfAccounts = snapshotOfCountOfAccounts.data().count;
 		} catch (error) {
 			console.log(error);
-			alert('Error in counting Bookings');
+			alert('Error in counting');
 		}
 	}
 
-	async function getCountOfAccounts() {
-		try {
-			const collectionOfAccounts = collection(db, 'accounts');
-			const snapshot = await getCountFromServer(collectionOfAccounts);
-			countOfAccounts = snapshot.data().count;
-			// return countOfAccounts;
-		} catch (error) {
-			console.log(error);
-			alert('Error in counting Accounts');
-		}
-	}
-	getCountOfPendingBooks();
-	getCountOfAccounts();
+	getCount();
 </script>
 
 <svelte:head>

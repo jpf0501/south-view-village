@@ -44,8 +44,8 @@
 					<div class="form-control">
 						<span class="label-text">Name</span>
 						<h1 class="border-2 rounded-lg p-3 mt-2 bg-gray-200" disabled>
-							{user.firstname}
-							{user.lastname}
+							{user.firstNameDisplay}
+							{user.lastNameDisplay}
 						</h1>
 					</div>
 					<div class="form-control">
@@ -65,6 +65,10 @@
 						<span class="label-text">Contact No.</span>
 						<input
 							type="tel"
+							onkeypress="return event.charCode >= 48 && event.charCode <= 57"
+							minlength="11" maxlength="11"
+							placeholder="09123456789"
+							pattern={String.raw`^(09)\d{9}$`}
 							bind:value={user.contactNumber}
 							name="contact"
 							class="input input-bordered mt-2"
@@ -72,8 +76,11 @@
 					</div>
 				</div>
 				<div class="flex justify-end mt-8">
-					<button type="submit" class="btn btn-primary mx-1">Update Info</button>
-					<a href="/profile" class="btn btn-error mx-1 text-white">Cancel</a>
+					<button type="submit" class="btn btn-primary bg-blue-500 mx-1 hover:bg-blue-900"
+						>Update Info</button
+					>
+					<a href="/profile" class="btn btn-primary mx-1 px-4 bg-red-500 hover:bg-red-900">Cancel</a
+					>
 				</div>
 			</form>
 			<ChangePassword />

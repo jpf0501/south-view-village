@@ -59,7 +59,7 @@
 				</svg>
 			</a>
 		{:else}
-			<p class="p-3 mx-5 font-bold">Hello, {user.firstname}</p>
+			<p class="p-3 mx-5 font-bold">Hello, {user.firstNameDisplay}</p>
 			<button class="gap-2 btn btn-outline" on:click={logOut}
 				>Logout<svg
 					xmlns="http://www.w3.org/2000/svg"

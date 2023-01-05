@@ -12,11 +12,14 @@
 	async function getUser() {
 		const snapshot = await getDoc(doc(db, 'accounts', userID));
 		user = snapshot.data();
+		user.firstname = user.firstNameDisplay;
+		user.lastname = user.lastNameDisplay;
 	}
 	getUser();
 
 	async function updateUser() {
-		// console.log(user);
+		user.firstname = user.firstNameDisplay.toLowerCase();
+		user.lastname = user.lastNameDisplay.toLowerCase();
 		try {
 			await updateDoc(doc(db, 'accounts', userID), user);
 			alert('User info updated');
@@ -58,7 +61,7 @@
 							name="fname"
 							class="input input-bordered"
 							required
-							bind:value={user.firstname}
+							bind:value={user.firstNameDisplay}
 						/>
 					</div>
 					<div class="form-control">
@@ -70,7 +73,7 @@
 							name="lname"
 							class="input input-bordered"
 							required
-							bind:value={user.lastname}
+							bind:value={user.lastNameDisplay}
 						/>
 					</div>
 				</div>
@@ -134,6 +137,10 @@
 					</label>
 					<input
 						type="tel"
+						onkeypress="return event.charCode >= 48 && event.charCode <= 57"
+						minlength="11" maxlength="11"
+						placeholder="09123456789"
+						pattern={String.raw`^(09)\d{9}$`}
 						name="contact"
 						class="input input-bordered"
 						required
@@ -141,13 +148,19 @@
 					/>
 				</div>
 				<div class="flex justify-end mt-8">
-					<button on:click={updateUser} type="submit" class="btn btn-primary mx-1 bg-blue-500"
-						>Save</button
+					<button
+						on:click={updateUser}
+						type="submit"
+						class="btn btn-primary mx-1 px-5 bg-blue-500 hover:bg-blue-900">Save</button
 					>
-					<button on:click={deleteUser} type="submit" class="btn btn-primary mx-1 bg-red-500"
-						>Delete</button
+					<a href="/admin/accounts" class="btn btn-primary mx-1 px-4 bg-red-500 hover:bg-red-900"
+						>Cancel</a
 					>
-					<a href="/admin/accounts" class="btn btn-error mx-1">Cancel</a>
+					<button
+						on:click={deleteUser}
+						type="submit"
+						class="btn btn-warning mx-1 hover:bg-red-900 text-white">Delete</button
+					>
 				</div>
 			</div>
 		</div>

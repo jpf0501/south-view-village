@@ -34,10 +34,11 @@
 	}
 
 	async function searchBookings() {
+		let searchByValueCase = searchByValue.toLowerCase();
 		bookingsQuery = query(
 			collection(db, 'booking'),
-			where(searchByField, '>=', searchByValue),
-			where(searchByField, '<=', searchByValue + '~')
+			where(searchByField, '>=', searchByValueCase),
+			where(searchByField, '<=', searchByValueCase + '~')
 		);
 	}
 
@@ -54,8 +55,8 @@
 		<a href="/admin/bookings" class="hover:underline">Go to Bookings</a>
 	</div>
 	<div class="flex justify-between">
-		<form on:submit|preventDefault={searchBookings} required>
-			<select bind:value={searchByField}>
+		<form on:submit|preventDefault={searchBookings}>
+			<select bind:value={searchByField} required>
 				<option value="" disabled selected>Search Filter</option>
 				<option value="firstname">Name</option>
 				<option value="email">E-mail Address</option>
@@ -73,8 +74,8 @@
 		</select>
 		<select bind:value={sortByStatus} on:change={changeSortByStatus}>
 			<option value="" selected>Status</option>
-			<option value="approved">Approved</option>
-			<option value="disapproved">Disapproved</option>
+			<option value="Approved">Approved</option>
+			<option value="Disapproved">Disapproved</option>
 		</select>
 	</div>
 
@@ -92,29 +93,26 @@
 			</thead>
 			<tbody>
 				{#each listOfBooking as book}
-					{#if book.status == 'approved' || book.status == 'disapproved'}
+					{#if book.status == 'Approved' || book.status == 'Disapproved'}
 						<tr class="border-t-2 border-black">
-							<td class="p-3 text-sm whitespace-nowrap">{book.firstname + ' ' + book.lastname}</td>
+							<td class="p-3 text-sm whitespace-nowrap"
+								>{book.firstNameDisplay + ' ' + book.lastNameDisplay}</td
+							>
 							<td class="p-3 text-sm whitespace-nowrap">{book.email}</td>
 							<td class="p-3 text-sm whitespace-nowrap">{book.contactNumber}</td>
-							<td class="p-3 text-sm whitespace-nowrap">{book.eventType}</td>
+							<td class="p-3 text-sm whitespace-nowrap">{book.eventTypeDisplay}</td>
 							<td class="p-3 text-sm whitespace-nowrap"
 								>{book.bookDate.toDate().toLocaleDateString() +
 									' at ' +
 									book.bookDate.toDate().toLocaleTimeString()}</td
 							>
-							{#if book.status == 'approved'}
-								<td class="p-3 text-sm whitespace-nowrap text-green-500 font-bold"
-									>{book.status.substring(0, 1).toUpperCase() + book.status.substring(1)}</td
+							{#if book.status == 'Approved'}
+								<td class="p-3 text-sm whitespace-nowrap text-green-500 font-bold">{book.status}</td
 								>
-							{:else if book.status == 'disapproved'}
-								<td class="p-3 text-sm whitespace-nowrap text-red-500 font-bold"
-									>{book.status.substring(0, 1).toUpperCase() + book.status.substring(1)}</td
-								>
-							{:else}
-								<td class="p-3 text-sm whitespace-nowrap"
-									>{book.status.substring(0, 1).toUpperCase() + book.status.substring(1)}</td
-								>
+							{:else if book.status == 'Disapproved'}
+								<td class="p-3 text-sm whitespace-nowrap text-red-500 font-bold">{book.status}</td>
+							{:else if book.status == 'Pending'}
+								<td class="p-3 text-sm whitespace-nowrap">{book.status}</td>
 							{/if}
 						</tr>
 					{/if}
@@ -126,49 +124,43 @@
 	<!-- Small screen -->
 	<div class="bg-gray-300 my-5 p-5  selection:grid grid-cols-1 gap-4 md:hidden rounded-lg shadow">
 		{#each listOfBooking as book}
-			<div class="bg-white space-y-3 p-4 border-2 border-black">
-				<div class="flex items-center space-x-2  text-sm">
+			{#if book.status == 'Approved' || book.status == 'Disapproved'}
+				<div class="bg-white space-y-3 p-4 border-2 border-black">
+					<div class="flex items-center space-x-2  text-sm">
+						<div>
+							<span class="font-bold text-sm">Name: </span>
+							{book.firstNameDisplay + ' ' + book.lastNameDisplay}
+						</div>
+					</div>
 					<div>
-						<span class="font-bold text-sm">Name: </span>
-						{book.firstname + ' ' + book.lastname}
+						<span class="font-bold text-sm">E-mail Address: </span>
+						{book.email}
+					</div>
+					<div>
+						<span class="font-bold text-sm">Contact No: </span>
+						{book.contactNumber}
+					</div>
+					<div>
+						<span class="font-bold text-sm">Type of Event: </span>
+						{book.eventTypeDisplay}
+					</div>
+					<div>
+						<span class="font-bold text-sm">Date and Time: </span>
+						{book.bookDate.toDate().toLocaleDateString() +
+							' at ' +
+							book.bookDate.toDate().toLocaleTimeString()}
+					</div>
+					<div class="font-bold">
+						Status:
+						{#if book.status == 'Approved'}
+							<span class="text-sm text-green-500">{book.status}</span>
+						{:else if book.status == 'Disapproved'}
+							<span class="text-sm text-red-500">{book.status}</span>
+						{/if}
 					</div>
 				</div>
-				<div>
-					<span class="font-bold text-sm">E-mail Address: </span>
-					{book.email}
-				</div>
-				<div>
-					<span class="font-bold text-sm">Contact No: </span>
-					{book.contactNumber}
-				</div>
-				<div>
-					<span class="font-bold text-sm">Type of Event: </span>
-					{book.eventType}
-				</div>
-				<div>
-					<span class="font-bold text-sm">Date: </span>
-					{book.date}
-					<span class="font-bold text-sm">Time: </span>
-					{book.time}
-				</div>
-				<div class="font-bold">
-					Status:
-					{#if book.status == 'approved'}
-						<span class="text-sm text-green-500"
-							>{book.status.substring(0, 1).toUpperCase() + book.status.substring(1)}</span
-						>
-					{:else if book.status == 'disapproved'}
-						<span class="text-sm text-red-500"
-							>{book.status.substring(0, 1).toUpperCase() + book.status.substring(1)}</span
-						>
-					{:else}
-						<span class="text-sm"
-							>{book.status.substring(0, 1).toUpperCase() + book.status.substring(1)}</span
-						>
-					{/if}
-				</div>
-			</div>
-			<br />
+				<br />
+			{/if}
 		{/each}
 	</div>
 </div>
