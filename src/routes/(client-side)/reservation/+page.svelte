@@ -119,6 +119,8 @@
 						<span class="label-text">Contact No.</span>
 						<input
 							type="tel"
+							onkeypress="return event.charCode >= 48 && event.charCode <= 57"
+							minlength="11" maxlength="11"
 							placeholder="09123456789"
 							pattern={String.raw`^(09)\d{9}$`}
 							class="border-2 rounded-lg p-3 mt-2"
@@ -159,6 +161,8 @@
 						<span class="label-text">Contact No.</span>
 						<input
 							type="tel"
+							onkeypress="return event.charCode >= 48 && event.charCode <= 57"
+							minlength="11" maxlength="11"
 							placeholder="09123456789"
 							pattern={String.raw`^(09)\d{9}$`}
 							bind:value={guest.contactNumber}

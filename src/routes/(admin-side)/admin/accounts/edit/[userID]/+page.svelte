@@ -137,6 +137,8 @@
 					</label>
 					<input
 						type="tel"
+						onkeypress="return event.charCode >= 48 && event.charCode <= 57"
+						minlength="11" maxlength="11"
 						placeholder="09123456789"
 						pattern={String.raw`^(09)\d{9}$`}
 						name="contact"
