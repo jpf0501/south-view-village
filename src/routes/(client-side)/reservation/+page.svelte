@@ -5,6 +5,9 @@
 	import { goto } from '$app/navigation';
 
 	let user = null;
+	const dateMin = new Date(Date.now() + 8.64e+7).toLocaleDateString('en-ca');
+	const dateMax = new Date((Date.now() + 8.64e+7) + (6.048e+8 * 2)).toLocaleDateString('en-ca');
+
 
 	let guest = {
 		firstname: '',
@@ -178,6 +181,8 @@
 					<span class="label-text">Date</span>
 					<input
 						type="date"
+						min={dateMin}
+						max={dateMax}
 						class="border-2 rounded-lg p-3 mt-2"
 						bind:value={guest.date}
 						required
