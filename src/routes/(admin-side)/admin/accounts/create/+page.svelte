@@ -190,6 +190,7 @@
 							<input
 								type="tel"
 								placeholder="09123456789"
+								pattern={String.raw`^(09)\d{9}$`}
 								name="contact"
 								class="input input-bordered"
 								required

@@ -65,6 +65,8 @@
 						<span class="label-text">Contact No.</span>
 						<input
 							type="tel"
+							placeholder="09123456789"
+							pattern={String.raw`^(09)\d{9}$`}
 							bind:value={user.contactNumber}
 							name="contact"
 							class="input input-bordered mt-2"

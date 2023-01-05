@@ -115,7 +115,9 @@
 					<div class="form-control">
 						<span class="label-text">Contact No.</span>
 						<input
-							type="text"
+							type="tel"
+							placeholder="09123456789"
+							pattern={String.raw`^(09)\d{9}$`}
 							class="border-2 rounded-lg p-3 mt-2"
 							bind:value={user.contactNumber}
 							required
@@ -153,9 +155,11 @@
 					<div class="form-control">
 						<span class="label-text">Contact No.</span>
 						<input
-							type="text"
+							type="tel"
+							placeholder="09123456789"
+							pattern={String.raw`^(09)\d{9}$`}
 							bind:value={guest.contactNumber}
-							name="email"
+							name="contact"
 							class="border-2 rounded-lg p-3 mt-2"
 							required
 						/>
