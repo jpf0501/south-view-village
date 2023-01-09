@@ -1,5 +1,6 @@
 <script>
 	import DayButton from './DayButton.svelte';
+	import { Modal } from 'svelte-simple-modal';
 
 	const daysOfTheWeek = [
 		'Sunday',
@@ -107,7 +108,7 @@
 					<button class="border border-collapse aspect-video" />
 				{/each}
 				{#each { length: daysInCurrentMonth } as _, i}
-					<DayButton dayNumber={i + 1} month={currentMonth} year={currentYear} />
+					<Modal><DayButton dayNumber={i + 1} month={currentMonth} year={currentYear} /></Modal>
 				{/each}
 			</main>
 		</section>
