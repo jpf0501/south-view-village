@@ -22,7 +22,7 @@
     <h1 class="font-bold text-xl pb-4">Events for {$calendarDate}</h1>
     {#each listOfEvents as event}
     <div class="p-3">
-        <h2 class="font-bold">{event.title}</h2>
+        <h2 class="font-bold">{event.titleDisplay}</h2>
         <p class="p-2">{event.description}</p>
     </div>
     {/each}

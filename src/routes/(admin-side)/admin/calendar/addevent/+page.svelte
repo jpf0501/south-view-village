@@ -15,7 +15,8 @@
 	async function submitHandler() {
 		try {
 			await addDoc(collection(db, 'event'), {
-				title: event.eventTitle.trim(),
+				title: event.eventTitle.trim().toLowerCase(),
+				titleDisplay: event.eventTitle.trim(),
 				description: event.eventDescription.trim(),
 				date: event.eventDate
 			});
@@ -29,7 +30,7 @@
 </script>
 
 <svelte:head>
-	<title>Add Event Form - Official Website of Southview Homes 3 Subdivision</title>
+	<title>Add Event - Southview Homes 3 Admin Panel</title>
 </svelte:head>
 
 <div class="min-h-screen hero bg-base-200">

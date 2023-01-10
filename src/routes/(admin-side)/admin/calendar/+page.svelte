@@ -113,7 +113,8 @@
 			</main>
 		</section>
 	</main>
-	<a href="/admin/calendar/addevent" class="mx-auto btn btn-primary btn-wide"
-		>Add Event in Calendar</a
-	>
+	<div class="mx-auto pt-8 pb-5">
+		<a href="/admin/calendar/addevent" class="mx-auto btn btn-primary btn-wide">Add Event in Calendar</a>
+		<a href="/admin/calendar/entries" class="mx-auto btn btn-primary btn-wide">Manage Events</a>
+	</div>
 </div>
