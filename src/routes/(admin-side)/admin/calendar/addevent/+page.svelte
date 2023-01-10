@@ -70,7 +70,7 @@
 			</div>
 			<div class="flex justify-end mt-8">
 				<button type="submit" class="btn btn-primary">Submit Event</button>
-				<a href="/calendar" class="btn btn-error mx-1">Cancel</a>
+				<a href="/admin/calendar" class="btn btn-error mx-1">Cancel</a>
 			</div>
 		</form>
 	</div>
