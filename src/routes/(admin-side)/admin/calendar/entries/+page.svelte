@@ -90,35 +90,23 @@
 
 	<!-- Small screen -->
 	<div class="bg-gray-300 my-5 p-5  selection:grid grid-cols-1 gap-4 md:hidden rounded-lg shadow">
-		{#each listOfEvents as user}
+		{#each listOfEvents as event}
 			<div class="bg-white space-y-3 p-4 border-2 border-black">
 				<div class="flex items-center space-x-2  text-sm">
-					<div>
-						<span class="font-bold text-sm">Name: </span>
-						{user.firstNameDisplay + ' ' + user.lastNameDisplay}
-					</div>
-					<div>
-						<span class="font-bold text-sm">Role: </span>
-						{user.role}
-					</div>
+					<span class="font-bold text-sm">Title: </span>
+					{event.titleDisplay}
 				</div>
 				<div>
-					<span class="font-bold text-sm">Address: </span>
-					{'Block ' +
-						user.addressBlock +
-						' Lot ' +
-						user.addressLot +
-						' ' +
-						user.addressStreet +
-						' Street'}
+					<span class="font-bold text-sm">Description:</span>
+					{event.description}
 				</div>
 				<div>
-					<span class="font-bold text-sm">Email: </span>
-					{user.email}
+					<span class="font-bold text-sm">Date: </span>
+					{event.date}
 				</div>
 				<div class="flex justify-end">
 					<a
-						href={'/admin/accounts/edit/' + user.id}
+						href={'/admin/calendar/entries/edit/' + event.id}
 						class="text-blue-500 font-bold hover:underline">Edit</a
 					>
 				</div>
