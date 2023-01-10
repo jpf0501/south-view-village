@@ -1,5 +1,6 @@
 <script>
-	import { each } from 'svelte/internal';
+	import DayButton from './DayButton.svelte';
+	import { Modal } from 'svelte-simple-modal';
 
 	const daysOfTheWeek = [
 		'Sunday',
@@ -33,7 +34,6 @@
 		currentYear,
 		currentMonth
 	);
-	$: console.log(currentMonth);
 	const previousMonth = () => {
 		currentMonth -= 1;
 		if (currentMonth < 1) {
@@ -108,12 +108,13 @@
 					<button class="border border-collapse aspect-video" />
 				{/each}
 				{#each { length: daysInCurrentMonth } as _, i}
-					<button class="border border-collapse aspect-video">
-						{i + 1}
-					</button>
+					<Modal><DayButton dayNumber={i + 1} month={currentMonth} year={currentYear} /></Modal>
 				{/each}
 			</main>
 		</section>
 	</main>
-	<a href="/admin/calendar/addevent" class="mx-auto btn btn-primary btn-wide">Add Event in Calendar</a>
+	<div class="mx-auto pt-8 pb-5">
+		<a href="/admin/calendar/addevent" class="mx-auto btn btn-primary btn-wide">Add Event in Calendar</a>
+		<a href="/admin/calendar/entries" class="mx-auto btn btn-primary btn-wide">Manage Events</a>
+	</div>
 </div>

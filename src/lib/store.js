@@ -1,4 +1,4 @@
-import { readable } from "svelte/store";
+import { readable, writable } from "svelte/store";
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '$lib/firebase/client.js';
 import { browser } from '$app/environment';
@@ -11,3 +11,4 @@ export const userStore = readable(undefined, set => {
     return () => unsubscribe()
 })
 
+export let calendarDate = writable(undefined);
