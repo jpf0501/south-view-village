@@ -84,7 +84,7 @@
 
 <!-- clubhouse card -->
 <div class="hero min-h-[70%]: bg-white">
-	<div class="hero-content flex-col sm:flex-row-reverse lg:flex-row-reverse m-10">
+	<div class="hero-content flex-col sm:flex-row lg:flex-row m-10">
 		<img src="/images/clubhouse.jpg" class="max-w-sm mask mask-circle m-10" alt="Southview Homes 3 Clubhouse"/>
 	  <div>
 		<h1 class="text-5xl font-bold">Clubhouse Renting</h1>
