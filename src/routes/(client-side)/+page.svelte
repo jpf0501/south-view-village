@@ -61,17 +61,17 @@
 <!-- end showcase -->
 
 <!-- news -->
-<div class="flex flex-col items-center mx-auto justify-center w-full bg-base-200">
+<div class="flex flex-col  w-full bg-base-200">
 	<div class="mt-12">
-		<h2 class="font-bold text-4xl">Recent News</h2>
+		<h2 class="font-bold text-4xl text-center mt-3">Recent News</h2>
 	</div>
-	<div class="flex flex-col md:flex-row m-10">
+	<div class="flex flex-col md:flex-row items-center justify-center m-10">
 		{#each listOfNews as news}
-		<div class="card w-96 bg-base-100 shadow-2xl m-5">
+		<div class="card w-96 h-96 bg-base-100 shadow-2xl m-5">
 			<div class="card-body">
 		  	<h2 class="card-title mb-2 text-2xl">{news.titleDisplay}</h2>
 			<p class="mb-10">Posted {news.dateCreated.toDate().toLocaleDateString()}</p>
-		  	<p class="text-justify text-md" style="white-space:pre-wrap">{news.content.substring(0,150) + '...'}</p>
+		  	<!-- <p class="text-justify text-md" style="white-space:pre-wrap">{news.content.substring(0,150) + '...'}</p> -->
 		  	<div class="card-actions justify-end mt-8">
 				<a href={'/news/entry/' + news.id} class="btn btn-primary">Read Article</a>
 		  	</div>
