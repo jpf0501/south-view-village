@@ -67,42 +67,44 @@
 	</div>
 
 	<!-- Medium to large screen -->
-	<div class="my-5 p-5 overflow-auto shadow-lg border rounded-xl bg-gray-300 hidden md:block">
-		<table class="border-2 border-black bg-white w-full text-center">
-			<thead class="font-bold bg-gray-500">
-				<tr>
-					<th class="p-3 text-sm tracking-wide">Name</th>
-					<th class="p-3 text-sm tracking-wide">Address</th>
-					<th class="p-3 text-sm tracking-wide">Email</th>
-					<th class="p-3 text-sm tracking-wide">Role</th>
-					<th class="p-3 text-sm tracking-wide" />
-				</tr>
-			</thead>
-			<tbody>
-				{#each listOfUsers as user}
-					<tr class="border-t-2 border-black">
-						<td class="p-3 text-sm whitespace-nowrap">{user.firstNameDisplay + ' ' + user.lastNameDisplay}</td>
-						<td class="p-3 text-sm whitespace-nowrap"
-							>{'Block ' +
-								user.addressBlock +
-								' Lot ' +
-								user.addressLot +
-								' ' +
-								user.addressStreet +
-								' Street'}</td
-						>
-						<td class="p-3 text-sm whitespace-nowrap">{user.email}</td>
-						<td class="p-3 text-sm whitespace-nowrap">{user.role}</td>
-						<td class="p-3 text-sm whitespace-nowrap">
-							<a
-								href={'/admin/accounts/edit/' + user.id}
-								class="font-bold text-blue-500 hover:underline">Edit</a
-							>
-						</td>
+	<div class="w-full p-6 mx-auto shadow-2xl border rounded-xl bg-base-100 my-5">
+		<div class="overflow-x-auto">
+			<table class="table w-full">
+				<thead>
+					<tr>
+						<th class="text-lg">Name</th>
+						<th class="text-lg">Address</th>
+						<th class="text-lg">Email</th>
+						<th class="text-lg">Role</th>
+						<th />
 					</tr>
-				{/each}
-			</tbody>
-		</table>
+				</thead>
+				<tbody>
+					{#each listOfUsers as user}
+						<tr class="hover">
+							<th>{user.firstNameDisplay + ' ' + user.lastNameDisplay}</th>
+							<td
+								>{'Block ' +
+									user.addressBlock +
+									' Lot ' +
+									user.addressLot +
+									' ' +
+									user.addressStreet +
+									' Street'}</td
+							>
+							<td>{user.email}</td>
+							<td>{user.role}</td>
+							<td
+								><a
+									href={'/admin/accounts/edit/' + user.id}
+									class="font-bold text-blue-500 hover:underline">Edit</a
+								></td
+							>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
+		</div>
 	</div>
 
 	<!-- Small screen -->

@@ -116,77 +116,77 @@
 	</div>
 
 	<!-- Medium to large screen -->
-	<div class="my-5 p-5 overflow-auto shadow-lg border rounded-xl bg-gray-300 hidden md:block">
-		<table class="border-2 border-black bg-white w-full text-center">
-			<thead class="font-bold bg-gray-500">
-				<tr>
-					<th class="p-3 text-sm tracking-wide">Name</th>
-					<th class="p-3 text-sm tracking-wide">E-mail Address</th>
-					<th class="p-3 text-sm tracking-wide">Contact No.</th>
-					<th class="p-3 text-sm tracking-wide">Type of Event</th>
-					<th class="p-3 text-sm tracking-wide">Date and Time</th>
-					<th class="p-3 text-sm tracking-wide">Payment Status</th>
-					<th class="p-3 text-sm tracking-wide" colspan="2" />
-				</tr>
-			</thead>
-			<tbody>
-				{#each listOfBooking as book}
-					{#if book.status == 'Pending'}
-						<tr class="border-t-2 border-black">
-							<td class="p-3 text-sm whitespace-nowrap"
-								>{book.firstNameDisplay + ' ' + book.lastNameDisplay}</td
-							>
-							<td class="p-3 text-sm whitespace-nowrap">{book.email}</td>
-							<td class="p-3 text-sm whitespace-nowrap">{book.contactNumber}</td>
-							<td class="p-3 text-sm whitespace-nowrap">{book.eventTypeDisplay}</td>
-							<td class="p-3 text-sm whitespace-nowrap"
-								>{book.bookDate.toDate().toLocaleDateString() +
-									' at ' +
-									book.bookDate.toDate().toLocaleTimeString()}</td
-							>
-							<td>
-								<form on:submit|preventDefault={changePaymentStatus(book.id)}>
-									{#if book.paymentStatus == 'Paid'}
-										<button type="submit" on:click={() => (bookingPaymentStatus = 'Unpaid')}>
-											<span class="p-3 text-sm whitespace-nowrap text-green-500 font-bold">
-												{book.paymentStatus}
-											</span>
-										</button>
-									{:else if book.paymentStatus == 'Unpaid'}
-										<button type="submit" on:click={() => (bookingPaymentStatus = 'Paid')}>
-											<span class="p-3 text-sm whitespace-nowrap text-red-500 font-bold">
-												{book.paymentStatus}
-											</span>
-										</button>
-									{/if}
-								</form>
-							</td>
-							<td class="p-3 text-sm whitespace-nowrap">
-								<form on:submit|preventDefault={changeStatus(book.id, book.paymentStatus)}>
-									<button
-										on:click={() => (bookingStatus = 'Approved')}
-										type="submit"
-										class="py-2 px-2 text-green-500 font-bold">Approve</button
-									>
-									<button
-										on:click={() => (bookingStatus = 'Disapproved')}
-										type="submit"
-										class="py-2 px-2 text-red-500 font-bold">Dissaprove</button
-									>
-								</form>
-							</td>
-							<td class="p-3 text-sm whitespace-nowrap">
-								<button
-									on:click={sendPaymentEmail(book.email)}
-									type="button"
-									class="py-2 px-2 text-blue-500 font-bold hover:underline">Send Payment</button
+	<div class="w-full p-6 mx-auto shadow-2xl border rounded-xl bg-base-100 my-5">
+		<div class="overflow-x-auto">
+			<table class="table w-full">
+				<thead>
+					<tr>
+						<th class="text-lg">Name</th>
+						<th class="text-lg">Email</th>
+						<th class="text-lg">Contact Number</th>
+						<th class="text-lg">Type of Event</th>
+						<th class="text-lg">Date and Time</th>
+						<th class="text-lg">Payment Status</th>
+						<th colspan="2" />
+					</tr>
+				</thead>
+				<tbody>
+					{#each listOfBooking as book}
+						{#if book.status == 'Pending'}
+							<tr class="hover">
+								<td>{book.firstNameDisplay + ' ' + book.lastNameDisplay}</td>
+								<td>{book.email}</td>
+								<td>{book.contactNumber}</td>
+								<td>{book.eventTypeDisplay}</td>
+								<td
+									>{book.bookDate.toDate().toLocaleDateString() +
+										' at ' +
+										book.bookDate.toDate().toLocaleTimeString()}</td
 								>
-							</td>
-						</tr>
-					{/if}
-				{/each}
-			</tbody>
-		</table>
+								<td
+									><form on:submit|preventDefault={changePaymentStatus(book.id)}>
+										{#if book.paymentStatus == 'Paid'}
+											<button type="submit" on:click={() => (bookingPaymentStatus = 'Unpaid')}>
+												<span class="p-3 text-sm whitespace-nowrap text-green-500 font-bold">
+													{book.paymentStatus}
+												</span>
+											</button>
+										{:else if book.paymentStatus == 'Unpaid'}
+											<button type="submit" on:click={() => (bookingPaymentStatus = 'Paid')}>
+												<span class="p-3 text-sm whitespace-nowrap text-red-500 font-bold">
+													{book.paymentStatus}
+												</span>
+											</button>
+										{/if}
+									</form></td
+								>
+								<td
+									><form on:submit|preventDefault={changeStatus(book.id, book.paymentStatus)}>
+										<button
+											on:click={() => (bookingStatus = 'Approved')}
+											type="submit"
+											class="py-2 px-2 text-green-500 font-bold">Approve</button
+										>
+										<button
+											on:click={() => (bookingStatus = 'Disapproved')}
+											type="submit"
+											class="py-2 px-2 text-red-500 font-bold">Dissaprove</button
+										>
+									</form></td
+								>
+								<td
+									><button
+										on:click={sendPaymentEmail(book.email)}
+										type="button"
+										class="py-2 px-2 text-blue-500 font-bold hover:underline">Send Payment</button
+									></td
+								>
+							</tr>
+						{/if}
+					{/each}
+				</tbody>
+			</table>
+		</div>
 	</div>
 
 	<!-- Small screen -->

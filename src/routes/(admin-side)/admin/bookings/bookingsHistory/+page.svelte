@@ -79,46 +79,52 @@
 		</select>
 	</div>
 
-	<div class="my-5 p-5 overflow-auto shadow-lg border rounded-xl bg-gray-300 hidden md:block">
-		<table class="border-2 border-black bg-white w-full text-center">
-			<thead class="font-bold bg-gray-500">
-				<tr>
-					<th class="p-3 text-sm tracking-wide">Name</th>
-					<th class="p-3 text-sm tracking-wide">E-mail Address</th>
-					<th class="p-3 text-sm tracking-wide">Contact No.</th>
-					<th class="p-3 text-sm tracking-wide">Type of Event</th>
-					<th class="p-3 text-sm tracking-wide">Date and Time</th>
-					<th class="p-3 text-sm tracking-wide">Status</th>
-				</tr>
-			</thead>
-			<tbody>
-				{#each listOfBooking as book}
-					{#if book.status == 'Approved' || book.status == 'Disapproved'}
-						<tr class="border-t-2 border-black">
-							<td class="p-3 text-sm whitespace-nowrap"
-								>{book.firstNameDisplay + ' ' + book.lastNameDisplay}</td
-							>
-							<td class="p-3 text-sm whitespace-nowrap">{book.email}</td>
-							<td class="p-3 text-sm whitespace-nowrap">{book.contactNumber}</td>
-							<td class="p-3 text-sm whitespace-nowrap">{book.eventTypeDisplay}</td>
-							<td class="p-3 text-sm whitespace-nowrap"
-								>{book.bookDate.toDate().toLocaleDateString() +
-									' at ' +
-									book.bookDate.toDate().toLocaleTimeString()}</td
-							>
-							{#if book.status == 'Approved'}
-								<td class="p-3 text-sm whitespace-nowrap text-green-500 font-bold">{book.status}</td
+	<!-- Medium to large screen -->
+	<div class="w-full p-6 mx-auto shadow-2xl border rounded-xl bg-base-100 my-5">
+		<div class="overflow-x-auto">
+			<table class="table w-full">
+				<thead>
+					<tr>
+						<th class="text-lg">Name</th>
+						<th class="text-lg">Email Address</th>
+						<th class="text-lg">Contact Number</th>
+						<th class="text-lg">Type of Event</th>
+						<th class="text-lg">Date and Time</th>
+						<th class="text-lg">Status</th>
+					</tr>
+				</thead>
+				<tbody>
+					{#each listOfBooking as book}
+						{#if book.status != 'Pending'}
+							<tr class="hover">
+								<td>{book.firstNameDisplay + ' ' + book.lastNameDisplay}</td>
+								<td>{book.email}</td>
+								<td>{book.contactNumber}</td>
+								<td>{book.eventTypeDisplay}</td>
+								<td
+									>{book.bookDate.toDate().toLocaleDateString() +
+										' at ' +
+										book.bookDate.toDate().toLocaleTimeString()}</td
 								>
-							{:else if book.status == 'Disapproved'}
-								<td class="p-3 text-sm whitespace-nowrap text-red-500 font-bold">{book.status}</td>
-							{:else if book.status == 'Pending'}
-								<td class="p-3 text-sm whitespace-nowrap">{book.status}</td>
-							{/if}
-						</tr>
-					{/if}
-				{/each}
-			</tbody>
-		</table>
+								<td>
+									{#if book.status == 'Approved'}
+										<td class="p-3 text-sm whitespace-nowrap text-green-500 font-bold"
+											>{book.status}</td
+										>
+									{:else if book.status == 'Disapproved'}
+										<td class="p-3 text-sm whitespace-nowrap text-red-500 font-bold"
+											>{book.status}</td
+										>
+									{:else if book.status == 'Pending'}
+										<td class="p-3 text-sm whitespace-nowrap">{book.status}</td>
+									{/if}
+								</td>
+							</tr>
+						{/if}
+					{/each}
+				</tbody>
+			</table>
+		</div>
 	</div>
 
 	<!-- Small screen -->

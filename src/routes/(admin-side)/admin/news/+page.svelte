@@ -63,42 +63,42 @@
 	</div>
 
 	<!-- Medium to large screen -->
-	<div
-		class="my-5 p-5 overflow-auto shadow-lg border rounded-xl bg-gray-300 hidden md:block text-center"
-	>
-		<table class="border-2 border-black bg-white w-full">
-			<thead class="font-bold bg-gray-500">
-				<tr>
-					<th class="w-1/4 p-3 text-sm tracking-wide">Title</th>
-					<th class="w-1/4 p-3 text-sm tracking-wide">Date Created</th>
-					<th class="w-1/4 p-3 text-sm tracking-wide">Last Updated</th>
-					<th class="w-1/4 p-3 text-sm tracking-wide" />
-				</tr>
-			</thead>
-			<tbody>
-				{#each listOfNews as news}
-					<tr class="border-t-2 border-black">
-						<td class="w-1/4 p-3 text-sm whitespace-nowrap">{news.titleDisplay}</td>
-						<td class="w-1/4 p-3 text-sm whitespace-nowrap"
-							>{news.dateCreated.toDate().toLocaleDateString() +
-								' ' +
-								news.dateCreated.toDate().toLocaleTimeString()}</td
-						>
-						<td class="w-1/4 p-3 text-sm whitespace-nowrap"
-							>{news.dateModified.toDate().toLocaleDateString() +
-								' ' +
-								news.dateModified.toDate().toLocaleTimeString()}</td
-						>
-						<td class="w-1/4 p-3 text-sm whitespace-nowrap">
-							<a
-								href={'/admin/news/edit/' + news.id}
-								class="font-bold text-blue-500 hover:underline">Edit</a
-							>
-						</td>
+	<div class="w-full p-6 mx-auto shadow-2xl border rounded-xl bg-base-100 my-5">
+		<div class="overflow-x-auto">
+			<table class="table w-full">
+				<thead>
+					<tr>
+						<th class="text-lg">Title</th>
+						<th class="text-lg">Date Created</th>
+						<th class="text-lg">Last Updated</th>
+						<th />
 					</tr>
-				{/each}
-			</tbody>
-		</table>
+				</thead>
+				<tbody>
+					{#each listOfNews as news}
+						<tr class="hover">
+							<th>{news.titleDisplay}</th>
+							<td
+								>{news.dateCreated.toDate().toLocaleDateString() +
+									' ' +
+									news.dateCreated.toDate().toLocaleTimeString()}</td
+							>
+							<td
+								>{news.dateModified.toDate().toLocaleDateString() +
+									' ' +
+									news.dateModified.toDate().toLocaleTimeString()}</td
+							>
+							<td
+								><a
+									href={'/admin/news/edit/' + news.id}
+									class="font-bold text-blue-500 hover:underline">Edit</a
+								></td
+							>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
+		</div>
 	</div>
 
 	<!-- Small screen -->
