@@ -67,7 +67,7 @@
 	</div>
 
 	<!-- Medium to large screen -->
-	<div class="w-full p-6 mx-auto shadow-2xl border rounded-xl bg-base-100 my-5">
+	<div class="w-full p-6 mx-auto shadow-2xl border rounded-xl bg-base-100 my-5 hidden md:block">
 		<div class="overflow-x-auto">
 			<table class="table w-full">
 				<thead>

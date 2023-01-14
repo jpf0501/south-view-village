@@ -63,7 +63,7 @@
 	</div>
 
 	<!-- Medium to large screen -->
-	<div class="w-full p-6 mx-auto shadow-2xl border rounded-xl bg-base-100 my-5">
+	<div class="w-full p-6 mx-auto shadow-2xl border rounded-xl bg-base-100 my-5 hidden md:block">
 		<div class="overflow-x-auto">
 			<table class="table w-full">
 				<thead>
@@ -102,32 +102,26 @@
 	</div>
 
 	<!-- Small screen -->
-	<div class="bg-gray-300 my-5 p-5  selection:grid grid-cols-1 gap-4 md:hidden rounded-lg shadow">
+	<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">
 		{#each listOfNews as news}
-			<div class="bg-white space-y-3 p-4 border-2 border-black">
-				<div>
-					<span class="font-bold text-sm">Title: </span>
-					{news.titleDisplay}
-				</div>
-				<div>
-					<span class="font-bold text-sm">Date Created: </span>
-					{news.dateCreated.toDate().toLocaleDateString() +
-						' ' +
-						news.dateCreated.toDate().toLocaleTimeString()}
-				</div>
-				<div>
-					<span class="font-bold text-sm">Last Updated: </span>
-					{news.dateModified.toDate().toLocaleDateString() +
-						' ' +
-						news.dateModified.toDate().toLocaleTimeString()}
-				</div>
-				<div class="flex justify-end">
-					<a href={'/admin/news/edit/' + news.id} class="text-blue-500 font-bold hover:underline"
-						>Edit</a
-					>
+			<div class="card w-[105%] bg-base-100 shadow-xl">
+				<div class="card-body">
+					<h2 class="card-title mb-2">{news.titleDisplay}</h2>
+					<p class="my-1">
+						Date Created: {news.dateCreated.toDate().toLocaleDateString() +
+							' ' +
+							news.dateCreated.toDate().toLocaleTimeString()}
+					</p>
+					<p class="my-1">
+						Last Updated: {news.dateModified.toDate().toLocaleDateString() +
+							' ' +
+							news.dateModified.toDate().toLocaleTimeString()}
+					</p>
+					<div class="card-actions justify-end">
+						<a href={'/admin/news/edit/' + news.id} class="btn btn-primary hover:underline">Edit</a>
+					</div>
 				</div>
 			</div>
-			<br />
 		{/each}
 	</div>
 </div>
