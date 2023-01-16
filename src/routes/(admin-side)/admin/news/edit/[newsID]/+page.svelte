@@ -6,7 +6,6 @@
 		deleteDoc,
 		doc,
 		serverTimestamp,
-		deleteField
 	} from 'firebase/firestore';
 	import { goto } from '$app/navigation';
 

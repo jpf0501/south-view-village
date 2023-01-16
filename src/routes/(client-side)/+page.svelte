@@ -1,5 +1,5 @@
 <script>
-	import { onSnapshot, query, collection, snapshotEqual, orderBy, limit } from 'firebase/firestore';
+	import { onSnapshot, query, collection, orderBy, limit } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
 
