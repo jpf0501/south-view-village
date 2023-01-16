@@ -43,14 +43,14 @@
 				<div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2">
 					<div class="form-control">
 						<span class="label-text">Name</span>
-						<h1 class="border-2 rounded-lg p-3 mt-2 bg-gray-200" disabled>
+						<h1 class="input input-bordered p-3 mt-2 bg-gray-200">
 							{user.firstNameDisplay}
 							{user.lastNameDisplay}
 						</h1>
 					</div>
 					<div class="form-control">
 						<span class="label-text">Address</span>
-						<h1 class="border-2 rounded-lg p-3 mt-2 bg-gray-200">
+						<h1 class="input input-bordered p-3 mt-2 bg-gray-200">
 							Block {user.addressBlock} Lot {user.addressLot}
 							{user.addressStreet} Street
 						</h1>
@@ -59,7 +59,7 @@
 				<div class="grid grid-cols-1 gap-6 mt-4 md:grid-cols-2">
 					<div class="form-control">
 						<span class="label-text">E-mail Address</span>
-						<h1 class="border-2 rounded-lg p-3 mt-2 bg-gray-200">{user.email}</h1>
+						<h1 class="input input-bordered p-3 mt-2 bg-gray-200">{user.email}</h1>
 					</div>
 					<div class="form-control">
 						<span class="label-text">Contact No.</span>
@@ -76,10 +76,10 @@
 					</div>
 				</div>
 				<div class="flex justify-end mt-8">
-					<button type="submit" class="btn btn-primary bg-blue-500 mx-1 hover:bg-blue-900"
+					<button type="submit" class="btn btn-primary mx-1"
 						>Update Info</button
 					>
-					<a href="/profile" class="btn btn-primary mx-1 px-4 bg-red-500 hover:bg-red-900">Cancel</a
+					<a href="/profile" class="btn btn-error mx-1 text-white px-4">Cancel</a
 					>
 				</div>
 			</form>

@@ -92,8 +92,9 @@
 						<span class="label-text">First Name</span>
 						<input
 							type="text"
-							class="border-2 rounded-lg p-3 mt-2"
+							class="input input-bordered p-3 mt-2"
 							bind:value={guest.firstname}
+							placeholder="Juan"
 							required
 						/>
 					</div>
@@ -101,8 +102,9 @@
 						<span class="label-text">Last Name</span>
 						<input
 							type="text"
-							class="border-2 rounded-lg p-3 mt-2"
+							class="input input-bordered p-3 mt-2"
 							bind:value={guest.lastname}
+							placeholder="Dela Cruz"
 							required
 						/>
 					</div>
@@ -110,8 +112,9 @@
 						<span class="label-text">E-mail Address</span>
 						<input
 							type="text"
-							class="border-2 rounded-lg p-3 mt-2"
+							class="input input-bordered p-3 mt-2"
 							bind:value={user.email}
+							placeholder="juandelacruz@gmail.com"
 							required
 						/>
 					</div>
@@ -123,7 +126,7 @@
 							minlength="11" maxlength="11"
 							placeholder="09123456789"
 							pattern={String.raw`^(09)\d{9}$`}
-							class="border-2 rounded-lg p-3 mt-2"
+							class="input input-bordered p-3 mt-2"
 							bind:value={user.contactNumber}
 							required
 						/>
@@ -134,7 +137,8 @@
 						<input
 							type="text"
 							bind:value={guest.firstname}
-							class="border-2 rounded-lg p-3 mt-2"
+							class="input input-bordered p-3 mt-2"
+							placeholder="Juan"
 							required
 						/>
 					</div>
@@ -143,7 +147,8 @@
 						<input
 							type="text"
 							bind:value={guest.lastname}
-							class="border-2 rounded-lg p-3 mt-2"
+							class="input input-bordered p-3 mt-2"
+							placeholder="Dela Cruz"
 							required
 						/>
 					</div>
@@ -153,7 +158,8 @@
 							type="email"
 							bind:value={guest.email}
 							name="email"
-							class="border-2 rounded-lg p-3 mt-2"
+							class="input input-bordered p-3 mt-2"
+							placeholder="juandelacruz@gmail.com"
 							required
 						/>
 					</div>
@@ -167,7 +173,7 @@
 							pattern={String.raw`^(09)\d{9}$`}
 							bind:value={guest.contactNumber}
 							name="contact"
-							class="border-2 rounded-lg p-3 mt-2"
+							class="input input-bordered p-3 mt-2"
 							required
 						/>
 					</div>
@@ -176,8 +182,9 @@
 					<span class="label-text">Type of Event</span>
 					<input
 						type="text"
-						class="border-2 rounded-lg p-3 mt-2"
+						class="input input-bordered p-3 mt-2"
 						bind:value={guest.eventType}
+						placeholder="Birthday"
 						required
 					/>
 				</div>
@@ -187,7 +194,7 @@
 						type="date"
 						min={dateMin}
 						max={dateMax}
-						class="border-2 rounded-lg p-3 mt-2"
+						class="input input-bordered p-3 mt-2"
 						bind:value={guest.date}
 						required
 					/>
@@ -198,7 +205,7 @@
 						type="time"
 						min="8:00"
 						max="19:00"
-						class="border-2 rounded-lg p-3 mt-2"
+						class="input input-bordered p-3 mt-2"
 						bind:value={guest.time}
 						required
 					/>
@@ -206,7 +213,7 @@
 			</div>
 			<div class="flex justify-end mt-8">
 				<button type="submit" class="btn btn-primary">Submit Schedule</button>
-				<a href="/calendar" class="btn btn-error mx-1">Cancel</a>
+				<button type="reset" class="btn btn-error mx-1 text-white">Clear Input</button>
 			</div>
 		</form>
 	</div>
