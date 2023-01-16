@@ -29,7 +29,7 @@
 			<tr>
 			<td>
 			<section>
-				<h1 class="divider">
+				<h1 class="divider w-full">
 				</h1>
 				<article class="w-full max-w-5xl mx-auto">
 					<div class="flex flex-row-2 justify-between">
@@ -41,7 +41,7 @@
 				</p>
 				<a href={'/news/entry/' + news.id} class="link link-hover link-info">Read more</a>
 				</article>
-				<h1 class="px-4 divider">
+				<h1 class="divider w-full">
 				</h1>
 			</section>
 			</td>
