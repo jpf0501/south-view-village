@@ -39,19 +39,19 @@
 		<form on:submit|preventDefault={submitHandler}>
 			<div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2">
 				<div class="form-control">
-					<span class="label-text">Event Title</span>
+					<span class="pb-3">Event Title</span>
 					<input
 						type="text"
-						class="border-2 rounded-lg p-3 mt-2"
+						class="input input-bordered p-3 mt-2"
 						bind:value={event.eventTitle}
 						required
 					/>
 				</div>
 				<div class="form-control">
-					<span class="label-text">Event Date</span>
+					<span class="pb-3">Event Date</span>
 					<input
 						type="date"
-						class="border-2 rounded-lg p-3 mt-2"
+						class="input input-bordered p-3 mt-2"
 						bind:value={event.eventDate}
 						required
 					/>
@@ -59,9 +59,9 @@
 			</div>
 			<div class="mt-6">
 				<div class="form-control">
-					<span class="label-text">Event Desciption</span>
+					<span class="pb-3">Event Desciption</span>
 					<textarea
-						class="h-60 border-2 rounded-lg p-3"
+						class="h-60 textarea textarea-bordered p-3"
 						style="white-space:pre-wrap; resize:none"
 						required
 						bind:value={event.eventDescription}
@@ -70,7 +70,7 @@
 			</div>
 			<div class="flex justify-end mt-8">
 				<button type="submit" class="btn btn-primary">Submit Event</button>
-				<a href="/admin/calendar" class="btn btn-error mx-1">Cancel</a>
+				<a href="/admin/calendar" class="btn btn-error mx-1 text-white">Cancel</a>
 			</div>
 		</form>
 	</div>

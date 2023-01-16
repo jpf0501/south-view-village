@@ -50,6 +50,19 @@
 	<title>Create Account - Southview Homes 3 Admin Panel</title>
 </svelte:head>
 
+<style>
+	input[type='number'] {
+  		appearance: textfield;
+	}
+	input[type='number']::-webkit-inner-spin-button,
+	input[type='number']::-webkit-outer-spin-button,
+	input[type='number']:hover::-webkit-inner-spin-button, 
+	input[type='number']:hover::-webkit-outer-spin-button {
+		-webkit-appearance: none; 
+		margin: 0;
+	}
+</style>
+
 <main>
 	<div class="min-h-screen hero bg-base-200">
 		<div class="w-full max-w-4xl p-6 mx-auto shadow-2xl border rounded-xl bg-base-100">
@@ -164,14 +177,19 @@
 									bind:value={account.passwordcheck}
 								/>
 								{#if account.password != account.passwordcheck && account.passwordcheck != ''}
-									<p class="text-red-500 mt-3">Password doesnt match</p>
+								<div class="alert alert-error shadow-lg my-3 w-full">
+									<div>
+									  <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+									  <span>Passwords do not match</span>
+									</div>
+								  </div>
 								{/if}
 							</div>
 							<div class="form-control">
 								<span class="label-text mb-3">Role</span>
 								<div class="mb-3">
 									<select
-										class="form-select appearance-none block w-full px-3 py-1.5 text-base border rounded-xl border-gray-300"
+										class="select select-bordered w-full"
 										aria-label="Default select example"
 										required
 										bind:value={account.role}
@@ -202,12 +220,12 @@
 					</div>
 				</div>
 				<div class="flex justify-end mt-8">
-					<button type="submit" class="btn btn-primary mx-1 px-6 bg-blue-500 hover:bg-blue-900"
+					<button type="submit" class="btn btn-primary mx-1 px-6"
 						>Create</button
 					>
 					<a
 						href="/admin/accounts"
-						class="btn btn-primary mx-1 bg-red-500 px-4 hover:bg-red-900 text-white">Cancel</a
+						class="btn btn-error mx-1 px-4 text-white">Cancel</a
 					>
 				</div>
 			</form>

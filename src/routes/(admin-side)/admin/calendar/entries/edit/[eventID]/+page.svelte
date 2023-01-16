@@ -51,19 +51,19 @@
 		<h1 class="text-2xl mt-2">Edit Event</h1>
 			<div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2">
 				<div class="form-control">
-					<span class="label-text">Event Title</span>
+					<span class="pb-3">Event Title</span>
 					<input
 						type="text"
-						class="border-2 rounded-lg p-3 mt-2"
+						class="input input-bordered p-3 mt-2"
 						bind:value={event.titleDisplay}
 						required
 					/>
 				</div>
 				<div class="form-control">
-					<span class="label-text">Event Date</span>
+					<span class="pb-3">Event Date</span>
 					<input
 						type="date"
-						class="border-2 rounded-lg p-3 mt-2"
+						class="input input-bordered p-3 mt-2"
 						bind:value={event.date}
 						required
 					/>
@@ -71,9 +71,9 @@
 			</div>
 			<div class="mt-6">
 				<div class="form-control">
-					<span class="label-text">Event Desciption</span>
+					<span class="pb-3">Event Desciption</span>
 					<textarea
-						class="h-60 border-2 rounded-lg p-3"
+						class="h-60 textarea textarea-bordered p-3"
 						style="white-space:pre-wrap; resize:none"
 						required
 						bind:value={event.description}
@@ -82,8 +82,8 @@
 			</div>
 			<div class="flex justify-end mt-8">
 				<button type="submit" on:click={updateEvent} class="btn btn-primary">Save</button>
-				<a href="/admin/calendar/entries/" class="btn btn-error mx-1">Cancel</a>
-                <button type="submit" on:click={deleteEvent} class="btn btn-warning">Delete</button>
+				<a href="/admin/calendar/entries/" class="btn btn-error mx-1 text-white">Cancel</a>
+                <button type="submit" on:click={deleteEvent} class="btn btn-warning text-white">Delete</button>
 			</div>
 	</div>
 </div>

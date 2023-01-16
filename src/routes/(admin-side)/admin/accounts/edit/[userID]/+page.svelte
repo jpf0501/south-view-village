@@ -46,6 +46,19 @@
 	<title>Edit Account - Southview Homes 3 Admin Panel</title>
 </svelte:head>
 
+<style>
+	input[type='number'] {
+  		appearance: textfield;
+	}
+	input[type='number']::-webkit-inner-spin-button,
+	input[type='number']::-webkit-outer-spin-button,
+	input[type='number']:hover::-webkit-inner-spin-button, 
+	input[type='number']:hover::-webkit-outer-spin-button {
+		-webkit-appearance: none; 
+		margin: 0;
+	}
+</style>
+
 {#if user}
 	<main>
 		<div class="min-h-screen hero bg-base-200">
@@ -120,7 +133,7 @@
 						<span class="label-text mb-3">Role</span>
 						<div class="mb-3">
 							<select
-								class="form-select appearance-none block w-full px-3 py-1.5 text-base border rounded-xl border-gray-300"
+								class="select select-bordered w-full"
 								aria-label="Default select example"
 								required
 								bind:value={user.role}
@@ -151,15 +164,15 @@
 					<button
 						on:click={updateUser}
 						type="submit"
-						class="btn btn-primary mx-1 px-5 bg-blue-500 hover:bg-blue-900">Save</button
+						class="btn btn-primary mx-1 px-5">Save</button
 					>
-					<a href="/admin/accounts" class="btn btn-primary mx-1 px-4 bg-red-500 hover:bg-red-900"
+					<a href="/admin/accounts" class="btn btn-error mx-1 px-4 text-white"
 						>Cancel</a
 					>
 					<button
 						on:click={deleteUser}
 						type="submit"
-						class="btn btn-warning mx-1 hover:bg-red-900 text-white">Delete</button
+						class="btn btn-warning mx-1 text-white">Delete</button
 					>
 				</div>
 			</div>
