@@ -23,7 +23,7 @@
 		<form class="form-control" on:submit|preventDefault={resetPassword}>
 			<p class="text-base my-2">Please enter your email address to reset your password</p>
 			<div class="my-5">
-				<label>Email</label>
+				<h1>Email</h1>
 				<input
 					class="input input-bordered ml-2"
 					type="email"
