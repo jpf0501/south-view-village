@@ -42,10 +42,5 @@
 		<a class="font-medium tab tab-lg" href="/profile" class:tab-active={pathname === '/profile'}
 			>Profile</a
 		>
-		{#if $userStore && user.role == 'Admin'}
-		<a class="font-medium tab tab-lg" href="/admin" class:tab-active={pathname === '/admin'}
-			>Admin Panel</a
-		>
-		{/if}
 	{/if}
 </nav>
