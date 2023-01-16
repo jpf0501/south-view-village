@@ -40,9 +40,9 @@
 
 <div class="min-w-full min-h-full bg-base-200 px-12">
 	<h1 class="text-3xl font-semibold py-12">Accounts</h1>
-	<div class="flex justify-between">
-		<form on:submit|preventDefault={searchAccounts}>
-			<select bind:value={searchByField} required>
+	<div class="flex flex-col md:flex-row justify-between">
+		<form on:submit|preventDefault={searchAccounts} class="my-4">
+			<select bind:value={searchByField} class="select select-bordered" required>
 				<option value="" disabled selected>Search Filter</option>
 				<option value="firstname">Name</option>
 				<option value="addressBlock">Block</option>
@@ -50,9 +50,9 @@
 				<option value="addressStreet">Street</option>
 				<option value="email">Email</option>
 			</select>
-			<input type="search" placeholder="Search here" required bind:value={searchByValue} />
+			<input type="search" placeholder="Search here" class="input input-bordered mx-2" required bind:value={searchByValue} />
 		</form>
-		<select bind:value={sortByField} on:change={changeSortBy}>
+		<select bind:value={sortByField} on:change={changeSortBy} class="select select-bordered my-4">
 			<option value="" disabled selected>Sort By</option>
 			<option value="firstname">Name</option>
 			<option value="addressBlock">Block</option>
@@ -60,18 +60,26 @@
 			<option value="addressStreet">Street</option>
 			<option value="email">Email</option>
 		</select>
-		<a
-			class="px-1 text-sm bg-gray-400 rounded-full hover:bg-gray-300 flex items-center border-gray-700"
-			href="/admin/accounts/create">Add User</a
-		>
+		<a class="btn btn-primary my-4" href="/admin/accounts/create">Add User</a>
 	</div>
 
+	<style>
+		table {
+			counter-reset: section;
+		}
+		.count:before {
+			counter-increment: section;
+			content: counter(section);
+		}
+	</style>
+
 	<!-- Medium to large screen -->
-	<div class="w-full p-6 mx-auto shadow-2xl border rounded-xl bg-base-100 my-5 hidden md:block">
+	<div class="w-full mx-auto shadow-2xl border rounded-xl bg-base-100 my-5 hidden md:block">
 		<div class="overflow-x-auto">
 			<table class="table w-full">
 				<thead>
 					<tr>
+						<th></th>
 						<th class="text-lg">Name</th>
 						<th class="text-lg">Address</th>
 						<th class="text-lg">Email</th>
@@ -82,7 +90,8 @@
 				<tbody>
 					{#each listOfUsers as user}
 						<tr class="hover">
-							<th>{user.firstNameDisplay + ' ' + user.lastNameDisplay}</th>
+							<td class="count"></td>
+							<td>{user.firstNameDisplay + ' ' + user.lastNameDisplay}</td>
 							<td
 								>{'Block ' +
 									user.addressBlock +
@@ -108,41 +117,35 @@
 	</div>
 
 	<!-- Small screen -->
-	<div class="bg-gray-300 my-5 p-5  selection:grid grid-cols-1 gap-4 md:hidden rounded-lg shadow">
+	<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">
 		{#each listOfUsers as user}
-			<div class="bg-white space-y-3 p-4 border-2 border-black">
-				<div class="flex items-center space-x-2  text-sm">
+			<div class="card w-[105%] bg-base-100 shadow-xl">
+				<div class="card-body">
+					<h2 class="card-title mb-2">{user.firstNameDisplay + ' ' + user.lastNameDisplay}</h2>
 					<div>
-						<span class="font-bold text-sm">Name: </span>
-						{user.firstNameDisplay + ' ' + user.lastNameDisplay}
-					</div>
-					<div>
-						<span class="font-bold text-sm">Role: </span>
+						<span class="my-1 font-bold">Role:</span>
 						{user.role}
 					</div>
-				</div>
-				<div>
-					<span class="font-bold text-sm">Address: </span>
-					{'Block ' +
+					<div>
+						<span class="my-1 font-bold">Address:</span>
+						{'Block ' +
 						user.addressBlock +
 						' Lot ' +
 						user.addressLot +
 						' ' +
 						user.addressStreet +
 						' Street'}
-				</div>
-				<div>
-					<span class="font-bold text-sm">Email: </span>
-					{user.email}
-				</div>
-				<div class="flex justify-end">
-					<a
-						href={'/admin/accounts/edit/' + user.id}
-						class="text-blue-500 font-bold hover:underline">Edit</a
-					>
+					</div>
+					<div>
+						<span class="my-1 font-bold">E-mail Address:</span>
+						{user.email}
+					</div>
+					<div class="card-actions justify-end">
+						<a href={'/admin/accounts/edit/' + user.id} class="btn btn-primary hover:underline">Edit</a>
+					</div>
 				</div>
 			</div>
-			<br />
 		{/each}
 	</div>
+	
 </div>

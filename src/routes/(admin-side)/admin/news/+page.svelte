@@ -42,32 +42,42 @@
 
 <div class="min-w-full min-h-full bg-base-200 px-12">
 	<h1 class="text-3xl font-semibold py-12">News</h1>
-	<div class="flex justify-between">
-		<form on:submit|preventDefault={searchNews}>
-			<select bind:value={searchByField} required>
+	<div class="flex flex-col md:flex-row justify-between">
+		<form on:submit|preventDefault={searchNews} class="my-4">
+			<select bind:value={searchByField} class="select select-bordered" required>
 				<option value="" disabled selected>Search Filter</option>
 				<option value="title">Title</option>
+				<option value="dateCreated">Date Created</option>
+				<option value="dateModified">Last Updated</option>
 			</select>
-			<input type="search" placeholder="Search here" bind:value={searchByValue} />
+			<input type="search" placeholder="Search here" bind:value={searchByValue} class="input input-bordered mx-2" />
 		</form>
-		<select bind:value={sortByField} on:change={changeSortBy}>
+		<select bind:value={sortByField} on:change={changeSortBy} class="select select-bordered my-4">
 			<option value="" disabled selected>Sort By</option>
 			<option value="title">Title</option>
 			<option value="dateCreated">Date Created</option>
 			<option value="dateModified">Last Updated</option>
 		</select>
-		<a
-			class="px-1 text-sm bg-gray-400 rounded-full hover:bg-gray-300 flex items-center border-gray-700"
-			href="/admin/news/create">Add Entry</a
-		>
+		<a class="btn btn-primary my-4" href="/admin/news/create">Add Entry</a>
 	</div>
 
+	<style>
+		table {
+			counter-reset: section;
+		}
+		.count:before {
+			counter-increment: section;
+			content: counter(section);
+		}
+	</style>
+
 	<!-- Medium to large screen -->
-	<div class="w-full p-6 mx-auto shadow-2xl border rounded-xl bg-base-100 my-5 hidden md:block">
+	<div class="w-full mx-auto shadow-2xl border rounded-xl bg-base-100 my-5 hidden md:block">
 		<div class="overflow-x-auto">
 			<table class="table w-full">
 				<thead>
 					<tr>
+						<th></th>
 						<th class="text-lg">Title</th>
 						<th class="text-lg">Date Created</th>
 						<th class="text-lg">Last Updated</th>
@@ -77,7 +87,8 @@
 				<tbody>
 					{#each listOfNews as news}
 						<tr class="hover">
-							<th>{news.titleDisplay}</th>
+							<td class="count"></td>
+							<td>{news.titleDisplay}</td>
 							<td
 								>{news.dateCreated.toDate().toLocaleDateString() +
 									' ' +
@@ -107,16 +118,18 @@
 			<div class="card w-[105%] bg-base-100 shadow-xl">
 				<div class="card-body">
 					<h2 class="card-title mb-2">{news.titleDisplay}</h2>
-					<p class="my-1">
-						Date Created: {news.dateCreated.toDate().toLocaleDateString() +
+					<div>
+						<span class="my-1 font-bold">Date Created:</span>
+						{news.dateCreated.toDate().toLocaleDateString() +
 							' ' +
 							news.dateCreated.toDate().toLocaleTimeString()}
-					</p>
-					<p class="my-1">
-						Last Updated: {news.dateModified.toDate().toLocaleDateString() +
+					</div>
+					<div>
+						<span class="my-1 font-bold">Last Updated:</span>
+						{news.dateModified.toDate().toLocaleDateString() +
 							' ' +
 							news.dateModified.toDate().toLocaleTimeString()}
-					</p>
+					</div>
 					<div class="card-actions justify-end">
 						<a href={'/admin/news/edit/' + news.id} class="btn btn-primary hover:underline">Edit</a>
 					</div>

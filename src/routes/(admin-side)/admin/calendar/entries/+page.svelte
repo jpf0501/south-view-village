@@ -38,45 +38,55 @@
 
 <div class="min-w-full min-h-full bg-base-200 px-12">
 	<h1 class="text-3xl font-semibold py-12">Events</h1>
-	<div class="flex justify-between">
-		<form on:submit|preventDefault={searchEvents}>
-			<select bind:value={searchByField} required>
+	<div class="flex flex-col md:flex-row justify-between">
+		<form on:submit|preventDefault={searchEvents} class="my-4">
+			<select bind:value={searchByField} required class="select select-bordered">
 				<option value="" disabled selected>Search Filter</option>
 				<option value="title">Title</option>
 				<option value="date">Date</option>
 			</select>
-			<input type="search" placeholder="Search here" required bind:value={searchByValue} />
+			<input type="search" placeholder="Search here" required bind:value={searchByValue} class="input input-bordered mx-2" />
 		</form>
-		<select bind:value={sortByField} on:change={changeSortBy}>
+		<select bind:value={sortByField} on:change={changeSortBy} class="select select-bordered my-4">
 			<option value="" disabled selected>Sort By</option>
 			<option value="title">Title</option>
 			<option value="date">Date</option>
 		</select>
-		<a
-			class="px-1 text-sm bg-gray-400 rounded-full hover:bg-gray-300 flex items-center border-gray-700"
-			href="/admin/calendar/">Go Back</a
-		>
+		<a class="btn btn-primary my-4" href="/admin/calendar/">Go Back</a>
 	</div>
 
+	<style>
+		table {
+			counter-reset: section;
+		}
+		.count:before {
+			counter-increment: section;
+			content: counter(section);
+		}
+	</style>
+
 	<!-- Medium to large screen -->
-	<div class="my-5 p-5 overflow-auto shadow-lg border rounded-xl bg-gray-300 hidden md:block">
-		<table class="border-2 border-black bg-white w-full text-center">
-			<thead class="font-bold bg-gray-500">
+	<div class="w-full mx-auto shadow-2xl border rounded-xl bg-base-100 my-5 hidden md:block">
+		<div class="overflow-x-auto"></div>
+		<table class="table w-full">
+			<thead>
 				<tr>
-					<th class="p-3 text-sm tracking-wide">Title</th>
-					<th class="p-3 text-sm tracking-wide">Description</th>
-					<th class="p-3 text-sm tracking-wide">Date</th>
-					<th class="p-3 text-sm tracking-wide" />
-                    <th class="p-3 text-sm tracking-wide" />
+					<th></th>
+					<th class="text-lg">Title</th>
+					<th class="text-lg">Description</th>
+					<th class="text-lg">Date</th>
+					<th />
+                    <th />
 				</tr>
 			</thead>
 			<tbody>
 				{#each listOfEvents as event}
-					<tr class="border-t-2 border-black">
-						<td class="p-3 text-sm whitespace-nowrap">{event.titleDisplay}</td>
-						<td class="p-3 text-sm whitespace-nowrap">{event.description.substring(0,50) + '...'}</td>
-						<td class="p-3 text-sm whitespace-nowrap">{event.date}</td>
-						<td class="p-3 text-sm whitespace-nowrap">
+					<tr class="hover">
+						<td class="count"></td>
+						<td>{event.titleDisplay}</td>
+						<td>{event.description.substring(0,50) + '...'}</td>
+						<td>{event.date}</td>
+						<td>
 							<a
 								href={'/admin/calendar/entries/edit/' + event.id}
 								class="font-bold text-blue-500 hover:underline">Edit</a
@@ -89,29 +99,24 @@
 	</div>
 
 	<!-- Small screen -->
-	<div class="bg-gray-300 my-5 p-5  selection:grid grid-cols-1 gap-4 md:hidden rounded-lg shadow">
+	<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">
 		{#each listOfEvents as event}
-			<div class="bg-white space-y-3 p-4 border-2 border-black">
-				<div class="flex items-center space-x-2  text-sm">
-					<span class="font-bold text-sm">Title: </span>
-					{event.titleDisplay}
-				</div>
-				<div>
-					<span class="font-bold text-sm">Description:</span>
-					{event.description}
-				</div>
-				<div>
-					<span class="font-bold text-sm">Date: </span>
-					{event.date}
-				</div>
-				<div class="flex justify-end">
-					<a
-						href={'/admin/calendar/entries/edit/' + event.id}
-						class="text-blue-500 font-bold hover:underline">Edit</a
-					>
+			<div class="card w-[105%] bg-base-100 shadow-xl">
+				<div class="card-body">
+					<h2 class="card-title mb-2">{event.titleDisplay}</h2>
+					<div>
+						<span class="my-1 font-bold">Description:</span>
+						{event.description}
+					</div>
+					<div>
+						<span class="my-1 font-bold">Date:</span>
+						{event.date}
+					</div>
+					<div class="card-actions justify-end">
+						<a href={'/admin/calendar/entries/edit/' + event.id} class="btn btn-primary hover:underline">Edit</a>
+					</div>
 				</div>
 			</div>
-			<br />
 		{/each}
 	</div>
 </div>
