@@ -39,7 +39,6 @@
 	async function getBookings(bookingsQuery) {
 		const unsubscribe = onSnapshot(bookingsQuery, (querySnapshot) => {
 			listOfBooking = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-			console.log(listOfBooking.dateReserved);
 		});
 		onDestroy(() => unsubscribe());
 	}
