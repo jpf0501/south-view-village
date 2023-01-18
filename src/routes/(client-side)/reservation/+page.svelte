@@ -48,7 +48,7 @@
 					eventTypeDisplay: guest.eventType,
 					bookDate: new Date(guest.date + ' ' + guest.time),
 					dateReserved: guest.dateReserved,
-					dateReviewed: undefined
+					dateReviewed: guest.dateReserved,
 				});
 				alert('Reservation form submitted');
 				await goto('/');
