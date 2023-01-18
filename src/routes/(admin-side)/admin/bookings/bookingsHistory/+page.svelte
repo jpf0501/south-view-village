@@ -115,9 +115,9 @@
 								<td>{book.contactNumber}</td>
 								<td>{book.eventTypeDisplay}</td>
 								<td
-									>{book.bookDate.toDate().toLocaleDateString('en-us', {year: "numeric", month: "long", day: "numeric"}) +
+									>{book.bookDate.toDate().toLocaleDateString() +
 										' at ' +
-										book.bookDate.toDate().toLocaleTimeString('en-us', {hour: "2-digit", minute: "2-digit"})}</td
+										book.bookDate.toDate().toLocaleTimeString()}</td
 								>
 								<td>
 									{#if book.status == 'Approved'}
@@ -133,9 +133,9 @@
 									{/if}
 								</td>
 								<td
-									>{book.dateReviewed.toDate().toLocaleDateString('en-us', {year: "numeric", month: "long", day: "numeric"}) +
+									>{book.dateReviewed.toDate().toLocaleDateString() +
 										' at ' +
-										book.dateReviewed.toDate().toLocaleTimeString('en-us', {hour: "2-digit", minute: "2-digit"})}</td
+										book.dateReviewed.toDate().toLocaleTimeString()}</td
 								>
 							</tr>
 						{/if}
@@ -167,9 +167,9 @@
 						</div>
 						<div>
 							<span class="my-1 font-bold">Date and Time:</span>
-							{book.bookDate.toDate().toLocaleDateString('en-us', {year: "numeric", month: "long", day: "numeric"}) +
+							{book.bookDate.toDate().toLocaleDateString() +
 								' at ' +
-							book.bookDate.toDate().toLocaleTimeString('en-us', {hour: "2-digit", minute: "2-digit"})}
+							book.bookDate.toDate().toLocaleTimeString()}
 						</div>
 						<div class="font-bold">
 							Status:
@@ -181,9 +181,9 @@
 						</div>
 						<div>
 							<span class="my-1 font-bold">Date Reviewed:</span>
-							{book.dateReviewed.toDate().toLocaleDateString('en-us', {year: "numeric", month: "long", day: "numeric"}) +
+							{book.dateReviewed.toDate().toLocaleDateString() +
 								' at ' +
-							book.dateReviewed.toDate().toLocaleTimeString('en-us', {hour: "2-digit", minute: "2-digit"})}
+							book.dateReviewed.toDate().toLocaleTimeString()}
 						</div>
 					</div>
 				</div>

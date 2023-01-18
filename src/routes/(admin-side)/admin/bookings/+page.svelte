@@ -169,14 +169,14 @@
 								<td>{book.contactNumber}</td>
 								<td>{book.eventTypeDisplay}</td>
 								<td
-									>{book.bookDate.toDate().toLocaleDateString('en-us', {year: "numeric", month: "long", day: "numeric"}) +
+									>{book.bookDate.toDate().toLocaleDateString() +
 										' at ' +
-										book.bookDate.toDate().toLocaleTimeString('en-us', {hour: "2-digit", minute: "2-digit"})}</td
+										book.bookDate.toDate().toLocaleTimeString()}</td
 								>
 								<td
-									>{book.dateReserved.toDate().toLocaleDateString('en-us', {year: "numeric", month: "long", day: "numeric"}) +
+									>{book.dateReserved.toDate().toLocaleDateString() +
 										' at ' +
-										book.dateReserved.toDate().toLocaleTimeString('en-us', {hour: "2-digit", minute: "2-digit"})}</td
+										book.dateReserved.toDate().toLocaleTimeString()}</td
 								>
 								<td class="text-center"
 									><form on:submit|preventDefault={changePaymentStatus(book.id)}>
@@ -244,15 +244,15 @@
 						</div>
 						<div>
 							<span class="my-1 font-bold">Date and Time:</span>
-							{book.bookDate.toDate().toLocaleDateString('en-us', {year: "numeric", month: "long", day: "numeric"}) +
+							{book.bookDate.toDate().toLocaleDateString() +
 							' at ' +
-							book.bookDate.toDate().toLocaleTimeString('en-us', {hour: "2-digit", minute: "2-digit"})}
+							book.bookDate.toDate().toLocaleTimeString()}
 						</div>
 						<div>
 							<span class="my-1 font-bold">Date Reserved:</span>
-							{book.dateReserved.toDate().toLocaleDateString('en-us', {year: "numeric", month: "long", day: "numeric"}) +
+							{book.dateReserved.toDate().toLocaleDateString() +
 							' at ' +
-							book.dateReserved.toDate().toLocaleTimeString('en-us', {hour: "2-digit", minute: "2-digit"})}
+							book.dateReserved.toDate().toLocaleTimeString()}
 						</div>
 						<div class="flex flex-row">
 							<span class="my-1 font-bold">Status:</span>
