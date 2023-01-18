@@ -155,7 +155,7 @@
 										' at ' +
 										book.bookDate.toDate().toLocaleTimeString()}</td
 								>
-								<td
+								<td class="text-center"
 									><form on:submit|preventDefault={changePaymentStatus(book.id)}>
 										{#if book.paymentStatus == 'Paid'}
 											<button type="submit" on:click={() => (bookingPaymentStatus = 'Unpaid')}>
@@ -177,12 +177,12 @@
 										<button
 											on:click={() => (bookingStatus = 'Approved')}
 											type="submit"
-											class="py-2 px-2 text-green-500 font-bold">Approve</button
+											class="btn btn-success text-white">Approve</button
 										>
 										<button
 											on:click={() => (bookingStatus = 'Disapproved')}
 											type="submit"
-											class="py-2 px-2 text-red-500 font-bold">Dissaprove</button
+											class="btn btn-error text-white">Dissaprove</button
 										>
 									</form></td
 								>
@@ -190,7 +190,7 @@
 									><button
 										on:click={sendPaymentEmail(book.email)}
 										type="button"
-										class="py-2 px-2 text-blue-500 font-bold hover:underline">Send Payment</button
+										class="btn btn-primary">Send Payment</button
 									></td
 								>
 							</tr>
@@ -244,22 +244,22 @@
 							</form>
 						</div>
 						<div>
-						<form on:submit|preventDefault={changeStatus(book.id, book.paymentStatus)}>
+						<form on:submit|preventDefault={changeStatus(book.id, book.paymentStatus)} class="py-3">
 							<button
 								on:click={() => (bookingStatus = 'Approved')}
 								type="submit"
-								class="py-2 px-2 text-green-500 font-bold">Approve</button
+								class="btn btn-success text-white">Approve</button
 							>
 							<button
 								on:click={() => (bookingStatus = 'Disapproved')}
 								type="submit"
-								class="py-2 px-2 text-red-500 font-bold">Dissaprove</button
+								class="btn btn-error text-white">Dissaprove</button
 							>
 						</form>
 						<button
 							on:click={sendPaymentEmail(book.email)}
 							type="button"
-							class="py-2 px-2 text-blue-500 font-bold hover:underline">Send Payment</button
+							class="btn btn-primary">Send Payment</button
 						>
 						</div>
 					</div>
