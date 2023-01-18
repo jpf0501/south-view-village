@@ -101,7 +101,8 @@
 						<th class="text-lg">Contact Number</th>
 						<th class="text-lg">Type of Event</th>
 						<th class="text-lg">Date and Time</th>
-						<th class="text-lg">Status</th>
+						<th class="text-lg">Booking Status</th>
+						<th class="text-lg">Date Reviewed</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -131,6 +132,11 @@
 										<td class="p-3 text-sm whitespace-nowrap">{book.status}</td>
 									{/if}
 								</td>
+								<td
+									>{book.dateReviewed.toDate().toLocaleDateString() +
+										' at ' +
+										book.dateReviewed.toDate().toLocaleTimeString()}</td
+								>
 							</tr>
 						{/if}
 					{/each}

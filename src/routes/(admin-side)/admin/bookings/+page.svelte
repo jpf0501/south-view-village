@@ -6,11 +6,27 @@
 		updateDoc,
 		doc,
 		orderBy,
-		where
+		where,
+		serverTimestamp
 	} from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
 	import { sendEmail } from '$lib/utils';
+
+	const monthName = [
+		'January',
+		'February',
+		'March',
+		'April',
+		'May',
+		'June',
+		'July',
+		'August',
+		'September',
+		'October',
+		'November',
+		'December'
+	];
 
 	let listOfBooking = [];
 	let sortByField = '';
@@ -23,6 +39,7 @@
 	async function getBookings(bookingsQuery) {
 		const unsubscribe = onSnapshot(bookingsQuery, (querySnapshot) => {
 			listOfBooking = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+			console.log(listOfBooking.dateReserved);
 		});
 		onDestroy(() => unsubscribe());
 	}
@@ -46,7 +63,8 @@
 		try {
 			const bookRef = doc(db, 'booking', bookingId);
 			const data = {
-				status: bookingStatus
+				status: bookingStatus,
+				dateReviewed: serverTimestamp()
 			};
 			if (paymentStatus == 'Unpaid' && bookingStatus == 'Approved') {
 				alert('Only paid bookings can be approved');
@@ -137,6 +155,7 @@
 						<th class="text-lg">Contact Number</th>
 						<th class="text-lg">Type of Event</th>
 						<th class="text-lg">Date and Time</th>
+						<th class="text-lg">Date Reserved</th>
 						<th class="text-lg">Payment Status</th>
 						<th colspan="2" />
 					</tr>
@@ -154,6 +173,11 @@
 									>{book.bookDate.toDate().toLocaleDateString() +
 										' at ' +
 										book.bookDate.toDate().toLocaleTimeString()}</td
+								>
+								<td
+									>{book.dateReserved.toDate().toLocaleDateString() +
+										' at ' +
+										book.dateReserved.toDate().toLocaleTimeString()}</td
 								>
 								<td class="text-center"
 									><form on:submit|preventDefault={changePaymentStatus(book.id)}>
@@ -224,6 +248,12 @@
 							{book.bookDate.toDate().toLocaleDateString() +
 							' at ' +
 							book.bookDate.toDate().toLocaleTimeString()}
+						</div>
+						<div>
+							<span class="my-1 font-bold">Date Reserved:</span>
+							{book.dateReserved.toDate().toLocaleDateString() +
+							' at ' +
+							book.dateReserved.toDate().toLocaleTimeString()}
 						</div>
 						<div class="flex flex-row">
 							<span class="my-1 font-bold">Status:</span>

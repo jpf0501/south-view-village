@@ -1,6 +1,6 @@
 <script>
 	import { userStore } from '$lib/store';
-	import { getDoc, doc, addDoc, collection } from 'firebase/firestore';
+	import { getDoc, doc, addDoc, collection, serverTimestamp } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { goto } from '$app/navigation';
 
@@ -18,7 +18,8 @@
 		paymentStatus: 'Unpaid',
 		eventType: '',
 		date: '',
-		time: ''
+		time: '',
+		dateReserved: serverTimestamp()
 	};
 
 	async function getUser() {
@@ -45,7 +46,9 @@
 					paymentStatus: guest.paymentStatus,
 					eventType: guest.eventType.trim().toLowerCase(),
 					eventTypeDisplay: guest.eventType,
-					bookDate: new Date(guest.date + ' ' + guest.time)
+					bookDate: new Date(guest.date + ' ' + guest.time),
+					dateReserved: guest.dateReserved,
+					dateReviewed: undefined
 				});
 				alert('Reservation form submitted');
 				await goto('/');
