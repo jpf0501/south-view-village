@@ -179,6 +179,12 @@
 								<span class="text-red-500">{book.status}</span>
 							{/if}
 						</div>
+						<div>
+							<span class="my-1 font-bold">Date Reviewed:</span>
+							{book.dateReviewed.toDate().toLocaleDateString() +
+								' at ' +
+							book.dateReviewed.toDate().toLocaleTimeString()}
+						</div>
 					</div>
 				</div>
 			{/if}
