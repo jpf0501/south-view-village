@@ -90,14 +90,14 @@
 							<td class="count"></td>
 							<td>{news.titleDisplay}</td>
 							<td
-								>{news.dateCreated.toDate().toLocaleDateString() +
-									' ' +
-									news.dateCreated.toDate().toLocaleTimeString()}</td
+								>{news.dateCreated.toDate().toLocaleDateString('en-us', {year: "numeric", month: "long", day: "numeric"}) +
+									' at ' +
+									news.dateCreated.toDate().toLocaleTimeString('en-us', {hour: "2-digit", minute: "2-digit"})}</td
 							>
 							<td
-								>{news.dateModified.toDate().toLocaleDateString() +
-									' ' +
-									news.dateModified.toDate().toLocaleTimeString()}</td
+								>{news.dateModified.toDate().toLocaleDateString('en-us', {year: "numeric", month: "long", day: "numeric"}) +
+									' at ' +
+									news.dateModified.toDate().toLocaleTimeString('en-us', {hour: "2-digit", minute: "2-digit"})}</td
 							>
 							<td>
 								<a
@@ -120,15 +120,15 @@
 					<h2 class="card-title mb-2">{news.titleDisplay}</h2>
 					<div>
 						<span class="my-1 font-bold">Date Created:</span>
-						{news.dateCreated.toDate().toLocaleDateString() +
-							' ' +
-							news.dateCreated.toDate().toLocaleTimeString()}
+						{news.dateCreated.toDate().toLocaleDateString('en-us', {year: "numeric", month: "long", day: "numeric"}) +
+							' at ' +
+							news.dateCreated.toDate().toLocaleTimeString('en-us', {hour: "2-digit", minute: "2-digit"})}
 					</div>
 					<div>
 						<span class="my-1 font-bold">Last Updated:</span>
-						{news.dateModified.toDate().toLocaleDateString() +
-							' ' +
-							news.dateModified.toDate().toLocaleTimeString()}
+						{news.dateModified.toDate().toLocaleDateString('en-us', {year: "numeric", month: "long", day: "numeric"}) +
+							' at ' +
+							news.dateModified.toDate().toLocaleTimeString('en-us', {hour: "2-digit", minute: "2-digit"})}
 					</div>
 					<div class="card-actions justify-end">
 						<a href={'/admin/news/edit/' + news.id} class="btn btn-primary hover:underline">Edit</a>
