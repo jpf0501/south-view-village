@@ -1,11 +1,11 @@
 import { initializeApp, cert, getApp, getApps } from 'firebase-admin/app';
 import { getAuth } from "firebase-admin/auth"
-import { env } from "$env/dynamic/private"
+import { PROJECT_ID, CLIENT_EMAIL, PRIVATE_KEY } from "$env/static/private"
 
 const serviceAccount = {
-    clientEmail: env.CLIENT_EMAIL,
-    privateKey: env.PRIVATE_KEY,
-    projectId: env.PROJECT_ID,
+    clientEmail: CLIENT_EMAIL,
+    privateKey: PRIVATE_KEY,
+    projectId: PROJECT_ID,
 }
 
 function getFirebaseAdmin() {
