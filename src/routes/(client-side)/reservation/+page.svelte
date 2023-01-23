@@ -69,7 +69,9 @@
 					paymentStatus: guest.paymentStatus,
 					eventType: guest.eventType.trim().toLowerCase(),
 					eventTypeDisplay: guest.eventType,
-					bookDate: new Date(guest.date + ' ' + guest.time)
+					bookDate: new Date(guest.date + ' ' + guest.time),
+					dateReserved: guest.dateReserved,
+					dateReviewed: guest.dateReserved
 				});
 				alert('Schedule request submitted');
 				await goto('/calendar');
