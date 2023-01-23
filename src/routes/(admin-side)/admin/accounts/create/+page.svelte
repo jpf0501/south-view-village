@@ -37,7 +37,7 @@
 			});
 			const result = await response.json();
 			console.log(result);
-			alert('Save success ' + result.uid);
+			alert('Save success');
 			await goto('/admin/accounts');
 		} catch (error) {
 			console.log(error);
@@ -50,21 +50,8 @@
 	<title>Create Account - Southview Homes 3 Admin Panel</title>
 </svelte:head>
 
-<style>
-	input[type='number'] {
-  		appearance: textfield;
-	}
-	input[type='number']::-webkit-inner-spin-button,
-	input[type='number']::-webkit-outer-spin-button,
-	input[type='number']:hover::-webkit-inner-spin-button, 
-	input[type='number']:hover::-webkit-outer-spin-button {
-		-webkit-appearance: none; 
-		margin: 0;
-	}
-</style>
-
 <main>
-	<div class="min-h-screen hero bg-base-200">
+	<div class="min-h-screen hero bg-base-200 py-8">
 		<div class="w-full max-w-4xl p-6 mx-auto shadow-2xl border rounded-xl bg-base-100">
 			<div class="mt-2">
 				<h1 class="text-2xl">Create Account</h1>
@@ -177,12 +164,23 @@
 									bind:value={account.passwordcheck}
 								/>
 								{#if account.password != account.passwordcheck && account.passwordcheck != ''}
-								<div class="alert alert-error shadow-lg my-3 w-full">
-									<div>
-									  <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-									  <span>Passwords do not match</span>
+									<div class="alert alert-error shadow-lg my-3 w-full">
+										<div>
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												class="stroke-current flex-shrink-0 h-6 w-6"
+												fill="none"
+												viewBox="0 0 24 24"
+												><path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													stroke-width="2"
+													d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+												/></svg
+											>
+											<span>Passwords do not match</span>
+										</div>
 									</div>
-								  </div>
 								{/if}
 							</div>
 							<div class="form-control">
@@ -208,7 +206,8 @@
 							<input
 								type="tel"
 								onkeypress="return event.charCode >= 48 && event.charCode <= 57"
-								minlength="11" maxlength="11"
+								minlength="11"
+								maxlength="11"
 								placeholder="09123456789"
 								pattern={String.raw`^(09)\d{9}$`}
 								name="contact"
@@ -220,15 +219,23 @@
 					</div>
 				</div>
 				<div class="flex justify-end mt-8">
-					<button type="submit" class="btn btn-primary mx-1 px-6"
-						>Create</button
-					>
-					<a
-						href="/admin/accounts"
-						class="btn btn-error mx-1 px-4 text-white">Cancel</a
-					>
+					<button type="submit" class="btn btn-primary mx-1 px-6">Create</button>
+					<a href="/admin/accounts" class="btn btn-error mx-1 px-4 text-white">Cancel</a>
 				</div>
 			</form>
 		</div>
 	</div>
 </main>
+
+<style>
+	input[type='number'] {
+		appearance: textfield;
+	}
+	input[type='number']::-webkit-inner-spin-button,
+	input[type='number']::-webkit-outer-spin-button,
+	input[type='number']:hover::-webkit-inner-spin-button,
+	input[type='number']:hover::-webkit-outer-spin-button {
+		-webkit-appearance: none;
+		margin: 0;
+	}
+</style>
