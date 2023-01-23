@@ -1,5 +1,5 @@
 <script>
-	import { onSnapshot, query, collection, snapshotEqual, orderBy, where } from 'firebase/firestore';
+	import { onSnapshot, query, collection, orderBy, where } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
 
@@ -10,8 +10,6 @@
 	let accountsQuery = query(collection(db, 'accounts'));
 
 	async function getAccounts(accountsQuery) {
-		// if (sortByField) accountsQuery = query(collection(db, 'accounts'));
-		// else accountsQuery = query(collection(db, 'accounts'), orderBy(sortByField, 'asc'));
 		const unsubscribe = onSnapshot(accountsQuery, (querySnapshot) => {
 			listOfUsers = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 		});
@@ -31,6 +29,11 @@
 		);
 	}
 
+	async function resetButton() {
+		accountsQuery = query(collection(db, 'accounts'));
+		searchByValue = '';
+	}
+
 	$: getAccounts(accountsQuery);
 </script>
 
@@ -41,17 +44,26 @@
 <div class="min-w-full min-h-full bg-base-200 px-12">
 	<h1 class="text-3xl font-semibold py-12">Accounts</h1>
 	<div class="flex flex-col md:flex-row justify-between">
-		<form on:submit|preventDefault={searchAccounts} class="my-4">
-			<select bind:value={searchByField} class="select select-bordered" required>
-				<option value="" disabled selected>Search Filter</option>
-				<option value="firstname">Name</option>
-				<option value="addressBlock">Block</option>
-				<option value="addressLot">Lot</option>
-				<option value="addressStreet">Street</option>
-				<option value="email">Email</option>
-			</select>
-			<input type="search" placeholder="Search here" class="input input-bordered mx-2" required bind:value={searchByValue} />
-		</form>
+		<div class="flex flex-col md:flex-row">
+			<form on:submit|preventDefault={searchAccounts} class="my-4">
+				<select bind:value={searchByField} class="select select-bordered" required>
+					<option value="" disabled selected>Search Filter</option>
+					<option value="firstname">Name</option>
+					<!-- <option value="addressBlock">Block</option>
+					<option value="addressLot">Lot</option>
+					<option value="addressStreet">Street</option> -->
+					<option value="email">Email</option>
+				</select>
+				<input
+					type="search"
+					placeholder="Search here"
+					class="input input-bordered mx-2"
+					bind:value={searchByValue}
+				/>
+			</form>
+			<button on:click={resetButton} class="btn btn-primary my-4">Reset</button>
+		</div>
+
 		<select bind:value={sortByField} on:change={changeSortBy} class="select select-bordered my-4">
 			<option value="" disabled selected>Sort By</option>
 			<option value="firstname">Name</option>
@@ -60,6 +72,7 @@
 			<option value="addressStreet">Street</option>
 			<option value="email">Email</option>
 		</select>
+
 		<a class="btn btn-primary my-4" href="/admin/accounts/create">Add User</a>
 	</div>
 
@@ -79,7 +92,7 @@
 			<table class="table w-full">
 				<thead>
 					<tr>
-						<th></th>
+						<th />
 						<th class="text-lg">Name</th>
 						<th class="text-lg">Address</th>
 						<th class="text-lg">Email</th>
@@ -91,7 +104,7 @@
 				<tbody>
 					{#each listOfUsers as user}
 						<tr class="hover">
-							<td class="count"></td>
+							<td class="count" />
 							<td>{user.firstNameDisplay + ' ' + user.lastNameDisplay}</td>
 							<td
 								>{'Block ' +
@@ -106,9 +119,16 @@
 							<td>{user.role}</td>
 							<td />
 							<td
-								><a
-									href={'/admin/accounts/edit/' + user.id}
-									class="btn glass text-white"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M7.127 22.562l-7.127 1.438 1.438-7.128 5.689 5.69zm1.414-1.414l11.228-11.225-5.69-5.692-11.227 11.227 5.689 5.69zm9.768-21.148l-2.816 2.817 5.691 5.691 2.816-2.819-5.691-5.689z"/></svg></a
+								><a href={'/admin/accounts/edit/' + user.id} class="btn glass text-white"
+									><svg
+										xmlns="http://www.w3.org/2000/svg"
+										width="24"
+										height="24"
+										viewBox="0 0 24 24"
+										><path
+											d="M7.127 22.562l-7.127 1.438 1.438-7.128 5.689 5.69zm1.414-1.414l11.228-11.225-5.69-5.692-11.227 11.227 5.689 5.69zm9.768-21.148l-2.816 2.817 5.691 5.691 2.816-2.819-5.691-5.689z"
+										/></svg
+									></a
 								></td
 							>
 						</tr>
@@ -131,25 +151,26 @@
 					<div>
 						<span class="my-1 font-bold">Address:</span>
 						{'Block ' +
-						user.addressBlock +
-						' Lot ' +
-						user.addressLot +
-						' ' +
-						user.addressStreet +
-						' Street'}
+							user.addressBlock +
+							' Lot ' +
+							user.addressLot +
+							' ' +
+							user.addressStreet +
+							' Street'}
 					</div>
 					<div>
 						<span class="my-1 font-bold">E-mail Address:</span>
 						{user.email}
 					</div>
 					<div class="card-actions justify-end">
-						<a href={'/admin/accounts/edit/' + user.id} class="btn btn-primary hover:underline">Edit</a>
+						<a href={'/admin/accounts/edit/' + user.id} class="btn btn-primary hover:underline"
+							>Edit</a
+						>
 					</div>
 				</div>
 			</div>
 		{/each}
 	</div>
-	
 </div>
 
 <!-- mema comment -->

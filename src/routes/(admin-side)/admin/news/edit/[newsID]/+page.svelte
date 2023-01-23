@@ -1,12 +1,6 @@
 <script>
 	import { db } from '$lib/firebase/client';
-	import {
-		getDoc,
-		updateDoc,
-		deleteDoc,
-		doc,
-		serverTimestamp,
-	} from 'firebase/firestore';
+	import { getDoc, updateDoc, deleteDoc, doc, serverTimestamp } from 'firebase/firestore';
 	import { goto } from '$app/navigation';
 
 	/** @type {import('./$types').PageData} */
@@ -20,7 +14,6 @@
 		news = snapshot.data();
 		news.title = news.titleDisplay;
 	}
-	getNews();
 
 	async function updateNews() {
 		news.title = news.titleDisplay.toLowerCase();
@@ -45,6 +38,8 @@
 			alert('Error deleting');
 		}
 	}
+
+	getNews();
 </script>
 
 <svelte:head>
@@ -54,7 +49,7 @@
 {#if news}
 	<div class="min-h-screen hero bg-base-200">
 		<div class="w-full max-w-4xl p-6 mx-auto shadow-2xl border rounded-xl bg-base-100">
-			<h1 class="text-2xl pb-8">Add News</h1>
+			<h1 class="text-2xl pb-8">Edit News</h1>
 			<form>
 				<div class="form-control">
 					<span class="pb-3">News Title</span>
@@ -77,12 +72,13 @@
 					</div>
 				</div>
 				<div class="flex justify-end mt-8">
-					<button on:click={updateNews} type="submit" class="btn btn-primary">Submit Event</button>
+					<button on:click={updateNews} type="submit" class="btn btn-primary">Save</button>
 					<a href="/admin/news" class="btn btn-error mx-1 text-white">Cancel</a>
-					<button on:click={deleteNews} type="submit" class="btn btn-warning mx-1 text-white">Delete</button>
+					<button on:click={deleteNews} type="submit" class="btn btn-warning mx-1 text-white"
+						>Delete</button
+					>
 				</div>
 			</form>
 		</div>
 	</div>
 {/if}
-

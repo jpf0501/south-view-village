@@ -33,6 +33,11 @@
 		}
 	}
 
+	async function resetButton() {
+		newsQuery = query(collection(db, 'news'));
+		searchByValue = '';
+	}
+
 	$: getNews(newsQuery);
 </script>
 
@@ -43,15 +48,24 @@
 <div class="min-w-full min-h-full bg-base-200 px-12">
 	<h1 class="text-3xl font-semibold py-12">News</h1>
 	<div class="flex flex-col md:flex-row justify-between">
-		<form on:submit|preventDefault={searchNews} class="my-4">
-			<select bind:value={searchByField} class="select select-bordered" required>
-				<option value="" disabled selected>Search Filter</option>
-				<option value="title">Title</option>
-				<option value="dateCreated">Date Created</option>
-				<option value="dateModified">Last Updated</option>
-			</select>
-			<input type="search" placeholder="Search here" bind:value={searchByValue} class="input input-bordered mx-2" />
-		</form>
+		<div class="flex flex-col md:flex-row">
+			<form on:submit|preventDefault={searchNews} class="my-4">
+				<select bind:value={searchByField} class="select select-bordered" required>
+					<option value="" disabled selected>Search Filter</option>
+					<option value="title">Title</option>
+					<!-- <option value="dateCreated">Date Created</option>
+					<option value="dateModified">Last Updated</option> -->
+				</select>
+				<input
+					type="search"
+					placeholder="Search here"
+					bind:value={searchByValue}
+					class="input input-bordered mx-2"
+				/>
+			</form>
+			<button on:click={resetButton} class="btn btn-primary my-4">Reset</button>
+		</div>
+
 		<select bind:value={sortByField} on:change={changeSortBy} class="select select-bordered my-4">
 			<option value="" disabled selected>Sort By</option>
 			<option value="title">Title</option>
@@ -77,7 +91,7 @@
 			<table class="table w-full">
 				<thead>
 					<tr>
-						<th></th>
+						<th />
 						<th class="text-lg">Title</th>
 						<th class="text-lg">Date Created</th>
 						<th class="text-lg">Last Updated</th>
@@ -87,23 +101,38 @@
 				<tbody>
 					{#each listOfNews as news}
 						<tr class="hover">
-							<td class="count"></td>
+							<td class="count" />
 							<td>{news.titleDisplay}</td>
 							<td
-								>{news.dateCreated.toDate().toLocaleDateString() +
+								>{news.dateCreated
+									.toDate()
+									.toLocaleDateString('en-us', { year: 'numeric', month: 'long', day: 'numeric' }) +
 									' at ' +
-									news.dateCreated.toDate().toLocaleTimeString()}</td
+									news.dateCreated
+										.toDate()
+										.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}</td
 							>
 							<td
-								>{news.dateModified.toDate().toLocaleDateString() +
+								>{news.dateModified
+									.toDate()
+									.toLocaleDateString('en-us', { year: 'numeric', month: 'long', day: 'numeric' }) +
 									' at ' +
-									news.dateModified.toDate().toLocaleTimeString()}</td
+									news.dateModified
+										.toDate()
+										.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}</td
 							>
 							<td>
-								<a
-								href={'/admin/news/edit/' + news.id}
-								class="btn glass text-white"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M7.127 22.562l-7.127 1.438 1.438-7.128 5.689 5.69zm1.414-1.414l11.228-11.225-5.69-5.692-11.227 11.227 5.689 5.69zm9.768-21.148l-2.816 2.817 5.691 5.691 2.816-2.819-5.691-5.689z"/></svg></a
-							>
+								<a href={'/admin/news/edit/' + news.id} class="btn glass text-white"
+									><svg
+										xmlns="http://www.w3.org/2000/svg"
+										width="24"
+										height="24"
+										viewBox="0 0 24 24"
+										><path
+											d="M7.127 22.562l-7.127 1.438 1.438-7.128 5.689 5.69zm1.414-1.414l11.228-11.225-5.69-5.692-11.227 11.227 5.689 5.69zm9.768-21.148l-2.816 2.817 5.691 5.691 2.816-2.819-5.691-5.689z"
+										/></svg
+									></a
+								>
 							</td>
 						</tr>
 					{/each}
@@ -120,15 +149,23 @@
 					<h2 class="card-title mb-2">{news.titleDisplay}</h2>
 					<div>
 						<span class="my-1 font-bold">Date Created:</span>
-						{news.dateCreated.toDate().toLocaleDateString() +
+						{news.dateCreated
+							.toDate()
+							.toLocaleDateString('en-us', { year: 'numeric', month: 'long', day: 'numeric' }) +
 							' at ' +
-							news.dateCreated.toDate().toLocaleTimeString()}
+							news.dateCreated
+								.toDate()
+								.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}
 					</div>
 					<div>
 						<span class="my-1 font-bold">Last Updated:</span>
-						{news.dateModified.toDate().toLocaleDateString() +
+						{news.dateModified
+							.toDate()
+							.toLocaleDateString('en-us', { year: 'numeric', month: 'long', day: 'numeric' }) +
 							' at ' +
-							news.dateModified.toDate().toLocaleTimeString()}
+							news.dateModified
+								.toDate()
+								.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}
 					</div>
 					<div class="card-actions justify-end">
 						<a href={'/admin/news/edit/' + news.id} class="btn btn-primary hover:underline">Edit</a>

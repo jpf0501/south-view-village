@@ -29,6 +29,11 @@
 		);
 	}
 
+	async function resetButton() {
+		eventQuery = query(collection(db, 'event'));
+		searchByValue = '';
+	}
+
 	$: getEvents(eventQuery);
 </script>
 
@@ -39,14 +44,23 @@
 <div class="min-w-full min-h-full bg-base-200 px-12">
 	<h1 class="text-3xl font-semibold py-12">Events</h1>
 	<div class="flex flex-col md:flex-row justify-between">
-		<form on:submit|preventDefault={searchEvents} class="my-4">
-			<select bind:value={searchByField} required class="select select-bordered">
-				<option value="" disabled selected>Search Filter</option>
-				<option value="title">Title</option>
-				<option value="date">Date</option>
-			</select>
-			<input type="search" placeholder="Search here" required bind:value={searchByValue} class="input input-bordered mx-2" />
-		</form>
+		<div class="flex flex-col md:flex-row">
+			<form on:submit|preventDefault={searchEvents} class="my-4">
+				<select bind:value={searchByField} required class="select select-bordered">
+					<option value="" disabled selected>Search Filter</option>
+					<option value="title">Title</option>
+					<!-- <option value="date">Date</option> -->
+				</select>
+				<input
+					type="search"
+					placeholder="Search here"
+					bind:value={searchByValue}
+					class="input input-bordered mx-2"
+				/>
+			</form>
+			<button on:click={resetButton} class="btn btn-primary my-4">Reset</button>
+		</div>
+
 		<select bind:value={sortByField} on:change={changeSortBy} class="select select-bordered my-4">
 			<option value="" disabled selected>Sort By</option>
 			<option value="title">Title</option>
@@ -67,7 +81,7 @@
 
 	<!-- Medium to large screen -->
 	<div class="w-full mx-auto shadow-2xl border rounded-xl bg-base-100 my-5 hidden md:block">
-		<div class="overflow-x-auto"></div>
+		<div class="overflow-x-auto" />
 		<table class="table w-full">
 			<thead>
 				<tr>
@@ -82,15 +96,18 @@
 			<tbody>
 				{#each listOfEvents as event}
 					<tr class="hover">
-						<td class="count"></td>
+						<td class="count" />
 						<td />
 						<td>{event.titleDisplay}</td>
-						<td>{event.description.substring(0,50) + '...'}</td>
+						<td>{event.description.substring(0, 50) + '...'}</td>
 						<td>{event.date}</td>
 						<td>
-							<a
-								href={'/admin/calendar/entries/edit/' + event.id}
-								class="btn glass text-white"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M7.127 22.562l-7.127 1.438 1.438-7.128 5.689 5.69zm1.414-1.414l11.228-11.225-5.69-5.692-11.227 11.227 5.689 5.69zm9.768-21.148l-2.816 2.817 5.691 5.691 2.816-2.819-5.691-5.689z"/></svg></a
+							<a href={'/admin/calendar/entries/edit/' + event.id} class="btn glass text-white"
+								><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+									><path
+										d="M7.127 22.562l-7.127 1.438 1.438-7.128 5.689 5.69zm1.414-1.414l11.228-11.225-5.69-5.692-11.227 11.227 5.689 5.69zm9.768-21.148l-2.816 2.817 5.691 5.691 2.816-2.819-5.691-5.689z"
+									/></svg
+								></a
 							>
 						</td>
 					</tr>
@@ -114,7 +131,10 @@
 						{event.date}
 					</div>
 					<div class="card-actions justify-end">
-						<a href={'/admin/calendar/entries/edit/' + event.id} class="btn btn-primary hover:underline">Edit</a>
+						<a
+							href={'/admin/calendar/entries/edit/' + event.id}
+							class="btn btn-primary hover:underline">Edit</a
+						>
 					</div>
 				</div>
 			</div>

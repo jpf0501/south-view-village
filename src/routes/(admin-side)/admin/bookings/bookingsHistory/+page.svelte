@@ -8,7 +8,7 @@
 	let sortByStatus = '';
 	let searchByField = '';
 	let searchByValue = '';
-	let bookingsQuery = query(collection(db, 'booking'));
+	let bookingsQuery = query(collection(db, 'booking'), orderBy('dateReviewed', 'asc'));
 
 	async function getBookings(bookingsQuery) {
 		const unsubscribe = onSnapshot(bookingsQuery, (querySnapshot) => {
@@ -18,17 +18,21 @@
 	}
 
 	async function changeSortBy() {
-		bookingsQuery = query(collection(db, 'booking'), orderBy(sortByField, 'asc'));
+		bookingsQuery = query(
+			collection(db, 'booking'),
+			orderBy(sortByField, 'asc'),
+			orderBy('dateReviewed', 'asc')
+		);
 	}
 
 	async function changeSortByStatus() {
 		if (sortByStatus == '') {
-			bookingsQuery = query(collection(db, 'booking'), orderBy('bookDate', 'desc'));
+			bookingsQuery = query(collection(db, 'booking'), orderBy('dateReviewed', 'asc'));
 		} else {
 			bookingsQuery = query(
 				collection(db, 'booking'),
 				where('status', '==', sortByStatus),
-				orderBy('bookDate', 'desc')
+				orderBy('dateReviewed', 'asc')
 			);
 		}
 	}
@@ -40,6 +44,11 @@
 			where(searchByField, '>=', searchByValueCase),
 			where(searchByField, '<=', searchByValueCase + '~')
 		);
+	}
+
+	async function resetButton() {
+		bookingsQuery = query(collection(db, 'booking'), orderBy('dateReviewed', 'asc'));
+		searchByValue = '';
 	}
 
 	$: getBookings(bookingsQuery);
@@ -55,16 +64,25 @@
 		<a href="/admin/bookings" class="btn btn-primary">Go to Bookings</a>
 	</div>
 	<div class="flex flex-col md:flex-row justify-between">
-		<form on:submit|preventDefault={searchBookings}>
-			<select bind:value={searchByField} class="select select-bordered" required>
-				<option value="" disabled selected>Search Filter</option>
-				<option value="firstname">Name</option>
-				<option value="email">E-mail Address</option>
-				<option value="eventType">Type of Event</option>
-				<option value="bookDate">Date and Time</option>
-			</select>
-			<input type="search" placeholder="Search here" required class="input input-bordered mx-2" bind:value={searchByValue} />
-		</form>
+		<div class="flex flex-col md:flex-row">
+			<form on:submit|preventDefault={searchBookings} class="my-4">
+				<select bind:value={searchByField} class="select select-bordered" required>
+					<option value="" disabled selected>Search Filter</option>
+					<option value="firstname">Name</option>
+					<option value="email">E-mail Address</option>
+					<option value="eventType">Type of Event</option>
+					<option value="bookDate">Date and Time</option>
+				</select>
+				<input
+					type="search"
+					placeholder="Search here"
+					class="input input-bordered mx-2"
+					bind:value={searchByValue}
+				/>
+			</form>
+			<button on:click={resetButton} class="btn btn-primary my-4">Reset</button>
+		</div>
+
 		<select bind:value={sortByField} on:change={changeSortBy} class="select select-bordered">
 			<option value="" disabled selected>Sort By</option>
 			<option value="firstname">Name</option>
@@ -95,7 +113,7 @@
 			<table class="table w-full">
 				<thead>
 					<tr>
-						<th></th>
+						<th />
 						<th class="text-lg">Name</th>
 						<th class="text-lg">Email Address</th>
 						<th class="text-lg">Contact Number</th>
@@ -109,15 +127,21 @@
 					{#each listOfBooking as book}
 						{#if book.status != 'Pending'}
 							<tr class="hover">
-								<td class="count"></td>
+								<td class="count" />
 								<td>{book.firstNameDisplay + ' ' + book.lastNameDisplay}</td>
 								<td>{book.email}</td>
 								<td>{book.contactNumber}</td>
 								<td>{book.eventTypeDisplay}</td>
 								<td
-									>{book.bookDate.toDate().toLocaleDateString() +
+									>{book.bookDate.toDate().toLocaleDateString('en-us', {
+										year: 'numeric',
+										month: 'long',
+										day: 'numeric'
+									}) +
 										' at ' +
-										book.bookDate.toDate().toLocaleTimeString()}</td
+										book.bookDate
+											.toDate()
+											.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}</td
 								>
 								<td>
 									{#if book.status == 'Approved'}
@@ -133,9 +157,15 @@
 									{/if}
 								</td>
 								<td
-									>{book.dateReviewed.toDate().toLocaleDateString() +
+									>{book.dateReviewed.toDate().toLocaleDateString('en-us', {
+										year: 'numeric',
+										month: 'long',
+										day: 'numeric'
+									}) +
 										' at ' +
-										book.dateReviewed.toDate().toLocaleTimeString()}</td
+										book.dateReviewed
+											.toDate()
+											.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}</td
 								>
 							</tr>
 						{/if}
@@ -167,9 +197,13 @@
 						</div>
 						<div>
 							<span class="my-1 font-bold">Date and Time:</span>
-							{book.bookDate.toDate().toLocaleDateString() +
+							{book.bookDate
+								.toDate()
+								.toLocaleDateString('en-us', { year: 'numeric', month: 'long', day: 'numeric' }) +
 								' at ' +
-							book.bookDate.toDate().toLocaleTimeString()}
+								book.bookDate
+									.toDate()
+									.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}
 						</div>
 						<div class="font-bold">
 							Status:
@@ -181,9 +215,13 @@
 						</div>
 						<div>
 							<span class="my-1 font-bold">Date Reviewed:</span>
-							{book.dateReviewed.toDate().toLocaleDateString() +
+							{book.dateReviewed
+								.toDate()
+								.toLocaleDateString('en-us', { year: 'numeric', month: 'long', day: 'numeric' }) +
 								' at ' +
-							book.dateReviewed.toDate().toLocaleTimeString()}
+								book.dateReviewed
+									.toDate()
+									.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}
 						</div>
 					</div>
 				</div>

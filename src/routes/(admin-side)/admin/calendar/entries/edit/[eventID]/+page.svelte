@@ -14,7 +14,7 @@
 		event = snapshot.data();
         event.title = event.titleDisplay;
 	}
-	getEvent();
+
 
 	async function updateEvent() {
 		event.title = event.titleDisplay.toLowerCase();
@@ -38,6 +38,8 @@
 			alert('Error deleting');
 		}
 	}
+
+	getEvent();
 
 </script>
 
