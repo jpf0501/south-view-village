@@ -56,19 +56,15 @@
 		);
 	}
 
-	async function changeStatus(bookingId, paymentStatus) {
+	async function changeStatus(bookingId) {
 		try {
 			const bookRef = doc(db, 'booking', bookingId);
 			const data = {
 				status: bookingStatus,
 				dateReviewed: serverTimestamp()
 			};
-			if (paymentStatus == 'Unpaid' && bookingStatus == 'Approved') {
-				alert('Only paid bookings can be approved');
-			} else {
-				await updateDoc(bookRef, data);
-				alert('Booking request has been ' + bookingStatus);
-			}
+			await updateDoc(bookRef, data);
+			alert('Booking request has been ' + bookingStatus);
 		} catch (error) {
 			console.log(error);
 		}
@@ -103,7 +99,6 @@
 		bookingsQuery = query(collection(db, 'booking'));
 		searchByValue = '';
 	}
-
 	$: getBookings(bookingsQuery);
 </script>
 
@@ -222,16 +217,34 @@
 								>
 								<td
 									><form on:submit|preventDefault={changeStatus(book.id, book.paymentStatus)}>
-										<button
-											on:click={() => (bookingStatus = 'Approved')}
-											type="submit"
-											class="btn btn-success text-white">Approve</button
-										>
-										<button
-											on:click={() => (bookingStatus = 'Disapproved')}
-											type="submit"
-											class="btn btn-error text-white">Dissaprove</button
-										>
+										{#if book.paymentStatus == 'Unpaid'}
+											<button
+												on:click={() => (bookingStatus = 'Approved')}
+												type="submit"
+												class="btn btn-success text-white"
+												disabled>Approve</button
+											>
+										{:else}
+											<button
+												on:click={() => (bookingStatus = 'Approved')}
+												type="submit"
+												class="btn btn-success text-white">Approve</button
+											>
+										{/if}
+										{#if book.paymentStatus == 'Paid'}
+											<button
+												on:click={() => (bookingStatus = 'Disapproved')}
+												type="submit"
+												class="btn btn-error text-white"
+												disabled>Dissaprove</button
+											>
+										{:else}
+											<button
+												on:click={() => (bookingStatus = 'Disapproved')}
+												type="submit"
+												class="btn btn-error text-white">Dissaprove</button
+											>
+										{/if}
 									</form></td
 								>
 								<td
@@ -310,16 +323,34 @@
 								on:submit|preventDefault={changeStatus(book.id, book.paymentStatus)}
 								class="py-3"
 							>
-								<button
-									on:click={() => (bookingStatus = 'Approved')}
-									type="submit"
-									class="btn btn-success text-white">Approve</button
-								>
-								<button
-									on:click={() => (bookingStatus = 'Disapproved')}
-									type="submit"
-									class="btn btn-error text-white">Dissaprove</button
-								>
+								{#if book.paymentStatus == 'Unpaid'}
+									<button
+										on:click={() => (bookingStatus = 'Approved')}
+										type="submit"
+										class="btn btn-success text-white"
+										disabled>Approve</button
+									>
+								{:else}
+									<button
+										on:click={() => (bookingStatus = 'Approved')}
+										type="submit"
+										class="btn btn-success text-white">Approve</button
+									>
+								{/if}
+								{#if book.paymentStatus == 'Paid'}
+									<button
+										on:click={() => (bookingStatus = 'Disapproved')}
+										type="submit"
+										class="btn btn-error text-white"
+										disabled>Dissaprove</button
+									>
+								{:else}
+									<button
+										on:click={() => (bookingStatus = 'Disapproved')}
+										type="submit"
+										class="btn btn-error text-white">Dissaprove</button
+									>
+								{/if}
 							</form>
 							<button on:click={sendPaymentEmail(book.email)} type="button" class="btn btn-primary"
 								>Send Payment</button
