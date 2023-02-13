@@ -1,13 +1,15 @@
 <script>
-	import { onSnapshot, query, collection, orderBy, where } from 'firebase/firestore';
+	import { onSnapshot, query, collection, orderBy, where, limit, startAt, endAt } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
 
 	let listOfUsers = [];
+	let pageCount = 1;
+	let queryLimit = 10;
 	let sortByField = '';
 	let searchByField = '';
 	let searchByValue = '';
-	let accountsQuery = query(collection(db, 'accounts'));
+	let accountsQuery = query(collection(db, 'accounts'), limit(queryLimit));
 
 	async function getAccounts(accountsQuery) {
 		const unsubscribe = onSnapshot(accountsQuery, (querySnapshot) => {
@@ -30,9 +32,20 @@
 	}
 
 	async function resetButton() {
-		accountsQuery = query(collection(db, 'accounts'));
+		accountsQuery = query(collection(db, 'accounts'), limit(queryLimit));
 		searchByValue = '';
 	}
+
+	async function nextPage() {
+		pageCount++;
+		accountsQuery = query(collection(db, 'accounts'), limit(queryLimit), orderBy('firstname'), startAt());
+  	}
+
+  	async function prevPage() {
+    	if (pageCount <= 1) return;
+   		pageCount--;
+    	accountsQuery = query(collection(db, 'accounts'), limit(queryLimit), orderBy('firstname'), startAt(queryLimit -1));
+  	}
 
 	$: getAccounts(accountsQuery);
 </script>
@@ -137,6 +150,13 @@
 			</table>
 		</div>
 	</div>
+	<div class="flex mx-auto items-center justify-center my-8">
+		<div class="grid grid-cols-2">
+			<button class="btn btn-primary mx-1">Previous</button>
+			<button class="btn btn-primary mx-1">Next</button>
+		</div>
+	</div>
+	
 
 	<!-- Small screen -->
 	<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">

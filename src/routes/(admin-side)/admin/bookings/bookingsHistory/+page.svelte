@@ -218,6 +218,12 @@
 			</table>
 		</div>
 	</div>
+	<div class="flex mx-auto items-center justify-center my-8">
+		<div class="grid grid-cols-2">
+			<button class="btn btn-primary mx-1">Previous</button>
+			<button class="btn btn-primary mx-1">Next</button>
+		</div>
+	</div>
 
 	<!-- Small screen -->
 
