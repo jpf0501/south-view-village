@@ -1,7 +1,23 @@
 <script>
-	import { onSnapshot, query, collection, orderBy, where } from 'firebase/firestore';
+	import { onSnapshot, query, collection, orderBy, where, getDocs } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
+	import { jsPDF } from 'jspdf';
+
+	const monthName = [
+		'January',
+		'February',
+		'March',
+		'April',
+		'May',
+		'June',
+		'July',
+		'August',
+		'September',
+		'October',
+		'November',
+		'December'
+	];
 
 	let listOfBooking = [];
 	let sortByField = '';
@@ -51,6 +67,30 @@
 		searchByValue = '';
 	}
 
+	async function generateReport() {
+		const reportQuery = query(collection(db, 'booking'), where('status', '!=', 'Pending'));
+		const reportSnap = await getDocs(reportQuery);
+
+		const report = new jsPDF();
+	
+		let text = '';
+		
+		reportSnap.forEach(booking => {
+			text += `Name: ${booking.data().firstNameDisplay} ${booking.data().lastNameDisplay}\n`;
+			text += `E-mail Address: ${booking.data().email}\n`;
+			text += `Contact No.: ${booking.data().contactNumber}\n`;
+			text += `Event Type: ${booking.data().eventTypeDisplay}\n`;
+			text += `Date Reserved: ${booking.data().dateReserved.toDate().toLocaleDateString()} ${booking.data().dateReserved.toDate().toLocaleTimeString()}\n`;
+			text += `Booking Status: ${booking.data().status}\n`;
+			text += `Date Reviewed: ${booking.data().dateReviewed.toDate().toLocaleDateString()} ${booking.data().dateReviewed.toDate().toLocaleTimeString()}\n`;
+			text += `Payment Status: ${booking.data().paymentStatus}\n\n`;
+		});
+		
+		report.text('Southview Homes 3 Booking History Report', 10, 18);
+		report.text(text, 10, 34);
+		report.save('Southview-Homes-3-Booking-Report.pdf');
+	}
+
 	$: getBookings(bookingsQuery);
 </script>
 
@@ -83,19 +123,23 @@
 			<button on:click={resetButton} class="btn btn-primary my-4">Reset</button>
 		</div>
 
-		<select bind:value={sortByField} on:change={changeSortBy} class="select select-bordered">
+		<select bind:value={sortByField} on:change={changeSortBy} class="select select-bordered my-4">
 			<option value="" disabled selected>Sort By</option>
 			<option value="firstname">Name</option>
 			<option value="email">E-mail Address</option>
 			<option value="eventType">Type of Event</option>
 			<option value="bookDate">Date and Time</option>
 		</select>
-		<select bind:value={sortByStatus} on:change={changeSortByStatus} class="select select-bordered">
+		<select bind:value={sortByStatus} on:change={changeSortByStatus} class="select select-bordered my-4">
 			<option value="" selected>Status Filter</option>
 			<option value="Approved">Approved</option>
 			<option value="Disapproved">Disapproved</option>
 		</select>
+		<div class="my-4">
+			<button class="btn btn-primary" on:click={generateReport}>Generate Report</button>
+		</div>
 	</div>
+
 
 	<style>
 		table {
