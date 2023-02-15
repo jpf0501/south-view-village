@@ -1,13 +1,16 @@
 <script>
 	import { db } from '$lib/firebase/client';
-	import { getDoc, updateDoc, doc } from 'firebase/firestore';
+	import { onSnapshot, query, collection, orderBy, getDoc, updateDoc, doc } from 'firebase/firestore';
 	import { goto } from '$app/navigation';
+	import { onDestroy } from 'svelte';
 
 	/** @type {import('./$types').PageData} */
 	export let data;
 	const { userID } = data;
 
 	let user = null;
+	let streetQuery = query(collection(db, 'street'), orderBy('streetName', 'asc'));
+	let listOfStreets = [];
 
 	async function getUser() {
 		const snapshot = await getDoc(doc(db, 'accounts', userID));
@@ -16,6 +19,13 @@
 		user.lastname = user.lastNameDisplay;
 	}
 	getUser();
+
+	async function getStreet() {
+		const unsubscribe = onSnapshot(streetQuery, (querySnapshot) => {
+			listOfStreets = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+		});
+		onDestroy(() => unsubscribe());
+	}
 
 	async function updateUser() {
 		user.firstname = user.firstNameDisplay.toLowerCase();
@@ -40,6 +50,8 @@
 			alert('Delete error');
 		}
 	}
+
+	$: getStreet(streetQuery);
 </script>
 
 <svelte:head>
@@ -119,13 +131,16 @@
 						<label for="Street" class="label">
 							<span class="label-text">Street</span>
 						</label>
-						<input
-							type="text"
-							name="Street"
-							class="input input-bordered"
+						<select
+							class="select select-bordered w-full"
+							aria-label="Default select example"
 							required
 							bind:value={user.addressStreet}
-						/>
+						>
+  							{#each listOfStreets as street}
+    								<option value={street.streetName}>{street.streetName}</option>
+  							{/each}
+						</select>
 					</div>
 				</div>
 				<div class="grid grid-cols-1 gap-6 mt-4 md:grid-cols-2">

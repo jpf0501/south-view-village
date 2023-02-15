@@ -1,5 +1,8 @@
 <script>
 	import { goto } from '$app/navigation';
+	import { db } from '$lib/firebase/client'
+	import { onSnapshot, query, collection, orderBy, } from 'firebase/firestore'
+	import { onDestroy } from 'svelte';
 
 	let account = {
 		email: '',
@@ -13,6 +16,15 @@
 		contactNumber: '',
 		role: ''
 	};
+	let streetQuery = query(collection(db, 'street'), orderBy('streetName', 'asc'));
+	let listOfStreets = [];
+
+	async function getStreet() {
+		const unsubscribe = onSnapshot(streetQuery, (querySnapshot) => {
+			listOfStreets = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+		});
+		onDestroy(() => unsubscribe());
+	}
 
 	async function submitHandler() {
 		try {
@@ -44,6 +56,8 @@
 			alert(error);
 		}
 	}
+
+	$: getStreet(streetQuery);
 </script>
 
 <svelte:head>
@@ -116,14 +130,17 @@
 						<label for="Street" class="label">
 							<span class="label-text">Street</span>
 						</label>
-						<input
-							type="text"
-							placeholder="1"
-							name="Street"
-							class="input input-bordered"
+						<select
+							class="select select-bordered w-full"
+							aria-label="Default select example"
 							required
 							bind:value={account.addressStreet}
-						/>
+						>
+							<option value="" selected disabled>Select street</option>
+  							{#each listOfStreets as street}
+    								<option value={street.streetName}>{street.streetName}</option>
+  							{/each}
+						</select>
 					</div>
 				</div>
 				<div class="grid grid-cols-1 gap-6 mt-4 md:grid-cols-2">
