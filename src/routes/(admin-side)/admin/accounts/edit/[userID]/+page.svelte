@@ -12,6 +12,14 @@
 	let streetQuery = query(collection(db, 'street'), orderBy('streetName', 'asc'));
 	let listOfStreets = [];
 
+	const blockValue = Array.from({ length: 23 }, (_, i) => ({
+    	value: i + 1,
+  	}));
+
+	const lotValue = Array.from({ length: 26 }, (_, i) => ({
+    	value: i + 1,
+  	}));
+
 	async function getUser() {
 		const snapshot = await getDoc(doc(db, 'accounts', userID));
 		user = snapshot.data();
@@ -58,19 +66,6 @@
 	<title>Edit Account - Southview Homes 3 Admin Panel</title>
 </svelte:head>
 
-<style>
-	input[type='number'] {
-  		appearance: textfield;
-	}
-	input[type='number']::-webkit-inner-spin-button,
-	input[type='number']::-webkit-outer-spin-button,
-	input[type='number']:hover::-webkit-inner-spin-button, 
-	input[type='number']:hover::-webkit-outer-spin-button {
-		-webkit-appearance: none; 
-		margin: 0;
-	}
-</style>
-
 {#if user}
 	<main>
 		<div class="min-h-screen hero bg-base-200">
@@ -107,25 +102,23 @@
 						<label for="Block" class="label">
 							<span class="label-text">Block</span>
 						</label>
-						<input
-							type="number"
-							name="Block"
-							class="input input-bordered"
-							required
-							bind:value={user.addressBlock}
-						/>
+						<select class="select select-bordered w-full" required bind:value={user.addressBlock}>
+							<option value="" disabled>Select block</option>
+							{#each blockValue as block} 
+								<option value={block.value}>{block.value}</option>
+							{/each}
+						</select>
 					</div>
 					<div class="form-control">
 						<label for="Lot" class="label">
 							<span class="label-text">Lot</span>
 						</label>
-						<input
-							type="number"
-							name="Lot"
-							class="input input-bordered"
-							required
-							bind:value={user.addressLot}
-						/>
+						<select class="select select-bordered w-full" required bind:value={user.addressLot}>
+							<option value="" disabled>Select lot</option>
+							{#each lotValue as lot} 
+								<option value={lot.value}>{lot.value}</option>
+							{/each}
+						</select>
 					</div>
 					<div class="form-control">
 						<label for="Street" class="label">
@@ -137,6 +130,7 @@
 							required
 							bind:value={user.addressStreet}
 						>
+						<option value="" selected disabled>Select street</option>
   							{#each listOfStreets as street}
     								<option value={street.streetName}>{street.streetName}</option>
   							{/each}
