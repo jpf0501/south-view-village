@@ -1,13 +1,24 @@
 <script>
 	import { db } from '$lib/firebase/client';
-	import { getDoc, updateDoc, doc } from 'firebase/firestore';
+	import { onSnapshot, query, collection, orderBy, getDoc, updateDoc, doc } from 'firebase/firestore';
 	import { goto } from '$app/navigation';
+	import { onDestroy } from 'svelte';
 
 	/** @type {import('./$types').PageData} */
 	export let data;
 	const { userID } = data;
 
 	let user = null;
+	let streetQuery = query(collection(db, 'street'), orderBy('streetName', 'asc'));
+	let listOfStreets = [];
+
+	const blockValue = Array.from({ length: 23 }, (_, i) => ({
+    	value: i + 1,
+  	}));
+
+	const lotValue = Array.from({ length: 26 }, (_, i) => ({
+    	value: i + 1,
+  	}));
 
 	async function getUser() {
 		const snapshot = await getDoc(doc(db, 'accounts', userID));
@@ -16,6 +27,13 @@
 		user.lastname = user.lastNameDisplay;
 	}
 	getUser();
+
+	async function getStreet() {
+		const unsubscribe = onSnapshot(streetQuery, (querySnapshot) => {
+			listOfStreets = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+		});
+		onDestroy(() => unsubscribe());
+	}
 
 	async function updateUser() {
 		user.firstname = user.firstNameDisplay.toLowerCase();
@@ -40,6 +58,8 @@
 			alert('Delete error');
 		}
 	}
+
+	$: getStreet(streetQuery);
 </script>
 
 <svelte:head>
@@ -82,37 +102,39 @@
 						<label for="Block" class="label">
 							<span class="label-text">Block</span>
 						</label>
-						<input
-							type="number"
-							name="Block"
-							class="input input-bordered"
-							required
-							bind:value={user.addressBlock}
-						/>
+						<select class="select select-bordered w-full" required bind:value={user.addressBlock}>
+							<option value="" disabled>Select block</option>
+							{#each blockValue as block} 
+								<option value={block.value}>{block.value}</option>
+							{/each}
+						</select>
 					</div>
 					<div class="form-control">
 						<label for="Lot" class="label">
 							<span class="label-text">Lot</span>
 						</label>
-						<input
-							type="number"
-							name="Lot"
-							class="input input-bordered"
-							required
-							bind:value={user.addressLot}
-						/>
+						<select class="select select-bordered w-full" required bind:value={user.addressLot}>
+							<option value="" disabled>Select lot</option>
+							{#each lotValue as lot} 
+								<option value={lot.value}>{lot.value}</option>
+							{/each}
+						</select>
 					</div>
 					<div class="form-control">
 						<label for="Street" class="label">
 							<span class="label-text">Street</span>
 						</label>
-						<input
-							type="text"
-							name="Street"
-							class="input input-bordered"
+						<select
+							class="select select-bordered w-full"
+							aria-label="Default select example"
 							required
 							bind:value={user.addressStreet}
-						/>
+						>
+						<option value="" selected disabled>Select street</option>
+  							{#each listOfStreets as street}
+    								<option value={street.streetName}>{street.streetName}</option>
+  							{/each}
+						</select>
 					</div>
 				</div>
 				<div class="grid grid-cols-1 gap-6 mt-4 md:grid-cols-2">
@@ -120,7 +142,7 @@
 						<span class="label-text mb-3">Role</span>
 						<div class="mb-3">
 							<select
-								class="form-select appearance-none block w-full px-3 py-1.5 text-base border rounded-xl border-gray-300"
+								class="select select-bordered w-full"
 								aria-label="Default select example"
 								required
 								bind:value={user.role}
@@ -151,15 +173,15 @@
 					<button
 						on:click={updateUser}
 						type="submit"
-						class="btn btn-primary mx-1 px-5 bg-blue-500 hover:bg-blue-900">Save</button
+						class="btn btn-primary mx-1 px-5">Save</button
 					>
-					<a href="/admin/accounts" class="btn btn-primary mx-1 px-4 bg-red-500 hover:bg-red-900"
+					<a href="/admin/accounts" class="btn btn-error mx-1 px-4 text-white"
 						>Cancel</a
 					>
 					<button
 						on:click={deleteUser}
 						type="submit"
-						class="btn btn-warning mx-1 hover:bg-red-900 text-white">Delete</button
+						class="btn btn-warning mx-1 text-white">Delete</button
 					>
 				</div>
 			</div>

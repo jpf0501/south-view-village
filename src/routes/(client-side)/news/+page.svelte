@@ -1,5 +1,5 @@
 <script>
-	import { onSnapshot, query, collection, snapshotEqual, orderBy, where } from 'firebase/firestore';
+	import { onSnapshot, query, collection, orderBy } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
 
@@ -22,14 +22,14 @@
 </svelte:head>
 
 <main class="p-8">
-	<h1 class="text-2xl font-bold p-4">News and Announcements</h1>
+	<h1 class="text-3xl font-bold p-4">News and Announcements</h1>
 	<table class="w-full">
 		<tbody>
 		{#each listOfNews as news}
 			<tr>
 			<td>
 			<section>
-				<h1 class="divider">
+				<h1 class="divider w-full">
 				</h1>
 				<article class="w-full max-w-5xl mx-auto">
 					<div class="flex flex-row-2 justify-between">
@@ -41,7 +41,7 @@
 				</p>
 				<a href={'/news/entry/' + news.id} class="link link-hover link-info">Read more</a>
 				</article>
-				<h1 class="px-4 divider">
+				<h1 class="divider w-full">
 				</h1>
 			</section>
 			</td>

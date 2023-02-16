@@ -1,17 +1,17 @@
 <script>
-	import { onSnapshot, query, collection, snapshotEqual, orderBy, where } from 'firebase/firestore';
+	import { onSnapshot, query, collection, orderBy, where, limit, startAt, endAt } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
 
 	let listOfUsers = [];
+	let pageCount = 1;
+	let queryLimit = 10;
 	let sortByField = '';
 	let searchByField = '';
 	let searchByValue = '';
-	let accountsQuery = query(collection(db, 'accounts'));
+	let accountsQuery = query(collection(db, 'accounts'), limit(queryLimit));
 
 	async function getAccounts(accountsQuery) {
-		// if (sortByField) accountsQuery = query(collection(db, 'accounts'));
-		// else accountsQuery = query(collection(db, 'accounts'), orderBy(sortByField, 'asc'));
 		const unsubscribe = onSnapshot(accountsQuery, (querySnapshot) => {
 			listOfUsers = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 		});
@@ -31,6 +31,22 @@
 		);
 	}
 
+	async function resetButton() {
+		accountsQuery = query(collection(db, 'accounts'), limit(queryLimit));
+		searchByValue = '';
+	}
+
+	async function nextPage() {
+		pageCount++;
+		accountsQuery = query(collection(db, 'accounts'), limit(queryLimit), orderBy('firstname'), startAt());
+  	}
+
+  	async function prevPage() {
+    	if (pageCount <= 1) return;
+   		pageCount--;
+    	accountsQuery = query(collection(db, 'accounts'), limit(queryLimit), orderBy('firstname'), startAt(queryLimit -1));
+  	}
+
 	$: getAccounts(accountsQuery);
 </script>
 
@@ -40,19 +56,28 @@
 
 <div class="min-w-full min-h-full bg-base-200 px-12">
 	<h1 class="text-3xl font-semibold py-12">Accounts</h1>
-	<div class="flex justify-between">
-		<form on:submit|preventDefault={searchAccounts}>
-			<select bind:value={searchByField} required>
-				<option value="" disabled selected>Search Filter</option>
-				<option value="firstname">Name</option>
-				<option value="addressBlock">Block</option>
-				<option value="addressLot">Lot</option>
-				<option value="addressStreet">Street</option>
-				<option value="email">Email</option>
-			</select>
-			<input type="search" placeholder="Search here" required bind:value={searchByValue} />
-		</form>
-		<select bind:value={sortByField} on:change={changeSortBy}>
+	<div class="flex flex-col md:flex-row justify-between">
+		<div class="flex flex-col md:flex-row">
+			<form on:submit|preventDefault={searchAccounts} class="my-4">
+				<select bind:value={searchByField} class="select select-bordered" required>
+					<option value="" disabled selected>Search Filter</option>
+					<option value="firstname">Name</option>
+					<!-- <option value="addressBlock">Block</option>
+					<option value="addressLot">Lot</option>
+					<option value="addressStreet">Street</option> -->
+					<option value="email">Email</option>
+				</select>
+				<input
+					type="search"
+					placeholder="Search here"
+					class="input input-bordered mx-2"
+					bind:value={searchByValue}
+				/>
+			</form>
+			<button on:click={resetButton} class="btn btn-primary my-4">Reset</button>
+		</div>
+
+		<select bind:value={sortByField} on:change={changeSortBy} class="select select-bordered my-4">
 			<option value="" disabled selected>Sort By</option>
 			<option value="firstname">Name</option>
 			<option value="addressBlock">Block</option>
@@ -60,87 +85,116 @@
 			<option value="addressStreet">Street</option>
 			<option value="email">Email</option>
 		</select>
-		<a
-			class="px-1 text-sm bg-gray-400 rounded-full hover:bg-gray-300 flex items-center border-gray-700"
-			href="/admin/accounts/create">Add User</a
-		>
+
+		<a class="btn btn-primary my-4" href="/admin/accounts/create">Add User</a>
 	</div>
+
+	<style>
+		table {
+			counter-reset: section;
+		}
+		.count:before {
+			counter-increment: section;
+			content: counter(section);
+		}
+	</style>
 
 	<!-- Medium to large screen -->
-	<div class="my-5 p-5 overflow-auto shadow-lg border rounded-xl bg-gray-300 hidden md:block">
-		<table class="border-2 border-black bg-white w-full text-center">
-			<thead class="font-bold bg-gray-500">
-				<tr>
-					<th class="p-3 text-sm tracking-wide">Name</th>
-					<th class="p-3 text-sm tracking-wide">Address</th>
-					<th class="p-3 text-sm tracking-wide">Email</th>
-					<th class="p-3 text-sm tracking-wide">Role</th>
-					<th class="p-3 text-sm tracking-wide" />
-				</tr>
-			</thead>
-			<tbody>
-				{#each listOfUsers as user}
-					<tr class="border-t-2 border-black">
-						<td class="p-3 text-sm whitespace-nowrap">{user.firstNameDisplay + ' ' + user.lastNameDisplay}</td>
-						<td class="p-3 text-sm whitespace-nowrap"
-							>{'Block ' +
-								user.addressBlock +
-								' Lot ' +
-								user.addressLot +
-								' ' +
-								user.addressStreet +
-								' Street'}</td
-						>
-						<td class="p-3 text-sm whitespace-nowrap">{user.email}</td>
-						<td class="p-3 text-sm whitespace-nowrap">{user.role}</td>
-						<td class="p-3 text-sm whitespace-nowrap">
-							<a
-								href={'/admin/accounts/edit/' + user.id}
-								class="font-bold text-blue-500 hover:underline">Edit</a
-							>
-						</td>
+	<div class="w-full mx-auto shadow-2xl border rounded-xl bg-base-100 my-5 hidden md:block">
+		<div class="overflow-x-auto">
+			<table class="table w-full">
+				<thead>
+					<tr>
+						<th />
+						<th class="text-lg">Name</th>
+						<th class="text-lg">Address</th>
+						<th class="text-lg">Email</th>
+						<th class="text-lg">Role</th>
+						<th />
+						<th />
 					</tr>
-				{/each}
-			</tbody>
-		</table>
+				</thead>
+				<tbody>
+					{#each listOfUsers as user}
+						<tr class="hover">
+							<td class="count" />
+							<td>{user.firstNameDisplay + ' ' + user.lastNameDisplay}</td>
+							<td
+								>{'Block ' +
+									user.addressBlock +
+									' Lot ' +
+									user.addressLot +
+									' ' +
+									user.addressStreet +
+									' Street'}</td
+							>
+							<td>{user.email}</td>
+							<td>{user.role}</td>
+							<td />
+							<td
+								><a href={'/admin/accounts/edit/' + user.id} class="btn glass text-white"
+									><svg
+										xmlns="http://www.w3.org/2000/svg"
+										width="24"
+										height="24"
+										viewBox="0 0 24 24"
+										><path
+											d="M7.127 22.562l-7.127 1.438 1.438-7.128 5.689 5.69zm1.414-1.414l11.228-11.225-5.69-5.692-11.227 11.227 5.689 5.69zm9.768-21.148l-2.816 2.817 5.691 5.691 2.816-2.819-5.691-5.689z"
+										/></svg
+									></a
+								></td
+							>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
+		</div>
 	</div>
+	<div class="flex mx-auto items-center justify-center my-8">
+		<div class="grid grid-cols-2">
+			<button class="btn btn-primary mx-1">Previous</button>
+			<button class="btn btn-primary mx-1">Next</button>
+		</div>
+	</div>
+	
 
 	<!-- Small screen -->
-	<div class="bg-gray-300 my-5 p-5  selection:grid grid-cols-1 gap-4 md:hidden rounded-lg shadow">
+	<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">
 		{#each listOfUsers as user}
-			<div class="bg-white space-y-3 p-4 border-2 border-black">
-				<div class="flex items-center space-x-2  text-sm">
+			<div class="card w-[105%] bg-base-100 shadow-xl">
+				<div class="card-body">
+					<h2 class="card-title mb-2">{user.firstNameDisplay + ' ' + user.lastNameDisplay}</h2>
 					<div>
-						<span class="font-bold text-sm">Name: </span>
-						{user.firstNameDisplay + ' ' + user.lastNameDisplay}
-					</div>
-					<div>
-						<span class="font-bold text-sm">Role: </span>
+						<span class="my-1 font-bold">Role:</span>
 						{user.role}
 					</div>
-				</div>
-				<div>
-					<span class="font-bold text-sm">Address: </span>
-					{'Block ' +
-						user.addressBlock +
-						' Lot ' +
-						user.addressLot +
-						' ' +
-						user.addressStreet +
-						' Street'}
-				</div>
-				<div>
-					<span class="font-bold text-sm">Email: </span>
-					{user.email}
-				</div>
-				<div class="flex justify-end">
-					<a
-						href={'/admin/accounts/edit/' + user.id}
-						class="text-blue-500 font-bold hover:underline">Edit</a
-					>
+					<div>
+						<span class="my-1 font-bold">Address:</span>
+						{'Block ' +
+							user.addressBlock +
+							' Lot ' +
+							user.addressLot +
+							' ' +
+							user.addressStreet +
+							' Street'}
+					</div>
+					<div>
+						<span class="my-1 font-bold">E-mail Address:</span>
+						{user.email}
+					</div>
+					<div class="card-actions justify-end">
+						<a href={'/admin/accounts/edit/' + user.id} class="btn glass text-white"
+							><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+								><path
+									d="M7.127 22.562l-7.127 1.438 1.438-7.128 5.689 5.69zm1.414-1.414l11.228-11.225-5.69-5.692-11.227 11.227 5.689 5.69zm9.768-21.148l-2.816 2.817 5.691 5.691 2.816-2.819-5.691-5.689z"
+								/></svg
+							></a
+						>
+					</div>
 				</div>
 			</div>
-			<br />
 		{/each}
 	</div>
 </div>
+
+<!-- mema comment -->

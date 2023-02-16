@@ -6,11 +6,27 @@
 		updateDoc,
 		doc,
 		orderBy,
-		where
+		where,
+		serverTimestamp
 	} from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
 	import { sendEmail } from '$lib/utils';
+
+	const monthName = [
+		'January',
+		'February',
+		'March',
+		'April',
+		'May',
+		'June',
+		'July',
+		'August',
+		'September',
+		'October',
+		'November',
+		'December'
+	];
 
 	let listOfBooking = [];
 	let sortByField = '';
@@ -18,7 +34,7 @@
 	let searchByValue = '';
 	let bookingStatus = '';
 	let bookingPaymentStatus = '';
-	let bookingsQuery = query(collection(db, 'booking'));
+	let bookingsQuery = query(collection(db, 'booking'), orderBy('dateReserved', 'asc'));
 
 	async function getBookings(bookingsQuery) {
 		const unsubscribe = onSnapshot(bookingsQuery, (querySnapshot) => {
@@ -40,20 +56,15 @@
 		);
 	}
 
-	$: getBookings(bookingsQuery);
-
-	async function changeStatus(bookingId, paymentStatus) {
+	async function changeStatus(bookingId) {
 		try {
 			const bookRef = doc(db, 'booking', bookingId);
 			const data = {
-				status: bookingStatus
+				status: bookingStatus,
+				dateReviewed: serverTimestamp()
 			};
-			if (paymentStatus == 'Unpaid' && bookingStatus == 'Approved') {
-				alert('Only paid bookings can be approved');
-			} else {
-				await updateDoc(bookRef, data);
-				alert('Booking request has been ' + bookingStatus);
-			}
+			await updateDoc(bookRef, data);
+			alert('Booking request has been ' + bookingStatus);
 		} catch (error) {
 			console.log(error);
 		}
@@ -84,6 +95,11 @@
 			alert('Error in sending payment method');
 		}
 	}
+	async function resetButton() {
+		bookingsQuery = query(collection(db, 'booking'));
+		searchByValue = '';
+	}
+	$: getBookings(bookingsQuery);
 </script>
 
 <svelte:head>
@@ -91,22 +107,31 @@
 </svelte:head>
 
 <div class="min-w-full min-h-full bg-base-200 px-12">
-	<div class="flex justify-between">
-		<h1 class="text-3xl font-semibold py-12">Booking</h1>
-		<a href="/admin/bookings/bookingsHistory" class="hover:underline">Go to History</a>
+	<div class="flex justify-between py-10">
+		<h1 class="text-3xl font-semibold">Booking</h1>
+		<a href="/admin/bookings/bookingsHistory" class="btn btn-primary">View History</a>
 	</div>
-	<div class="flex justify-between">
-		<form on:submit|preventDefault={searchBookings}>
-			<select bind:value={searchByField} required>
-				<option value="" disabled selected>Search Filter</option>
-				<option value="firstname">Name</option>
-				<option value="email">E-mail Address</option>
-				<option value="eventType">Type of Event</option>
-				<option value="bookDate">Date and Time</option>
-			</select>
-			<input type="search" placeholder="Search here" required bind:value={searchByValue} />
-		</form>
-		<select bind:value={sortByField} on:change={changeSortBy}>
+	<div class="flex flex-col md:flex-row justify-between">
+		<div class="flex flex-col md:flex-row">
+			<form on:submit|preventDefault={searchBookings} class="my-4">
+				<select bind:value={searchByField} class="select select-bordered" required>
+					<option value="" disabled selected>Search Filter</option>
+					<option value="firstname">Name</option>
+					<option value="email">E-mail Address</option>
+					<option value="eventType">Type of Event</option>
+					<!-- <option value="bookDate">Date and Time</option> -->
+				</select>
+				<input
+					type="search"
+					placeholder="Search here"
+					class="input input-bordered mx-2"
+					bind:value={searchByValue}
+				/>
+			</form>
+			<button on:click={resetButton} class="btn btn-primary my-4">Reset</button>
+		</div>
+
+		<select bind:value={sortByField} on:change={changeSortBy} class="select select-bordered my-4">
 			<option value="" disabled selected>Sort By</option>
 			<option value="firstname">Name</option>
 			<option value="email">E-mail Address</option>
@@ -115,148 +140,230 @@
 		</select>
 	</div>
 
+	<style>
+		table {
+			counter-reset: section;
+		}
+		.count:before {
+			counter-increment: section;
+			content: counter(section);
+		}
+	</style>
+
 	<!-- Medium to large screen -->
-	<div class="my-5 p-5 overflow-auto shadow-lg border rounded-xl bg-gray-300 hidden md:block">
-		<table class="border-2 border-black bg-white w-full text-center">
-			<thead class="font-bold bg-gray-500">
-				<tr>
-					<th class="p-3 text-sm tracking-wide">Name</th>
-					<th class="p-3 text-sm tracking-wide">E-mail Address</th>
-					<th class="p-3 text-sm tracking-wide">Contact No.</th>
-					<th class="p-3 text-sm tracking-wide">Type of Event</th>
-					<th class="p-3 text-sm tracking-wide">Date and Time</th>
-					<th class="p-3 text-sm tracking-wide">Payment Status</th>
-					<th class="p-3 text-sm tracking-wide" colspan="2" />
-				</tr>
-			</thead>
-			<tbody>
-				{#each listOfBooking as book}
-					{#if book.status == 'Pending'}
-						<tr class="border-t-2 border-black">
-							<td class="p-3 text-sm whitespace-nowrap"
-								>{book.firstNameDisplay + ' ' + book.lastNameDisplay}</td
+	<div class="w-full mx-auto shadow-2xl border rounded-xl bg-base-100 my-5 hidden md:block">
+		<div class="overflow-x-auto">
+			<table class="table w-full ">
+				<thead>
+					<tr>
+						<th />
+						<th class="text-lg">Name</th>
+						<th class="text-lg">Email</th>
+						<th class="text-lg">Contact Number</th>
+						<th class="text-lg">Type of Event</th>
+						<th class="text-lg">Date and Time</th>
+						<!-- <th class="text-lg">Date Reserved</th> -->
+						<th class="text-lg">Payment Status</th>
+						<th colspan="2" />
+					</tr>
+				</thead>
+				<tbody>
+					{#each listOfBooking as book}
+						{#if book.status == 'Pending'}
+							<tr class="hover">
+								<td class="count" />
+								<td>{book.firstNameDisplay + ' ' + book.lastNameDisplay}</td>
+								<td>{book.email}</td>
+								<td>{book.contactNumber}</td>
+								<td>{book.eventTypeDisplay}</td>
+								<td
+									>{book.bookDate.toDate().toLocaleDateString('en-us', {
+										year: 'numeric',
+										month: 'long',
+										day: 'numeric'
+									}) +
+										' at ' +
+										book.bookDate
+											.toDate()
+											.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}</td
+								>
+								<!-- <td
+									>{book.dateReserved.toDate().toLocaleDateString('en-us', {
+										year: 'numeric',
+										month: 'long',
+										day: 'numeric'
+									}) +
+										' at ' +
+										book.dateReserved
+											.toDate()
+											.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}</td
+								> -->
+								<td class="text-center"
+									><form on:submit|preventDefault={changePaymentStatus(book.id)}>
+										{#if book.paymentStatus == 'Paid'}
+											<button type="submit" on:click={() => (bookingPaymentStatus = 'Unpaid')}>
+												<span class="p-3 text-sm whitespace-nowrap text-green-500 font-bold">
+													{book.paymentStatus}
+												</span>
+											</button>
+										{:else if book.paymentStatus == 'Unpaid'}
+											<button type="submit" on:click={() => (bookingPaymentStatus = 'Paid')}>
+												<span class="p-3 text-sm whitespace-nowrap text-red-500 font-bold">
+													{book.paymentStatus}
+												</span>
+											</button>
+										{/if}
+									</form></td
+								>
+								<td
+									><form on:submit|preventDefault={changeStatus(book.id, book.paymentStatus)}>
+										{#if book.paymentStatus == 'Unpaid'}
+											<button
+												on:click={() => (bookingStatus = 'Approved')}
+												type="submit"
+												class="btn btn-success text-white"
+												disabled>Approve</button
+											>
+										{:else}
+											<button
+												on:click={() => (bookingStatus = 'Approved')}
+												type="submit"
+												class="btn btn-success text-white">Approve</button
+											>
+										{/if}
+										{#if book.paymentStatus == 'Paid'}
+											<button
+												on:click={() => (bookingStatus = 'Disapproved')}
+												type="submit"
+												class="btn btn-error text-white"
+												disabled>Dissaprove</button
+											>
+										{:else}
+											<button
+												on:click={() => (bookingStatus = 'Disapproved')}
+												type="submit"
+												class="btn btn-error text-white">Dissaprove</button
+											>
+										{/if}
+									</form></td
+								>
+								<td
+									><button
+										on:click={sendPaymentEmail(book.email)}
+										type="button"
+										class="btn btn-primary">Send Payment</button
+									></td
+								>
+							</tr>
+						{/if}
+					{/each}
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<div class="flex mx-auto items-center justify-center my-8">
+		<div class="grid grid-cols-2">
+			<button class="btn btn-primary mx-1">Previous</button>
+			<button class="btn btn-primary mx-1">Next</button>
+		</div>
+	</div>
+
+	<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">
+		{#each listOfBooking as book}
+			{#if book.status == 'Pending'}
+				<div class="card w-[105%] bg-base-100 shadow-xl">
+					<div class="card-body">
+						<h2 class="card-title mb-2">{book.firstNameDisplay + ' ' + book.lastNameDisplay}</h2>
+						<div>
+							<span class="my-1 font-bold">E-mail Address:</span>
+							{book.email}
+						</div>
+						<div>
+							<span class="my-1 font-bold">Contact No:</span>
+							{book.contactNumber}
+						</div>
+						<div>
+							<span class="my-1 font-bold">Type of Event:</span>
+							{book.contactNumber}
+						</div>
+						<div>
+							<span class="my-1 font-bold">Date and Time:</span>
+							{book.bookDate
+								.toDate()
+								.toLocaleDateString('en-us', { year: 'numeric', month: 'long', day: 'numeric' }) +
+								' at ' +
+								book.bookDate
+									.toDate()
+									.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}
+						</div>
+						<!-- <div>
+							<span class="my-1 font-bold">Date Reserved:</span>
+							{book.dateReserved
+								.toDate()
+								.toLocaleDateString('en-us', { year: 'numeric', month: 'long', day: 'numeric' }) +
+								' at ' +
+								book.dateReserved
+									.toDate()
+									.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}
+						</div> -->
+						<div class="flex flex-row">
+							<span class="my-1 font-bold">Status:</span>
+							<form on:submit|preventDefault={changePaymentStatus(book.id)}>
+								{#if book.paymentStatus == 'Paid'}
+									<button type="submit" on:click={() => (bookingPaymentStatus = 'Unpaid')}>
+										<span class="p-3 text-sm whitespace-nowrap text-green-500 font-bold">
+											{book.paymentStatus}
+										</span>
+									</button>
+								{:else if book.paymentStatus == 'Unpaid'}
+									<button type="submit" on:click={() => (bookingPaymentStatus = 'Paid')}>
+										<span class="p-3 text-sm whitespace-nowrap text-red-500 font-bold">
+											{book.paymentStatus}
+										</span>
+									</button>
+								{/if}
+							</form>
+						</div>
+						<div>
+							<form
+								on:submit|preventDefault={changeStatus(book.id, book.paymentStatus)}
+								class="py-3"
 							>
-							<td class="p-3 text-sm whitespace-nowrap">{book.email}</td>
-							<td class="p-3 text-sm whitespace-nowrap">{book.contactNumber}</td>
-							<td class="p-3 text-sm whitespace-nowrap">{book.eventTypeDisplay}</td>
-							<td class="p-3 text-sm whitespace-nowrap"
-								>{book.bookDate.toDate().toLocaleDateString() +
-									' at ' +
-									book.bookDate.toDate().toLocaleTimeString()}</td
-							>
-							<td>
-								<form on:submit|preventDefault={changePaymentStatus(book.id)}>
-									{#if book.paymentStatus == 'Paid'}
-										<button type="submit" on:click={() => (bookingPaymentStatus = 'Unpaid')}>
-											<span class="p-3 text-sm whitespace-nowrap text-green-500 font-bold">
-												{book.paymentStatus}
-											</span>
-										</button>
-									{:else if book.paymentStatus == 'Unpaid'}
-										<button type="submit" on:click={() => (bookingPaymentStatus = 'Paid')}>
-											<span class="p-3 text-sm whitespace-nowrap text-red-500 font-bold">
-												{book.paymentStatus}
-											</span>
-										</button>
-									{/if}
-								</form>
-							</td>
-							<td class="p-3 text-sm whitespace-nowrap">
-								<form on:submit|preventDefault={changeStatus(book.id, book.paymentStatus)}>
+								{#if book.paymentStatus == 'Unpaid'}
 									<button
 										on:click={() => (bookingStatus = 'Approved')}
 										type="submit"
-										class="py-2 px-2 text-green-500 font-bold">Approve</button
+										class="btn btn-success text-white"
+										disabled>Approve</button
 									>
+								{:else}
+									<button
+										on:click={() => (bookingStatus = 'Approved')}
+										type="submit"
+										class="btn btn-success text-white">Approve</button
+									>
+								{/if}
+								{#if book.paymentStatus == 'Paid'}
 									<button
 										on:click={() => (bookingStatus = 'Disapproved')}
 										type="submit"
-										class="py-2 px-2 text-red-500 font-bold">Dissaprove</button
+										class="btn btn-error text-white"
+										disabled>Dissaprove</button
 									>
-								</form>
-							</td>
-							<td class="p-3 text-sm whitespace-nowrap">
-								<button
-									on:click={sendPaymentEmail(book.email)}
-									type="button"
-									class="py-2 px-2 text-blue-500 font-bold hover:underline">Send Payment</button
-								>
-							</td>
-						</tr>
-					{/if}
-				{/each}
-			</tbody>
-		</table>
-	</div>
-
-	<!-- Small screen -->
-	<div class="bg-gray-300 my-5 p-5  selection:grid grid-cols-1 gap-4 md:hidden rounded-lg shadow">
-		{#each listOfBooking as book}
-			{#if book.status == 'Pending'}
-				<div class="bg-white space-y-3 p-4 border-2 border-black">
-					<div class="flex items-center space-x-2  text-sm">
-						<div>
-							<span class="font-bold text-sm">Name: </span>
-							{book.firstNameDisplay + ' ' + book.lastNameDisplay}
+								{:else}
+									<button
+										on:click={() => (bookingStatus = 'Disapproved')}
+										type="submit"
+										class="btn btn-error text-white">Dissaprove</button
+									>
+								{/if}
+							</form>
+							<button on:click={sendPaymentEmail(book.email)} type="button" class="btn btn-primary"
+								>Send Payment</button
+							>
 						</div>
 					</div>
-					<div>
-						<span class="font-bold text-sm">E-mail Address: </span>
-						{book.email}
-					</div>
-					<div>
-						<span class="font-bold text-sm">Contact No: </span>
-						{book.contactNumber}
-					</div>
-					<div>
-						<span class="font-bold text-sm">Type of Event: </span>
-						{book.eventTypeDisplay}
-					</div>
-					<div>
-						<span class="font-bold text-sm">Date and Time </span>
-						{book.bookDate.toDate().toLocaleDateString() +
-							' at ' +
-							book.bookDate.toDate().toLocaleTimeString()}
-					</div>
-					<div class="font-bold">
-						Status:
-						<form on:submit|preventDefault={changePaymentStatus(book.id)}>
-							{#if book.paymentStatus == 'Paid'}
-								<button type="submit" on:click={() => (bookingPaymentStatus = 'Unpaid')}>
-									<span class="p-3 text-sm whitespace-nowrap text-green-500 font-bold">
-										{book.paymentStatus}
-									</span>
-								</button>
-							{:else if book.paymentStatus == 'Unpaid'}
-								<button type="submit" on:click={() => (bookingPaymentStatus = 'Paid')}>
-									<span class="p-3 text-sm whitespace-nowrap text-red-500 font-bold">
-										{book.paymentStatus}
-									</span>
-								</button>
-							{/if}
-						</form>
-					</div>
-					<div>
-						<form on:submit|preventDefault={changeStatus(book.id)}>
-							<button
-								on:click={() => (bookingStatus = 'Approved')}
-								type="submit"
-								class="py-2 px-2 text-green-500 font-bold">Approve</button
-							>
-							<button
-								on:click={() => (bookingStatus = 'Disapproved')}
-								type="submit"
-								class="py-2 px-2 text-red-500 font-bold">Dissaprove</button
-							>
-						</form>
-						<button
-							on:click={sendPaymentEmail(book.email)}
-							type="button"
-							class="py-2 px-2 text-blue-500 font-bold hover:underline">Send Payment</button
-						>
-					</div>
 				</div>
-				<br />
 			{/if}
 		{/each}
 	</div>

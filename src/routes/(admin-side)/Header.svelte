@@ -35,7 +35,7 @@
 	<div class="flex-1">
 		<img
 			class="mask mask-circle"
-			src="https://i.ibb.co/Q6Jmgpt/logo-01.jpg" 
+			src="/logo.png" 
 			alt="Southview Homes 3 Logo"
 		/>
 		<h1 class="font-semibold text-xl">Southview Homes 3</h1>

@@ -13,6 +13,6 @@
 	  </div>
 	</div>  -->
 	<div class="mt-5">
-		<p>Copyright © 2022 Soutview Homes 3 - All Rights Reserved</p>
+		<p>Copyright © 2022 Southview Homes 3 - All Rights Reserved</p>
 	</div>
 </footer>

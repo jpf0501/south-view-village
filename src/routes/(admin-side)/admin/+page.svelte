@@ -1,9 +1,13 @@
 <script>
 	import { db } from '$lib/firebase/client';
-	import { query, collection, getCountFromServer, where } from 'firebase/firestore';
+	import { onSnapshot, query, collection, getCountFromServer, where, limit, orderBy } from 'firebase/firestore';
+	import { onDestroy } from 'svelte';
 
 	let countOfPendingBooks = '';
 	let countOfAccounts = '';
+	let listOfEvents = [];
+	let dateToday = new Date().toLocaleDateString("fr-CA", {year:"numeric", month: "2-digit", day:"2-digit"});
+	let eventQuery = query(collection(db, 'event'), limit(3), where('date', '>=', dateToday), orderBy('date', 'asc'))
 
 	async function getCount() {
 		try {
@@ -26,6 +30,14 @@
 		}
 	}
 
+	async function getUpcoming() {
+		const unsubscribe = onSnapshot(eventQuery, (querySnapshot) => {
+			listOfEvents = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+		});
+		onDestroy(() => unsubscribe());
+	}
+
+	$: getUpcoming(eventQuery);
 	getCount();
 </script>
 
@@ -61,7 +73,8 @@
 				<div class="p-4">
 					<h1 class="text-2xl mb-8 font-semibold p-3">Upcoming Events</h1>
 					<div class="flex flex-col space-y-8 text-md p-3">
-						<div>
+						{#each listOfEvents as event}
+						<!-- <div>
 							<p class="font-medium text-md mb-3">Christmas Party</p>
 							<p>Dec 18 3:00 PM</p>
 						</div>
@@ -72,7 +85,12 @@
 						<div>
 							<p class="font-medium text-md mb-3">Meeting</p>
 							<p>Jan 3 8:00 PM</p>
+						</div> -->
+						<div>
+							<p class="font-medium text-md mb-3">{event.titleDisplay}</p>
+							<p>{event.date}</p>
 						</div>
+						{/each}
 					</div>
 				</div>
 			</div>

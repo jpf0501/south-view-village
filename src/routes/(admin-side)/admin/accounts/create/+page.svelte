@@ -1,5 +1,8 @@
 <script>
 	import { goto } from '$app/navigation';
+	import { db } from '$lib/firebase/client'
+	import { onSnapshot, query, collection, orderBy, } from 'firebase/firestore'
+	import { onDestroy } from 'svelte';
 
 	let account = {
 		email: '',
@@ -13,6 +16,24 @@
 		contactNumber: '',
 		role: ''
 	};
+	let streetQuery = query(collection(db, 'street'), orderBy('streetName', 'asc'));
+	let listOfStreets = [];
+
+	const blockValue = Array.from({ length: 23 }, (_, i) => ({
+    	value: i + 1,
+  	}));
+
+	const lotValue = Array.from({ length: 26 }, (_, i) => ({
+    	value: i + 1,
+  	}));
+
+
+	async function getStreet() {
+		const unsubscribe = onSnapshot(streetQuery, (querySnapshot) => {
+			listOfStreets = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+		});
+		onDestroy(() => unsubscribe());
+	}
 
 	async function submitHandler() {
 		try {
@@ -37,13 +58,15 @@
 			});
 			const result = await response.json();
 			console.log(result);
-			alert('Save success ' + result.uid);
+			alert('Save success');
 			await goto('/admin/accounts');
 		} catch (error) {
 			console.log(error);
 			alert(error);
 		}
 	}
+
+	$: getStreet(streetQuery);
 </script>
 
 <svelte:head>
@@ -51,7 +74,7 @@
 </svelte:head>
 
 <main>
-	<div class="min-h-screen hero bg-base-200">
+	<div class="min-h-screen hero bg-base-200 py-8">
 		<div class="w-full max-w-4xl p-6 mx-auto shadow-2xl border rounded-xl bg-base-100">
 			<div class="mt-2">
 				<h1 class="text-2xl">Create Account</h1>
@@ -90,40 +113,39 @@
 						<label for="Block" class="label">
 							<span class="label-text">Block</span>
 						</label>
-						<input
-							type="number"
-							placeholder="1"
-							name="Block"
-							class="input input-bordered"
-							required
-							bind:value={account.addressBlock}
-						/>
+						<select class="select select-bordered w-full" required bind:value={account.addressBlock}>
+							<option value="" disabled>Select block</option>
+							{#each blockValue as block} 
+								<option value={block.value}>{block.value}</option>
+							{/each}
+						</select>
 					</div>
 					<div class="form-control">
 						<label for="Lot" class="label">
 							<span class="label-text">Lot</span>
 						</label>
-						<input
-							type="number"
-							placeholder="1"
-							name="Lot"
-							class="input input-bordered"
-							required
-							bind:value={account.addressLot}
-						/>
+						<select class="select select-bordered w-full" required bind:value={account.addressLot}>
+							<option value="" disabled>Select lot</option>
+							{#each lotValue as lot} 
+								<option value={lot.value}>{lot.value}</option>
+							{/each}
+						</select>
 					</div>
 					<div class="form-control">
 						<label for="Street" class="label">
 							<span class="label-text">Street</span>
 						</label>
-						<input
-							type="text"
-							placeholder="1"
-							name="Street"
-							class="input input-bordered"
+						<select
+							class="select select-bordered w-full"
+							aria-label="Default select example"
 							required
 							bind:value={account.addressStreet}
-						/>
+						>
+							<option value="" selected disabled>Select street</option>
+  							{#each listOfStreets as street}
+    								<option value={street.streetName}>{street.streetName}</option>
+  							{/each}
+						</select>
 					</div>
 				</div>
 				<div class="grid grid-cols-1 gap-6 mt-4 md:grid-cols-2">
@@ -164,14 +186,30 @@
 									bind:value={account.passwordcheck}
 								/>
 								{#if account.password != account.passwordcheck && account.passwordcheck != ''}
-									<p class="text-red-500 mt-3">Password doesnt match</p>
+									<div class="alert alert-error shadow-lg my-3 w-full">
+										<div>
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												class="stroke-current flex-shrink-0 h-6 w-6"
+												fill="none"
+												viewBox="0 0 24 24"
+												><path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													stroke-width="2"
+													d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+												/></svg
+											>
+											<span>Passwords do not match</span>
+										</div>
+									</div>
 								{/if}
 							</div>
 							<div class="form-control">
 								<span class="label-text mb-3">Role</span>
 								<div class="mb-3">
 									<select
-										class="form-select appearance-none block w-full px-3 py-1.5 text-base border rounded-xl border-gray-300"
+										class="select select-bordered w-full"
 										aria-label="Default select example"
 										required
 										bind:value={account.role}
@@ -190,7 +228,8 @@
 							<input
 								type="tel"
 								onkeypress="return event.charCode >= 48 && event.charCode <= 57"
-								minlength="11" maxlength="11"
+								minlength="11"
+								maxlength="11"
 								placeholder="09123456789"
 								pattern={String.raw`^(09)\d{9}$`}
 								name="contact"
@@ -202,13 +241,8 @@
 					</div>
 				</div>
 				<div class="flex justify-end mt-8">
-					<button type="submit" class="btn btn-primary mx-1 px-6 bg-blue-500 hover:bg-blue-900"
-						>Create</button
-					>
-					<a
-						href="/admin/accounts"
-						class="btn btn-primary mx-1 bg-red-500 px-4 hover:bg-red-900 text-white">Cancel</a
-					>
+					<button type="submit" class="btn btn-primary mx-1 px-6">Create</button>
+					<a href="/admin/accounts" class="btn btn-error mx-1 px-4 text-white">Cancel</a>
 				</div>
 			</form>
 		</div>

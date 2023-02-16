@@ -1,14 +1,30 @@
 <script>
-	import { onSnapshot, query, collection, orderBy, where } from 'firebase/firestore';
+	import { onSnapshot, query, collection, orderBy, where, getDocs } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
+	import { jsPDF } from 'jspdf';
+
+	const monthName = [
+		'January',
+		'February',
+		'March',
+		'April',
+		'May',
+		'June',
+		'July',
+		'August',
+		'September',
+		'October',
+		'November',
+		'December'
+	];
 
 	let listOfBooking = [];
 	let sortByField = '';
 	let sortByStatus = '';
 	let searchByField = '';
 	let searchByValue = '';
-	let bookingsQuery = query(collection(db, 'booking'));
+	let bookingsQuery = query(collection(db, 'booking'), orderBy('dateReviewed', 'asc'));
 
 	async function getBookings(bookingsQuery) {
 		const unsubscribe = onSnapshot(bookingsQuery, (querySnapshot) => {
@@ -18,17 +34,21 @@
 	}
 
 	async function changeSortBy() {
-		bookingsQuery = query(collection(db, 'booking'), orderBy(sortByField, 'asc'));
+		bookingsQuery = query(
+			collection(db, 'booking'),
+			orderBy(sortByField, 'asc'),
+			orderBy('dateReviewed', 'asc')
+		);
 	}
 
 	async function changeSortByStatus() {
 		if (sortByStatus == '') {
-			bookingsQuery = query(collection(db, 'booking'), orderBy('bookDate', 'desc'));
+			bookingsQuery = query(collection(db, 'booking'), orderBy('dateReviewed', 'asc'));
 		} else {
 			bookingsQuery = query(
 				collection(db, 'booking'),
 				where('status', '==', sortByStatus),
-				orderBy('bookDate', 'desc')
+				orderBy('dateReviewed', 'asc')
 			);
 		}
 	}
@@ -42,6 +62,35 @@
 		);
 	}
 
+	async function resetButton() {
+		bookingsQuery = query(collection(db, 'booking'), orderBy('dateReviewed', 'asc'));
+		searchByValue = '';
+	}
+
+	async function generateReport() {
+		const reportQuery = query(collection(db, 'booking'), where('status', '!=', 'Pending'));
+		const reportSnap = await getDocs(reportQuery);
+
+		const report = new jsPDF();
+	
+		let text = '';
+		
+		reportSnap.forEach(booking => {
+			text += `Name: ${booking.data().firstNameDisplay} ${booking.data().lastNameDisplay}\n`;
+			text += `E-mail Address: ${booking.data().email}\n`;
+			text += `Contact No.: ${booking.data().contactNumber}\n`;
+			text += `Event Type: ${booking.data().eventTypeDisplay}\n`;
+			text += `Date Reserved: ${booking.data().dateReserved.toDate().toLocaleDateString()} ${booking.data().dateReserved.toDate().toLocaleTimeString()}\n`;
+			text += `Booking Status: ${booking.data().status}\n`;
+			text += `Date Reviewed: ${booking.data().dateReviewed.toDate().toLocaleDateString()} ${booking.data().dateReviewed.toDate().toLocaleTimeString()}\n`;
+			text += `Payment Status: ${booking.data().paymentStatus}\n\n`;
+		});
+		
+		report.text('Southview Homes 3 Booking History Report', 10, 18);
+		report.text(text, 10, 34);
+		report.save('Southview-Homes-3-Booking-Report.pdf');
+	}
+
 	$: getBookings(bookingsQuery);
 </script>
 
@@ -50,116 +99,182 @@
 </svelte:head>
 
 <div class="min-w-full min-h-full bg-base-200 px-12">
-	<div class="flex justify-between">
-		<h1 class="text-3xl font-semibold py-12">Booking History</h1>
-		<a href="/admin/bookings" class="hover:underline">Go to Bookings</a>
+	<div class="flex justify-between py-10">
+		<h1 class="text-3xl font-semibold">Booking History</h1>
+		<a href="/admin/bookings" class="btn btn-primary">Go to Bookings</a>
 	</div>
-	<div class="flex justify-between">
-		<form on:submit|preventDefault={searchBookings}>
-			<select bind:value={searchByField} required>
-				<option value="" disabled selected>Search Filter</option>
-				<option value="firstname">Name</option>
-				<option value="email">E-mail Address</option>
-				<option value="eventType">Type of Event</option>
-				<option value="bookDate">Date and Time</option>
-			</select>
-			<input type="search" placeholder="Search here" required bind:value={searchByValue} />
-		</form>
-		<select bind:value={sortByField} on:change={changeSortBy}>
+	<div class="flex flex-col md:flex-row justify-between">
+		<div class="flex flex-col md:flex-row">
+			<form on:submit|preventDefault={searchBookings} class="my-4">
+				<select bind:value={searchByField} class="select select-bordered" required>
+					<option value="" disabled selected>Search Filter</option>
+					<option value="firstname">Name</option>
+					<option value="email">E-mail Address</option>
+					<option value="eventType">Type of Event</option>
+					<option value="bookDate">Date and Time</option>
+				</select>
+				<input
+					type="search"
+					placeholder="Search here"
+					class="input input-bordered mx-2"
+					bind:value={searchByValue}
+				/>
+			</form>
+			<button on:click={resetButton} class="btn btn-primary my-4">Reset</button>
+		</div>
+
+		<select bind:value={sortByField} on:change={changeSortBy} class="select select-bordered my-4">
 			<option value="" disabled selected>Sort By</option>
 			<option value="firstname">Name</option>
 			<option value="email">E-mail Address</option>
 			<option value="eventType">Type of Event</option>
 			<option value="bookDate">Date and Time</option>
 		</select>
-		<select bind:value={sortByStatus} on:change={changeSortByStatus}>
-			<option value="" selected>Status</option>
+		<select bind:value={sortByStatus} on:change={changeSortByStatus} class="select select-bordered my-4">
+			<option value="" selected>Status Filter</option>
 			<option value="Approved">Approved</option>
 			<option value="Disapproved">Disapproved</option>
 		</select>
+		<div class="my-4">
+			<button class="btn btn-primary" on:click={generateReport}>Generate Report</button>
+		</div>
 	</div>
 
-	<div class="my-5 p-5 overflow-auto shadow-lg border rounded-xl bg-gray-300 hidden md:block">
-		<table class="border-2 border-black bg-white w-full text-center">
-			<thead class="font-bold bg-gray-500">
-				<tr>
-					<th class="p-3 text-sm tracking-wide">Name</th>
-					<th class="p-3 text-sm tracking-wide">E-mail Address</th>
-					<th class="p-3 text-sm tracking-wide">Contact No.</th>
-					<th class="p-3 text-sm tracking-wide">Type of Event</th>
-					<th class="p-3 text-sm tracking-wide">Date and Time</th>
-					<th class="p-3 text-sm tracking-wide">Status</th>
-				</tr>
-			</thead>
-			<tbody>
-				{#each listOfBooking as book}
-					{#if book.status == 'Approved' || book.status == 'Disapproved'}
-						<tr class="border-t-2 border-black">
-							<td class="p-3 text-sm whitespace-nowrap"
-								>{book.firstNameDisplay + ' ' + book.lastNameDisplay}</td
-							>
-							<td class="p-3 text-sm whitespace-nowrap">{book.email}</td>
-							<td class="p-3 text-sm whitespace-nowrap">{book.contactNumber}</td>
-							<td class="p-3 text-sm whitespace-nowrap">{book.eventTypeDisplay}</td>
-							<td class="p-3 text-sm whitespace-nowrap"
-								>{book.bookDate.toDate().toLocaleDateString() +
-									' at ' +
-									book.bookDate.toDate().toLocaleTimeString()}</td
-							>
-							{#if book.status == 'Approved'}
-								<td class="p-3 text-sm whitespace-nowrap text-green-500 font-bold">{book.status}</td
+
+	<style>
+		table {
+			counter-reset: section;
+		}
+		.count:before {
+			counter-increment: section;
+			content: counter(section);
+		}
+	</style>
+
+	<!-- Medium to large screen -->
+	<div class="w-full mx-auto shadow-2xl border rounded-xl bg-base-100 my-5 hidden md:block">
+		<div class="overflow-x-auto">
+			<table class="table w-full">
+				<thead>
+					<tr>
+						<th />
+						<th class="text-lg">Name</th>
+						<th class="text-lg">Email Address</th>
+						<th class="text-lg">Contact Number</th>
+						<th class="text-lg">Type of Event</th>
+						<th class="text-lg">Date and Time</th>
+						<th class="text-lg">Booking Status</th>
+						<th class="text-lg">Date Reviewed</th>
+					</tr>
+				</thead>
+				<tbody>
+					{#each listOfBooking as book}
+						{#if book.status != 'Pending'}
+							<tr class="hover">
+								<td class="count" />
+								<td>{book.firstNameDisplay + ' ' + book.lastNameDisplay}</td>
+								<td>{book.email}</td>
+								<td>{book.contactNumber}</td>
+								<td>{book.eventTypeDisplay}</td>
+								<td
+									>{book.bookDate.toDate().toLocaleDateString('en-us', {
+										year: 'numeric',
+										month: 'long',
+										day: 'numeric'
+									}) +
+										' at ' +
+										book.bookDate
+											.toDate()
+											.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}</td
 								>
-							{:else if book.status == 'Disapproved'}
-								<td class="p-3 text-sm whitespace-nowrap text-red-500 font-bold">{book.status}</td>
-							{:else if book.status == 'Pending'}
-								<td class="p-3 text-sm whitespace-nowrap">{book.status}</td>
-							{/if}
-						</tr>
-					{/if}
-				{/each}
-			</tbody>
-		</table>
+								<td>
+									{#if book.status == 'Approved'}
+										<td class="p-3 text-sm whitespace-nowrap text-green-500 font-bold"
+											>{book.status}</td
+										>
+									{:else if book.status == 'Disapproved'}
+										<td class="p-3 text-sm whitespace-nowrap text-red-500 font-bold"
+											>{book.status}</td
+										>
+									{:else if book.status == 'Pending'}
+										<td class="p-3 text-sm whitespace-nowrap">{book.status}</td>
+									{/if}
+								</td>
+								<td
+									>{book.dateReviewed.toDate().toLocaleDateString('en-us', {
+										year: 'numeric',
+										month: 'long',
+										day: 'numeric'
+									}) +
+										' at ' +
+										book.dateReviewed
+											.toDate()
+											.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}</td
+								>
+							</tr>
+						{/if}
+					{/each}
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<div class="flex mx-auto items-center justify-center my-8">
+		<div class="grid grid-cols-2">
+			<button class="btn btn-primary mx-1">Previous</button>
+			<button class="btn btn-primary mx-1">Next</button>
+		</div>
 	</div>
 
 	<!-- Small screen -->
-	<div class="bg-gray-300 my-5 p-5  selection:grid grid-cols-1 gap-4 md:hidden rounded-lg shadow">
+
+	<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">
 		{#each listOfBooking as book}
 			{#if book.status == 'Approved' || book.status == 'Disapproved'}
-				<div class="bg-white space-y-3 p-4 border-2 border-black">
-					<div class="flex items-center space-x-2  text-sm">
+				<div class="card w-[105%] bg-base-100 shadow-xl">
+					<div class="card-body">
+						<h2 class="card-title mb-2">{book.firstNameDisplay + ' ' + book.lastNameDisplay}</h2>
 						<div>
-							<span class="font-bold text-sm">Name: </span>
-							{book.firstNameDisplay + ' ' + book.lastNameDisplay}
+							<span class="my-1 font-bold">E-mail Address:</span>
+							{book.email}
+						</div>
+						<div>
+							<span class="my-1 font-bold">Contact No:</span>
+							{book.contactNumber}
+						</div>
+						<div>
+							<span class="my-1 font-bold">Type of Event:</span>
+							{book.eventTypeDisplay}
+						</div>
+						<div>
+							<span class="my-1 font-bold">Date and Time:</span>
+							{book.bookDate
+								.toDate()
+								.toLocaleDateString('en-us', { year: 'numeric', month: 'long', day: 'numeric' }) +
+								' at ' +
+								book.bookDate
+									.toDate()
+									.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}
+						</div>
+						<div class="font-bold">
+							Status:
+							{#if book.status == 'Approved'}
+								<span class="text-green-500">{book.status}</span>
+							{:else if book.status == 'Disapproved'}
+								<span class="text-red-500">{book.status}</span>
+							{/if}
+						</div>
+						<div>
+							<span class="my-1 font-bold">Date Reviewed:</span>
+							{book.dateReviewed
+								.toDate()
+								.toLocaleDateString('en-us', { year: 'numeric', month: 'long', day: 'numeric' }) +
+								' at ' +
+								book.dateReviewed
+									.toDate()
+									.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}
 						</div>
 					</div>
-					<div>
-						<span class="font-bold text-sm">E-mail Address: </span>
-						{book.email}
-					</div>
-					<div>
-						<span class="font-bold text-sm">Contact No: </span>
-						{book.contactNumber}
-					</div>
-					<div>
-						<span class="font-bold text-sm">Type of Event: </span>
-						{book.eventTypeDisplay}
-					</div>
-					<div>
-						<span class="font-bold text-sm">Date and Time: </span>
-						{book.bookDate.toDate().toLocaleDateString() +
-							' at ' +
-							book.bookDate.toDate().toLocaleTimeString()}
-					</div>
-					<div class="font-bold">
-						Status:
-						{#if book.status == 'Approved'}
-							<span class="text-sm text-green-500">{book.status}</span>
-						{:else if book.status == 'Disapproved'}
-							<span class="text-sm text-red-500">{book.status}</span>
-						{/if}
-					</div>
 				</div>
-				<br />
 			{/if}
 		{/each}
 	</div>

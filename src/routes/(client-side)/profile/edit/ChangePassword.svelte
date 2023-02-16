@@ -54,13 +54,13 @@
 			</div>
 		</div>
 		<div class="flex justify-end mt-8">
-			<button type="submit" class="btn btn-primary bg-blue-500 mx-1 hover:bg-blue-900"
+			<button type="submit" class="btn btn-primary mx-1"
 				>Save New Password</button
 			><br />
 			<button
 				type="button"
-				class="btn btn-primary mx-1 px-4 bg-red-500 hover:bg-red-900"
-				on:click={() => (showChangePassword = false)}>Cancel Change Password</button
+				class="btn btn-error mx-1 px-4 text-white"
+				on:click={() => (showChangePassword = false)}>Cancel</button
 			>
 		</div>
 	</form>
