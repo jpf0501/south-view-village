@@ -11,7 +11,7 @@
 	} from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
-	import { sendEmail } from '$lib/utils';
+	import { createPaymentLink, sendEmail } from '$lib/utils';
 
 	const monthName = [
 		'January',
@@ -83,10 +83,12 @@
 
 	async function sendPaymentEmail(bookEmail) {
 		try {
+			const paymentLinkData = await createPaymentLink()
+			const checkoutURL = paymentLinkData.data.attributes.checkout_url
 			const result = await sendEmail({
 				to: bookEmail,
 				subject: 'Southview Homes 3 Payment Method',
-				html: '<h1>This is the link for payment for reservation in booking</ht>'
+				html: `<h1>This is the link for payment for reservation in booking: <a href=${checkoutURL}>Click here</a></h1>`
 			});
 			console.log(JSON.stringify(result));
 			alert('Email for payment method sent successfully');

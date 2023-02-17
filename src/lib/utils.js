@@ -1,3 +1,5 @@
+import { PUBLIC_PAYMONGO_SECRET_KEY } from '$env/static/public'
+
 export const sendEmail = async (
 	mailOptions = {
 		to: 'dngumayagay@gmail.com',
@@ -11,3 +13,31 @@ export const sendEmail = async (
 			body: JSON.stringify({ mailOptions })
 		})
 	).json();
+
+	export async function createPaymentLink (description = 'Clubhouse Reservation Downpayment', amount = 50000, remarks = '') {
+		const options = {
+			method: 'POST',
+			headers: {
+			  accept: 'application/json',
+			  'content-type': 'application/json',
+			  authorization: 'Basic ' + PUBLIC_PAYMONGO_SECRET_KEY,
+			},
+			body: JSON.stringify({
+			  data: {
+				attributes: {
+				  amount: amount,
+				  description: description,
+				  remarks: remarks
+				}
+			  }
+			})
+		  };
+		  try {
+			const response = await fetch('https://api.paymongo.com/v1/links', options)
+			const result = await response.json()  
+			return result;
+		  } catch (error) {
+			console.log(error)
+		  }
+		
+	}
