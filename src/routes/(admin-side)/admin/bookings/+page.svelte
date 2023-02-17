@@ -81,9 +81,9 @@
 		}
 	}
 
-	async function sendPaymentEmail(bookEmail) {
+	async function sendPaymentEmail(bookEmail, bookID) {
 		try {
-			const paymentLinkData = await createPaymentLink()
+			const paymentLinkData = await createPaymentLink(remarks = bookID)
 			const checkoutURL = paymentLinkData.data.attributes.checkout_url
 			const result = await sendEmail({
 				to: bookEmail,
@@ -251,7 +251,7 @@
 								>
 								<td
 									><button
-										on:click={sendPaymentEmail(book.email)}
+										on:click={sendPaymentEmail(book.email, book.id)}
 										type="button"
 										class="btn btn-primary">Send Payment</button
 									></td
