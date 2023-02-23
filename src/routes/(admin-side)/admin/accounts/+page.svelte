@@ -115,6 +115,7 @@
 						<th class="text-lg">Name</th>
 						<th class="text-lg">Address</th>
 						<th class="text-lg">Email</th>
+						<th class="text-lg">Contact No.</th>
 						<th class="text-lg">Role</th>
 						<th />
 						<th />
@@ -135,6 +136,7 @@
 									' Street'}</td
 							>
 							<td>{user.email}</td>
+							<td>{user.contactNumber}</td>
 							<td>{user.role}</td>
 							<td />
 							<td
