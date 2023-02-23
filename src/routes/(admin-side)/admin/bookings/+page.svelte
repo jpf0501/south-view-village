@@ -251,12 +251,20 @@
 									</form></td
 								>
 								<td
-									><button
+									>
+									{#if book.paymentStatus == 'Unpaid'}
+									<button
 										on:click={sendPaymentEmail(book.email, book.id)}
 										type="button"
 										class="btn btn-primary">Send Payment</button
-									></td
-								>
+									>
+									{:else}
+									<button
+										type="button"
+										class="btn btn-primary" disabled>Send Payment</button
+									>
+									{/if}
+									</td>
 							</tr>
 						{/if}
 					{/each}
