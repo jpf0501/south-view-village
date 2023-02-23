@@ -2,6 +2,7 @@
 	import { onSnapshot, query, collection, orderBy, where } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
+	import { sendEmail } from '$lib/utils'
 
 	let listOfUsers = [];
 	let sortByField = '';
@@ -36,6 +37,24 @@
 			where(searchByField, '>=', searchByValueCase),
 			where(searchByField, '<=', searchByValueCase + '~')
 		);
+	}
+
+	async function sendPaymentEmail(paymentEmail) {
+		// console.log(bookID)
+		try {
+			// const paymentLinkData = await createPaymentLink('Clubhouse Reservation Downpayment', 50000, bookID)
+			// const checkoutURL = paymentLinkData.data.attributes.checkout_url
+			const result = await sendEmail({
+				to: paymentEmail,
+				subject: 'Southview Homes 3 Payment Method',
+				html: `<h1>This is the link for payment for reservation in booking: Click here</h1>`
+			});
+			console.log(JSON.stringify(result));
+			alert('Email for dues payment sent successfully');
+		} catch (error) {
+			console.log(error);
+			alert('Error in sending payment method');
+		}
 	}
 
 	async function resetButton() {
@@ -145,7 +164,7 @@
 							<td
 								>
 								{#if user.paymentStatus == 'Unpaid'}
-									<button
+									<button on:click={sendPaymentEmail(user.email)}
 										type="button"
 										class="btn btn-primary">Send Payment</button
 									>
