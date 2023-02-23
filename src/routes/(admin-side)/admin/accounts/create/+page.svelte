@@ -14,7 +14,8 @@
 		addressLot: '',
 		addressStreet: '',
 		contactNumber: '',
-		role: ''
+		role: '',
+		paymentStatus: 'Unpaid'
 	};
 	let streetQuery = query(collection(db, 'street'), orderBy('streetName', 'asc'));
 	let listOfStreets = [];
@@ -53,7 +54,8 @@
 					addressLot: account.addressLot,
 					addressStreet: account.addressStreet,
 					contactNumber: account.contactNumber,
-					role: account.role
+					role: account.role,
+					paymentStatus: account.paymentStatus
 				})
 			});
 			const result = await response.json();
