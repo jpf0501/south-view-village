@@ -2,7 +2,25 @@
 	import { onSnapshot, query, collection, orderBy, where } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
-	import { sendEmail } from '$lib/utils'
+	import { createPaymentLink, sendEmail } from '$lib/utils'
+
+	const monthName = [
+		'January',
+		'February',
+		'March',
+		'April',
+		'May',
+		'June',
+		'July',
+		'August',
+		'September',
+		'October',
+		'November',
+		'December'
+	];
+
+	const date = new Date()
+	const currentMonth = monthName[date.getMonth()];
 
 	let listOfUsers = [];
 	let sortByField = '';
@@ -39,15 +57,15 @@
 		);
 	}
 
-	async function sendPaymentEmail(paymentEmail) {
-		// console.log(bookID)
+	async function sendPaymentEmail(paymentEmail, paymentID) {
+		// console.log(paymentID)
 		try {
-			// const paymentLinkData = await createPaymentLink('Clubhouse Reservation Downpayment', 50000, bookID)
-			// const checkoutURL = paymentLinkData.data.attributes.checkout_url
+			const paymentLinkData = await createPaymentLink('Southview Homes 3 Monthly Dues', 50000, paymentID)
+			const checkoutURL = paymentLinkData.data.attributes.checkout_url
 			const result = await sendEmail({
 				to: paymentEmail,
-				subject: 'Southview Homes 3 Payment Method',
-				html: `<h1>This is the link for payment for reservation in booking: Click here</h1>`
+				subject: 'Southview Homes 3 Monthly Dues Payment Link',
+				html: `<h1>This is the link for payment for monthly dues of ${currentMonth}: <a href=${checkoutURL}>Click here</a></h1>`
 			});
 			console.log(JSON.stringify(result));
 			alert('Email for dues payment sent successfully');
@@ -164,7 +182,7 @@
 							<td
 								>
 								{#if user.paymentStatus == 'Unpaid'}
-									<button on:click={sendPaymentEmail(user.email)}
+									<button on:click={sendPaymentEmail(user.email, user.id)}
 										type="button"
 										class="btn btn-primary">Send Payment</button
 									>
