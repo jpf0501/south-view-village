@@ -4,21 +4,6 @@
 	import { onDestroy } from 'svelte';
 	import { jsPDF } from 'jspdf';
 
-	const monthName = [
-		'January',
-		'February',
-		'March',
-		'April',
-		'May',
-		'June',
-		'July',
-		'August',
-		'September',
-		'October',
-		'November',
-		'December'
-	];
-
 	let listOfBooking = [];
 	let sortByField = '';
 	let sortByStatus = '';
