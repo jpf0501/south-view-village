@@ -1,19 +1,26 @@
 <script>
-	import { onSnapshot, query, collection, orderBy, where, limit, startAt, endAt } from 'firebase/firestore';
+	import { onSnapshot, query, collection, orderBy, where } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
 
 	let listOfUsers = [];
-	let pageCount = 1;
-	let queryLimit = 10;
 	let sortByField = '';
 	let searchByField = '';
 	let searchByValue = '';
-	let accountsQuery = query(collection(db, 'accounts'), limit(queryLimit));
+	let accountsQuery = query(collection(db, 'accounts'));
 
-	async function getAccounts(accountsQuery) {
+	let currentPage = 1;
+	let pageSize = 10;
+	let totalRecords = 1;
+	let totalPages = 0;
+
+	async function getAccounts(accountsQuery, page, pageSize) {
+		const startIndex = (page - 1) * pageSize;
+		const endIndex = startIndex + pageSize;
 		const unsubscribe = onSnapshot(accountsQuery, (querySnapshot) => {
-			listOfUsers = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+			listOfUsers = querySnapshot.docs
+				.map((doc) => ({ id: doc.id, ...doc.data() }))
+				.slice(startIndex, endIndex);
 		});
 		onDestroy(() => unsubscribe());
 	}
@@ -32,22 +39,21 @@
 	}
 
 	async function resetButton() {
-		accountsQuery = query(collection(db, 'accounts'), limit(queryLimit));
+		accountsQuery = query(collection(db, 'accounts'));
 		searchByValue = '';
 	}
 
-	async function nextPage() {
-		pageCount++;
-		accountsQuery = query(collection(db, 'accounts'), limit(queryLimit), orderBy('firstname'), startAt());
-  	}
-
-  	async function prevPage() {
-    	if (pageCount <= 1) return;
-   		pageCount--;
-    	accountsQuery = query(collection(db, 'accounts'), limit(queryLimit), orderBy('firstname'), startAt(queryLimit -1));
-  	}
-
-	$: getAccounts(accountsQuery);
+	$: {
+		getAccounts(accountsQuery, currentPage, pageSize);
+		const unsubscribe = onSnapshot(accountsQuery, (querySnapshot) => {
+			totalRecords = querySnapshot.docs.length;
+			totalPages = Math.ceil(totalRecords / pageSize);
+		});
+		onDestroy(() => unsubscribe());
+	}
+	function goToPage(page) {
+		currentPage = page;
+	}
 </script>
 
 <svelte:head>
@@ -109,6 +115,7 @@
 						<th class="text-lg">Name</th>
 						<th class="text-lg">Address</th>
 						<th class="text-lg">Email</th>
+						<th class="text-lg">Contact No.</th>
 						<th class="text-lg">Role</th>
 						<th />
 						<th />
@@ -129,6 +136,7 @@
 									' Street'}</td
 							>
 							<td>{user.email}</td>
+							<td>{user.contactNumber}</td>
 							<td>{user.role}</td>
 							<td />
 							<td
@@ -150,13 +158,6 @@
 			</table>
 		</div>
 	</div>
-	<div class="flex mx-auto items-center justify-center my-8">
-		<div class="grid grid-cols-2">
-			<button class="btn btn-primary mx-1">Previous</button>
-			<button class="btn btn-primary mx-1">Next</button>
-		</div>
-	</div>
-	
 
 	<!-- Small screen -->
 	<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">
@@ -195,6 +196,62 @@
 			</div>
 		{/each}
 	</div>
+</div>
+
+<!-- pagination button -->
+<div class="flex justify-center items-center mt-5">
+	<nav class="block">
+		<ul class="flex pl-0 rounded list-none flex-wrap">
+			{#if currentPage > 1}
+				<li>
+					<button
+						class="relative block py-2 px-3 leading-tight bg-white border border-gray-300 text-blue-700 hover:bg-gray-200 focus:bg-gray-200"
+						on:click={() => goToPage(currentPage - 1)}
+					>
+						Previous
+					</button>
+				</li>
+			{/if}
+
+			{#each Array.from({ length: totalPages }, (_, i) => i + 1) as page}
+				{#if page === currentPage}
+					<li>
+						<button
+							class="relative block py-2 px-3 leading-tight bg-blue-700 text-white hover:bg-blue-500 focus:bg-blue-500"
+							>{page}</button
+						>
+					</li>
+				{:else if (page >= currentPage - 2 && page <= currentPage + 2) || page === totalPages || page === 1}
+					<li>
+						<button
+							class="relative block py-2 px-3 leading-tight bg-white border border-gray-300 text-blue-700 hover:bg-gray-200 focus:bg-gray-200"
+							on:click={() => goToPage(page)}
+						>
+							{page}
+						</button>
+					</li>
+				{:else if page === currentPage - 3 || page === currentPage + 3}
+					<li>
+						<span
+							class="relative block py-2 px-3 leading-tight bg-white border border-gray-300 text-blue-700"
+							>...</span
+						>
+					</li>
+				{/if}
+			{/each}
+
+			{#if currentPage < totalPages}
+				<li>
+					<button
+						class="relative block py-2 px-3 leading-tight bg-white border border-gray-300 text-blue-700 hover:bg-gray-200 focus:bg-gray-200"
+						on:click={() => goToPage(currentPage + 1)}
+					>
+						Next
+					</button>
+				</li>
+			{/if}
+		</ul>
+	</nav>
 </div>
 
 <!-- mema comment -->

@@ -13,21 +13,6 @@
 	import { onDestroy } from 'svelte';
 	import { createPaymentLink, sendEmail } from '$lib/utils';
 
-	const monthName = [
-		'January',
-		'February',
-		'March',
-		'April',
-		'May',
-		'June',
-		'July',
-		'August',
-		'September',
-		'October',
-		'November',
-		'December'
-	];
-
 	let listOfBooking = [];
 	let sortByField = '';
 	let searchByField = '';
@@ -36,9 +21,18 @@
 	let bookingPaymentStatus = '';
 	let bookingsQuery = query(collection(db, 'booking'), orderBy('dateReserved', 'asc'));
 
-	async function getBookings(bookingsQuery) {
+	let currentPage = 1;
+	let pageSize = 10;
+	let totalRecords = 1;
+	let totalPages = 0;
+
+	async function getBookings(bookingsQuery, page, pageSize) {
+		const startIndex = (page - 1) * pageSize;
+		const endIndex = startIndex + pageSize;
 		const unsubscribe = onSnapshot(bookingsQuery, (querySnapshot) => {
-			listOfBooking = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+			listOfBooking = querySnapshot.docs
+				.map((doc) => ({ id: doc.id, ...doc.data() }))
+				.slice(startIndex, endIndex);
 		});
 		onDestroy(() => unsubscribe());
 	}
@@ -84,8 +78,12 @@
 	async function sendPaymentEmail(bookEmail, bookID) {
 		// console.log(bookID)
 		try {
-			const paymentLinkData = await createPaymentLink('Clubhouse Reservation Downpayment', 50000, bookID)
-			const checkoutURL = paymentLinkData.data.attributes.checkout_url
+			const paymentLinkData = await createPaymentLink(
+				'Clubhouse Reservation Downpayment',
+				50000,
+				bookID
+			);
+			const checkoutURL = paymentLinkData.data.attributes.checkout_url;
 			const result = await sendEmail({
 				to: bookEmail,
 				subject: 'Southview Homes 3 Payment Method',
@@ -102,7 +100,17 @@
 		bookingsQuery = query(collection(db, 'booking'));
 		searchByValue = '';
 	}
-	$: getBookings(bookingsQuery);
+	$: {
+		getBookings(bookingsQuery, currentPage, pageSize);
+		const unsubscribe = onSnapshot(bookingsQuery, (querySnapshot) => {
+			totalRecords = querySnapshot.docs.length;
+			totalPages = Math.ceil(totalRecords / pageSize);
+		});
+		onDestroy(() => unsubscribe());
+	}
+	function goToPage(page) {
+		currentPage = page;
+	}
 </script>
 
 <svelte:head>
@@ -250,24 +258,22 @@
 										{/if}
 									</form></td
 								>
-								<td
-									><button
-										on:click={sendPaymentEmail(book.email, book.id)}
-										type="button"
-										class="btn btn-primary">Send Payment</button
-									></td
-								>
+								<td>
+									{#if book.paymentStatus == 'Unpaid'}
+										<button
+											on:click={sendPaymentEmail(book.email, book.id)}
+											type="button"
+											class="btn btn-primary">Send Payment</button
+										>
+									{:else}
+										<button type="button" class="btn btn-primary" disabled>Send Payment</button>
+									{/if}
+								</td>
 							</tr>
 						{/if}
 					{/each}
 				</tbody>
 			</table>
-		</div>
-	</div>
-	<div class="flex mx-auto items-center justify-center my-8">
-		<div class="grid grid-cols-2">
-			<button class="btn btn-primary mx-1">Previous</button>
-			<button class="btn btn-primary mx-1">Next</button>
 		</div>
 	</div>
 
@@ -361,8 +367,10 @@
 									>
 								{/if}
 							</form>
-							<button on:click={sendPaymentEmail(book.email, book.id)} type="button" class="btn btn-primary"
-								>Send Payment</button
+							<button
+								on:click={sendPaymentEmail(book.email, book.id)}
+								type="button"
+								class="btn btn-primary">Send Payment</button
 							>
 						</div>
 					</div>
@@ -371,3 +379,61 @@
 		{/each}
 	</div>
 </div>
+
+<!-- pagination button -->
+<div class="flex justify-center items-center mt-5">
+	<nav class="block">
+		<ul class="flex pl-0 rounded list-none flex-wrap">
+			{#if currentPage > 1}
+				<li>
+					<button
+						class="relative block py-2 px-3 leading-tight bg-white border border-gray-300 text-blue-700 hover:bg-gray-200 focus:bg-gray-200"
+						on:click={() => goToPage(currentPage - 1)}
+					>
+						Previous
+					</button>
+				</li>
+			{/if}
+
+			{#each Array.from({ length: totalPages }, (_, i) => i + 1) as page}
+				{#if page === currentPage}
+					<li>
+						<button
+							class="relative block py-2 px-3 leading-tight bg-blue-700 text-white hover:bg-blue-500 focus:bg-blue-500"
+							>{page}</button
+						>
+					</li>
+				{:else if (page >= currentPage - 2 && page <= currentPage + 2) || page === totalPages || page === 1}
+					<li>
+						<button
+							class="relative block py-2 px-3 leading-tight bg-white border border-gray-300 text-blue-700 hover:bg-gray-200 focus:bg-gray-200"
+							on:click={() => goToPage(page)}
+						>
+							{page}
+						</button>
+					</li>
+				{:else if page === currentPage - 3 || page === currentPage + 3}
+					<li>
+						<span
+							class="relative block py-2 px-3 leading-tight bg-white border border-gray-300 text-blue-700"
+							>...</span
+						>
+					</li>
+				{/if}
+			{/each}
+
+			{#if currentPage < totalPages}
+				<li>
+					<button
+						class="relative block py-2 px-3 leading-tight bg-white border border-gray-300 text-blue-700 hover:bg-gray-200 focus:bg-gray-200"
+						on:click={() => goToPage(currentPage + 1)}
+					>
+						Next
+					</button>
+				</li>
+			{/if}
+		</ul>
+	</nav>
+</div>
+
+<!-- mema comment -->

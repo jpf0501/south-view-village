@@ -31,6 +31,7 @@ export async function POST({ request }) {
 			contactNumber:createUserRequest.contactNumber,
             role:createUserRequest.role,
 			email:createUserRequest.email,
+			paymentStatus:createUserRequest.paymentStatus
 		 })
 		// return json(userRecord);
 		// console.log(userRecord);

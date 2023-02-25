@@ -2,42 +2,23 @@
 	import { onSnapshot, query, collection, orderBy, where } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
-	import { createPaymentLink, sendEmail } from '$lib/utils'
 
-	const monthName = [
-		'January',
-		'February',
-		'March',
-		'April',
-		'May',
-		'June',
-		'July',
-		'August',
-		'September',
-		'October',
-		'November',
-		'December'
-	];
-
-	const date = new Date()
-	const currentMonth = monthName[date.getMonth()];
-
-	let listOfUsers = [];
+	let listOfPayments = [];
 	let sortByField = '';
 	let searchByField = '';
 	let searchByValue = '';
-	let accountsQuery = query(collection(db, 'accounts'));
+	let paymentsQuery = query(collection(db, 'payments'));
 
 	let currentPage = 1;
 	let pageSize = 10;
 	let totalRecords = 1;
 	let totalPages = 0;
 
-	async function getAccounts(accountsQuery, page, pageSize) {
+	async function getPayments(paymentsQuery, page, pageSize) {
 		const startIndex = (page - 1) * pageSize;
 		const endIndex = startIndex + pageSize;
-		const unsubscribe = onSnapshot(accountsQuery, (querySnapshot) => {
-			listOfUsers = querySnapshot.docs
+		const unsubscribe = onSnapshot(paymentsQuery, (querySnapshot) => {
+			listOfPayments = querySnapshot.docs
 				.map((doc) => ({ id: doc.id, ...doc.data() }))
 				.slice(startIndex, endIndex);
 		});
@@ -45,44 +26,26 @@
 	}
 
 	async function changeSortBy() {
-		accountsQuery = query(collection(db, 'accounts'), orderBy(sortByField, 'asc'));
+		paymentsQuery = query(collection(db, 'payments'), orderBy(sortByField, 'asc'));
 	}
 
 	async function searchAccounts() {
 		let searchByValueCase = searchByValue.toLowerCase();
-		accountsQuery = query(
-			collection(db, 'accounts'),
+		paymentsQuery = query(
+			collection(db, 'payments'),
 			where(searchByField, '>=', searchByValueCase),
 			where(searchByField, '<=', searchByValueCase + '~')
 		);
 	}
 
-	async function sendPaymentEmail(paymentEmail, paymentID) {
-		console.log(paymentID)
-		try {
-			const paymentLinkData = await createPaymentLink('Southview Homes 3 Monthly Dues', 50000, paymentID)
-			const checkoutURL = paymentLinkData.data.attributes.checkout_url
-			const result = await sendEmail({
-				to: paymentEmail,
-				subject: 'Southview Homes 3 Monthly Dues Payment Link',
-				html: `<h1>This is the link for payment for monthly dues of ${currentMonth}: <a href=${checkoutURL}>Click here</a></h1>`
-			});
-			console.log(JSON.stringify(result));
-			alert('Email for dues payment sent successfully');
-		} catch (error) {
-			console.log(error);
-			alert('Error in sending payment method');
-		}
-	}
-
 	async function resetButton() {
-		accountsQuery = query(collection(db, 'accounts'));
+		paymentsQuery = query(collection(db, 'payments'));
 		searchByValue = '';
 	}
 
 	$: {
-		getAccounts(accountsQuery, currentPage, pageSize);
-		const unsubscribe = onSnapshot(accountsQuery, (querySnapshot) => {
+		getPayments(paymentsQuery, currentPage, pageSize);
+		const unsubscribe = onSnapshot(paymentsQuery, (querySnapshot) => {
 			totalRecords = querySnapshot.docs.length;
 			totalPages = Math.ceil(totalRecords / pageSize);
 		});
@@ -94,24 +57,24 @@
 </script>
 
 <svelte:head>
-	<title>Payment - Southview Homes 3 Admin Panel</title>
+	<title>Payment History - Southview Homes 3 Admin Panel</title>
 </svelte:head>
 
 <div class="min-w-full min-h-full bg-base-200 px-12">
 	<div class="flex justify-between py-10">
-		<h1 class="text-3xl font-semibold">Payment</h1>
-		<a href="/admin/payment/history" class="btn btn-primary">View History</a>
+		<h1 class="text-3xl font-semibold">Payment History</h1>
+		<a href="/admin/payment/" class="btn btn-primary">Go to Payments</a>
 	</div>
 	<div class="flex flex-col md:flex-row justify-between">
 		<div class="flex flex-col md:flex-row">
 			<form on:submit|preventDefault={searchAccounts} class="my-4">
 				<select bind:value={searchByField} class="select select-bordered" required>
 					<option value="" disabled selected>Search Filter</option>
-					<option value="firstname">Name</option>
+					<option value="firstName">Name</option>
 					<!-- <option value="addressBlock">Block</option>
 					<option value="addressLot">Lot</option>
 					<option value="addressStreet">Street</option> -->
-					<option value="email">Email</option>
+					<!-- <option value="email">Email</option> -->
 				</select>
 				<input
 					type="search"
@@ -125,14 +88,11 @@
 
 		<select bind:value={sortByField} on:change={changeSortBy} class="select select-bordered my-4">
 			<option value="" disabled selected>Sort By</option>
-			<option value="firstname">Name</option>
-			<option value="addressBlock">Block</option>
-			<option value="addressLot">Lot</option>
-			<option value="addressStreet">Street</option>
-			<option value="email">Email</option>
+			<option value="firstName">Name</option>
+			<option value="paymentDate">Payment Date</option>
 		</select>
 
-		<button class="btn btn-primary my-4">Reset Payment Status</button>
+		<button class="btn btn-primary my-4">Generate Report</button>
 	</div>
 
 	<style>
@@ -153,47 +113,21 @@
 					<tr>
 						<th />
 						<th class="text-lg">Name</th>
-						<th class="text-lg">Address</th>
-						<th class="text-lg">Email</th>
-						<th class="text-lg">Contact No.</th>
-						<th class="text-lg">Payment Status</th>
-						<th />
-						<th />
+						<th class="text-lg">Payment Amount</th>
+						<th class="text-lg">Payment Date</th>
 					</tr>
 				</thead>
 				<tbody>
-					{#each listOfUsers as user}
+					{#each listOfPayments as payment}
 						<tr class="hover">
 							<td class="count" />
-							<td>{user.firstNameDisplay + ' ' + user.lastNameDisplay}</td>
-							<td
-								>{'Block ' +
-									user.addressBlock +
-									' Lot ' +
-									user.addressLot +
-									' ' +
-									user.addressStreet +
-									' Street'}</td
-							>
-							<td>{user.email}</td>
-							<td>{user.contactNumber}</td>
-							<td>{user.paymentStatus}</td>
-							<td />
-							<td
-								>
-								{#if user.paymentStatus == 'Unpaid'}
-									<button on:click={sendPaymentEmail(user.email, user.id)}
-										type="button"
-										class="btn btn-primary">Send Payment</button
-									>
-								{:else}
-									<button
-										type="button"
-										class="btn btn-primary" disabled>Send Payment</button
-									>
-								{/if}
-								</td
-							>
+							<td>{payment.firstNameDisplay + ' ' + payment.lastNameDisplay}</td>
+							<td>{payment.paymentAmount}</td>
+							<td>{payment.paymentDate.toDate().toLocaleDateString('en-us', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric'
+                            })}</td>
 						</tr>
 					{/each}
 				</tbody>
@@ -259,7 +193,7 @@
 
 	<!-- Small screen -->
 	<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">
-		{#each listOfUsers as user}
+		{#each listOfPayments as user}
 			<div class="card w-[105%] bg-base-100 shadow-xl">
 				<div class="card-body">
 					<h2 class="card-title mb-2">{user.firstNameDisplay + ' ' + user.lastNameDisplay}</h2>
