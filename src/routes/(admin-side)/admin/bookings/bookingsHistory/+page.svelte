@@ -9,31 +9,60 @@
 	let sortByStatus = '';
 	let searchByField = '';
 	let searchByValue = '';
-	let bookingsQuery = query(collection(db, 'booking'), orderBy('dateReviewed', 'asc'));
+	let bookingsQuery = query(
+		collection(db, 'booking'),
+		where('status', '!=', 'Pending'),
+		orderBy('status', 'desc'),
+		orderBy('dateReviewed', 'desc')
+	);
 
-	async function getBookings(bookingsQuery) {
+	let currentPage = 1;
+	let pageSize = 10;
+	let totalRecords = 1;
+	let totalPages = 0;
+
+	async function getBookings(bookingsQuery, page, pageSize) {
+		const startIndex = (page - 1) * pageSize;
+		const endIndex = startIndex + pageSize;
 		const unsubscribe = onSnapshot(bookingsQuery, (querySnapshot) => {
-			listOfBooking = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+			listOfBooking = querySnapshot.docs
+				.map((doc) => ({ id: doc.id, ...doc.data() }))
+				.slice(startIndex, endIndex);
 		});
 		onDestroy(() => unsubscribe());
 	}
 
 	async function changeSortBy() {
-		bookingsQuery = query(
-			collection(db, 'booking'),
-			orderBy(sortByField, 'asc'),
-			orderBy('dateReviewed', 'asc')
-		);
+		if (sortByField == 'bookDate') {
+			bookingsQuery = query(
+				collection(db, 'booking'),
+				where('status', '!=', 'Pending'),
+				orderBy('status', 'asc'),
+				orderBy(sortByField, 'desc')
+			);
+		} else {
+			bookingsQuery = query(
+				collection(db, 'booking'),
+				where('status', '!=', 'Pending'),
+				orderBy('status', 'asc'),
+				orderBy(sortByField, 'asc')
+			);
+		}
 	}
 
 	async function changeSortByStatus() {
 		if (sortByStatus == '') {
-			bookingsQuery = query(collection(db, 'booking'), orderBy('dateReviewed', 'asc'));
+			bookingsQuery = query(
+				collection(db, 'booking'),
+				where('status', '!=', 'Pending'),
+				orderBy('status', 'desc'),
+				orderBy('dateReviewed', 'desc')
+			);
 		} else {
 			bookingsQuery = query(
 				collection(db, 'booking'),
 				where('status', '==', sortByStatus),
-				orderBy('dateReviewed', 'asc')
+				orderBy('dateReviewed', 'desc')
 			);
 		}
 	}
@@ -48,7 +77,12 @@
 	}
 
 	async function resetButton() {
-		bookingsQuery = query(collection(db, 'booking'), orderBy('dateReviewed', 'asc'));
+		bookingsQuery = query(
+			collection(db, 'booking'),
+			where('status', '!=', 'Pending'),
+			orderBy('status', 'desc'),
+			orderBy('dateReviewed', 'desc')
+		);
 		searchByValue = '';
 	}
 
@@ -57,26 +91,42 @@
 		const reportSnap = await getDocs(reportQuery);
 
 		const report = new jsPDF();
-	
+
 		let text = '';
-		
-		reportSnap.forEach(booking => {
+
+		reportSnap.forEach((booking) => {
 			text += `Name: ${booking.data().firstNameDisplay} ${booking.data().lastNameDisplay}\n`;
 			text += `E-mail Address: ${booking.data().email}\n`;
 			text += `Contact No.: ${booking.data().contactNumber}\n`;
 			text += `Event Type: ${booking.data().eventTypeDisplay}\n`;
-			text += `Date Reserved: ${booking.data().dateReserved.toDate().toLocaleDateString()} ${booking.data().dateReserved.toDate().toLocaleTimeString()}\n`;
+			text += `Date Reserved: ${booking.data().dateReserved.toDate().toLocaleDateString()} ${booking
+				.data()
+				.dateReserved.toDate()
+				.toLocaleTimeString()}\n`;
 			text += `Booking Status: ${booking.data().status}\n`;
-			text += `Date Reviewed: ${booking.data().dateReviewed.toDate().toLocaleDateString()} ${booking.data().dateReviewed.toDate().toLocaleTimeString()}\n`;
+			text += `Date Reviewed: ${booking.data().dateReviewed.toDate().toLocaleDateString()} ${booking
+				.data()
+				.dateReviewed.toDate()
+				.toLocaleTimeString()}\n`;
 			text += `Payment Status: ${booking.data().paymentStatus}\n\n`;
 		});
-		
+
 		report.text('Southview Homes 3 Booking History Report', 10, 18);
 		report.text(text, 10, 34);
 		report.save('Southview-Homes-3-Booking-Report.pdf');
 	}
 
-	$: getBookings(bookingsQuery);
+	$: {
+		getBookings(bookingsQuery, currentPage, pageSize);
+		const unsubscribe = onSnapshot(bookingsQuery, (querySnapshot) => {
+			totalRecords = querySnapshot.docs.length;
+			totalPages = Math.ceil(totalRecords / pageSize);
+		});
+		onDestroy(() => unsubscribe());
+	}
+	function goToPage(page) {
+		currentPage = page;
+	}
 </script>
 
 <svelte:head>
@@ -115,7 +165,11 @@
 			<option value="eventType">Type of Event</option>
 			<option value="bookDate">Date and Time</option>
 		</select>
-		<select bind:value={sortByStatus} on:change={changeSortByStatus} class="select select-bordered my-4">
+		<select
+			bind:value={sortByStatus}
+			on:change={changeSortByStatus}
+			class="select select-bordered my-4"
+		>
 			<option value="" selected>Status Filter</option>
 			<option value="Approved">Approved</option>
 			<option value="Disapproved">Disapproved</option>
@@ -124,7 +178,6 @@
 			<button class="btn btn-primary" on:click={generateReport}>Generate Report</button>
 		</div>
 	</div>
-
 
 	<style>
 		table {
@@ -154,59 +207,52 @@
 				</thead>
 				<tbody>
 					{#each listOfBooking as book}
-						{#if book.status != 'Pending'}
-							<tr class="hover">
-								<td class="count" />
-								<td>{book.firstNameDisplay + ' ' + book.lastNameDisplay}</td>
-								<td>{book.email}</td>
-								<td>{book.contactNumber}</td>
-								<td>{book.eventTypeDisplay}</td>
-								<td
-									>{book.bookDate.toDate().toLocaleDateString('en-us', {
-										year: 'numeric',
-										month: 'long',
-										day: 'numeric'
-									}) +
-										' at ' +
-										book.bookDate
-											.toDate()
-											.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}</td
-								>
-								<td>
-									{#if book.status == 'Approved'}
-										<td class="p-3 text-sm whitespace-nowrap text-green-500 font-bold"
-											>{book.status}</td
-										>
-									{:else if book.status == 'Disapproved'}
-										<td class="p-3 text-sm whitespace-nowrap text-red-500 font-bold"
-											>{book.status}</td
-										>
-									{:else if book.status == 'Pending'}
-										<td class="p-3 text-sm whitespace-nowrap">{book.status}</td>
-									{/if}
-								</td>
-								<td
-									>{book.dateReviewed.toDate().toLocaleDateString('en-us', {
-										year: 'numeric',
-										month: 'long',
-										day: 'numeric'
-									}) +
-										' at ' +
-										book.dateReviewed
-											.toDate()
-											.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}</td
-								>
-							</tr>
-						{/if}
+						<!-- {#if book.status != 'Pending'} -->
+						<tr class="hover">
+							<td class="count" />
+							<td>{book.firstNameDisplay + ' ' + book.lastNameDisplay}</td>
+							<td>{book.email}</td>
+							<td>{book.contactNumber}</td>
+							<td>{book.eventTypeDisplay}</td>
+							<td
+								>{book.bookDate.toDate().toLocaleDateString('en-us', {
+									year: 'numeric',
+									month: 'long',
+									day: 'numeric'
+								}) +
+									' at ' +
+									book.bookDate
+										.toDate()
+										.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}</td
+							>
+							<td>
+								{#if book.status == 'Approved'}
+									<td class="p-3 text-sm whitespace-nowrap text-green-500 font-bold"
+										>{book.status}</td
+									>
+								{:else if book.status == 'Disapproved'}
+									<td class="p-3 text-sm whitespace-nowrap text-red-500 font-bold">{book.status}</td
+									>
+								{:else if book.status == 'Pending'}
+									<td class="p-3 text-sm whitespace-nowrap">{book.status}</td>
+								{/if}
+							</td>
+							<td
+								>{book.dateReviewed.toDate().toLocaleDateString('en-us', {
+									year: 'numeric',
+									month: 'long',
+									day: 'numeric'
+								}) +
+									' at ' +
+									book.dateReviewed
+										.toDate()
+										.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}</td
+							>
+						</tr>
+						<!-- {/if} -->
 					{/each}
 				</tbody>
 			</table>
-		</div>
-	</div>
-	<div class="flex mx-auto items-center justify-center my-8">
-		<div class="grid grid-cols-2">
-			<button class="btn btn-primary mx-1">Previous</button>
-			<button class="btn btn-primary mx-1">Next</button>
 		</div>
 	</div>
 
@@ -214,53 +260,110 @@
 
 	<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">
 		{#each listOfBooking as book}
-			{#if book.status == 'Approved' || book.status == 'Disapproved'}
-				<div class="card w-[105%] bg-base-100 shadow-xl">
-					<div class="card-body">
-						<h2 class="card-title mb-2">{book.firstNameDisplay + ' ' + book.lastNameDisplay}</h2>
-						<div>
-							<span class="my-1 font-bold">E-mail Address:</span>
-							{book.email}
-						</div>
-						<div>
-							<span class="my-1 font-bold">Contact No:</span>
-							{book.contactNumber}
-						</div>
-						<div>
-							<span class="my-1 font-bold">Type of Event:</span>
-							{book.eventTypeDisplay}
-						</div>
-						<div>
-							<span class="my-1 font-bold">Date and Time:</span>
-							{book.bookDate
+			<!-- {#if book.status == 'Approved' || book.status == 'Disapproved'} -->
+			<div class="card w-[105%] bg-base-100 shadow-xl">
+				<div class="card-body">
+					<h2 class="card-title mb-2">{book.firstNameDisplay + ' ' + book.lastNameDisplay}</h2>
+					<div>
+						<span class="my-1 font-bold">E-mail Address:</span>
+						{book.email}
+					</div>
+					<div>
+						<span class="my-1 font-bold">Contact No:</span>
+						{book.contactNumber}
+					</div>
+					<div>
+						<span class="my-1 font-bold">Type of Event:</span>
+						{book.eventTypeDisplay}
+					</div>
+					<div>
+						<span class="my-1 font-bold">Date and Time:</span>
+						{book.bookDate
+							.toDate()
+							.toLocaleDateString('en-us', { year: 'numeric', month: 'long', day: 'numeric' }) +
+							' at ' +
+							book.bookDate
 								.toDate()
-								.toLocaleDateString('en-us', { year: 'numeric', month: 'long', day: 'numeric' }) +
-								' at ' +
-								book.bookDate
-									.toDate()
-									.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}
-						</div>
-						<div class="font-bold">
-							Status:
-							{#if book.status == 'Approved'}
-								<span class="text-green-500">{book.status}</span>
-							{:else if book.status == 'Disapproved'}
-								<span class="text-red-500">{book.status}</span>
-							{/if}
-						</div>
-						<div>
-							<span class="my-1 font-bold">Date Reviewed:</span>
-							{book.dateReviewed
+								.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}
+					</div>
+					<div class="font-bold">
+						Status:
+						{#if book.status == 'Approved'}
+							<span class="text-green-500">{book.status}</span>
+						{:else if book.status == 'Disapproved'}
+							<span class="text-red-500">{book.status}</span>
+						{/if}
+					</div>
+					<div>
+						<span class="my-1 font-bold">Date Reviewed:</span>
+						{book.dateReviewed
+							.toDate()
+							.toLocaleDateString('en-us', { year: 'numeric', month: 'long', day: 'numeric' }) +
+							' at ' +
+							book.dateReviewed
 								.toDate()
-								.toLocaleDateString('en-us', { year: 'numeric', month: 'long', day: 'numeric' }) +
-								' at ' +
-								book.dateReviewed
-									.toDate()
-									.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}
-						</div>
+								.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}
 					</div>
 				</div>
-			{/if}
+			</div>
+			<!-- {/if} -->
 		{/each}
 	</div>
 </div>
+<!-- pagination button -->
+<div class="flex justify-center items-center mt-5">
+	<nav class="block">
+		<ul class="flex pl-0 rounded list-none flex-wrap">
+			{#if currentPage > 1}
+				<li>
+					<button
+						class="relative block py-2 px-3 leading-tight bg-white border border-gray-300 text-blue-700 hover:bg-gray-200 focus:bg-gray-200"
+						on:click={() => goToPage(currentPage - 1)}
+					>
+						Previous
+					</button>
+				</li>
+			{/if}
+
+			{#each Array.from({ length: totalPages }, (_, i) => i + 1) as page}
+				{#if page === currentPage}
+					<li>
+						<button
+							class="relative block py-2 px-3 leading-tight bg-blue-700 text-white hover:bg-blue-500 focus:bg-blue-500"
+							>{page}</button
+						>
+					</li>
+				{:else if (page >= currentPage - 2 && page <= currentPage + 2) || page === totalPages || page === 1}
+					<li>
+						<button
+							class="relative block py-2 px-3 leading-tight bg-white border border-gray-300 text-blue-700 hover:bg-gray-200 focus:bg-gray-200"
+							on:click={() => goToPage(page)}
+						>
+							{page}
+						</button>
+					</li>
+				{:else if page === currentPage - 3 || page === currentPage + 3}
+					<li>
+						<span
+							class="relative block py-2 px-3 leading-tight bg-white border border-gray-300 text-blue-700"
+							>...</span
+						>
+					</li>
+				{/if}
+			{/each}
+
+			{#if currentPage < totalPages}
+				<li>
+					<button
+						class="relative block py-2 px-3 leading-tight bg-white border border-gray-300 text-blue-700 hover:bg-gray-200 focus:bg-gray-200"
+						on:click={() => goToPage(currentPage + 1)}
+					>
+						Next
+					</button>
+				</li>
+			{/if}
+		</ul>
+	</nav>
+</div>
+
+<!-- mema comment -->
