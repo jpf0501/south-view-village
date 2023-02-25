@@ -18,15 +18,6 @@ export async function POST({request}) {
         await updateDoc(doc(db, 'booking', bookID), {paymentStatus: 'Paid'})
     } else {
         await updateDoc(doc(db, 'accounts', bookID), {paymentStatus: 'Paid'})
-        const userData = await getDoc(doc(db, 'accounts', bookID))
-        if (userData.exists()) {
-            await addDoc(collection(db, 'payments'), {
-                firstName: userData.firstname,
-                firstNameDisplay: userData.firstNameDisplay,
-                lastName: userData.lastname,
-                lastNameDisplay: userData.lastNameDisplay
-            })
-        }
     }
     return new Response();
 };
