@@ -58,7 +58,7 @@
 	}
 
 	async function sendPaymentEmail(paymentEmail, paymentID) {
-		// console.log(paymentID)
+		console.log(paymentID)
 		try {
 			const paymentLinkData = await createPaymentLink('Southview Homes 3 Monthly Dues', 50000, paymentID)
 			const checkoutURL = paymentLinkData.data.attributes.checkout_url

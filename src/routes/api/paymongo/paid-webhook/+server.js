@@ -9,9 +9,14 @@ export async function GET() {
 /** @type {import('./$types').RequestHandler} */
 export async function POST({request}) {
     const body = await request.json()
-    console.log(body)
+    // console.log(body)
     await addDoc(collection(db, 'paymongo'), body)
+    const paymentDesc = body.data.attributes.data.attributes.description
     const bookID = body.data.attributes.data.attributes.remarks
-    await updateDoc(doc(db, 'booking', bookID), {paymentStatus: 'Paid'})
+    if (paymentDesc == 'Clubhouse Reservation Downpayment') {
+        await updateDoc(doc(db, 'booking', bookID), {paymentStatus: 'Paid'})
+    } else {
+        await updateDoc(doc(db, 'accounts', bookID), {paymentStatus: 'Paid'})
+    }
     return new Response();
 };
