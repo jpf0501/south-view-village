@@ -5,6 +5,7 @@
 
 	let countOfPendingBooks = '';
 	let countOfAccounts = '';
+	let dueCount = ''
 	let listOfEvents = [];
 	let dateToday = new Date().toLocaleDateString("fr-CA", {year:"numeric", month: "2-digit", day:"2-digit"});
 	let eventQuery = query(collection(db, 'event'), limit(3), where('date', '>=', dateToday), orderBy('date', 'asc'))
@@ -20,10 +21,16 @@
 				collectionOfPendingBooksQuery
 			);
 			countOfPendingBooks = snapshotOfCountOfPendingBookings.data().count;
+
 			// Get count of number of accounts
 			const collectionOfAccountsQuery = collection(db, 'accounts');
 			const snapshotOfCountOfAccounts = await getCountFromServer(collectionOfAccountsQuery);
 			countOfAccounts = snapshotOfCountOfAccounts.data().count;
+
+			// Get pending payment count
+			const dueQuery = query(collection(db, 'accounts'), where('paymentStatus', '==', 'Unpaid'))
+			const dueSnapshot = await getCountFromServer(dueQuery)
+			dueCount = dueSnapshot.data().count
 		} catch (error) {
 			console.log(error);
 			alert('Error in counting');
@@ -52,7 +59,7 @@
 			<div
 				class="w-60 h-40 flex flex-col justify-center items-center overflow-hidden shadow-lg border rounded-xl bg-base-100"
 			>
-				<p class="text-3xl font-semibold">43</p>
+				<p class="text-3xl font-semibold">{dueCount}</p>
 				<p class="text-md mt-2">Pending Dues</p>
 			</div>
 			<div

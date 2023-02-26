@@ -71,10 +71,7 @@
 				<select bind:value={searchByField} class="select select-bordered" required>
 					<option value="" disabled selected>Search Filter</option>
 					<option value="firstName">Name</option>
-					<!-- <option value="addressBlock">Block</option>
-					<option value="addressLot">Lot</option>
-					<option value="addressStreet">Street</option> -->
-					<!-- <option value="email">Email</option> -->
+					<option value="email">Email</option>
 				</select>
 				<input
 					type="search"
@@ -89,7 +86,7 @@
 		<select bind:value={sortByField} on:change={changeSortBy} class="select select-bordered my-4">
 			<option value="" disabled selected>Sort By</option>
 			<option value="firstName">Name</option>
-			<option value="paymentDate">Payment Date</option>
+			<option value="paymentTime">Payment Date</option>
 		</select>
 
 		<button class="btn btn-primary my-4">Generate Report</button>
@@ -113,7 +110,9 @@
 					<tr>
 						<th />
 						<th class="text-lg">Name</th>
-						<th class="text-lg">Payment Amount</th>
+						<th class="text-lg">Address</th>
+						<th class="text-lg">Email</th>
+						<th class="text-lg">Contact No.</th>
 						<th class="text-lg">Payment Date</th>
 					</tr>
 				</thead>
@@ -121,9 +120,11 @@
 					{#each listOfPayments as payment}
 						<tr class="hover">
 							<td class="count" />
-							<td>{payment.firstNameDisplay + ' ' + payment.lastNameDisplay}</td>
-							<td>{payment.paymentAmount}</td>
-							<td>{payment.paymentDate.toDate().toLocaleDateString('en-us', {
+							<td>{payment.firstNameDisplay} {payment.lastNameDisplay}</td>
+							<td>Block {payment.addressBlock} Lot {payment.addressLot} {payment.addressStreet} Street</td>
+							<td>{payment.email}</td>
+							<td>{payment.contact}</td>
+							<td>{payment.paymentTime.toDate().toLocaleDateString('en-us', {
                                 year: 'numeric',
                                 month: 'long',
                                 day: 'numeric'
