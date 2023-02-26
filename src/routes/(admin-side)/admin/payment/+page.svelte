@@ -1,5 +1,5 @@
 <script>
-	import { onSnapshot, query, collection, orderBy, where } from 'firebase/firestore';
+	import { onSnapshot, query, collection, orderBy, where, updateDoc, doc, getDocs } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
 	import { createPaymentLink, sendEmail } from '$lib/utils'
@@ -81,6 +81,19 @@
 		searchByValue = '';
 	}
 
+	async function resetStatus() {
+		let text = "Would you like to reset payment status?"
+		if (confirm(text) == true) {
+    		const accountQuery = query(collection(db, 'accounts'));
+			const snapshot = await getDocs(accountQuery);
+			for (let i = 0; i < snapshot.docs.length; i++) {
+  				const docRef = doc(db, 'accounts', snapshot.docs[i].id);
+  				await updateDoc(docRef, { paymentStatus: 'Unpaid' });
+			}
+			alert('Payment status reset')
+  		}
+	}
+
 	$: {
 		getAccounts(accountsQuery, currentPage, pageSize);
 		const unsubscribe = onSnapshot(accountsQuery, (querySnapshot) => {
@@ -133,7 +146,7 @@
 			<option value="email">Email</option>
 		</select>
 
-		<button class="btn btn-primary my-4">Reset Payment Status</button>
+		<button class="btn btn-primary my-4" on:click={resetStatus}>Reset Payment Status</button>
 	</div>
 
 	<style>
