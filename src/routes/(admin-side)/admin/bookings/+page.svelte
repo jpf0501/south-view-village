@@ -7,7 +7,8 @@
 		doc,
 		where,
 		orderBy,
-		serverTimestamp
+		serverTimestamp,
+		getCountFromServer
 	} from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
@@ -24,6 +25,8 @@
 		where('status', '==', 'Pending'),
 		orderBy('dateReserved', 'desc')
 	);
+	let countofSearchResult = '';
+	let noResult = false;
 
 	let currentPage = 1;
 	let pageSize = 10;
@@ -62,8 +65,13 @@
 		bookingsQuery = query(
 			collection(db, 'booking'),
 			where(searchByField, '>=', searchByValueCase),
-			where(searchByField, '<=', searchByValueCase + '~', where('status', '==', 'Pending'))
+			where(searchByField, '<=', searchByValueCase + '~'),
+			where('status', '==', 'Pending')
 		);
+
+		const snapshotOfCountOfPendingBookings = await getCountFromServer(bookingsQuery);
+		countofSearchResult = snapshotOfCountOfPendingBookings.data().count;
+		countofSearchResult === 0 ? (noResult = true) : (noResult = false);
 	}
 
 	async function changeStatus(bookingId) {
@@ -182,7 +190,9 @@
 	</style>
 
 	<!-- Medium to large screen -->
-	<div class="w-full mx-auto shadow-2xl border rounded-xl bg-base-100 my-5 hidden md:block">
+	<div
+		class="w-full mx-auto shadow-2xl border rounded-xl bg-base-100 my-5 hidden md:block"
+	>
 		<div class="overflow-x-auto">
 			<table class="table w-full ">
 				<thead>
@@ -198,6 +208,11 @@
 						<th colspan="2" />
 					</tr>
 				</thead>
+				{#if noResult}
+					<tr>
+						<td class="" colspan="8">No result found</td>
+					</tr>
+				{/if}
 				<tbody>
 					{#each listOfBooking as book}
 						<!-- {#if book.status == 'Pending'} -->
@@ -299,6 +314,9 @@
 
 	<!-- Small screen -->
 	<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">
+		{#if noResult}
+			<div class="w-full mx-auto" colspan="8">No result found</div>
+		{/if}
 		{#each listOfBooking as book}
 			<!-- {#if book.status == 'Pending'} -->
 			<div class="card w-[105%] bg-base-100 shadow-xl">

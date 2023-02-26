@@ -1,5 +1,13 @@
 <script>
-	import { onSnapshot, query, collection, orderBy, where, getDocs } from 'firebase/firestore';
+	import {
+		onSnapshot,
+		query,
+		collection,
+		orderBy,
+		where,
+		getDocs,
+		getCountFromServer
+	} from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
 	import { jsPDF } from 'jspdf';
@@ -11,10 +19,11 @@
 	let searchByValue = '';
 	let bookingsQuery = query(
 		collection(db, 'booking'),
-		where('status', '!=', 'Pending'),
-		orderBy('status', 'desc'),
+		where('status', 'in', ['Approved', 'Disapproved']),
 		orderBy('dateReviewed', 'desc')
 	);
+	let countofSearchResult = '';
+	let noResult = false;
 
 	let currentPage = 1;
 	let pageSize = 10;
@@ -36,15 +45,13 @@
 		if (sortByField == 'bookDate') {
 			bookingsQuery = query(
 				collection(db, 'booking'),
-				where('status', '!=', 'Pending'),
-				orderBy('status', 'asc'),
+				where('status', 'in', ['Approved', 'Disapproved']),
 				orderBy(sortByField, 'desc')
 			);
 		} else {
 			bookingsQuery = query(
 				collection(db, 'booking'),
-				where('status', '!=', 'Pending'),
-				orderBy('status', 'asc'),
+				where('status', 'in', ['Approved', 'Disapproved']),
 				orderBy(sortByField, 'asc')
 			);
 		}
@@ -54,8 +61,7 @@
 		if (sortByStatus == '') {
 			bookingsQuery = query(
 				collection(db, 'booking'),
-				where('status', '!=', 'Pending'),
-				orderBy('status', 'desc'),
+				where('status', 'in', ['Approved', 'Disapproved']),
 				orderBy('dateReviewed', 'desc')
 			);
 		} else {
@@ -72,15 +78,18 @@
 		bookingsQuery = query(
 			collection(db, 'booking'),
 			where(searchByField, '>=', searchByValueCase),
-			where(searchByField, '<=', searchByValueCase + '~')
+			where(searchByField, '<=', searchByValueCase + '~'),
+			where('status', 'in', ['Approved', 'Disapproved'])
 		);
+		const snapshotOfCountOfBookingHistory = await getCountFromServer(bookingsQuery);
+		countofSearchResult = snapshotOfCountOfBookingHistory.data().count;
+		countofSearchResult === 0 ? (noResult = true) : (noResult = false);
 	}
 
 	async function resetButton() {
 		bookingsQuery = query(
 			collection(db, 'booking'),
-			where('status', '!=', 'Pending'),
-			orderBy('status', 'desc'),
+			where('status', 'in', ['Approved', 'Disapproved']),
 			orderBy('dateReviewed', 'desc')
 		);
 		searchByValue = '';
@@ -205,6 +214,11 @@
 						<th class="text-lg">Date Reviewed</th>
 					</tr>
 				</thead>
+				{#if noResult}
+					<tr>
+						<td class="" colspan="8">No result found</td>
+					</tr>
+				{/if}
 				<tbody>
 					{#each listOfBooking as book}
 						<!-- {#if book.status != 'Pending'} -->
@@ -259,6 +273,9 @@
 	<!-- Small screen -->
 
 	<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">
+		{#if noResult}
+			<div class="w-full mx-auto" colspan="8">No result found</div>
+		{/if}
 		{#each listOfBooking as book}
 			<!-- {#if book.status == 'Approved' || book.status == 'Disapproved'} -->
 			<div class="card w-[105%] bg-base-100 shadow-xl">
