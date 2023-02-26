@@ -7,7 +7,8 @@
 		doc,
 		where,
 		orderBy,
-		serverTimestamp
+		serverTimestamp,
+		getCountFromServer
 	} from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
@@ -22,8 +23,10 @@
 	let bookingsQuery = query(
 		collection(db, 'booking'),
 		where('status', '==', 'Pending'),
-		orderBy('dateReserved', 'desc')
+		orderBy('dateReserved', 'asc')
 	);
+	let countofSearchResult = '';
+	let noResult = false;
 
 	let currentPage = 1;
 	let pageSize = 10;
@@ -46,13 +49,15 @@
 			bookingsQuery = query(
 				collection(db, 'booking'),
 				where('status', '==', 'Pending'),
-				orderBy(sortByField, 'desc')
+				orderBy(sortByField, 'desc'),
+				orderBy('dateReserved', 'asc')
 			);
 		} else {
 			bookingsQuery = query(
 				collection(db, 'booking'),
 				where('status', '==', 'Pending'),
-				orderBy(sortByField, 'asc')
+				orderBy(sortByField, 'asc'),
+				orderBy('dateReserved', 'asc')
 			);
 		}
 	}
@@ -62,8 +67,15 @@
 		bookingsQuery = query(
 			collection(db, 'booking'),
 			where(searchByField, '>=', searchByValueCase),
-			where(searchByField, '<=', searchByValueCase + '~', where('status', '==', 'Pending'))
+			orderBy(searchByField, 'asc'),
+			where(searchByField, '<=', searchByValueCase + '~'),
+			where('status', '==', 'Pending'),
+			orderBy('dateReserved', 'asc')
 		);
+
+		const snapshotOfCountOfPendingBookings = await getCountFromServer(bookingsQuery);
+		countofSearchResult = snapshotOfCountOfPendingBookings.data().count;
+		countofSearchResult === 0 ? (noResult = true) : (noResult = false);
 	}
 
 	async function changeStatus(bookingId) {
@@ -116,7 +128,7 @@
 		bookingsQuery = query(
 			collection(db, 'booking'),
 			where('status', '==', 'Pending'),
-			orderBy('dateReserved', 'desc')
+			orderBy('dateReserved', 'asc')
 		);
 		searchByValue = '';
 	}
@@ -198,6 +210,11 @@
 						<th colspan="2" />
 					</tr>
 				</thead>
+				{#if noResult}
+					<tr>
+						<td class="" colspan="8">No result found</td>
+					</tr>
+				{/if}
 				<tbody>
 					{#each listOfBooking as book}
 						<!-- {#if book.status == 'Pending'} -->
@@ -299,6 +316,9 @@
 
 	<!-- Small screen -->
 	<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">
+		{#if noResult}
+			<div class="w-full mx-auto" colspan="8">No result found</div>
+		{/if}
 		{#each listOfBooking as book}
 			<!-- {#if book.status == 'Pending'} -->
 			<div class="card w-[105%] bg-base-100 shadow-xl">
