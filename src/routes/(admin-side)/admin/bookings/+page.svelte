@@ -212,7 +212,7 @@
 				</thead>
 				{#if noResult}
 					<tr>
-						<td class="" colspan="8">No result found</td>
+						<td class="py-24 text-center" colspan="8">No result found</td>
 					</tr>
 				{/if}
 				<tbody>

@@ -1,5 +1,5 @@
 <script>
-	import { onSnapshot, query, collection, orderBy, where } from 'firebase/firestore';
+	import { onSnapshot, query, collection, orderBy, where, updateDoc, doc, getDocs } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
 	import { createPaymentLink, sendEmail } from '$lib/utils'
@@ -21,6 +21,7 @@
 
 	const date = new Date()
 	const currentMonth = monthName[date.getMonth()];
+	const currentYear = date.getFullYear()
 
 	let listOfUsers = [];
 	let sortByField = '';
@@ -64,11 +65,11 @@
 			const checkoutURL = paymentLinkData.data.attributes.checkout_url
 			const result = await sendEmail({
 				to: paymentEmail,
-				subject: 'Southview Homes 3 Monthly Dues Payment Link',
-				html: `<h1>This is the link for payment for monthly dues of ${currentMonth}: <a href=${checkoutURL}>Click here</a></h1>`
+				subject: 'Southview Homes 3 Monthly Dues Payment Notice',
+				html: `<h1>This is the link for payment for monthly dues of ${currentMonth} ${currentYear}: <a href=${checkoutURL}>Click here</a></h1>`
 			});
 			console.log(JSON.stringify(result));
-			alert('Email for dues payment sent successfully');
+			alert('Payment method link sent successfully');
 		} catch (error) {
 			console.log(error);
 			alert('Error in sending payment method');
@@ -78,6 +79,19 @@
 	async function resetButton() {
 		accountsQuery = query(collection(db, 'accounts'));
 		searchByValue = '';
+	}
+
+	async function resetStatus() {
+		let text = "Would you like to reset payment status?"
+		if (confirm(text) == true) {
+    		const accountQuery = query(collection(db, 'accounts'));
+			const snapshot = await getDocs(accountQuery);
+			for (let i = 0; i < snapshot.docs.length; i++) {
+  				const docRef = doc(db, 'accounts', snapshot.docs[i].id);
+  				await updateDoc(docRef, { paymentStatus: 'Unpaid' });
+			}
+			alert('Payment status reset')
+  		}
 	}
 
 	$: {
@@ -132,7 +146,7 @@
 			<option value="email">Email</option>
 		</select>
 
-		<button class="btn btn-primary my-4">Reset Payment Status</button>
+		<button class="btn btn-primary my-4" on:click={resetStatus}>Reset Payment Status</button>
 	</div>
 
 	<style>
