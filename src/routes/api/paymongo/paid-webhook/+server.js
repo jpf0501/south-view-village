@@ -12,7 +12,7 @@ export async function POST({request}) {
     // console.log(body)
     await addDoc(collection(db, 'paymongo'), body)
     const paymentDesc = body.data.attributes.data.attributes.description
-    const paymentMethod = body.data.attributes.data.attributes.attributes.source.type
+    // const paymentMethod = body.data.attributes.data.attributes.attributes.source.type
     const bookID = body.data.attributes.data.attributes.remarks
     if (paymentDesc == 'Clubhouse Reservation Downpayment') {
         await updateDoc(doc(db, 'booking', bookID), {paymentStatus: 'Paid'})

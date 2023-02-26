@@ -46,13 +46,15 @@
 			bookingsQuery = query(
 				collection(db, 'booking'),
 				where('status', 'in', ['Approved', 'Disapproved']),
-				orderBy(sortByField, 'desc')
+				orderBy(sortByField, 'desc'),
+				orderBy('dateReviewed', 'desc')
 			);
 		} else {
 			bookingsQuery = query(
 				collection(db, 'booking'),
 				where('status', 'in', ['Approved', 'Disapproved']),
-				orderBy(sortByField, 'asc')
+				orderBy(sortByField, 'asc'),
+				orderBy('dateReviewed', 'desc')
 			);
 		}
 	}
@@ -79,7 +81,9 @@
 			collection(db, 'booking'),
 			where(searchByField, '>=', searchByValueCase),
 			where(searchByField, '<=', searchByValueCase + '~'),
-			where('status', 'in', ['Approved', 'Disapproved'])
+			orderBy(searchByField, 'asc'),
+			where('status', 'in', ['Approved', 'Disapproved']),
+			orderBy('dateReviewed', 'desc')
 		);
 		const snapshotOfCountOfBookingHistory = await getCountFromServer(bookingsQuery);
 		countofSearchResult = snapshotOfCountOfBookingHistory.data().count;
@@ -155,7 +159,7 @@
 					<option value="firstname">Name</option>
 					<option value="email">E-mail Address</option>
 					<option value="eventType">Type of Event</option>
-					<option value="bookDate">Date and Time</option>
+					<!-- <option value="bookDate">Date and Time</option> -->
 				</select>
 				<input
 					type="search"

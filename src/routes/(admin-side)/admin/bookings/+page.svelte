@@ -23,7 +23,7 @@
 	let bookingsQuery = query(
 		collection(db, 'booking'),
 		where('status', '==', 'Pending'),
-		orderBy('dateReserved', 'desc')
+		orderBy('dateReserved', 'asc')
 	);
 	let countofSearchResult = '';
 	let noResult = false;
@@ -49,13 +49,15 @@
 			bookingsQuery = query(
 				collection(db, 'booking'),
 				where('status', '==', 'Pending'),
-				orderBy(sortByField, 'desc')
+				orderBy(sortByField, 'desc'),
+				orderBy('dateReserved', 'asc')
 			);
 		} else {
 			bookingsQuery = query(
 				collection(db, 'booking'),
 				where('status', '==', 'Pending'),
-				orderBy(sortByField, 'asc')
+				orderBy(sortByField, 'asc'),
+				orderBy('dateReserved', 'asc')
 			);
 		}
 	}
@@ -65,8 +67,10 @@
 		bookingsQuery = query(
 			collection(db, 'booking'),
 			where(searchByField, '>=', searchByValueCase),
+			orderBy(searchByField, 'asc'),
 			where(searchByField, '<=', searchByValueCase + '~'),
-			where('status', '==', 'Pending')
+			where('status', '==', 'Pending'),
+			orderBy('dateReserved', 'asc')
 		);
 
 		const snapshotOfCountOfPendingBookings = await getCountFromServer(bookingsQuery);
@@ -124,7 +128,7 @@
 		bookingsQuery = query(
 			collection(db, 'booking'),
 			where('status', '==', 'Pending'),
-			orderBy('dateReserved', 'desc')
+			orderBy('dateReserved', 'asc')
 		);
 		searchByValue = '';
 	}
@@ -190,9 +194,7 @@
 	</style>
 
 	<!-- Medium to large screen -->
-	<div
-		class="w-full mx-auto shadow-2xl border rounded-xl bg-base-100 my-5 hidden md:block"
-	>
+	<div class="w-full mx-auto shadow-2xl border rounded-xl bg-base-100 my-5 hidden md:block">
 		<div class="overflow-x-auto">
 			<table class="table w-full ">
 				<thead>
