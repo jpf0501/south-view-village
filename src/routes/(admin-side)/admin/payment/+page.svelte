@@ -21,6 +21,7 @@
 
 	const date = new Date()
 	const currentMonth = monthName[date.getMonth()];
+	const currentYear = date.getFullYear()
 
 	let listOfUsers = [];
 	let sortByField = '';
@@ -64,11 +65,11 @@
 			const checkoutURL = paymentLinkData.data.attributes.checkout_url
 			const result = await sendEmail({
 				to: paymentEmail,
-				subject: 'Southview Homes 3 Monthly Dues Payment Link',
-				html: `<h1>This is the link for payment for monthly dues of ${currentMonth}: <a href=${checkoutURL}>Click here</a></h1>`
+				subject: 'Southview Homes 3 Monthly Dues Payment Notice',
+				html: `<h1>This is the link for payment for monthly dues of ${currentMonth} ${currentYear}: <a href=${checkoutURL}>Click here</a></h1>`
 			});
 			console.log(JSON.stringify(result));
-			alert('Email for dues payment sent successfully');
+			alert('Payment method link sent successfully');
 		} catch (error) {
 			console.log(error);
 			alert('Error in sending payment method');
