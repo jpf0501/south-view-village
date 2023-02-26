@@ -1,4 +1,4 @@
-import { addDoc, updateDoc, doc, collection } from 'firebase/firestore'
+import { addDoc, updateDoc, doc, collection, serverTimestamp } from 'firebase/firestore'
 import { db } from '$lib/firebase/client';
 
 /** @type {import('./$types').RequestHandler} */
