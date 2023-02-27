@@ -25,7 +25,6 @@
 	export function showModal() {
 		calendarDate.set(dateString)
 		open(Popup);
-		console.log(dateString)
 	}
 	
 	$: checkIfExistingEvent(dateString);
@@ -34,6 +33,7 @@
 <button
 	class="border border-collapse aspect-video"
 	on:click={showModal}
+	disabled={!isThereEvent}
 	class:bg-red-500={isThereEvent}
 >
 	{dayNumber}
