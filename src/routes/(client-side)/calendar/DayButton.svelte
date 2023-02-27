@@ -9,7 +9,7 @@
 	export let month;
 	export let year;
 
-	$: dateString = new Date(`${year}-${month}-${dayNumber}`).toLocaleDateString('en-CA');
+	$: dateString = new Date(`${year}-${month}-${dayNumber}`).toLocaleDateString('fr-CA');
 	
 	let isThereEvent = false;
 	const { open } = getContext('simple-modal');
