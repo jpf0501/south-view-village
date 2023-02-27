@@ -9,7 +9,7 @@
 	export let month;
 	export let year;
 
-	$: dateString = new Date(`${year}-${month}-${dayNumber}`).toLocaleDateString('en-CA');
+	$: dateString = new Date(`${year}-${month}-${dayNumber}`).toLocaleDateString('fr-CA');
 	
 	let isThereEvent = false;
 	const { open } = getContext('simple-modal');
@@ -25,6 +25,7 @@
 	export function showModal() {
 		calendarDate.set(dateString)
 		open(Popup);
+		console.log(dateString)
 	}
 	
 	$: checkIfExistingEvent(dateString);
@@ -33,7 +34,6 @@
 <button
 	class="border border-collapse aspect-video"
 	on:click={showModal}
-	disabled={!isThereEvent}
 	class:bg-red-500={isThereEvent}
 >
 	{dayNumber}
