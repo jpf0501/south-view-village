@@ -22,6 +22,7 @@
 
 	$: {
 		if ($userStore === null) {
+			show = !show;
 			goto('/');
 		} else if ($userStore) {
 			checkIfAdmin($userStore.uid);
