@@ -76,3 +76,22 @@
 		</div>
 	</div>
 </div>
+
+	<div class="p-5">
+		<div class="text-center">
+			<h1 class="text-2xl font-bold p-4">Have an inquiry?</h1>
+			<p class="text-md p-3">Leave us a message using the form below, or contact us directly at </p>
+			<a href="mailto:southviewhomes3mail@gmail.com"class="text-md p-3 text-blue-700 hover:underline">southviewhomes3mail@gmail.com</a>
+		</div>
+		<form on:submit|preventDefault={() => console.log('Submitted')}>
+			<div class="form-control w-full max-w-xl py-4 mx-auto">
+				<div class="flex flex-row py-5 gap-3">
+				   <input type="text" placeholder="Name" class="input input-bordered w-full max-w-xs" required />
+				   <input type="text" placeholder="E-mail Address" class="input input-bordered w-full max-w-xs" required />
+				</div>
+				<textarea class="textarea textarea-bordered h-32 w-auto" placeholder="Message" style="resize: none;" required></textarea>
+				<button type="submit" class="btn btn-primary my-6">Submit Message</button>
+		</div>
+		</form>
+	</div>
+
