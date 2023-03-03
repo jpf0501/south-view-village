@@ -62,7 +62,7 @@
 
 <div class="min-w-full min-h-full bg-base-200 px-5">
 	<h1 class="text-3xl font-semibold py-2">Accounts</h1>
-	<div class="flex flex-col md:flex-row justify-between">
+	<div class="flex flex-col md:flex-row justify-between items-center">
 		<div class="flex flex-col md:flex-row">
 			<form
 				on:submit|preventDefault={searchAccounts}
