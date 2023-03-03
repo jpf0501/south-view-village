@@ -60,12 +60,19 @@
 	<title>Accounts - Southview Homes 3 Admin Panel</title>
 </svelte:head>
 
-<div class="min-w-full min-h-full bg-base-200 px-12">
-	<h1 class="text-3xl font-semibold py-12">Accounts</h1>
+<div class="min-w-full min-h-full bg-base-200 px-5">
+	<h1 class="text-3xl font-semibold py-2">Accounts</h1>
 	<div class="flex flex-col md:flex-row justify-between">
 		<div class="flex flex-col md:flex-row">
-			<form on:submit|preventDefault={searchAccounts} class="my-4">
-				<select bind:value={searchByField} class="select select-bordered" required>
+			<form
+				on:submit|preventDefault={searchAccounts}
+				class="my-4 flex flex-col md:flex-row items-start"
+			>
+				<select
+					bind:value={searchByField}
+					class="select select-bordered mb-2 md:mb-0 md:mr-2"
+					required
+				>
 					<option value="" disabled selected>Search Filter</option>
 					<option value="firstname">Name</option>
 					<!-- <option value="addressBlock">Block</option>
@@ -76,10 +83,11 @@
 				<input
 					type="search"
 					placeholder="Search here"
-					class="input input-bordered mx-2"
+					class="input input-bordered"
 					bind:value={searchByValue}
 				/>
 			</form>
+
 			<button on:click={resetButton} class="btn btn-primary my-4">Reset</button>
 		</div>
 
