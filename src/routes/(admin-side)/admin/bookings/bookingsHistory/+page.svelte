@@ -57,6 +57,7 @@
 				orderBy('dateReviewed', 'desc')
 			);
 		}
+		noResult = false;
 	}
 
 	async function changeSortByStatus() {
@@ -73,6 +74,7 @@
 				orderBy('dateReviewed', 'desc')
 			);
 		}
+		noResult = false;
 	}
 
 	async function searchBookings() {
@@ -97,6 +99,7 @@
 			orderBy('dateReviewed', 'desc')
 		);
 		searchByValue = '';
+		noResult = false;
 	}
 
 	async function generateReport() {

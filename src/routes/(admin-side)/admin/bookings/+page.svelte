@@ -60,6 +60,7 @@
 				orderBy('dateReserved', 'asc')
 			);
 		}
+		noResult = false;
 	}
 
 	async function searchBookings() {
@@ -90,6 +91,7 @@
 		} catch (error) {
 			console.log(error);
 		}
+		noResult = false;
 	}
 	async function changePaymentStatus(bookingId) {
 		try {
@@ -131,6 +133,7 @@
 			orderBy('dateReserved', 'asc')
 		);
 		searchByValue = '';
+		noResult = false;
 	}
 	$: {
 		getBookings(bookingsQuery, currentPage, pageSize);
