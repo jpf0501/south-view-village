@@ -35,7 +35,7 @@
 <!-- community -->
 <div class="hero py-16">
 	<div class="hero-content flex-col lg:flex-row-reverse">
-		<img src="/images/house.jpg" class="w-full max-w-xl mask mask-circle" alt="housing"/>
+		<img src="/images/house.jpg" class="w-full max-w-md mask mask-circle" alt="housing"/>
 		<div class="p-8">
 			<h1 class="text-5xl font-bold pb-7 text-center lg:text-left">A Welcoming Community</h1>
 			<p class="py-6 text-justify">Located at the heart of San Pedro, Laguna, Southview Homes 3 not only offers a peaceful and an easily accessible neighborhood at an affordable price, but also an organized community filled with approachable and hardworking people that keep the residents of Southview Homes 3 tightly-knit together.</p>
