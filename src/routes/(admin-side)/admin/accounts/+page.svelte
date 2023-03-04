@@ -1,5 +1,12 @@
 <script>
-	import { onSnapshot, query, collection, orderBy, where } from 'firebase/firestore';
+	import {
+		onSnapshot,
+		query,
+		collection,
+		orderBy,
+		where,
+		getCountFromServer
+	} from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
 
@@ -8,6 +15,9 @@
 	let searchByField = '';
 	let searchByValue = '';
 	let accountsQuery = query(collection(db, 'accounts'));
+
+	let countofSearchResult = '';
+	let noResult = false;
 
 	let currentPage = 1;
 	let pageSize = 10;
@@ -27,6 +37,7 @@
 
 	async function changeSortBy() {
 		accountsQuery = query(collection(db, 'accounts'), orderBy(sortByField, 'asc'));
+		noResult = false;
 	}
 
 	async function searchAccounts() {
@@ -36,11 +47,16 @@
 			where(searchByField, '>=', searchByValueCase),
 			where(searchByField, '<=', searchByValueCase + '~')
 		);
+
+		const snapshotOfCountOfPendingBookings = await getCountFromServer(accountsQuery);
+		countofSearchResult = snapshotOfCountOfPendingBookings.data().count;
+		countofSearchResult === 0 ? (noResult = true) : (noResult = false);
 	}
 
 	async function resetButton() {
 		accountsQuery = query(collection(db, 'accounts'));
 		searchByValue = '';
+		noResult = false;
 	}
 
 	$: {
@@ -129,6 +145,11 @@
 						<th />
 					</tr>
 				</thead>
+				{#if noResult}
+					<tr>
+						<td class="py-24 text-center" colspan="8">No result found</td>
+					</tr>
+				{/if}
 				<tbody>
 					{#each listOfUsers as user}
 						<tr class="hover">
@@ -169,6 +190,9 @@
 
 	<!-- Small screen -->
 	<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">
+		{#if noResult}
+			<div class="w-full mx-auto">No result found</div>
+		{/if}
 		{#each listOfUsers as user}
 			<div class="card w-[105%] bg-base-100 shadow-xl">
 				<div class="card-body">

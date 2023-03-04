@@ -1,5 +1,12 @@
 <script>
-	import { onSnapshot, query, collection, orderBy, where } from 'firebase/firestore';
+	import {
+		onSnapshot,
+		query,
+		collection,
+		orderBy,
+		where,
+		getCountFromServer
+	} from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
 
@@ -8,6 +15,9 @@
 	let searchByField = '';
 	let searchByValue = '';
 	let eventQuery = query(collection(db, 'event'));
+
+	let countofSearchResult = '';
+	let noResult = false;
 
 	let currentPage = 1;
 	let pageSize = 10;
@@ -27,6 +37,7 @@
 
 	async function changeSortBy() {
 		eventQuery = query(collection(db, 'event'), orderBy(sortByField, 'asc'));
+		noResult = false;
 	}
 
 	async function searchEvents() {
@@ -36,11 +47,15 @@
 			where(searchByField, '>=', searchByValueCase),
 			where(searchByField, '<=', searchByValueCase + '~')
 		);
+		const snapshotOfCountOfPendingBookings = await getCountFromServer(eventQuery);
+		countofSearchResult = snapshotOfCountOfPendingBookings.data().count;
+		countofSearchResult === 0 ? (noResult = true) : (noResult = false);
 	}
 
 	async function resetButton() {
 		eventQuery = query(collection(db, 'event'));
 		searchByValue = '';
+		noResult = false;
 	}
 
 	$: {
@@ -64,8 +79,15 @@
 	<h1 class="text-3xl font-semibold py-2">Events</h1>
 	<div class="flex flex-col md:flex-row justify-between">
 		<div class="flex flex-col md:flex-row">
-			<form on:submit|preventDefault={searchEvents} class="my-4 flex flex-col md:flex-row items-start">
-				<select bind:value={searchByField} required class="select select-bordered mb-2 md:mb-0 md:mr-2">
+			<form
+				on:submit|preventDefault={searchEvents}
+				class="my-4 flex flex-col md:flex-row items-start"
+			>
+				<select
+					bind:value={searchByField}
+					required
+					class="select select-bordered mb-2 md:mb-0 md:mr-2"
+				>
 					<option value="" disabled selected>Search Filter</option>
 					<option value="title">Title</option>
 					<!-- <option value="date">Date</option> -->
@@ -112,6 +134,11 @@
 					<th />
 				</tr>
 			</thead>
+			{#if noResult}
+				<tr>
+					<td class="py-24 text-center" colspan="8">No result found</td>
+				</tr>
+			{/if}
 			<tbody>
 				{#each listOfEvents as event}
 					<tr class="hover">
@@ -137,6 +164,9 @@
 
 	<!-- Small screen -->
 	<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">
+		{#if noResult}
+			<div class="w-full mx-auto">No result found</div>
+		{/if}
 		{#each listOfEvents as event}
 			<div class="card w-[105%] bg-base-100 shadow-xl">
 				<div class="card-body">

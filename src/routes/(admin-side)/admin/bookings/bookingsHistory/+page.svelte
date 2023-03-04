@@ -230,7 +230,7 @@
 				</thead>
 				{#if noResult}
 					<tr>
-						<td class="" colspan="8">No result found</td>
+						<td class="py-24 text-center" colspan="8">No result found</td>
 					</tr>
 				{/if}
 				<tbody>
@@ -288,7 +288,7 @@
 
 	<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">
 		{#if noResult}
-			<div class="w-full mx-auto" colspan="8">No result found</div>
+			<div class="w-full mx-auto">No result found</div>
 		{/if}
 		{#each listOfBooking as book}
 			<!-- {#if book.status == 'Approved' || book.status == 'Disapproved'} -->

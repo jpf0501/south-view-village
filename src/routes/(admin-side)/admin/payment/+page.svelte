@@ -7,7 +7,8 @@
 		where,
 		updateDoc,
 		doc,
-		getDocs
+		getDocs,
+		getCountFromServer
 	} from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
@@ -38,6 +39,9 @@
 	let searchByValue = '';
 	let accountsQuery = query(collection(db, 'accounts'));
 
+	let countofSearchResult = '';
+	let noResult = false;
+
 	let currentPage = 1;
 	let pageSize = 10;
 	let totalRecords = 1;
@@ -56,6 +60,7 @@
 
 	async function changeSortBy() {
 		accountsQuery = query(collection(db, 'accounts'), orderBy(sortByField, 'asc'));
+		noResult = false;
 	}
 
 	async function searchAccounts() {
@@ -65,6 +70,9 @@
 			where(searchByField, '>=', searchByValueCase),
 			where(searchByField, '<=', searchByValueCase + '~')
 		);
+		const snapshotOfCountOfPendingBookings = await getCountFromServer(accountsQuery);
+		countofSearchResult = snapshotOfCountOfPendingBookings.data().count;
+		countofSearchResult === 0 ? (noResult = true) : (noResult = false);
 	}
 
 	async function sendPaymentEmail(paymentEmail, paymentID) {
@@ -92,6 +100,7 @@
 	async function resetButton() {
 		accountsQuery = query(collection(db, 'accounts'));
 		searchByValue = '';
+		noResult = false;
 	}
 
 	async function resetStatus() {
@@ -195,6 +204,11 @@
 						<th />
 					</tr>
 				</thead>
+				{#if noResult}
+					<tr>
+						<td class="py-24 text-center" colspan="8">No result found</td>
+					</tr>
+				{/if}
 				<tbody>
 					{#each listOfUsers as user}
 						<tr class="hover">
@@ -228,67 +242,14 @@
 					{/each}
 				</tbody>
 			</table>
-
-			<!-- pagination button -->
-			<div class="flex justify-center items-center mt-5">
-				<nav class="block">
-					<ul class="flex pl-0 rounded list-none flex-wrap">
-						{#if currentPage > 1}
-							<li>
-								<button
-									class="relative block py-2 px-3 leading-tight bg-white border border-gray-300 text-blue-700 hover:bg-gray-200 focus:bg-gray-200"
-									on:click={() => goToPage(currentPage - 1)}
-								>
-									Previous
-								</button>
-							</li>
-						{/if}
-
-						{#each Array.from({ length: totalPages }, (_, i) => i + 1) as page}
-							{#if page === currentPage}
-								<li>
-									<button
-										class="relative block py-2 px-3 leading-tight bg-blue-700 text-white hover:bg-blue-500 focus:bg-blue-500"
-										>{page}</button
-									>
-								</li>
-							{:else if (page >= currentPage - 2 && page <= currentPage + 2) || page === totalPages || page === 1}
-								<li>
-									<button
-										class="relative block py-2 px-3 leading-tight bg-white border border-gray-300 text-blue-700 hover:bg-gray-200 focus:bg-gray-200"
-										on:click={() => goToPage(page)}
-									>
-										{page}
-									</button>
-								</li>
-							{:else if page === currentPage - 3 || page === currentPage + 3}
-								<li>
-									<span
-										class="relative block py-2 px-3 leading-tight bg-white border border-gray-300 text-blue-700"
-										>...</span
-									>
-								</li>
-							{/if}
-						{/each}
-
-						{#if currentPage < totalPages}
-							<li>
-								<button
-									class="relative block py-2 px-3 leading-tight bg-white border border-gray-300 text-blue-700 hover:bg-gray-200 focus:bg-gray-200"
-									on:click={() => goToPage(currentPage + 1)}
-								>
-									Next
-								</button>
-							</li>
-						{/if}
-					</ul>
-				</nav>
-			</div>
 		</div>
 	</div>
 
 	<!-- Small screen -->
 	<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">
+		{#if noResult}
+			<div class="w-full mx-auto">No result found</div>
+		{/if}
 		{#each listOfUsers as user}
 			<div class="card w-[105%] bg-base-100 shadow-xl">
 				<div class="card-body">
@@ -324,6 +285,62 @@
 			</div>
 		{/each}
 	</div>
+</div>
+
+<!-- pagination button -->
+<div class="flex justify-center items-center mt-5">
+	<nav class="block">
+		<ul class="flex pl-0 rounded list-none flex-wrap">
+			{#if currentPage > 1}
+				<li>
+					<button
+						class="relative block py-2 px-3 leading-tight bg-white border border-gray-300 text-blue-700 hover:bg-gray-200 focus:bg-gray-200"
+						on:click={() => goToPage(currentPage - 1)}
+					>
+						Previous
+					</button>
+				</li>
+			{/if}
+
+			{#each Array.from({ length: totalPages }, (_, i) => i + 1) as page}
+				{#if page === currentPage}
+					<li>
+						<button
+							class="relative block py-2 px-3 leading-tight bg-blue-700 text-white hover:bg-blue-500 focus:bg-blue-500"
+							>{page}</button
+						>
+					</li>
+				{:else if (page >= currentPage - 2 && page <= currentPage + 2) || page === totalPages || page === 1}
+					<li>
+						<button
+							class="relative block py-2 px-3 leading-tight bg-white border border-gray-300 text-blue-700 hover:bg-gray-200 focus:bg-gray-200"
+							on:click={() => goToPage(page)}
+						>
+							{page}
+						</button>
+					</li>
+				{:else if page === currentPage - 3 || page === currentPage + 3}
+					<li>
+						<span
+							class="relative block py-2 px-3 leading-tight bg-white border border-gray-300 text-blue-700"
+							>...</span
+						>
+					</li>
+				{/if}
+			{/each}
+
+			{#if currentPage < totalPages}
+				<li>
+					<button
+						class="relative block py-2 px-3 leading-tight bg-white border border-gray-300 text-blue-700 hover:bg-gray-200 focus:bg-gray-200"
+						on:click={() => goToPage(currentPage + 1)}
+					>
+						Next
+					</button>
+				</li>
+			{/if}
+		</ul>
+	</nav>
 </div>
 
 <!-- mema comment -->
