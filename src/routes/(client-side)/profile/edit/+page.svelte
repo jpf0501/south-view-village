@@ -66,7 +66,8 @@
 						<input
 							type="tel"
 							onkeypress="return event.charCode >= 48 && event.charCode <= 57"
-							minlength="11" maxlength="11"
+							minlength="11"
+							maxlength="11"
 							placeholder="09123456789"
 							pattern={String.raw`^(09)\d{9}$`}
 							bind:value={user.contactNumber}
@@ -76,14 +77,13 @@
 					</div>
 				</div>
 				<div class="flex justify-end mt-8">
-					<button type="submit" class="btn btn-primary mx-1"
-						>Update Info</button
-					>
-					<a href="/profile" class="btn btn-error mx-1 text-white px-4">Cancel</a
-					>
+					<button type="submit" class="btn btn-primary mx-1">Update Info</button>
+					<a href="/profile" class="btn btn-error mx-1 text-white px-4">Cancel</a>
 				</div>
 			</form>
-			<ChangePassword />
+			<div class="mt-5">
+				<ChangePassword />
+			</div>
 		</div>
 	</div>
 {/if}
