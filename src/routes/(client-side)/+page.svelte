@@ -1,4 +1,4 @@
-<!-- <script>
+<script>
 	import { onSnapshot, query, collection, orderBy, limit } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
@@ -14,7 +14,7 @@
 	}
 
 	$: getNews(newsQuery);
-</script> -->
+</script>
 
 <svelte:head>
 	<title>Southview Homes 3 - Official Website of Southview Homes 3 Subdivision</title>
@@ -60,24 +60,18 @@
 <!-- end showcase -->
 
 <!-- news -->
-<!-- <div class="flex flex-col  w-full bg-base-200">
-	<div class="mt-12">
-		<h2 class="font-bold text-4xl text-center mt-3">Recent News</h2>
+<div class="flex flex-col  w-full bg-base-200">
+	<div class="m-8 bg-white rounded-lg">
+		<div class="flex flex-col mt-6 mx-8 mb-4">
+			<h2 class="font-bold text-4xl mt-3">Recent News</h2>
+				<p class="divider"></p>
+				{#each listOfNews as news}
+					<a href={`/news/entry/${news.id}`} class="text-blue-700">{news.titleDisplay}</a>
+					<p class="divider"></p>
+				{/each}
+		</div>
 	</div>
-	<div class="flex flex-col md:flex-row items-center justify-center m-10">
-		{#each listOfNews as news}
-		<div class="card w-96 h-96 bg-base-100 shadow-2xl m-5">
-			<div class="card-body">
-		  	<h2 class="card-title mb-2 text-2xl">{news.titleDisplay}</h2>
-			<p class="mb-10">Posted {news.dateCreated.toDate().toLocaleDateString()}</p>
-		  	<div class="card-actions justify-end mt-8">
-				<a href={'/news/entry/' + news.id} class="btn btn-primary">Read Article</a>
-		  	</div>
-			</div>
-	  	</div>
-		{/each}
-	</div>
-</div> -->
+</div>
 <!-- end news -->
 
 <!-- clubhouse card -->
