@@ -27,23 +27,22 @@
 		<div class="max-w-ct">
 			<h2 class="mb-5 text-2xl md:text-5xl font-bold drop-shadow-xl">WELCOME TO</h2>
 			<h1 class="mb-10 text-3xl md:text-6xl font-bold">SOUTHVIEW HOMES 3</h1>
-			<!-- <a href="/community/" class="btn btn-primary">Learn More</a> -->
 		</div>
 	</div>
 </div>
 <!-- end hero -->
 
 <!-- community -->
-<div class="hero min-h-[70%]:">
-	<div class="hero-content flex-col sm:flex-row-reverse lg:flex-row-reverse m-10">
-		<img src="/images/house.jpg" class="max-w-sm mask mask-circle m-10" alt="Southview Homes 3 Residence"/>
-	  <div>
-		<h1 class="text-5xl font-bold">A Welcoming Community</h1>
-		<p class="py-10 text-justify">Located at the heart of San Pedro, Laguna, Southview Homes 3 not only offers a peaceful and an easily accessible neighborhood at an affordable price, but also an organized community filled with approachable and hardworking people that keep the residents of Southview Homes 3 tightly-knit together.</p>
-		<a href="/community" class="btn btn-primary">Learn More</a>
-	  </div>
+<div class="hero py-16">
+	<div class="hero-content flex-col lg:flex-row-reverse">
+		<img src="/images/house.jpg" class="w-full max-w-xl mask mask-circle" alt="housing"/>
+		<div class="p-8">
+			<h1 class="text-5xl font-bold pb-7 text-center lg:text-left">A Welcoming Community</h1>
+			<p class="py-6 text-justify">Located at the heart of San Pedro, Laguna, Southview Homes 3 not only offers a peaceful and an easily accessible neighborhood at an affordable price, but also an organized community filled with approachable and hardworking people that keep the residents of Southview Homes 3 tightly-knit together.</p>
+			<a href="/community" class="btn btn-primary mt-3">Learn More</a>
+		</div>
 	</div>
-  </div>
+</div>
 <!-- end committee -->
 
 <!-- photo showcase -->
@@ -71,7 +70,6 @@
 			<div class="card-body">
 		  	<h2 class="card-title mb-2 text-2xl">{news.titleDisplay}</h2>
 			<p class="mb-10">Posted {news.dateCreated.toDate().toLocaleDateString()}</p>
-		  	<!-- <p class="text-justify text-md" style="white-space:pre-wrap">{news.content.substring(0,150) + '...'}</p> -->
 		  	<div class="card-actions justify-end mt-8">
 				<a href={'/news/entry/' + news.id} class="btn btn-primary">Read Article</a>
 		  	</div>
@@ -83,14 +81,14 @@
 <!-- end news -->
 
 <!-- clubhouse card -->
-<div class="hero min-h-[70%]: bg-white">
-	<div class="hero-content flex-col sm:flex-row lg:flex-row m-10">
-		<img src="/images/clubhouse.jpg" class="max-w-sm mask mask-circle m-10" alt="Southview Homes 3 Clubhouse"/>
-	  <div>
-		<h1 class="text-5xl font-bold">Clubhouse Renting</h1>
-		<p class="py-10 text-justify">Southview Homes 3 also offers reservations of its clubhouse facility and surrounding amenities for both residents and non-residents. Reservations can include all kinds of events - birthdays, debuts, and everything else.</p>
-		<a href="/reservation" class="btn btn-primary">Book Reservation</a>
-	  </div>
+<div class="hero py-16">
+	<div class="hero-content flex-col lg:flex-row">
+		<img src="/images/clubhouse.jpg" class="w-full max-w-md mask mask-circle" alt="clubhouse"/>
+		<div class="p-8">
+			<h1 class="text-5xl font-bold pb-7 text-center lg:text-left">Clubhouse Renting</h1>
+			<p class="py-6 text-justify">Southview Homes 3 also offers reservations of its clubhouse facility and surrounding amenities for both residents and non-residents. Reservations can include all kinds of events - birthdays, debuts, and everything else.</p>
+			<a href="/community" class="btn btn-primary mt-3">Learn More</a>
+		</div>
 	</div>
-  </div>
+</div>
 <!-- end clubhouse card -->
