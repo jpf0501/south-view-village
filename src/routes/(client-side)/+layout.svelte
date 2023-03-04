@@ -5,8 +5,10 @@
 </script>
 
 <main class="flex flex-col min-h-full">
-	<Header />
-	<Nav />
+	<div class="sticky top-0 z-50">
+		<Header />
+		<Nav />
+	</div>
 	<slot />
 	<Footer />
 </main>
