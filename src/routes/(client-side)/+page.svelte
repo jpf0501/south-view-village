@@ -1,4 +1,4 @@
-<script>
+<!-- <script>
 	import { onSnapshot, query, collection, orderBy, limit } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
@@ -14,7 +14,7 @@
 	}
 
 	$: getNews(newsQuery);
-</script>
+</script> -->
 
 <svelte:head>
 	<title>Southview Homes 3 - Official Website of Southview Homes 3 Subdivision</title>
@@ -60,7 +60,7 @@
 <!-- end showcase -->
 
 <!-- news -->
-<div class="flex flex-col  w-full bg-base-200">
+<!-- <div class="flex flex-col  w-full bg-base-200">
 	<div class="mt-12">
 		<h2 class="font-bold text-4xl text-center mt-3">Recent News</h2>
 	</div>
@@ -77,7 +77,7 @@
 	  	</div>
 		{/each}
 	</div>
-</div>
+</div> -->
 <!-- end news -->
 
 <!-- clubhouse card -->
