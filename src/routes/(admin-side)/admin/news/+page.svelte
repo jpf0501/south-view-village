@@ -64,12 +64,19 @@
 	<title>News - Southview Homes 3 Admin Panel</title>
 </svelte:head>
 
-<div class="min-w-full min-h-full bg-base-200 px-12">
-	<h1 class="text-3xl font-semibold py-12">News</h1>
+<div class="min-w-full min-h-full bg-base-200 px-5">
+	<h1 class="text-3xl font-semibold py-2">News</h1>
 	<div class="flex flex-col md:flex-row justify-between">
 		<div class="flex flex-col md:flex-row">
-			<form on:submit|preventDefault={searchNews} class="my-4">
-				<select bind:value={searchByField} class="select select-bordered" required>
+			<form
+				on:submit|preventDefault={searchNews}
+				class="my-4 flex flex-col md:flex-row items-start"
+			>
+				<select
+					bind:value={searchByField}
+					class="select select-bordered mb-2 md:mb-0 md:mr-2"
+					required
+				>
 					<option value="" disabled selected>Search Filter</option>
 					<option value="title">Title</option>
 					<!-- <option value="dateCreated">Date Created</option>
@@ -79,10 +86,10 @@
 					type="search"
 					placeholder="Search here"
 					bind:value={searchByValue}
-					class="input input-bordered mx-2"
+					class="input input-bordered"
 				/>
 			</form>
-			<button on:click={resetButton} class="btn btn-primary my-4">Reset</button>
+			<button on:click={resetButton} class="btn btn-primary my-4 mx-2">Reset</button>
 		</div>
 
 		<select bind:value={sortByField} on:change={changeSortBy} class="select select-bordered my-4">

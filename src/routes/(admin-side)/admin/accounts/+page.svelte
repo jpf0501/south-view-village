@@ -88,7 +88,7 @@
 				/>
 			</form>
 
-			<button on:click={resetButton} class="btn btn-primary my-4">Reset</button>
+			<button on:click={resetButton} class="btn btn-primary my-4 mx-2">Reset</button>
 		</div>
 
 		<select bind:value={sortByField} on:change={changeSortBy} class="select select-bordered my-4">

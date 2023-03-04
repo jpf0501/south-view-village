@@ -1,8 +1,17 @@
 <script>
-	import { onSnapshot, query, collection, orderBy, where, updateDoc, doc, getDocs } from 'firebase/firestore';
+	import {
+		onSnapshot,
+		query,
+		collection,
+		orderBy,
+		where,
+		updateDoc,
+		doc,
+		getDocs
+	} from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
-	import { createPaymentLink, sendEmail } from '$lib/utils'
+	import { createPaymentLink, sendEmail } from '$lib/utils';
 
 	const monthName = [
 		'January',
@@ -19,9 +28,9 @@
 		'December'
 	];
 
-	const date = new Date()
+	const date = new Date();
 	const currentMonth = monthName[date.getMonth()];
-	const currentYear = date.getFullYear()
+	const currentYear = date.getFullYear();
 
 	let listOfUsers = [];
 	let sortByField = '';
@@ -59,10 +68,14 @@
 	}
 
 	async function sendPaymentEmail(paymentEmail, paymentID) {
-		console.log(paymentID)
+		console.log(paymentID);
 		try {
-			const paymentLinkData = await createPaymentLink('Southview Homes 3 Monthly Dues', 50000, paymentID)
-			const checkoutURL = paymentLinkData.data.attributes.checkout_url
+			const paymentLinkData = await createPaymentLink(
+				'Southview Homes 3 Monthly Dues',
+				50000,
+				paymentID
+			);
+			const checkoutURL = paymentLinkData.data.attributes.checkout_url;
 			const result = await sendEmail({
 				to: paymentEmail,
 				subject: 'Southview Homes 3 Monthly Dues Payment Notice',
@@ -82,16 +95,16 @@
 	}
 
 	async function resetStatus() {
-		let text = "Would you like to reset payment status?"
+		let text = 'Would you like to reset payment status?';
 		if (confirm(text) == true) {
-    		const accountQuery = query(collection(db, 'accounts'));
+			const accountQuery = query(collection(db, 'accounts'));
 			const snapshot = await getDocs(accountQuery);
 			for (let i = 0; i < snapshot.docs.length; i++) {
-  				const docRef = doc(db, 'accounts', snapshot.docs[i].id);
-  				await updateDoc(docRef, { paymentStatus: 'Unpaid' });
+				const docRef = doc(db, 'accounts', snapshot.docs[i].id);
+				await updateDoc(docRef, { paymentStatus: 'Unpaid' });
 			}
-			alert('Payment status reset')
-  		}
+			alert('Payment status reset');
+		}
 	}
 
 	$: {
@@ -111,15 +124,22 @@
 	<title>Payment - Southview Homes 3 Admin Panel</title>
 </svelte:head>
 
-<div class="min-w-full min-h-full bg-base-200 px-12">
-	<div class="flex justify-between py-10">
-		<h1 class="text-3xl font-semibold">Payment</h1>
-		<a href="/admin/payment/history" class="btn btn-primary">View History</a>
+<div class="min-w-full min-h-full bg-base-200 px-5">
+	<h1 class="text-3xl font-semibold py-2">Payment</h1>
+	<div class="flex justify-end">
+		<a href="/admin/payment/history" class="btn btn-primary ">Payment History</a>
 	</div>
 	<div class="flex flex-col md:flex-row justify-between">
 		<div class="flex flex-col md:flex-row">
-			<form on:submit|preventDefault={searchAccounts} class="my-4">
-				<select bind:value={searchByField} class="select select-bordered" required>
+			<form
+				on:submit|preventDefault={searchAccounts}
+				class="my-4 flex flex-col md:flex-row items-start"
+			>
+				<select
+					bind:value={searchByField}
+					class="select select-bordered mb-2 md:mb-0 md:mr-2"
+					required
+				>
 					<option value="" disabled selected>Search Filter</option>
 					<option value="firstname">Name</option>
 					<!-- <option value="addressBlock">Block</option>
@@ -130,11 +150,11 @@
 				<input
 					type="search"
 					placeholder="Search here"
-					class="input input-bordered mx-2"
+					class="input input-bordered"
 					bind:value={searchByValue}
 				/>
 			</form>
-			<button on:click={resetButton} class="btn btn-primary my-4">Reset</button>
+			<button on:click={resetButton} class="btn btn-primary my-4 mx-2">Reset</button>
 		</div>
 
 		<select bind:value={sortByField} on:change={changeSortBy} class="select select-bordered my-4">
@@ -193,21 +213,17 @@
 							<td>{user.contactNumber}</td>
 							<td>{user.paymentStatus}</td>
 							<td />
-							<td
-								>
+							<td>
 								{#if user.paymentStatus == 'Unpaid'}
-									<button on:click={sendPaymentEmail(user.email, user.id)}
+									<button
+										on:click={sendPaymentEmail(user.email, user.id)}
 										type="button"
 										class="btn btn-primary">Send Payment</button
 									>
 								{:else}
-									<button
-										type="button"
-										class="btn btn-primary" disabled>Send Payment</button
-									>
+									<button type="button" class="btn btn-primary" disabled>Send Payment</button>
 								{/if}
-								</td
-							>
+							</td>
 						</tr>
 					{/each}
 				</tbody>
