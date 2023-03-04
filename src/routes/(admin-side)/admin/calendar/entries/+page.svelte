@@ -110,16 +110,6 @@
 		<a class="btn btn-primary my-4" href="/admin/calendar/">Go Back</a>
 	</div>
 
-	<style>
-		table {
-			counter-reset: section;
-		}
-		.count:before {
-			counter-increment: section;
-			content: counter(section);
-		}
-	</style>
-
 	<!-- Medium to large screen -->
 	<div class="w-full mx-auto shadow-2xl border rounded-xl bg-base-100 my-5 hidden md:block">
 		<div class="overflow-x-auto" />
@@ -140,9 +130,9 @@
 				</tr>
 			{/if}
 			<tbody>
-				{#each listOfEvents as event}
+				{#each listOfEvents as event, i}
 					<tr class="hover">
-						<td class="count" />
+						<td>{i + (currentPage - 1) * pageSize + 1}</td>
 						<td />
 						<td>{event.titleDisplay.substring(0, 20) + '...'}</td>
 						<td>{event.description.substring(0, 50) + '...'}</td>

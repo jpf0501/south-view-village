@@ -193,16 +193,6 @@
 		</select>
 	</div>
 
-	<style>
-		table {
-			counter-reset: section;
-		}
-		.count:before {
-			counter-increment: section;
-			content: counter(section);
-		}
-	</style>
-
 	<!-- Medium to large screen -->
 	<div class="w-full mx-auto shadow-2xl border rounded-xl bg-base-100 my-5 hidden md:block">
 		<div class="overflow-x-auto">
@@ -226,10 +216,10 @@
 					</tr>
 				{/if}
 				<tbody>
-					{#each listOfBooking as book}
+					{#each listOfBooking as book, i}
 						<!-- {#if book.status == 'Pending'} -->
 						<tr class="hover">
-							<td class="count" />
+							<td>{i + (currentPage - 1) * pageSize + 1}</td>
 							<td>{book.firstNameDisplay + ' ' + book.lastNameDisplay}</td>
 							<td>{book.email}</td>
 							<td>{book.contactNumber}</td>
