@@ -10,11 +10,9 @@
 		setDoc,
 		updateDoc
 	} from 'firebase/firestore';
-	import { db, auth } from '$lib/firebase/client';
-	import { createUserWithEmailAndPassword } from 'firebase/auth';
+	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
 	import Pagination from '../../Pagination.svelte';
-	
 
 	let listOfUsers = [];
 	let sortByField = '';
@@ -92,28 +90,27 @@
 	) {
 		if (isApproved) {
 			try {
-			const response = await fetch('/api/pendingAccounts', {
-				method: 'POST',
-				body: JSON.stringify({
-					email: pendingEmail,
-					password: pendingPassword,
-					firstname: pendingFirstname,
-					firstNameDisplay: pendingFirstNameDisplay,
-					lastname: pendingLastname,
-					lastNameDisplay: pendingLastNameDisplay,
-					addressBlock: pendingAddressBlock,
-					addressLot: pendingAddressLot,
-					addressStreet: pendingAddressStreet,
-					contactNumber: pendingContactNumber,
-					role: pendingRole,
-					paymentStatus: pendingPaymentStatus
-				})
-			});
-			const result = await response.json();
-			console.log(result);
-				
-			
-			const pendingAccountsRef = doc(db, 'pendingAccounts', pendingID);
+				const response = await fetch('/api/pendingAccounts', {
+					method: 'POST',
+					body: JSON.stringify({
+						email: pendingEmail,
+						password: pendingPassword,
+						firstname: pendingFirstname,
+						firstNameDisplay: pendingFirstNameDisplay,
+						lastname: pendingLastname,
+						lastNameDisplay: pendingLastNameDisplay,
+						addressBlock: pendingAddressBlock,
+						addressLot: pendingAddressLot,
+						addressStreet: pendingAddressStreet,
+						contactNumber: pendingContactNumber,
+						role: pendingRole,
+						paymentStatus: pendingPaymentStatus
+					})
+				});
+				const result = await response.json();
+				console.log(result);
+
+				const pendingAccountsRef = doc(db, 'pendingAccounts', pendingID);
 				const data = {
 					isPending: false
 				};
