@@ -239,7 +239,7 @@
 										bind:value={account.paymentHead}
 									>
 										<option value="" selected disabled>Select</option>
-										<option value={true}>'Yes</option>
+										<option value={true}>Yes</option>
 										<option value={false}>No</option>
 									</select>
 								</div>
