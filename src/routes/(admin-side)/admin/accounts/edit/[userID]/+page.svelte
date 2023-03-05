@@ -1,6 +1,14 @@
 <script>
 	import { db } from '$lib/firebase/client';
-	import { onSnapshot, query, collection, orderBy, getDoc, updateDoc, doc } from 'firebase/firestore';
+	import {
+		onSnapshot,
+		query,
+		collection,
+		orderBy,
+		getDoc,
+		updateDoc,
+		doc
+	} from 'firebase/firestore';
 	import { goto } from '$app/navigation';
 	import { onDestroy } from 'svelte';
 
@@ -13,12 +21,12 @@
 	let listOfStreets = [];
 
 	const blockValue = Array.from({ length: 23 }, (_, i) => ({
-    	value: i + 1,
-  	}));
+		value: i + 1
+	}));
 
 	const lotValue = Array.from({ length: 26 }, (_, i) => ({
-    	value: i + 1,
-  	}));
+		value: i + 1
+	}));
 
 	async function getUser() {
 		const snapshot = await getDoc(doc(db, 'accounts', userID));
@@ -104,7 +112,7 @@
 						</label>
 						<select class="select select-bordered w-full" required bind:value={user.addressBlock}>
 							<option value="" disabled>Select block</option>
-							{#each blockValue as block} 
+							{#each blockValue as block}
 								<option value={block.value}>{block.value}</option>
 							{/each}
 						</select>
@@ -115,7 +123,7 @@
 						</label>
 						<select class="select select-bordered w-full" required bind:value={user.addressLot}>
 							<option value="" disabled>Select lot</option>
-							{#each lotValue as lot} 
+							{#each lotValue as lot}
 								<option value={lot.value}>{lot.value}</option>
 							{/each}
 						</select>
@@ -130,10 +138,10 @@
 							required
 							bind:value={user.addressStreet}
 						>
-						<option value="" selected disabled>Select street</option>
-  							{#each listOfStreets as street}
-    								<option value={street.streetName}>{street.streetName}</option>
-  							{/each}
+							<option value="" selected disabled>Select street</option>
+							{#each listOfStreets as street}
+								<option value={street.streetName}>{street.streetName}</option>
+							{/each}
 						</select>
 					</div>
 				</div>
@@ -147,8 +155,24 @@
 								required
 								bind:value={user.role}
 							>
+								<option value="" selected disabled>Select role</option>
 								<option value="Resident">Resident</option>
 								<option value="Admin">Admin</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-control">
+						<span class="label-text mb-3">Payment Head</span>
+						<div class="mb-3">
+							<select
+								class="select select-bordered w-full"
+								aria-label="Default select example"
+								required
+								bind:value={user.paymentHead}
+							>
+								<option value="" selected disabled>Select</option>
+								<option value={true}>Yes</option>
+								<option value={false}>No</option>
 							</select>
 						</div>
 					</div>
@@ -160,7 +184,8 @@
 					<input
 						type="tel"
 						onkeypress="return event.charCode >= 48 && event.charCode <= 57"
-						minlength="11" maxlength="11"
+						minlength="11"
+						maxlength="11"
 						placeholder="09123456789"
 						pattern={String.raw`^(09)\d{9}$`}
 						name="contact"
@@ -170,18 +195,11 @@
 					/>
 				</div>
 				<div class="flex justify-end mt-8">
-					<button
-						on:click={updateUser}
-						type="submit"
-						class="btn btn-primary mx-1 px-5">Save</button
+					<button on:click={updateUser} type="submit" class="btn btn-primary mx-1 px-5">Save</button
 					>
-					<a href="/admin/accounts" class="btn btn-error mx-1 px-4 text-white"
-						>Cancel</a
-					>
-					<button
-						on:click={deleteUser}
-						type="submit"
-						class="btn btn-warning mx-1 text-white">Delete</button
+					<a href="/admin/accounts" class="btn btn-error mx-1 px-4 text-white">Cancel</a>
+					<button on:click={deleteUser} type="submit" class="btn btn-warning mx-1 text-white"
+						>Delete</button
 					>
 				</div>
 			</div>

@@ -30,6 +30,7 @@ export async function POST({ request }) {
 			addressStreet:createUserRequest.addressStreet,
 			contactNumber:createUserRequest.contactNumber,
             role:createUserRequest.role,
+			paymentHead:createUserRequest.paymentHead,
 			email:createUserRequest.email,
 			paymentStatus:createUserRequest.paymentStatus
 		 })

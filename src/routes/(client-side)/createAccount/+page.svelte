@@ -16,6 +16,7 @@
 		contactNumber: '',
 		role: 'Resident',
 		paymentStatus: 'Unpaid',
+		paymentHead: '',
 		isPending: true
 	};
 	let streetQuery = query(collection(db, 'street'), orderBy('streetName', 'asc'));
@@ -57,6 +58,7 @@
 				pendingContactNumber: account.contactNumber,
 				pendingRole: account.role,
 				pendingPaymentStatus: account.paymentStatus,
+				pendingPaymentHead: account.paymentHead,
 				isPending: account.isPending
 			});
 			alert('Creation of account request success');
@@ -209,6 +211,21 @@
 										</div>
 									</div>
 								{/if}
+							</div>
+						</div>
+						<div class="form-control">
+							<span class="label-text mb-3">Payment Head</span>
+							<div class="mb-3">
+								<select
+									class="select select-bordered w-full"
+									aria-label="Default select example"
+									required
+									bind:value={account.paymentHead}
+								>
+									<option value="" selected disabled>Select</option>
+									<option value={true}>'Yes</option>
+									<option value={false}>No</option>
+								</select>
 							</div>
 						</div>
 						<div class="form-control">

@@ -49,7 +49,11 @@
 			countOfAccounts = snapshotOfCountOfAccounts.data().count;
 
 			// Get pending payment count
-			const dueQuery = query(collection(db, 'accounts'), where('paymentStatus', '==', 'Unpaid'));
+			const dueQuery = query(
+				collection(db, 'accounts'),
+				where('paymentStatus', '==', 'Unpaid'),
+				where('paymentHead', '==', true)
+			);
 			const dueSnapshot = await getCountFromServer(dueQuery);
 			dueCount = dueSnapshot.data().count;
 		} catch (error) {

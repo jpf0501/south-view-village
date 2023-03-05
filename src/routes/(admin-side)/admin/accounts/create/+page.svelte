@@ -1,7 +1,7 @@
 <script>
 	import { goto } from '$app/navigation';
-	import { db } from '$lib/firebase/client'
-	import { onSnapshot, query, collection, orderBy, } from 'firebase/firestore'
+	import { db } from '$lib/firebase/client';
+	import { onSnapshot, query, collection, orderBy } from 'firebase/firestore';
 	import { onDestroy } from 'svelte';
 
 	let account = {
@@ -15,19 +15,19 @@
 		addressStreet: '',
 		contactNumber: '',
 		role: '',
+		paymentHead: '',
 		paymentStatus: 'Unpaid'
 	};
 	let streetQuery = query(collection(db, 'street'), orderBy('streetName', 'asc'));
 	let listOfStreets = [];
 
 	const blockValue = Array.from({ length: 23 }, (_, i) => ({
-    	value: i + 1,
-  	}));
+		value: i + 1
+	}));
 
 	const lotValue = Array.from({ length: 26 }, (_, i) => ({
-    	value: i + 1,
-  	}));
-
+		value: i + 1
+	}));
 
 	async function getStreet() {
 		const unsubscribe = onSnapshot(streetQuery, (querySnapshot) => {
@@ -55,6 +55,7 @@
 					addressStreet: account.addressStreet,
 					contactNumber: account.contactNumber,
 					role: account.role,
+					paymentHead: account.paymentHead,
 					paymentStatus: account.paymentStatus
 				})
 			});
@@ -115,9 +116,13 @@
 						<label for="Block" class="label">
 							<span class="label-text">Block</span>
 						</label>
-						<select class="select select-bordered w-full" required bind:value={account.addressBlock}>
+						<select
+							class="select select-bordered w-full"
+							required
+							bind:value={account.addressBlock}
+						>
 							<option value="" disabled>Select block</option>
-							{#each blockValue as block} 
+							{#each blockValue as block}
 								<option value={block.value}>{block.value}</option>
 							{/each}
 						</select>
@@ -128,7 +133,7 @@
 						</label>
 						<select class="select select-bordered w-full" required bind:value={account.addressLot}>
 							<option value="" disabled>Select lot</option>
-							{#each lotValue as lot} 
+							{#each lotValue as lot}
 								<option value={lot.value}>{lot.value}</option>
 							{/each}
 						</select>
@@ -144,9 +149,9 @@
 							bind:value={account.addressStreet}
 						>
 							<option value="" selected disabled>Select street</option>
-  							{#each listOfStreets as street}
-    								<option value={street.streetName}>{street.streetName}</option>
-  							{/each}
+							{#each listOfStreets as street}
+								<option value={street.streetName}>{street.streetName}</option>
+							{/each}
 						</select>
 					</div>
 				</div>
@@ -207,6 +212,8 @@
 									</div>
 								{/if}
 							</div>
+						</div>
+						<div class="grid grid-cols-1 gap-6 mt-4 md:grid-cols-2">
 							<div class="form-control">
 								<span class="label-text mb-3">Role</span>
 								<div class="mb-3">
@@ -219,6 +226,21 @@
 										<option value="" selected disabled>Select role</option>
 										<option value="Resident">Resident</option>
 										<option value="Admin">Admin</option>
+									</select>
+								</div>
+							</div>
+							<div class="form-control">
+								<span class="label-text mb-3">Payment Head</span>
+								<div class="mb-3">
+									<select
+										class="select select-bordered w-full"
+										aria-label="Default select example"
+										required
+										bind:value={account.paymentHead}
+									>
+										<option value="" selected disabled>Select</option>
+										<option value={true}>'Yes</option>
+										<option value={false}>No</option>
 									</select>
 								</div>
 							</div>

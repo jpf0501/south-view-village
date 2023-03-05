@@ -37,7 +37,7 @@
 	let sortByField = '';
 	let searchByField = '';
 	let searchByValue = '';
-	let accountsQuery = query(collection(db, 'accounts'));
+	let accountsQuery = query(collection(db, 'accounts'), where('paymentHead', '==', true));
 
 	let noResult = false;
 
@@ -59,8 +59,11 @@
 	}
 
 	async function changeSortBy() {
-		accountsQuery = query(collection(db, 'accounts'), orderBy(sortByField, 'asc'));
-		
+		accountsQuery = query(
+			collection(db, 'accounts'),
+			where('paymentHead', '==', true),
+			orderBy(sortByField, 'asc')
+		);
 	}
 
 	async function searchAccounts() {
@@ -68,7 +71,8 @@
 		accountsQuery = query(
 			collection(db, 'accounts'),
 			where(searchByField, '>=', searchByValueCase),
-			where(searchByField, '<=', searchByValueCase + '~')
+			where(searchByField, '<=', searchByValueCase + '~'),
+			where('paymentHead', '==', true)
 		);
 	}
 
@@ -95,7 +99,7 @@
 	}
 
 	async function resetButton() {
-		accountsQuery = query(collection(db, 'accounts'));
+		accountsQuery = query(collection(db, 'accounts'), where('paymentHead', '==', true));
 		searchByValue = '';
 	}
 

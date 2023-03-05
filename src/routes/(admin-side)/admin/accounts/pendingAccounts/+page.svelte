@@ -18,7 +18,7 @@
 	let searchByValue = '';
 	let pendingAccountsQuery = query(
 		collection(db, 'pendingAccounts'),
-		where('isPending', '==', true)
+		where('isPending', '==', true),
 	);
 
 	let noResult = false;
@@ -194,6 +194,7 @@
 						<th class="text-lg">Email</th>
 						<th class="text-lg">Contact No.</th>
 						<th class="text-lg">Role</th>
+						<th class="text-lg">Payment Head</th>
 						<th />
 					</tr>
 				</thead>
@@ -219,6 +220,11 @@
 							<td>{user.pendingEmail}</td>
 							<td>{user.pendingContactNumber}</td>
 							<td>{user.pendingRole}</td>
+							{#if user.pendingPaymentHead}
+								<td class="text-center">Yes</td>
+							{:else}
+								<td class="text-center">No</td>
+							{/if}
 							<td
 								><form
 									on:submit|preventDefault={approval(
@@ -261,29 +267,68 @@
 		{#if noResult}
 			<div class="w-full mx-auto">No Pending Account/s to Approve Found</div>
 		{/if}
-		{#each listOfUsers as pendingUser}
+		{#each listOfUsers as user}
 			<div class="card w-[105%] bg-base-100 shadow-xl">
 				<div class="card-body">
 					<h2 class="card-title mb-2">
-						{pendingUser.pendingFirstNameDisplay + ' ' + pendingUser.pendingLastNameDisplay}
+						{user.pendingFirstNameDisplay + ' ' + user.pendingLastNameDisplay}
 					</h2>
 					<div>
 						<span class="my-1 font-bold">Role:</span>
-						{pendingUser.pendingRole}
+						{user.pendingRole}
 					</div>
 					<div>
 						<span class="my-1 font-bold">Address:</span>
 						{'Block ' +
-							pendingUser.pendingAddressBlock +
+							user.pendingAddressBlock +
 							' Lot ' +
-							pendingUser.pendingAddressLot +
+							user.pendingAddressLot +
 							' ' +
-							pendingUser.pendingAddressStreet +
+							user.pendingAddressStreet +
 							' Street'}
 					</div>
 					<div>
+						<span class="my-1 font-bold">Payment Head:</span>
+						{#if user.pendingPaymentHead}
+							Yes
+						{:else}
+							No
+						{/if}
+					</div>
+					<div>
 						<span class="my-1 font-bold">E-mail Address:</span>
-						{pendingUser.pendingEmail}
+						{user.pendingEmail}
+					</div>
+					<div>
+						<form
+							on:submit|preventDefault={approval(
+								user.id,
+								user.pendingEmail,
+								user.pendingPassword,
+								user.pendingFirstname,
+								user.pendingFirstNameDisplay,
+								user.pendingLastname,
+								user.pendingLastNameDisplay,
+								user.pendingContactNumber,
+								user.pendingAddressBlock,
+								user.pendingAddressLot,
+								user.pendingAddressStreet,
+								user.pendingRole,
+								user.pendingPaymentStatus
+							)}
+							class="py-3"
+						>
+							<button
+								on:click={() => (isApproved = true)}
+								type="submit"
+								class="btn btn-success text-white">Approve</button
+							>
+							<button
+								on:click={() => (isApproved = false)}
+								type="submit"
+								class="btn btn-error text-white">Dissaprove</button
+							>
+						</form>
 					</div>
 				</div>
 			</div>
