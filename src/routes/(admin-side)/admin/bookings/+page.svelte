@@ -7,8 +7,7 @@
 		doc,
 		where,
 		orderBy,
-		serverTimestamp,
-		getCountFromServer
+		serverTimestamp
 	} from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
@@ -26,7 +25,7 @@
 		where('status', '==', 'Pending'),
 		orderBy('dateReserved', 'asc')
 	);
-	let countofSearchResult = '';
+
 	let noResult = false;
 
 	let currentPage = 1;
@@ -42,6 +41,7 @@
 				.map((doc) => ({ id: doc.id, ...doc.data() }))
 				.slice(startIndex, endIndex);
 		});
+		listOfBooking.length === 0 ? (noResult = true) : (noResult = false);
 		onDestroy(() => unsubscribe());
 	}
 
@@ -61,7 +61,6 @@
 				orderBy('dateReserved', 'asc')
 			);
 		}
-		noResult = false;
 	}
 
 	async function searchBookings() {
@@ -74,10 +73,6 @@
 			where('status', '==', 'Pending'),
 			orderBy('dateReserved', 'asc')
 		);
-
-		const snapshotOfCountOfPendingBookings = await getCountFromServer(bookingsQuery);
-		countofSearchResult = snapshotOfCountOfPendingBookings.data().count;
-		countofSearchResult === 0 ? (noResult = true) : (noResult = false);
 	}
 
 	async function changeStatus(bookingId) {
@@ -92,7 +87,6 @@
 		} catch (error) {
 			console.log(error);
 		}
-		noResult = false;
 	}
 	async function changePaymentStatus(bookingId) {
 		try {
@@ -134,7 +128,6 @@
 			orderBy('dateReserved', 'asc')
 		);
 		searchByValue = '';
-		noResult = false;
 	}
 	$: {
 		getBookings(bookingsQuery, currentPage, pageSize);
@@ -213,7 +206,7 @@
 				</thead>
 				{#if noResult}
 					<tr>
-						<td class="py-24 text-center" colspan="8">No result found</td>
+						<td class="py-24 text-center" colspan="8">No Pending Booking/s Found</td>
 					</tr>
 				{/if}
 				<tbody>
@@ -318,7 +311,7 @@
 	<!-- Small screen -->
 	<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">
 		{#if noResult}
-			<div class="w-full mx-auto">No result found</div>
+			<div class="w-full mx-auto">No Pending Booking/s Found</div>
 		{/if}
 		{#each listOfBooking as book}
 			<!-- {#if book.status == 'Pending'} -->

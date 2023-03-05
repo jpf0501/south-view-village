@@ -5,9 +5,7 @@
 		collection,
 		orderBy,
 		where,
-		getCountFromServer,
 		doc,
-		setDoc,
 		updateDoc
 	} from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
@@ -23,7 +21,6 @@
 		where('isPending', '==', true)
 	);
 
-	let countofSearchResult = '';
 	let noResult = false;
 
 	let currentPage = 1;
@@ -41,6 +38,7 @@
 				.map((doc) => ({ id: doc.id, ...doc.data() }))
 				.slice(startIndex, endIndex);
 		});
+		listOfUsers.length === 0 ? (noResult = true) : (noResult = false);
 		onDestroy(() => unsubscribe());
 	}
 
@@ -50,7 +48,6 @@
 			where('isPending', '==', true),
 			orderBy(sortByField, 'asc')
 		);
-		noResult = false;
 	}
 
 	async function searchPendingAccounts() {
@@ -61,16 +58,11 @@
 			where(searchByField, '>=', searchByValueCase),
 			where(searchByField, '<=', searchByValueCase + '~')
 		);
-
-		const snapshotOfCountOfPendingAccounts = await getCountFromServer(pendingAccountsQuery);
-		countofSearchResult = snapshotOfCountOfPendingAccounts.data().count;
-		countofSearchResult === 0 ? (noResult = true) : (noResult = false);
 	}
 
 	async function resetButton() {
 		pendingAccountsQuery = query(collection(db, 'pendingAccounts'), where('isPending', '==', true));
 		searchByValue = '';
-		noResult = false;
 	}
 
 	async function approval(
@@ -207,7 +199,7 @@
 				</thead>
 				{#if noResult}
 					<tr>
-						<td class="py-24 text-center" colspan="8">No result found</td>
+						<td class="py-24 text-center" colspan="8">No Pending Account/s to Approve Found</td>
 					</tr>
 				{/if}
 				<tbody>
@@ -267,7 +259,7 @@
 	<!-- Small screen -->
 	<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">
 		{#if noResult}
-			<div class="w-full mx-auto">No result found</div>
+			<div class="w-full mx-auto">No Pending Account/s to Approve Found</div>
 		{/if}
 		{#each listOfUsers as pendingUser}
 			<div class="card w-[105%] bg-base-100 shadow-xl">

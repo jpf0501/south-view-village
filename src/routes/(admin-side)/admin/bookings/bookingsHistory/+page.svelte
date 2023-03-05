@@ -1,13 +1,5 @@
 <script>
-	import {
-		onSnapshot,
-		query,
-		collection,
-		orderBy,
-		where,
-		getDocs,
-		getCountFromServer
-	} from 'firebase/firestore';
+	import { onSnapshot, query, collection, orderBy, where, getDocs } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
 	import { jsPDF } from 'jspdf';
@@ -23,7 +15,7 @@
 		where('status', 'in', ['Approved', 'Disapproved']),
 		orderBy('dateReviewed', 'desc')
 	);
-	let countofSearchResult = '';
+
 	let noResult = false;
 
 	let currentPage = 1;
@@ -39,6 +31,7 @@
 				.map((doc) => ({ id: doc.id, ...doc.data() }))
 				.slice(startIndex, endIndex);
 		});
+		listOfBooking.length === 0 ? (noResult = true) : (noResult = false);
 		onDestroy(() => unsubscribe());
 	}
 
@@ -58,7 +51,6 @@
 				orderBy('dateReviewed', 'desc')
 			);
 		}
-		noResult = false;
 	}
 
 	async function changeSortByStatus() {
@@ -75,7 +67,6 @@
 				orderBy('dateReviewed', 'desc')
 			);
 		}
-		noResult = false;
 	}
 
 	async function searchBookings() {
@@ -88,9 +79,6 @@
 			where('status', 'in', ['Approved', 'Disapproved']),
 			orderBy('dateReviewed', 'desc')
 		);
-		const snapshotOfCountOfBookingHistory = await getCountFromServer(bookingsQuery);
-		countofSearchResult = snapshotOfCountOfBookingHistory.data().count;
-		countofSearchResult === 0 ? (noResult = true) : (noResult = false);
 	}
 
 	async function resetButton() {
@@ -100,7 +88,6 @@
 			orderBy('dateReviewed', 'desc')
 		);
 		searchByValue = '';
-		noResult = false;
 	}
 
 	async function generateReport() {
@@ -221,7 +208,7 @@
 				</thead>
 				{#if noResult}
 					<tr>
-						<td class="py-24 text-center" colspan="8">No result found</td>
+						<td class="py-24 text-center" colspan="8">No Booking History Found</td>
 					</tr>
 				{/if}
 				<tbody>
@@ -279,7 +266,7 @@
 
 	<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">
 		{#if noResult}
-			<div class="w-full mx-auto">No result found</div>
+			<div class="w-full mx-auto">No Booking History Found</div>
 		{/if}
 		{#each listOfBooking as book}
 			<!-- {#if book.status == 'Approved' || book.status == 'Disapproved'} -->
