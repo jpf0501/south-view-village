@@ -46,21 +46,21 @@
 <!-- end committee -->
 
 <!-- photo showcase -->
-<div class="flex flex-col md:flex-row items-fit">
-	<div>
-		<img src="/images/playground.jpg" alt="Southview Homes 3 Residence"/>
+<div class="flex flex-col md:flex-row w-full">
+	<div class="grow h-full px-3 py-8">
+		<img src="/images/playground.jpg" class="mx-auto rounded-md shadow-2xl" alt="Southview Homes 3 Residence"/>
 	</div>
-	<div>
-		<img src="/images/amenities.jpg" alt="Southview Homes 3 Amenities"/>
+	<div class="grow h-full px-3 py-8">
+		<img src="/images/amenities.jpg" class="mx-auto rounded-md shadow-2xl" alt="Southview Homes 3 Amenities"/>
 	</div>
-	<div>
-		<img src="/images/front_gate.jpg" alt="Southview Homes 3 Front Gate"/>
+	<div class="grow h-full px-3 py-8">
+		<img src="/images/front_gate.jpg" class="mx-auto rounded-md shadow-2xl" alt="Southview Homes 3 Front Gate"/>
 	</div>
 </div>
 <!-- end showcase -->
 
 <!-- news -->
-<div class="flex flex-col  w-full bg-base-200">
+<div class="flex flex-col w-full bg-base-200">
 	<div class="m-8 bg-white rounded-lg">
 		<div class="flex flex-col mt-6 mx-8 mb-4">
 			<h2 class="font-bold text-4xl mt-3">Recent News</h2>
