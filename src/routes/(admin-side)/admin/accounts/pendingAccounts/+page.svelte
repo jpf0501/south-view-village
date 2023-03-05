@@ -92,15 +92,11 @@
 	) {
 		if (isApproved) {
 			try {
-				const userCredential = await createUserWithEmailAndPassword(
-					auth,
-					pendingEmail,
-					pendingPassword
-				);
-				const user = userCredential.user;
-				await setDoc(doc(db, 'accounts', user.uid), {
+			const response = await fetch('/api/pendingAccounts', {
+				method: 'POST',
+				body: JSON.stringify({
 					email: pendingEmail,
-					// password: pendingPassword,
+					password: pendingPassword,
 					firstname: pendingFirstname,
 					firstNameDisplay: pendingFirstNameDisplay,
 					lastname: pendingLastname,
@@ -111,9 +107,13 @@
 					contactNumber: pendingContactNumber,
 					role: pendingRole,
 					paymentStatus: pendingPaymentStatus
-				});
-
-				const pendingAccountsRef = doc(db, 'pendingAccounts', pendingID);
+				})
+			});
+			const result = await response.json();
+			console.log(result);
+				
+			
+			const pendingAccountsRef = doc(db, 'pendingAccounts', pendingID);
 				const data = {
 					isPending: false
 				};
