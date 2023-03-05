@@ -118,6 +118,7 @@
 		</select>
 
 		<a class="btn btn-primary my-4" href="/admin/accounts/create">Add User</a>
+		<a class="btn btn-primary my-4" href="/admin/accounts/pendingAccounts">Account Request</a>
 	</div>
 
 	<!-- Medium to large screen -->
@@ -223,4 +224,3 @@
 
 <!-- pagination button -->
 <Pagination {currentPage} {totalPages} onPageChange={goToPage} />
-
