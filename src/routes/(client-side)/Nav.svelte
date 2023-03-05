@@ -52,11 +52,6 @@
 		{#if $userStore}
 			<a
 				class="font-medium tab tab-lg py-2 px-4"
-				href="/payment"
-				class:tab-active={pathname === '/payment'}>Payment</a
-			>
-			<a
-				class="font-medium tab tab-lg py-2 px-4"
 				href="/profile"
 				class:tab-active={pathname === '/profile'}>Profile</a
 			>
@@ -124,12 +119,6 @@
 				>
 
 				{#if $userStore}
-					<a
-						class="block font-medium tab tab-lg py-2 px-4 border-b"
-						href="/payment"
-						class:tab-active={pathname === '/payment'}
-						on:click={() => (isDropdownOpen = !isDropdownOpen)}>Payment</a
-					>
 					<a
 						class="block font-medium tab tab-lg py-2 px-4 border-b"
 						href="/profile"
