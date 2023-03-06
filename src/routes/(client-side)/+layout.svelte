@@ -33,7 +33,7 @@
 	Loading
 {:else}
 	<Header/>
-	<div class="pt-10">
+	<div class="pt-16">
 		<slot/>
 	</div>
 	<Footer/>

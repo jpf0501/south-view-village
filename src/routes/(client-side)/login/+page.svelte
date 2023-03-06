@@ -25,7 +25,7 @@
 	<title>Login - Official Website of Southview Homes 3 Subdivision</title>
 </svelte:head>
 
-<div class="min-h-screen hero bg-base-200">
+<div class="min-h-screen hero bg-base-200 pt-6">
 	<div class="flex-col hero-content lg:flex-row-reverse gap-11">
 		<div class="text-center lg:text-left">
 			<h1 class="text-5xl font-bold pb-6">Login</h1>
