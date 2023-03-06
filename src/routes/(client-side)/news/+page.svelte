@@ -33,7 +33,7 @@
 				</h1>
 				<article class="w-full max-w-5xl mx-auto">
 					<div class="flex flex-row-2 justify-between">
-						<h1 class="font-bold text-2xl p-4">{news.titleDisplay}</h1>
+						<h1 class="font-bold text-2xl py-4">{news.titleDisplay}</h1>
 						<div class="flex items-center">
 							<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 mr-2">
 								<path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
