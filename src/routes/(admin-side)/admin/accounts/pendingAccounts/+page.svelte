@@ -18,7 +18,7 @@
 	let searchByValue = '';
 	let pendingAccountsQuery = query(
 		collection(db, 'pendingAccounts'),
-		where('isPending', '==', true),
+		where('isPending', '==', true)
 	);
 
 	let noResult = false;
@@ -78,7 +78,8 @@
 		pendingAddressLot,
 		pendingAddressStreet,
 		pendingRole,
-		pendingPaymentStatus
+		pendingPaymentStatus,
+		pendingPaymentHead
 	) {
 		if (isApproved) {
 			try {
@@ -96,7 +97,8 @@
 						addressStreet: pendingAddressStreet,
 						contactNumber: pendingContactNumber,
 						role: pendingRole,
-						paymentStatus: pendingPaymentStatus
+						paymentStatus: pendingPaymentStatus,
+						paymentHead: pendingPaymentHead	
 					})
 				});
 				const result = await response.json();
@@ -240,7 +242,8 @@
 										user.pendingAddressLot,
 										user.pendingAddressStreet,
 										user.pendingRole,
-										user.pendingPaymentStatus
+										user.pendingPaymentStatus,
+										user.pendingPaymentHead
 									)}
 								>
 									<button
@@ -314,7 +317,8 @@
 								user.pendingAddressLot,
 								user.pendingAddressStreet,
 								user.pendingRole,
-								user.pendingPaymentStatus
+								user.pendingPaymentStatus,
+								user.pendingPaymentHead
 							)}
 							class="py-3"
 						>
