@@ -29,10 +29,13 @@
 </footer> -->
 
 <footer class="footer p-10 bg-base-200 text-base-content">
-  <div class="pl-24 py-8">
-    <img class="mask mask-circle" src="/logo.png" alt="Southview Homes 3 Logo"/>
-    <p class="pt-3 font-bold">Southview Homes 3</p>
-	<p>Copyright © {year} Southview Homes 3 - All Rights Reserved</p>
+  <div class="py-5">
+	<div class="flex items-center">
+		<img class="mask mask-circle" src="/logo.png" alt="Southview Homes 3 Logo"/>
+		<p class="pl-3 font-bold">Southview Homes 3</p>
+	</div>
+	<p class="pt-4">Copyright © {year} Southview Homes 3</p>
+	<p>All Rights Reserved</p>
   </div> 
   <div class="py-5">
 	<span class="footer-title">Quick Links</span>
