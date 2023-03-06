@@ -26,11 +26,11 @@
 </svelte:head>
 
 <div class="min-h-screen hero bg-base-200">
-	<div class="flex-col hero-content lg:flex-row-reverse">
+	<div class="flex-col hero-content lg:flex-row-reverse gap-11">
 		<div class="text-center lg:text-left">
-			<h1 class="text-5xl font-bold">Login now!</h1>
+			<h1 class="text-5xl font-bold pb-6">Login</h1>
 			<p class="py-6">
-				To create an account, please contact a Southview Homes 3 committee member for requests and
+				To create an account, you can either go <a href="/createAccount" class="text-blue-700 hover:text-blue-500">here</a> and wait for verification, or contact a Southview Homes 3 committee member for account creation request and
 				other inquiries.
 			</p>
 		</div>
@@ -67,8 +67,7 @@
 				</div>
 				<div class="mt-6 form-control">
 					<button class="btn btn-primary">Login</button>
-					<a href="createAccount" class="mx-auto my-3 hover:underline">Create Account</a>
-					<a href="/forgot_Password" class="mx-auto my-3 hover:underline">Forgot Password?</a>
+					<a href="/forgot_Password" class="mx-auto mt-6 hover:underline">Forgot Password?</a>
 				</div>
 			</div>
 		</form>
