@@ -31,7 +31,7 @@
 	}
 </script>
 
-<div class="navbar bg-base-100 fixed top-0 z-50">
+<div class="navbar bg-base-100 fixed top-0 z-50 drop-shadow-2xl">
 	<div class="navbar-start">
 	  <div class="dropdown">
 		<!-- svelte-ignore a11y-label-has-associated-control -->
