@@ -32,7 +32,7 @@
   <div class="py-5 self-start">
 	<div class="flex items-center">
 		<img class="mask mask-circle" src="/logo.png" alt="Southview Homes 3 Logo"/>
-		<p class="pl-3 font-bold">Southview Homes 3</p>
+		<p class="text-lg pl-3 font-bold">Southview Homes 3</p>
 	</div>
 	<p class="pt-4">Copyright © {year} Southview Homes 3</p>
 	<p>All Rights Reserved</p>
