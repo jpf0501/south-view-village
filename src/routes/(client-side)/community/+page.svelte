@@ -64,22 +64,22 @@
 <p class="divider px-5 pt-5"></p>
 <div class="px-5 py-3">
 	<h1 class="text-2xl font-bold pb-3">Community Images</h1>
-	<div class="flex flex-col md:flex-row items-center justify-center mx-auto py-3">
-		<div class="px-3 pt-3">
+	<div class="flex flex-col md:flex-row items-center justify-center mx-auto gap-3 py-3">
+		<div class="pt-3">
 			<img
 				src="/images/grass.jpg"
 				alt="Southview Homes 3 Neighborhood"
 				class="rounded-lg shadow-lg"
 			/>
 		</div>
-		<div class="px-3 pt-3">
+		<div class="pt-3">
 			<img
 				src="/images/street.jpg"
 				alt="Southview Homes 3 Neighborhood"
 				class="rounded-lg shadow-lg"
 			/>
 		</div>
-		<div class="px-3 pt-3">
+		<div class="pt-3">
 			<img
 				src="/images/front.jpg"
 				alt="Southview Homes 3 Neighborhood"
