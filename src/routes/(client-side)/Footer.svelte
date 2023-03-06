@@ -46,7 +46,7 @@
   </div> 
   <div class="py-5 self-start">
 	<span class="footer-title">Legal</span>
-    <a href="/terms-of-use" class="link link-hover">Terms of Use</a> 
+    <a href="/terms-and-conditions" class="link link-hover">Terms and Conditions</a> 
     <a href="/privacy-policy" class="link link-hover">Privacy Policy</a>
   </div> 
   <div class="py-5 self-start">
