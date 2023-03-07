@@ -74,7 +74,6 @@
 		<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
 		<ul tabindex="0" class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52">
 			{#if !$userStore}
-				<p class="text-sm font-semibold px-4 py-3">You are not logged in</p>
 		  		<li><a href="/login">Login</a></li>
 		  		<li class="pb-2"><a href="/createAccount">Register</a></li>
 			{:else}
