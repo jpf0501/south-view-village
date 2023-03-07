@@ -38,7 +38,7 @@
 	let sortByField = '';
 	let searchByField = '';
 	let searchByValue = '';
-	let accountsQuery = query(collection(db, 'accounts'), where('paymentHead', '==', true));
+	let accountsQuery = query(collection(db, 'accounts'), where('paymentHead', '==', true), where('role', '==', 'Resident'));
 
 	let noResult = false;
 
@@ -63,6 +63,7 @@
 		accountsQuery = query(
 			collection(db, 'accounts'),
 			where('paymentHead', '==', true),
+			where('role', '==', 'Resident'),
 			orderBy(sortByField, 'asc')
 		);
 	}
@@ -73,7 +74,8 @@
 			collection(db, 'accounts'),
 			where(searchByField, '>=', searchByValueCase),
 			where(searchByField, '<=', searchByValueCase + '~'),
-			where('paymentHead', '==', true)
+			where('paymentHead', '==', true),
+			where('role', '==', 'Resident'),
 		);
 	}
 
@@ -100,7 +102,7 @@
 	}
 
 	async function resetButton() {
-		accountsQuery = query(collection(db, 'accounts'), where('paymentHead', '==', true));
+		accountsQuery = query(collection(db, 'accounts'), where('paymentHead', '==', true), where('role', '==', 'Resident'),);
 		searchByValue = '';
 	}
 
@@ -192,7 +194,6 @@
 						<th class="text-lg">Contact No.</th>
 						<th class="text-lg">Payment Status</th>
 						<th />
-						<th />
 					</tr>
 				</thead>
 				{#if noResult}
@@ -217,7 +218,6 @@
 							<td>{user.email}</td>
 							<td>{user.contactNumber}</td>
 							<td>{user.paymentStatus}</td>
-							<td />
 							<td>
 								{#if user.paymentStatus == 'Unpaid'}
 									<button
@@ -264,13 +264,15 @@
 						{user.email}
 					</div>
 					<div class="card-actions justify-end">
-						<a href={'/admin/accounts/edit/' + user.id} class="btn glass text-white"
-							><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-								><path
-									d="M7.127 22.562l-7.127 1.438 1.438-7.128 5.689 5.69zm1.414-1.414l11.228-11.225-5.69-5.692-11.227 11.227 5.689 5.69zm9.768-21.148l-2.816 2.817 5.691 5.691 2.816-2.819-5.691-5.689z"
-								/></svg
-							></a
-						>
+						{#if user.paymentStatus == 'Unpaid'}
+							<button
+								on:click={sendPaymentEmail(user.email, user.id)}
+								type="button"
+								class="btn btn-primary">Send Payment</button
+							>
+						{:else}
+							<button type="button" class="btn btn-primary" disabled>Send Payment</button>
+						{/if}
 					</div>
 				</div>
 			</div>
