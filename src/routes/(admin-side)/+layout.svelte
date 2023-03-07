@@ -30,6 +30,7 @@
 	Loading
 {:else}
 	<Header/>
-	<Navbar/>
-	<slot/>
+	<div class="pt-16">
+		<slot/>
+	</div>
 {/if}

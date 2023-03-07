@@ -3,6 +3,7 @@
 	import { getDoc, doc, addDoc, collection, serverTimestamp } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { goto } from '$app/navigation';
+	import toast from 'svelte-french-toast';
 
 	let user = null;
 	const dateMin = new Date(Date.now() + 8.64e+7).toLocaleDateString('en-ca');
@@ -50,11 +51,11 @@
 					dateReserved: guest.dateReserved,
 					dateReviewed: guest.dateReserved,
 				});
-				alert('Reservation form submitted');
-				await goto('/');
+				toast.success('Reservation Form Submitted!')
+				await goto('/calendar');
 			} catch (error) {
 				console.log(error);
-				alert('Error sending request');
+				toast.error('Error in Submitting Reservation!')
 			}
 		} else {
 			try {
@@ -73,11 +74,11 @@
 					dateReserved: guest.dateReserved,
 					dateReviewed: guest.dateReserved
 				});
-				alert('Schedule request submitted');
+				toast.success('Reservation Form Submitted!')
 				await goto('/calendar');
 			} catch (error) {
 				console.log(error);
-				alert('Error sending request');
+				toast.error('Error in Submitting Reservation!');
 			}
 		}
 	}

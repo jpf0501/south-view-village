@@ -1,16 +1,9 @@
 <script>
-	import {
-		onSnapshot,
-		query,
-		collection,
-		orderBy,
-		where,
-		getDocs,
-		getCountFromServer
-	} from 'firebase/firestore';
+	import { onSnapshot, query, collection, orderBy, where, getDocs } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
 	import { jsPDF } from 'jspdf';
+	import Pagination from '../../Pagination.svelte';
 
 	let listOfBooking = [];
 	let sortByField = '';
@@ -22,7 +15,7 @@
 		where('status', 'in', ['Approved', 'Disapproved']),
 		orderBy('dateReviewed', 'desc')
 	);
-	let countofSearchResult = '';
+
 	let noResult = false;
 
 	let currentPage = 1;
@@ -38,6 +31,7 @@
 				.map((doc) => ({ id: doc.id, ...doc.data() }))
 				.slice(startIndex, endIndex);
 		});
+		listOfBooking.length === 0 ? (noResult = true) : (noResult = false);
 		onDestroy(() => unsubscribe());
 	}
 
@@ -85,9 +79,6 @@
 			where('status', 'in', ['Approved', 'Disapproved']),
 			orderBy('dateReviewed', 'desc')
 		);
-		const snapshotOfCountOfBookingHistory = await getCountFromServer(bookingsQuery);
-		countofSearchResult = snapshotOfCountOfBookingHistory.data().count;
-		countofSearchResult === 0 ? (noResult = true) : (noResult = false);
 	}
 
 	async function resetButton() {
@@ -146,17 +137,25 @@
 	<title>Booking History - Southview Homes 3 Admin Panel</title>
 </svelte:head>
 
-<div class="min-w-full min-h-full bg-base-200 px-12">
-	<div class="flex justify-between py-10">
-		<h1 class="text-3xl font-semibold">Booking History</h1>
-		<a href="/admin/bookings" class="btn btn-primary">Go to Bookings</a>
+<div class="min-w-full min-h-full bg-base-200 py-8 px-5">
+	<h1 class="text-3xl font-semibold py-2">Bookings History</h1>
+	<div class="flex justify-end">
+		<a href="/admin/bookings/" class="btn btn-primary ">Go to Bookings</a>
 	</div>
 	<div class="flex flex-col md:flex-row justify-between">
 		<div class="flex flex-col md:flex-row">
-			<form on:submit|preventDefault={searchBookings} class="my-4">
-				<select bind:value={searchByField} class="select select-bordered" required>
+			<form
+				on:submit|preventDefault={searchBookings}
+				class="my-4 flex flex-col md:flex-row items-start"
+			>
+				<select
+					bind:value={searchByField}
+					class="select select-bordered mb-2 md:mb-0 md:mr-2"
+					required
+				>
 					<option value="" disabled selected>Search Filter</option>
-					<option value="firstname">Name</option>
+					<option value="firstname">Firstname</option>
+					<option value="lastname">Lastname</option>
 					<option value="email">E-mail Address</option>
 					<option value="eventType">Type of Event</option>
 					<!-- <option value="bookDate">Date and Time</option> -->
@@ -164,16 +163,17 @@
 				<input
 					type="search"
 					placeholder="Search here"
-					class="input input-bordered mx-2"
+					class="input input-bordered"
 					bind:value={searchByValue}
 				/>
 			</form>
-			<button on:click={resetButton} class="btn btn-primary my-4">Reset</button>
+			<button on:click={resetButton} class="btn btn-primary my-4 mx-2">Reset</button>
 		</div>
 
 		<select bind:value={sortByField} on:change={changeSortBy} class="select select-bordered my-4">
 			<option value="" disabled selected>Sort By</option>
-			<option value="firstname">Name</option>
+			<option value="firstname">Firstname</option>
+			<option value="lastname">Lastname</option>
 			<option value="email">E-mail Address</option>
 			<option value="eventType">Type of Event</option>
 			<option value="bookDate">Date and Time</option>
@@ -191,16 +191,6 @@
 			<button class="btn btn-primary" on:click={generateReport}>Generate Report</button>
 		</div>
 	</div>
-
-	<style>
-		table {
-			counter-reset: section;
-		}
-		.count:before {
-			counter-increment: section;
-			content: counter(section);
-		}
-	</style>
 
 	<!-- Medium to large screen -->
 	<div class="w-full mx-auto shadow-2xl border rounded-xl bg-base-100 my-5 hidden md:block">
@@ -220,14 +210,14 @@
 				</thead>
 				{#if noResult}
 					<tr>
-						<td class="" colspan="8">No result found</td>
+						<td class="py-24 text-center" colspan="8">No Booking History Found</td>
 					</tr>
 				{/if}
 				<tbody>
-					{#each listOfBooking as book}
+					{#each listOfBooking as book, i}
 						<!-- {#if book.status != 'Pending'} -->
 						<tr class="hover">
-							<td class="count" />
+							<td>{i + (currentPage - 1) * pageSize + 1}</td>
 							<td>{book.firstNameDisplay + ' ' + book.lastNameDisplay}</td>
 							<td>{book.email}</td>
 							<td>{book.contactNumber}</td>
@@ -278,7 +268,7 @@
 
 	<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">
 		{#if noResult}
-			<div class="w-full mx-auto" colspan="8">No result found</div>
+			<div class="w-full mx-auto">No Booking History Found</div>
 		{/if}
 		{#each listOfBooking as book}
 			<!-- {#if book.status == 'Approved' || book.status == 'Disapproved'} -->
@@ -330,61 +320,8 @@
 			<!-- {/if} -->
 		{/each}
 	</div>
+
+	<div class="mt-14">
+		<Pagination {currentPage} {totalPages} onPageChange={goToPage} />
+	</div>
 </div>
-<!-- pagination button -->
-<div class="flex justify-center items-center mt-5">
-	<nav class="block">
-		<ul class="flex pl-0 rounded list-none flex-wrap">
-			{#if currentPage > 1}
-				<li>
-					<button
-						class="relative block py-2 px-3 leading-tight bg-white border border-gray-300 text-blue-700 hover:bg-gray-200 focus:bg-gray-200"
-						on:click={() => goToPage(currentPage - 1)}
-					>
-						Previous
-					</button>
-				</li>
-			{/if}
-
-			{#each Array.from({ length: totalPages }, (_, i) => i + 1) as page}
-				{#if page === currentPage}
-					<li>
-						<button
-							class="relative block py-2 px-3 leading-tight bg-blue-700 text-white hover:bg-blue-500 focus:bg-blue-500"
-							>{page}</button
-						>
-					</li>
-				{:else if (page >= currentPage - 2 && page <= currentPage + 2) || page === totalPages || page === 1}
-					<li>
-						<button
-							class="relative block py-2 px-3 leading-tight bg-white border border-gray-300 text-blue-700 hover:bg-gray-200 focus:bg-gray-200"
-							on:click={() => goToPage(page)}
-						>
-							{page}
-						</button>
-					</li>
-				{:else if page === currentPage - 3 || page === currentPage + 3}
-					<li>
-						<span
-							class="relative block py-2 px-3 leading-tight bg-white border border-gray-300 text-blue-700"
-							>...</span
-						>
-					</li>
-				{/if}
-			{/each}
-
-			{#if currentPage < totalPages}
-				<li>
-					<button
-						class="relative block py-2 px-3 leading-tight bg-white border border-gray-300 text-blue-700 hover:bg-gray-200 focus:bg-gray-200"
-						on:click={() => goToPage(currentPage + 1)}
-					>
-						Next
-					</button>
-				</li>
-			{/if}
-		</ul>
-	</nav>
-</div>
-
-<!-- mema comment -->

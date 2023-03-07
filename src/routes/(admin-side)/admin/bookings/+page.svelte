@@ -7,12 +7,13 @@
 		doc,
 		where,
 		orderBy,
-		serverTimestamp,
-		getCountFromServer
+		serverTimestamp
 	} from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
 	import { createPaymentLink, sendEmail } from '$lib/utils';
+	import Pagination from '../Pagination.svelte';
+	import toast from 'svelte-french-toast';
 
 	let listOfBooking = [];
 	let sortByField = '';
@@ -25,7 +26,7 @@
 		where('status', '==', 'Pending'),
 		orderBy('dateReserved', 'asc')
 	);
-	let countofSearchResult = '';
+
 	let noResult = false;
 
 	let currentPage = 1;
@@ -41,6 +42,7 @@
 				.map((doc) => ({ id: doc.id, ...doc.data() }))
 				.slice(startIndex, endIndex);
 		});
+		listOfBooking.length === 0 ? (noResult = true) : (noResult = false);
 		onDestroy(() => unsubscribe());
 	}
 
@@ -72,13 +74,9 @@
 			where('status', '==', 'Pending'),
 			orderBy('dateReserved', 'asc')
 		);
-
-		const snapshotOfCountOfPendingBookings = await getCountFromServer(bookingsQuery);
-		countofSearchResult = snapshotOfCountOfPendingBookings.data().count;
-		countofSearchResult === 0 ? (noResult = true) : (noResult = false);
 	}
 
-	async function changeStatus(bookingId) {
+	async function changeStatus(bookingId, bookEmail, bookDate) {
 		try {
 			const bookRef = doc(db, 'booking', bookingId);
 			const data = {
@@ -86,9 +84,33 @@
 				dateReviewed: serverTimestamp()
 			};
 			await updateDoc(bookRef, data);
-			alert('Booking request has been ' + bookingStatus);
+			toast.success('Booking request has been ' + bookingStatus.toLowerCase() + ' !');
+			try {
+				const result = await sendEmail({
+					to: bookEmail,
+					subject: 'Southview Homes 3 Booking Request',
+					html:
+						'<h1>Your booking request that is scheduled on ' +
+						bookDate.toDate().toLocaleDateString('en-us', {
+							year: 'numeric',
+							month: 'long',
+							day: 'numeric'
+						}) +
+						' at ' +
+						bookDate.toDate().toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' }) +
+						' has been ' +
+						bookingStatus.toLowerCase() +
+						' by the admin</ht>'
+				});
+				// console.log(JSON.stringify(result));
+				// alert('Email sent successfuly');
+			} catch (error) {
+				console.log(error);
+				toast.error('Error in sending approval/disapproval booking request in email');
+			}
 		} catch (error) {
 			console.log(error);
+			toast.error('Error in approving/disapproving a booking!');
 		}
 	}
 	async function changePaymentStatus(bookingId) {
@@ -98,8 +120,10 @@
 				paymentStatus: bookingPaymentStatus
 			};
 			await updateDoc(bookRef, data);
+			toast.success('Booking status changed!');
 		} catch (error) {
 			console.log(error);
+			toast.error('Error in changing booking status!');
 		}
 	}
 
@@ -118,10 +142,10 @@
 				html: `<h1>This is the link for payment for reservation in booking: <a href=${checkoutURL}>Click here</a></h1>`
 			});
 			console.log(JSON.stringify(result));
-			alert('Email for payment method sent successfully');
+			toast.success('Payment has been sent!');
 		} catch (error) {
 			console.log(error);
-			alert('Error in sending payment method');
+			toast.error('Error in sending payment!');
 		}
 	}
 	async function resetButton() {
@@ -149,17 +173,25 @@
 	<title>Booking Requests - Southview Homes 3 Admin Panel</title>
 </svelte:head>
 
-<div class="min-w-full min-h-full bg-base-200 px-12">
-	<div class="flex justify-between py-10">
-		<h1 class="text-3xl font-semibold">Booking</h1>
-		<a href="/admin/bookings/bookingsHistory" class="btn btn-primary">View History</a>
+<div class="min-w-full min-h-full bg-base-200 py-8 px-5">
+	<h1 class="text-3xl font-semibold py-2">Bookings</h1>
+	<div class="flex justify-end">
+		<a href="/admin/bookings/bookingsHistory" class="btn btn-primary ">Bookings History</a>
 	</div>
 	<div class="flex flex-col md:flex-row justify-between">
 		<div class="flex flex-col md:flex-row">
-			<form on:submit|preventDefault={searchBookings} class="my-4">
-				<select bind:value={searchByField} class="select select-bordered" required>
+			<form
+				on:submit|preventDefault={searchBookings}
+				class="my-4 flex flex-col md:flex-row items-start"
+			>
+				<select
+					bind:value={searchByField}
+					class="select select-bordered mb-2 md:mb-0 md:mr-2"
+					required
+				>
 					<option value="" disabled selected>Search Filter</option>
-					<option value="firstname">Name</option>
+					<option value="firstname">Firstname</option>
+					<option value="lastname">Lastname</option>
 					<option value="email">E-mail Address</option>
 					<option value="eventType">Type of Event</option>
 					<!-- <option value="bookDate">Date and Time</option> -->
@@ -167,31 +199,22 @@
 				<input
 					type="search"
 					placeholder="Search here"
-					class="input input-bordered mx-2"
+					class="input input-bordered"
 					bind:value={searchByValue}
 				/>
 			</form>
-			<button on:click={resetButton} class="btn btn-primary my-4">Reset</button>
+			<button on:click={resetButton} class="btn btn-primary my-4 mx-2">Reset</button>
 		</div>
 
 		<select bind:value={sortByField} on:change={changeSortBy} class="select select-bordered my-4">
 			<option value="" disabled selected>Sort By</option>
-			<option value="firstname">Name</option>
+			<option value="firstname">Firstname</option>
+			<option value="lastname">Lastname</option>
 			<option value="email">E-mail Address</option>
 			<option value="eventType">Type of Event</option>
 			<option value="bookDate">Date and Time</option>
 		</select>
 	</div>
-
-	<style>
-		table {
-			counter-reset: section;
-		}
-		.count:before {
-			counter-increment: section;
-			content: counter(section);
-		}
-	</style>
 
 	<!-- Medium to large screen -->
 	<div class="w-full mx-auto shadow-2xl border rounded-xl bg-base-100 my-5 hidden md:block">
@@ -212,14 +235,14 @@
 				</thead>
 				{#if noResult}
 					<tr>
-						<td class="py-24 text-center" colspan="8">No result found</td>
+						<td class="py-24 text-center" colspan="8">No Pending Booking/s Found</td>
 					</tr>
 				{/if}
 				<tbody>
-					{#each listOfBooking as book}
+					{#each listOfBooking as book, i}
 						<!-- {#if book.status == 'Pending'} -->
 						<tr class="hover">
-							<td class="count" />
+							<td>{i + (currentPage - 1) * pageSize + 1}</td>
 							<td>{book.firstNameDisplay + ' ' + book.lastNameDisplay}</td>
 							<td>{book.email}</td>
 							<td>{book.contactNumber}</td>
@@ -264,7 +287,7 @@
 								</form></td
 							>
 							<td
-								><form on:submit|preventDefault={changeStatus(book.id, book.paymentStatus)}>
+								><form on:submit|preventDefault={changeStatus(book.id, book.email, book.bookDate)}>
 									{#if book.paymentStatus == 'Unpaid'}
 										<button
 											on:click={() => (bookingStatus = 'Approved')}
@@ -317,7 +340,7 @@
 	<!-- Small screen -->
 	<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">
 		{#if noResult}
-			<div class="w-full mx-auto" colspan="8">No result found</div>
+			<div class="w-full mx-auto">No Pending Booking/s Found</div>
 		{/if}
 		{#each listOfBooking as book}
 			<!-- {#if book.status == 'Pending'} -->
@@ -375,7 +398,10 @@
 						</form>
 					</div>
 					<div>
-						<form on:submit|preventDefault={changeStatus(book.id, book.paymentStatus)} class="py-3">
+						<form
+							on:submit|preventDefault={changeStatus(book.id, book.email, book.bookDate)}
+							class="py-3"
+						>
 							{#if book.paymentStatus == 'Unpaid'}
 								<button
 									on:click={() => (bookingStatus = 'Approved')}
@@ -416,62 +442,8 @@
 			<!-- {/if} -->
 		{/each}
 	</div>
+
+	<div class="mt-14">
+		<Pagination {currentPage} {totalPages} onPageChange={goToPage} />
+	</div>
 </div>
-
-<!-- pagination button -->
-<div class="flex justify-center items-center mt-5">
-	<nav class="block">
-		<ul class="flex pl-0 rounded list-none flex-wrap">
-			{#if currentPage > 1}
-				<li>
-					<button
-						class="relative block py-2 px-3 leading-tight bg-white border border-gray-300 text-blue-700 hover:bg-gray-200 focus:bg-gray-200"
-						on:click={() => goToPage(currentPage - 1)}
-					>
-						Previous
-					</button>
-				</li>
-			{/if}
-
-			{#each Array.from({ length: totalPages }, (_, i) => i + 1) as page}
-				{#if page === currentPage}
-					<li>
-						<button
-							class="relative block py-2 px-3 leading-tight bg-blue-700 text-white hover:bg-blue-500 focus:bg-blue-500"
-							>{page}</button
-						>
-					</li>
-				{:else if (page >= currentPage - 2 && page <= currentPage + 2) || page === totalPages || page === 1}
-					<li>
-						<button
-							class="relative block py-2 px-3 leading-tight bg-white border border-gray-300 text-blue-700 hover:bg-gray-200 focus:bg-gray-200"
-							on:click={() => goToPage(page)}
-						>
-							{page}
-						</button>
-					</li>
-				{:else if page === currentPage - 3 || page === currentPage + 3}
-					<li>
-						<span
-							class="relative block py-2 px-3 leading-tight bg-white border border-gray-300 text-blue-700"
-							>...</span
-						>
-					</li>
-				{/if}
-			{/each}
-
-			{#if currentPage < totalPages}
-				<li>
-					<button
-						class="relative block py-2 px-3 leading-tight bg-white border border-gray-300 text-blue-700 hover:bg-gray-200 focus:bg-gray-200"
-						on:click={() => goToPage(currentPage + 1)}
-					>
-						Next
-					</button>
-				</li>
-			{/if}
-		</ul>
-	</nav>
-</div>
-
-<!-- mema comment -->

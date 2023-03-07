@@ -7,6 +7,7 @@
 	const { newsID } = data;
 
     let news = null;
+    
 
 	async function getNews() {
 		const snapshot = await getDoc(doc(db, 'news', newsID));
@@ -24,24 +25,28 @@
 {#if news}
 <main class="p-8 w-full">
     <div class="pb-10"> 
-        <a href="/news/" class="gap-2 btn btn-outline">
-            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-arrow-left-circle" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-4.5-.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5z"/>
-            </svg>Go Back
-        </a>
+        <div class="text-md breadcrumbs">
+            <ul>
+              <li><a href="/" class="hover:underline hover:text-blue-700">Home</a></li> 
+              <li><a href="/news" class="hover:underline hover:text-blue-700">News</a></li> 
+              <li>{news.titleDisplay}</li>
+            </ul>
+          </div>
     </div>
     <section class="pb-11">
-        <h1 class="text-3xl font-bold pb-5">{news.titleDisplay}</h1>
-        <p>Posted on {news.dateCreated.toDate().toLocaleDateString()} at {news.dateCreated.toDate().toLocaleTimeString()} | Last Updated on {news.dateModified.toDate().toLocaleDateString()} at {news.dateModified.toDate().toLocaleTimeString()}</p>
+        <h1 class="text-4xl font-bold pb-5">{news.titleDisplay}</h1>
+        <div class="flex items-center mt-2">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 mr-2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p><span class="tooltip" data-tip='{news.dateCreated.toDate().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} {news.dateCreated.toDate().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}'>{news.dateCreated.toDate().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric'})}</span> by Admin | Last Updated <span class="tooltip" data-tip='{news.dateModified.toDate().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric'})} {news.dateModified.toDate().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}'>{news.dateModified.toDate().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric'})}</span></p>
+        </div>
         <h1 class="divider">           
         </h1>
         <article class="max-w-7xl text-justify mx-auto" style="white-space:pre-wrap">
-            <p>{news.content}</p>
+            <p class="pt-8">{news.content}</p>
         </article>
     </section>
 </main>
-  
-    
-
 {/if}
 

@@ -4,6 +4,7 @@
 	import { db } from '$lib/firebase/client';
 	import { goto } from '$app/navigation';
 	import ChangePassword from './ChangePassword.svelte';
+	import toast from 'svelte-french-toast';
 
 	let user = null;
 
@@ -22,11 +23,11 @@
 	async function updateInfo() {
 		try {
 			await updateDoc(doc(db, 'accounts', $userStore.uid), user);
-			alert('Update info success');
+			toast.success('Update Success!')
 			await goto('/profile');
 		} catch (error) {
 			console.log(error);
-			alert('Error updating');
+			toast.error("Error in Updating")
 		}
 	}
 </script>
@@ -66,7 +67,8 @@
 						<input
 							type="tel"
 							onkeypress="return event.charCode >= 48 && event.charCode <= 57"
-							minlength="11" maxlength="11"
+							minlength="11"
+							maxlength="11"
 							placeholder="09123456789"
 							pattern={String.raw`^(09)\d{9}$`}
 							bind:value={user.contactNumber}
@@ -76,14 +78,13 @@
 					</div>
 				</div>
 				<div class="flex justify-end mt-8">
-					<button type="submit" class="btn btn-primary mx-1"
-						>Update Info</button
-					>
-					<a href="/profile" class="btn btn-error mx-1 text-white px-4">Cancel</a
-					>
+					<button type="submit" class="btn btn-primary mx-1">Update Info</button>
+					<a href="/profile" class="btn btn-error mx-1 text-white px-4">Cancel</a>
 				</div>
 			</form>
-			<ChangePassword />
+			<div class="mt-5">
+				<ChangePassword />
+			</div>
 		</div>
 	</div>
 {/if}

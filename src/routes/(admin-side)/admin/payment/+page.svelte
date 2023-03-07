@@ -1,8 +1,19 @@
 <script>
-	import { onSnapshot, query, collection, orderBy, where, updateDoc, doc, getDocs } from 'firebase/firestore';
+	import {
+		onSnapshot,
+		query,
+		collection,
+		orderBy,
+		where,
+		updateDoc,
+		doc,
+		getDocs
+	} from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
-	import { createPaymentLink, sendEmail } from '$lib/utils'
+	import { createPaymentLink, sendEmail } from '$lib/utils';
+	import Pagination from '../Pagination.svelte';
+	import toast from 'svelte-french-toast';
 
 	const monthName = [
 		'January',
@@ -19,15 +30,17 @@
 		'December'
 	];
 
-	const date = new Date()
+	const date = new Date();
 	const currentMonth = monthName[date.getMonth()];
-	const currentYear = date.getFullYear()
+	const currentYear = date.getFullYear();
 
 	let listOfUsers = [];
 	let sortByField = '';
 	let searchByField = '';
 	let searchByValue = '';
-	let accountsQuery = query(collection(db, 'accounts'));
+	let accountsQuery = query(collection(db, 'accounts'), where('paymentHead', '==', true), where('role', '==', 'Resident'));
+
+	let noResult = false;
 
 	let currentPage = 1;
 	let pageSize = 10;
@@ -42,11 +55,17 @@
 				.map((doc) => ({ id: doc.id, ...doc.data() }))
 				.slice(startIndex, endIndex);
 		});
+		listOfUsers.length === 0 ? (noResult = true) : (noResult = false);
 		onDestroy(() => unsubscribe());
 	}
 
 	async function changeSortBy() {
-		accountsQuery = query(collection(db, 'accounts'), orderBy(sortByField, 'asc'));
+		accountsQuery = query(
+			collection(db, 'accounts'),
+			where('paymentHead', '==', true),
+			where('role', '==', 'Resident'),
+			orderBy(sortByField, 'asc')
+		);
 	}
 
 	async function searchAccounts() {
@@ -54,44 +73,50 @@
 		accountsQuery = query(
 			collection(db, 'accounts'),
 			where(searchByField, '>=', searchByValueCase),
-			where(searchByField, '<=', searchByValueCase + '~')
+			where(searchByField, '<=', searchByValueCase + '~'),
+			where('paymentHead', '==', true),
+			where('role', '==', 'Resident'),
 		);
 	}
 
 	async function sendPaymentEmail(paymentEmail, paymentID) {
-		console.log(paymentID)
+		console.log(paymentID);
 		try {
-			const paymentLinkData = await createPaymentLink('Southview Homes 3 Monthly Dues', 50000, paymentID)
-			const checkoutURL = paymentLinkData.data.attributes.checkout_url
+			const paymentLinkData = await createPaymentLink(
+				'Southview Homes 3 Monthly Dues',
+				50000,
+				paymentID
+			);
+			const checkoutURL = paymentLinkData.data.attributes.checkout_url;
 			const result = await sendEmail({
 				to: paymentEmail,
 				subject: 'Southview Homes 3 Monthly Dues Payment Notice',
 				html: `<h1>This is the link for payment for monthly dues of ${currentMonth} ${currentYear}: <a href=${checkoutURL}>Click here</a></h1>`
 			});
 			console.log(JSON.stringify(result));
-			alert('Payment method link sent successfully');
+			toast.success('Payment has been sent!');
 		} catch (error) {
 			console.log(error);
-			alert('Error in sending payment method');
+			toast.error('Error in sending payment!');
 		}
 	}
 
 	async function resetButton() {
-		accountsQuery = query(collection(db, 'accounts'));
+		accountsQuery = query(collection(db, 'accounts'), where('paymentHead', '==', true), where('role', '==', 'Resident'),);
 		searchByValue = '';
 	}
 
 	async function resetStatus() {
-		let text = "Would you like to reset payment status?"
+		let text = 'Would you like to reset payment status?';
 		if (confirm(text) == true) {
-    		const accountQuery = query(collection(db, 'accounts'));
+			const accountQuery = query(collection(db, 'accounts'));
 			const snapshot = await getDocs(accountQuery);
 			for (let i = 0; i < snapshot.docs.length; i++) {
-  				const docRef = doc(db, 'accounts', snapshot.docs[i].id);
-  				await updateDoc(docRef, { paymentStatus: 'Unpaid' });
+				const docRef = doc(db, 'accounts', snapshot.docs[i].id);
+				await updateDoc(docRef, { paymentStatus: 'Unpaid' });
 			}
-			alert('Payment status reset')
-  		}
+			toast.success('All payment status has been reset!');
+		}
 	}
 
 	$: {
@@ -111,17 +136,25 @@
 	<title>Payment - Southview Homes 3 Admin Panel</title>
 </svelte:head>
 
-<div class="min-w-full min-h-full bg-base-200 px-12">
-	<div class="flex justify-between py-10">
-		<h1 class="text-3xl font-semibold">Payment</h1>
-		<a href="/admin/payment/history" class="btn btn-primary">View History</a>
+<div class="min-w-full min-h-full bg-base-200 py-8 px-5">
+	<h1 class="text-3xl font-semibold py-2">Payment</h1>
+	<div class="flex justify-end">
+		<a href="/admin/payment/history" class="btn btn-primary ">Payment History</a>
 	</div>
 	<div class="flex flex-col md:flex-row justify-between">
 		<div class="flex flex-col md:flex-row">
-			<form on:submit|preventDefault={searchAccounts} class="my-4">
-				<select bind:value={searchByField} class="select select-bordered" required>
+			<form
+				on:submit|preventDefault={searchAccounts}
+				class="my-4 flex flex-col md:flex-row items-start"
+			>
+				<select
+					bind:value={searchByField}
+					class="select select-bordered mb-2 md:mb-0 md:mr-2"
+					required
+				>
 					<option value="" disabled selected>Search Filter</option>
-					<option value="firstname">Name</option>
+					<option value="firstname">Firstname</option>
+					<option value="lastname">Lastname</option>
 					<!-- <option value="addressBlock">Block</option>
 					<option value="addressLot">Lot</option>
 					<option value="addressStreet">Street</option> -->
@@ -130,16 +163,17 @@
 				<input
 					type="search"
 					placeholder="Search here"
-					class="input input-bordered mx-2"
+					class="input input-bordered"
 					bind:value={searchByValue}
 				/>
 			</form>
-			<button on:click={resetButton} class="btn btn-primary my-4">Reset</button>
+			<button on:click={resetButton} class="btn btn-primary my-4 mx-2">Reset</button>
 		</div>
 
 		<select bind:value={sortByField} on:change={changeSortBy} class="select select-bordered my-4">
 			<option value="" disabled selected>Sort By</option>
-			<option value="firstname">Name</option>
+			<option value="firstname">Firstname</option>
+			<option value="lastname">Lastname</option>
 			<option value="addressBlock">Block</option>
 			<option value="addressLot">Lot</option>
 			<option value="addressStreet">Street</option>
@@ -148,16 +182,6 @@
 
 		<button class="btn btn-primary my-4" on:click={resetStatus}>Reset Payment Status</button>
 	</div>
-
-	<style>
-		table {
-			counter-reset: section;
-		}
-		.count:before {
-			counter-increment: section;
-			content: counter(section);
-		}
-	</style>
 
 	<!-- Medium to large screen -->
 	<div class="w-full mx-auto shadow-2xl border rounded-xl bg-base-100 my-5 hidden md:block">
@@ -172,13 +196,17 @@
 						<th class="text-lg">Contact No.</th>
 						<th class="text-lg">Payment Status</th>
 						<th />
-						<th />
 					</tr>
 				</thead>
+				{#if noResult}
+					<tr>
+						<td class="py-24 text-center" colspan="8">No User/s Found</td>
+					</tr>
+				{/if}
 				<tbody>
-					{#each listOfUsers as user}
+					{#each listOfUsers as user, i}
 						<tr class="hover">
-							<td class="count" />
+							<td>{i + (currentPage - 1) * pageSize + 1}</td>
 							<td>{user.firstNameDisplay + ' ' + user.lastNameDisplay}</td>
 							<td
 								>{'Block ' +
@@ -192,87 +220,29 @@
 							<td>{user.email}</td>
 							<td>{user.contactNumber}</td>
 							<td>{user.paymentStatus}</td>
-							<td />
-							<td
-								>
+							<td>
 								{#if user.paymentStatus == 'Unpaid'}
-									<button on:click={sendPaymentEmail(user.email, user.id)}
+									<button
+										on:click={sendPaymentEmail(user.email, user.id)}
 										type="button"
 										class="btn btn-primary">Send Payment</button
 									>
 								{:else}
-									<button
-										type="button"
-										class="btn btn-primary" disabled>Send Payment</button
-									>
+									<button type="button" class="btn btn-primary" disabled>Send Payment</button>
 								{/if}
-								</td
-							>
+							</td>
 						</tr>
 					{/each}
 				</tbody>
 			</table>
-
-			<!-- pagination button -->
-			<div class="flex justify-center items-center mt-5">
-				<nav class="block">
-					<ul class="flex pl-0 rounded list-none flex-wrap">
-						{#if currentPage > 1}
-							<li>
-								<button
-									class="relative block py-2 px-3 leading-tight bg-white border border-gray-300 text-blue-700 hover:bg-gray-200 focus:bg-gray-200"
-									on:click={() => goToPage(currentPage - 1)}
-								>
-									Previous
-								</button>
-							</li>
-						{/if}
-
-						{#each Array.from({ length: totalPages }, (_, i) => i + 1) as page}
-							{#if page === currentPage}
-								<li>
-									<button
-										class="relative block py-2 px-3 leading-tight bg-blue-700 text-white hover:bg-blue-500 focus:bg-blue-500"
-										>{page}</button
-									>
-								</li>
-							{:else if (page >= currentPage - 2 && page <= currentPage + 2) || page === totalPages || page === 1}
-								<li>
-									<button
-										class="relative block py-2 px-3 leading-tight bg-white border border-gray-300 text-blue-700 hover:bg-gray-200 focus:bg-gray-200"
-										on:click={() => goToPage(page)}
-									>
-										{page}
-									</button>
-								</li>
-							{:else if page === currentPage - 3 || page === currentPage + 3}
-								<li>
-									<span
-										class="relative block py-2 px-3 leading-tight bg-white border border-gray-300 text-blue-700"
-										>...</span
-									>
-								</li>
-							{/if}
-						{/each}
-
-						{#if currentPage < totalPages}
-							<li>
-								<button
-									class="relative block py-2 px-3 leading-tight bg-white border border-gray-300 text-blue-700 hover:bg-gray-200 focus:bg-gray-200"
-									on:click={() => goToPage(currentPage + 1)}
-								>
-									Next
-								</button>
-							</li>
-						{/if}
-					</ul>
-				</nav>
-			</div>
 		</div>
 	</div>
 
 	<!-- Small screen -->
 	<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">
+		{#if noResult}
+			<div class="w-full mx-auto">No user/s Found</div>
+		{/if}
 		{#each listOfUsers as user}
 			<div class="card w-[105%] bg-base-100 shadow-xl">
 				<div class="card-body">
@@ -296,18 +266,22 @@
 						{user.email}
 					</div>
 					<div class="card-actions justify-end">
-						<a href={'/admin/accounts/edit/' + user.id} class="btn glass text-white"
-							><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-								><path
-									d="M7.127 22.562l-7.127 1.438 1.438-7.128 5.689 5.69zm1.414-1.414l11.228-11.225-5.69-5.692-11.227 11.227 5.689 5.69zm9.768-21.148l-2.816 2.817 5.691 5.691 2.816-2.819-5.691-5.689z"
-								/></svg
-							></a
-						>
+						{#if user.paymentStatus == 'Unpaid'}
+							<button
+								on:click={sendPaymentEmail(user.email, user.id)}
+								type="button"
+								class="btn btn-primary">Send Payment</button
+							>
+						{:else}
+							<button type="button" class="btn btn-primary" disabled>Send Payment</button>
+						{/if}
 					</div>
 				</div>
 			</div>
 		{/each}
 	</div>
-</div>
 
-<!-- mema comment -->
+	<div class="mt-14">
+		<Pagination {currentPage} {totalPages} onPageChange={goToPage} />
+	</div>
+</div>

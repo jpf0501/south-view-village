@@ -2,12 +2,15 @@
 	import { onSnapshot, query, collection, orderBy, where } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
+	import Pagination from '../../Pagination.svelte';
 
 	let listOfPayments = [];
 	let sortByField = '';
 	let searchByField = '';
 	let searchByValue = '';
 	let paymentsQuery = query(collection(db, 'payments'));
+
+	let noResult = false;
 
 	let currentPage = 1;
 	let pageSize = 10;
@@ -22,6 +25,7 @@
 				.map((doc) => ({ id: doc.id, ...doc.data() }))
 				.slice(startIndex, endIndex);
 		});
+		listOfPayments.length === 0 ? (noResult = true) : (noResult = false);
 		onDestroy(() => unsubscribe());
 	}
 
@@ -60,47 +64,46 @@
 	<title>Payment History - Southview Homes 3 Admin Panel</title>
 </svelte:head>
 
-<div class="min-w-full min-h-full bg-base-200 px-12">
-	<div class="flex justify-between py-10">
-		<h1 class="text-3xl font-semibold">Payment History</h1>
-		<a href="/admin/payment/" class="btn btn-primary">Go to Payments</a>
+<div class="min-w-full min-h-full bg-base-200 py-8 px-5">
+	<h1 class="text-3xl font-semibold py-2">Payment History</h1>
+	<div class="flex justify-end">
+		<a href="/admin/payment/" class="btn btn-primary ">Go to Payment</a>
 	</div>
 	<div class="flex flex-col md:flex-row justify-between">
 		<div class="flex flex-col md:flex-row">
-			<form on:submit|preventDefault={searchAccounts} class="my-4">
-				<select bind:value={searchByField} class="select select-bordered" required>
+			<form
+				on:submit|preventDefault={searchAccounts}
+				class="my-4 flex flex-col md:flex-row items-start"
+			>
+				<select
+					bind:value={searchByField}
+					class="select select-bordered mb-2 md:mb-0 md:mr-2"
+					required
+				>
 					<option value="" disabled selected>Search Filter</option>
-					<option value="firstName">Name</option>
+					<option value="firstName">Firstname</option>
+					<option value="lastName">Lastname</option>
 					<option value="email">Email</option>
 				</select>
 				<input
 					type="search"
 					placeholder="Search here"
-					class="input input-bordered mx-2"
+					class="input input-bordered"
 					bind:value={searchByValue}
 				/>
 			</form>
-			<button on:click={resetButton} class="btn btn-primary my-4">Reset</button>
+			<button on:click={resetButton} class="btn btn-primary my-4 mx-2">Reset</button>
 		</div>
 
 		<select bind:value={sortByField} on:change={changeSortBy} class="select select-bordered my-4">
 			<option value="" disabled selected>Sort By</option>
-			<option value="firstName">Name</option>
+			<option value="firstName">Firstname</option>
+			<option value="lastName">Lastname</option>
 			<option value="paymentTime">Payment Date</option>
 		</select>
 
 		<button class="btn btn-primary my-4">Generate Report</button>
 	</div>
-
-	<style>
-		table {
-			counter-reset: section;
-		}
-		.count:before {
-			counter-increment: section;
-			content: counter(section);
-		}
-	</style>
 
 	<!-- Medium to large screen -->
 	<div class="w-full mx-auto shadow-2xl border rounded-xl bg-base-100 my-5 hidden md:block">
@@ -116,84 +119,41 @@
 						<th class="text-lg">Payment Date</th>
 					</tr>
 				</thead>
+				{#if noResult}
+					<tr>
+						<td class="py-24 text-center" colspan="8">No user/s Found</td>
+					</tr>
+				{/if}
 				<tbody>
-					{#each listOfPayments as payment}
+					{#each listOfPayments as payment, i}
 						<tr class="hover">
-							<td class="count" />
+							<td>{i + (currentPage - 1) * pageSize + 1}</td>
 							<td>{payment.firstNameDisplay} {payment.lastNameDisplay}</td>
-							<td>Block {payment.addressBlock} Lot {payment.addressLot} {payment.addressStreet} Street</td>
+							<td
+								>Block {payment.addressBlock} Lot {payment.addressLot}
+								{payment.addressStreet} Street</td
+							>
 							<td>{payment.email}</td>
 							<td>{payment.contact}</td>
-							<td>{payment.paymentTime.toDate().toLocaleDateString('en-us', {
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric'
-                            })}</td>
+							<td
+								>{payment.paymentTime.toDate().toLocaleDateString('en-us', {
+									year: 'numeric',
+									month: 'long',
+									day: 'numeric'
+								})}</td
+							>
 						</tr>
 					{/each}
 				</tbody>
 			</table>
-
-			<!-- pagination button -->
-			<div class="flex justify-center items-center mt-5">
-				<nav class="block">
-					<ul class="flex pl-0 rounded list-none flex-wrap">
-						{#if currentPage > 1}
-							<li>
-								<button
-									class="relative block py-2 px-3 leading-tight bg-white border border-gray-300 text-blue-700 hover:bg-gray-200 focus:bg-gray-200"
-									on:click={() => goToPage(currentPage - 1)}
-								>
-									Previous
-								</button>
-							</li>
-						{/if}
-
-						{#each Array.from({ length: totalPages }, (_, i) => i + 1) as page}
-							{#if page === currentPage}
-								<li>
-									<button
-										class="relative block py-2 px-3 leading-tight bg-blue-700 text-white hover:bg-blue-500 focus:bg-blue-500"
-										>{page}</button
-									>
-								</li>
-							{:else if (page >= currentPage - 2 && page <= currentPage + 2) || page === totalPages || page === 1}
-								<li>
-									<button
-										class="relative block py-2 px-3 leading-tight bg-white border border-gray-300 text-blue-700 hover:bg-gray-200 focus:bg-gray-200"
-										on:click={() => goToPage(page)}
-									>
-										{page}
-									</button>
-								</li>
-							{:else if page === currentPage - 3 || page === currentPage + 3}
-								<li>
-									<span
-										class="relative block py-2 px-3 leading-tight bg-white border border-gray-300 text-blue-700"
-										>...</span
-									>
-								</li>
-							{/if}
-						{/each}
-
-						{#if currentPage < totalPages}
-							<li>
-								<button
-									class="relative block py-2 px-3 leading-tight bg-white border border-gray-300 text-blue-700 hover:bg-gray-200 focus:bg-gray-200"
-									on:click={() => goToPage(currentPage + 1)}
-								>
-									Next
-								</button>
-							</li>
-						{/if}
-					</ul>
-				</nav>
-			</div>
 		</div>
 	</div>
 
 	<!-- Small screen -->
 	<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">
+		{#if noResult}
+			<div class="w-full mx-auto">No User/s Found</div>
+		{/if}
 		{#each listOfPayments as user}
 			<div class="card w-[105%] bg-base-100 shadow-xl">
 				<div class="card-body">
@@ -229,6 +189,8 @@
 			</div>
 		{/each}
 	</div>
-</div>
 
-<!-- mema comment -->
+	<div class="mt-14">
+		<Pagination {currentPage} {totalPages} onPageChange={goToPage} />
+	</div>
+</div>

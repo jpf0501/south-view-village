@@ -2,6 +2,7 @@
 	import { db } from '$lib/firebase/client';
 	import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 	import { goto } from '$app/navigation';
+	import toast from 'svelte-french-toast';
 
 	let news = {
 		title: '',
@@ -17,11 +18,11 @@
 				dateCreated: serverTimestamp(),
 				dateModified: serverTimestamp()
 			});
-			alert('News entry created');
+			toast.success('News added!');
 			await goto('/admin/news');
 		} catch (error) {
 			console.log(error);
-			alert('Error updating');
+			toast.error('Error in adding news!');
 		}
 	}
 </script>
@@ -51,7 +52,7 @@
 				</div>
 			</div>
 			<div class="flex justify-end mt-8">
-				<button type="submit" class="btn btn-primary">Add Entry</button>
+				<button type="submit" class="btn btn-primary">Add News</button>
 				<a href="/admin/news" class="btn btn-error mx-1 text-white">Cancel</a>
 			</div>
 		</form>

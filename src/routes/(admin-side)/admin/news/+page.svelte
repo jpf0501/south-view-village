@@ -2,12 +2,15 @@
 	import { onSnapshot, query, collection, orderBy, where } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
+	import Pagination from '../Pagination.svelte';
 
 	let listOfNews = [];
 	let sortByField = '';
 	let searchByField = '';
 	let searchByValue = '';
 	let newsQuery = query(collection(db, 'news'));
+
+	let noResult = false;
 
 	let currentPage = 1;
 	let pageSize = 10;
@@ -22,11 +25,16 @@
 				.map((doc) => ({ id: doc.id, ...doc.data() }))
 				.slice(startIndex, endIndex);
 		});
+		listOfNews.length === 0 ? (noResult = true) : (noResult = false);
 		onDestroy(() => unsubscribe());
 	}
 
 	async function changeSortBy() {
-		newsQuery = query(collection(db, 'news'), orderBy(sortByField, 'asc'));
+		if (sortByField === 'title') {
+			newsQuery = query(collection(db, 'news'), orderBy(sortByField, 'asc'));
+		} else {
+			newsQuery = query(collection(db, 'news'), orderBy(sortByField, 'desc'));
+		}
 	}
 
 	async function searchNews() {
@@ -64,12 +72,19 @@
 	<title>News - Southview Homes 3 Admin Panel</title>
 </svelte:head>
 
-<div class="min-w-full min-h-full bg-base-200 px-12">
-	<h1 class="text-3xl font-semibold py-12">News</h1>
+<div class="min-w-full min-h-full bg-base-200 py-8 px-5">
+	<h1 class="text-3xl font-semibold py-2">News</h1>
 	<div class="flex flex-col md:flex-row justify-between">
 		<div class="flex flex-col md:flex-row">
-			<form on:submit|preventDefault={searchNews} class="my-4">
-				<select bind:value={searchByField} class="select select-bordered" required>
+			<form
+				on:submit|preventDefault={searchNews}
+				class="my-4 flex flex-col md:flex-row items-start"
+			>
+				<select
+					bind:value={searchByField}
+					class="select select-bordered mb-2 md:mb-0 md:mr-2"
+					required
+				>
 					<option value="" disabled selected>Search Filter</option>
 					<option value="title">Title</option>
 					<!-- <option value="dateCreated">Date Created</option>
@@ -79,10 +94,10 @@
 					type="search"
 					placeholder="Search here"
 					bind:value={searchByValue}
-					class="input input-bordered mx-2"
+					class="input input-bordered"
 				/>
 			</form>
-			<button on:click={resetButton} class="btn btn-primary my-4">Reset</button>
+			<button on:click={resetButton} class="btn btn-primary my-4 mx-2">Reset</button>
 		</div>
 
 		<select bind:value={sortByField} on:change={changeSortBy} class="select select-bordered my-4">
@@ -91,18 +106,8 @@
 			<option value="dateCreated">Date Created</option>
 			<option value="dateModified">Last Updated</option>
 		</select>
-		<a class="btn btn-primary my-4" href="/admin/news/create">Add Entry</a>
+		<a class="btn btn-primary my-4" href="/admin/news/create">Add News</a>
 	</div>
-
-	<style>
-		table {
-			counter-reset: section;
-		}
-		.count:before {
-			counter-increment: section;
-			content: counter(section);
-		}
-	</style>
 
 	<!-- Medium to large screen -->
 	<div class="w-full mx-auto shadow-2xl border rounded-xl bg-base-100 my-5 hidden md:block">
@@ -117,10 +122,15 @@
 						<th />
 					</tr>
 				</thead>
+				{#if noResult}
+					<tr>
+						<td class="py-24 text-center" colspan="8">No News/s Found</td>
+					</tr>
+				{/if}
 				<tbody>
-					{#each listOfNews as news}
+					{#each listOfNews as news, i}
 						<tr class="hover">
-							<td class="count" />
+							<td>{i + (currentPage - 1) * pageSize + 1}</td>
 							<td>{news.titleDisplay}</td>
 							<td
 								>{news.dateCreated
@@ -162,6 +172,9 @@
 
 	<!-- Small screen -->
 	<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">
+		{#if noResult}
+			<div class="w-full mx-auto">No News/s Found</div>
+		{/if}
 		{#each listOfNews as news}
 			<div class="card w-[105%] bg-base-100 shadow-xl">
 				<div class="card-body">
@@ -199,60 +212,8 @@
 			</div>
 		{/each}
 	</div>
-</div>
 
-<!-- pagination button -->
-<div class="flex justify-center items-center mt-5">
-	<nav class="block">
-		<ul class="flex pl-0 rounded list-none flex-wrap">
-			{#if currentPage > 1}
-				<li>
-					<button
-						class="relative block py-2 px-3 leading-tight bg-white border border-gray-300 text-blue-700 hover:bg-gray-200 focus:bg-gray-200"
-						on:click={() => goToPage(currentPage - 1)}
-					>
-						Previous
-					</button>
-				</li>
-			{/if}
-
-			{#each Array.from({ length: totalPages }, (_, i) => i + 1) as page}
-				{#if page === currentPage}
-					<li>
-						<button
-							class="relative block py-2 px-3 leading-tight bg-blue-700 text-white hover:bg-blue-500 focus:bg-blue-500"
-							>{page}</button
-						>
-					</li>
-				{:else if (page >= currentPage - 2 && page <= currentPage + 2) || page === totalPages || page === 1}
-					<li>
-						<button
-							class="relative block py-2 px-3 leading-tight bg-white border border-gray-300 text-blue-700 hover:bg-gray-200 focus:bg-gray-200"
-							on:click={() => goToPage(page)}
-						>
-							{page}
-						</button>
-					</li>
-				{:else if page === currentPage - 3 || page === currentPage + 3}
-					<li>
-						<span
-							class="relative block py-2 px-3 leading-tight bg-white border border-gray-300 text-blue-700"
-							>...</span
-						>
-					</li>
-				{/if}
-			{/each}
-
-			{#if currentPage < totalPages}
-				<li>
-					<button
-						class="relative block py-2 px-3 leading-tight bg-white border border-gray-300 text-blue-700 hover:bg-gray-200 focus:bg-gray-200"
-						on:click={() => goToPage(currentPage + 1)}
-					>
-						Next
-					</button>
-				</li>
-			{/if}
-		</ul>
-	</nav>
+	<div class="mt-14">
+		<Pagination {currentPage} {totalPages} onPageChange={goToPage} />
+	</div>
 </div>

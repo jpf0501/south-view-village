@@ -1,7 +1,7 @@
 <script>
 	import { goto } from '$app/navigation';
 	import { db } from '$lib/firebase/client';
-	import { onSnapshot, query, collection, orderBy } from 'firebase/firestore';
+	import { onSnapshot, query, collection, orderBy, addDoc } from 'firebase/firestore';
 	import { onDestroy } from 'svelte';
 	import toast from 'svelte-french-toast';
 
@@ -15,9 +15,10 @@
 		addressLot: '',
 		addressStreet: '',
 		contactNumber: '',
-		role: '',
+		role: 'Resident',
+		paymentStatus: 'Unpaid',
 		paymentHead: '',
-		paymentStatus: 'Unpaid'
+		isPending: true
 	};
 	let streetQuery = query(collection(db, 'street'), orderBy('streetName', 'asc'));
 	let listOfStreets = [];
@@ -39,34 +40,27 @@
 
 	async function submitHandler() {
 		try {
-			if (account.password != account.passwordcheck) {
-				throw 'Passwords do not match';
-			}
-			const response = await fetch('/api/accounts', {
-				method: 'POST',
-				body: JSON.stringify({
-					email: account.email,
-					password: account.password,
-					firstname: account.firstname.trim().toLowerCase(),
-					firstNameDisplay: account.firstname,
-					lastname: account.lastname.trim().toLowerCase(),
-					lastNameDisplay: account.lastname,
-					addressBlock: account.addressBlock,
-					addressLot: account.addressLot,
-					addressStreet: account.addressStreet,
-					contactNumber: account.contactNumber,
-					role: account.role,
-					paymentHead: account.paymentHead,
-					paymentStatus: account.paymentStatus
-				})
+			await addDoc(collection(db, 'pendingAccounts'), {
+				pendingEmail: account.email,
+				pendingPassword: account.password,
+				pendingFirstname: account.firstname.trim().toLowerCase(),
+				pendingFirstNameDisplay: account.firstname,
+				pendingLastname: account.lastname.trim().toLowerCase(),
+				pendingLastNameDisplay: account.lastname,
+				pendingAddressBlock: account.addressBlock,
+				pendingAddressLot: account.addressLot,
+				pendingAddressStreet: account.addressStreet,
+				pendingContactNumber: account.contactNumber,
+				pendingRole: account.role,
+				pendingPaymentStatus: account.paymentStatus,
+				pendingPaymentHead: account.paymentHead,
+				isPending: account.isPending
 			});
-			const result = await response.json();
-			console.log(result);
-			toast.success('Account created!');
-			await goto('/admin/accounts');
+			toast.success('Creation of Account Request Sent');
+			await goto('/login');
 		} catch (error) {
 			console.log(error);
-			toast.error('Error in creating an account!');
+			toast.error('Error in Creating an Account');
 		}
 	}
 
@@ -74,7 +68,7 @@
 </script>
 
 <svelte:head>
-	<title>Create Account - Southview Homes 3 Admin Panel</title>
+	<title>Create Account - Southview Homes 3</title>
 </svelte:head>
 
 <main>
@@ -214,36 +208,19 @@
 								{/if}
 							</div>
 						</div>
-						<div class="grid grid-cols-1 gap-6 mt-4 md:grid-cols-2">
-							<div class="form-control">
-								<span class="label-text mb-3">Role</span>
-								<div class="mb-3">
-									<select
-										class="select select-bordered w-full"
-										aria-label="Default select example"
-										required
-										bind:value={account.role}
-									>
-										<option value="" selected disabled>Select role</option>
-										<option value="Resident">Resident</option>
-										<option value="Admin">Admin</option>
-									</select>
-								</div>
-							</div>
-							<div class="form-control">
-								<span class="label-text mb-3">Payment Head</span>
-								<div class="mb-3">
-									<select
-										class="select select-bordered w-full"
-										aria-label="Default select example"
-										required
-										bind:value={account.paymentHead}
-									>
-										<option value="" selected disabled>Select</option>
-										<option value={true}>Yes</option>
-										<option value={false}>No</option>
-									</select>
-								</div>
+						<div class="form-control">
+							<span class="label-text mb-3">Payment Head</span>
+							<div class="mb-3">
+								<select
+									class="select select-bordered w-full"
+									aria-label="Default select example"
+									required
+									bind:value={account.paymentHead}
+								>
+									<option value="" selected disabled>Select</option>
+									<option value={true}>Yes</option>
+									<option value={false}>No</option>
+								</select>
 							</div>
 						</div>
 						<div class="form-control">
@@ -267,7 +244,7 @@
 				</div>
 				<div class="flex justify-end mt-8">
 					<button type="submit" class="btn btn-primary mx-1 px-6">Create</button>
-					<a href="/admin/accounts" class="btn btn-error mx-1 px-4 text-white">Cancel</a>
+					<a href="/login" class="btn btn-error mx-1 px-4 text-white">Cancel</a>
 				</div>
 			</form>
 		</div>
