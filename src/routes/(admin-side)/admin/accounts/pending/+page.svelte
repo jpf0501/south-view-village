@@ -154,7 +154,7 @@
 </svelte:head>
 
 <div class="min-w-full min-h-full bg-base-200 py-8 px-5">
-	<h1 class="text-3xl font-semibold py-2">Pending Accounts</h1>
+	<h1 class="text-3xl font-semibold py-2">Account Approval</h1>
 	<div class="flex flex-col md:flex-row justify-between">
 		<div class="flex flex-col md:flex-row">
 			<form
@@ -187,15 +187,15 @@
 
 		<select bind:value={sortByField} on:change={changeSortBy} class="select select-bordered my-4">
 			<option value="" disabled selected>Sort By</option>
-			<option value="pendingFirstname">Firstname</option>
-			<option value="pendingLastname">Lastname</option>
+			<option value="pendingFirstname">First Name</option>
+			<option value="pendingLastname">Last Name</option>
 			<option value="pendingAddressBlock">Block</option>
 			<option value="pendingAddressLot">Lot</option>
 			<option value="pendingAddressStreet">Street</option>
 			<option value="pendingEmail">Email</option>
 		</select>
 
-		<a class="btn btn-primary my-4" href="/admin/accounts">Accounts</a>
+		<a class="btn btn-primary my-4" href="/admin/accounts">Go Back</a>
 	</div>
 
 	<!-- Medium to large screen -->

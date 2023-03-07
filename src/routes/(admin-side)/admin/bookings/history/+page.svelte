@@ -140,7 +140,7 @@
 <div class="min-w-full min-h-full bg-base-200 py-8 px-5">
 	<h1 class="text-3xl font-semibold py-2">Bookings History</h1>
 	<div class="flex justify-end">
-		<a href="/admin/bookings/" class="btn btn-primary ">Go to Bookings</a>
+		<a href="/admin/bookings/" class="btn btn-primary ">Go Back</a>
 	</div>
 	<div class="flex flex-col md:flex-row justify-between">
 		<div class="flex flex-col md:flex-row">
@@ -154,8 +154,8 @@
 					required
 				>
 					<option value="" disabled selected>Search Filter</option>
-					<option value="firstname">Firstname</option>
-					<option value="lastname">Lastname</option>
+					<option value="firstname">First Name</option>
+					<option value="lastname">Last Name</option>
 					<option value="email">E-mail Address</option>
 					<option value="eventType">Type of Event</option>
 					<!-- <option value="bookDate">Date and Time</option> -->
