@@ -103,8 +103,9 @@
 		<div class="basis-2/3 flex justify-center p-5">
 			<div class="w-full max-w-3xl shadow-2xl border rounded-xl bg-base-100">
 				<div class="p-4">
-					<h1 class="text-2xl mb-8 font-semibold p-3">Upcoming Events</h1>
-					<div class="flex flex-col space-y-8 text-md p-3">
+					<h1 class="text-2xl mb-8 font-bold pt-6 px-8">Upcoming Events</h1>
+					<p class="divider"></p>
+					<div class="flex flex-col space-y-8 text-md px-8 py-4">
 						{#each listOfEvents as event}
 							<!-- <div>
 							<p class="font-medium text-md mb-3">Christmas Party</p>
@@ -119,7 +120,7 @@
 							<p>Jan 3 8:00 PM</p>
 						</div> -->
 							<div>
-								<p class="font-medium text-md mb-3">{event.titleDisplay}</p>
+								<p class="font-semibold text-lg mb-4">{event.titleDisplay}</p>
 								<p>{event.date}</p>
 							</div>
 						{/each}
