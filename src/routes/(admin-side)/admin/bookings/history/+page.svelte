@@ -154,8 +154,8 @@
 					required
 				>
 					<option value="" disabled selected>Search Filter</option>
-					<option value="firstname">Firstname</option>
-					<option value="lastname">Lastname</option>
+					<option value="firstname">First Name</option>
+					<option value="lastname">Last Name</option>
 					<option value="email">E-mail Address</option>
 					<option value="eventType">Type of Event</option>
 					<!-- <option value="bookDate">Date and Time</option> -->

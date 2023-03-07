@@ -98,8 +98,8 @@
 
 		<select bind:value={sortByField} on:change={changeSortBy} class="select select-bordered my-4">
 			<option value="" disabled selected>Sort By</option>
-			<option value="firstname">Firstame</option>
-			<option value="lastname">Lastame</option>
+			<option value="firstname">First Name</option>
+			<option value="lastname">Last Name</option>
 			<option value="addressBlock">Block</option>
 			<option value="addressLot">Lot</option>
 			<option value="addressStreet">Street</option>

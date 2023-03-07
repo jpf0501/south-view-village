@@ -81,8 +81,8 @@
 					required
 				>
 					<option value="" disabled selected>Search Filter</option>
-					<option value="firstName">Firstname</option>
-					<option value="lastName">Lastname</option>
+					<option value="firstName">First Name</option>
+					<option value="lastName">Last Name</option>
 					<option value="email">Email</option>
 				</select>
 				<input

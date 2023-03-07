@@ -153,8 +153,8 @@
 					required
 				>
 					<option value="" disabled selected>Search Filter</option>
-					<option value="firstname">Firstname</option>
-					<option value="lastname">Lastname</option>
+					<option value="firstname">First Name</option>
+					<option value="lastname">Last Name</option>
 					<!-- <option value="addressBlock">Block</option>
 					<option value="addressLot">Lot</option>
 					<option value="addressStreet">Street</option> -->

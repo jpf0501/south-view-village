@@ -187,8 +187,8 @@
 
 		<select bind:value={sortByField} on:change={changeSortBy} class="select select-bordered my-4">
 			<option value="" disabled selected>Sort By</option>
-			<option value="pendingFirstname">Firstname</option>
-			<option value="pendingLastname">Lastname</option>
+			<option value="pendingFirstname">First Name</option>
+			<option value="pendingLastname">Last Name</option>
 			<option value="pendingAddressBlock">Block</option>
 			<option value="pendingAddressLot">Lot</option>
 			<option value="pendingAddressStreet">Street</option>
