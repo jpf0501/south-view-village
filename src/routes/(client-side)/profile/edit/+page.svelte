@@ -4,6 +4,7 @@
 	import { db } from '$lib/firebase/client';
 	import { goto } from '$app/navigation';
 	import ChangePassword from './ChangePassword.svelte';
+	import toast from 'svelte-french-toast';
 
 	let user = null;
 
@@ -22,11 +23,11 @@
 	async function updateInfo() {
 		try {
 			await updateDoc(doc(db, 'accounts', $userStore.uid), user);
-			alert('Update info success');
+			toast.success('Update Success!')
 			await goto('/profile');
 		} catch (error) {
 			console.log(error);
-			alert('Error updating');
+			toast.error("Error in Updating")
 		}
 	}
 </script>

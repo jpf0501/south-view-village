@@ -2,22 +2,23 @@
 	import { auth } from '$lib/firebase/client';
 	import { updatePassword } from 'firebase/auth';
 	import { goto } from '$app/navigation';
+	import toast from 'svelte-french-toast';
 	let showChangePassword;
 	let newPassword = '';
 	let newPasswordCheck = '';
 
 	async function changePassword() {
 		if (newPassword !== newPasswordCheck) {
-			alert('Password not match');
+			toast.error('Password not match!')
 			return;
 		}
 		try {
 			await updatePassword(auth.currentUser, newPassword);
-			alert('Update password success');
+			toast.success('Password Updated!')
 			goto('/profile');
 		} catch (error) {
 			console.log(error);
-			alert('Error in updating password');
+			toast.error('Error in Updating Password');
 		}
 	}
 </script>

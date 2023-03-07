@@ -3,6 +3,7 @@
 	import { db } from '$lib/firebase/client';
 	import { onSnapshot, query, collection, orderBy, addDoc } from 'firebase/firestore';
 	import { onDestroy } from 'svelte';
+	import toast from 'svelte-french-toast';
 
 	let account = {
 		email: '',
@@ -39,12 +40,6 @@
 
 	async function submitHandler() {
 		try {
-			// const userCredential = await createUserWithEmailAndPassword(
-			// 	auth,
-			// 	account.email,
-			// 	account.password
-			// );
-			// const userRecord = userCredential.user;
 			await addDoc(collection(db, 'pendingAccounts'), {
 				pendingEmail: account.email,
 				pendingPassword: account.password,
@@ -61,11 +56,11 @@
 				pendingPaymentHead: account.paymentHead,
 				isPending: account.isPending
 			});
-			alert('Creation of account request success');
-			await goto('/admin/accounts');
+			toast.success('Creation of Account Request Sent');
+			await goto('/login');
 		} catch (error) {
 			console.log(error);
-			alert(error);
+			toast.error('Error in Creating an Account');
 		}
 	}
 

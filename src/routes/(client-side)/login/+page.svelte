@@ -2,6 +2,7 @@
 	import { auth } from '$lib/firebase/client.js';
 	import { signInWithEmailAndPassword } from 'firebase/auth';
 	import { goto } from '$app/navigation';
+	import toast from 'svelte-french-toast';
 
 	let user = '';
 	let password = '';
@@ -11,12 +12,11 @@
 		// console.log(password)
 		try {
 			const cred = await signInWithEmailAndPassword(auth, user, password);
-			// console.log(cred);
-			alert('Login success');
+			toast.success('Login Success!')
 			goto('/admin');
 		} catch (error) {
 			console.log(error);
-			alert(error);
+			toast.error("Invalid Email or Password")
 		}
 	}
 </script>
