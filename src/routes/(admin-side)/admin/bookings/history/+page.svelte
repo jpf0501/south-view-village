@@ -1,5 +1,5 @@
 <script>
-	import { onSnapshot, query, collection, orderBy, where, getDocs } from 'firebase/firestore';
+	import { onSnapshot, query, collection, orderBy, where, getCountFromServer } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
 	import { jsPDF } from 'jspdf';
@@ -14,8 +14,6 @@
 	let day = "01";
 	let startDate = new Date(`${currentYear}-${currentMonth}-${day}`);
 	let endDate = new Date(`${currentYear}-${nextMonth}-${day}`);
-
-	console.log(startDate)
 
 	let listOfBooking = [];
 	let listOfReports = [];
@@ -113,11 +111,18 @@
 
 	async function generateReport() {
 		const report = new jsPDF();
+		let entrySnapshotCount = await getCountFromServer(generateQuery);
+		let entryCount = entrySnapshotCount.data().count;
+		let totalEarnings = 500 * entryCount
+
+		report.addImage("/logo.png", "PNG", 36, 12, 11, 7);
 		report.text('Southview Homes 3 Booking History Report', 50, 18);
 		report.setFontSize(10)
 		report.text('SVH3 Clubhouse, San Vicente Road, Brgy., San Vicente, San Pedro, Laguna', 43, 27);
 		report.line(10, 34, 200, 34);
-		report.autoTable({ margin: { top: 40 }, html: '#generate-table' })
+		report.autoTable({ margin: { top: 40, bottom: 40}, html: '#generate-table' })
+		report.text(`Total bookings paid: ${entryCount} entries`, 150, 194)
+		report.text(`Total earned: PHP ${totalEarnings}`, 150, 200)
 		report.save('Southview-Homes-3-Booking-Report.pdf');
 	}
 
