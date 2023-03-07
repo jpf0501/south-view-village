@@ -81,7 +81,8 @@
 					required
 				>
 					<option value="" disabled selected>Search Filter</option>
-					<option value="firstName">Name</option>
+					<option value="firstName">Firstname</option>
+					<option value="lastName">Lastname</option>
 					<option value="email">Email</option>
 				</select>
 				<input
@@ -96,7 +97,8 @@
 
 		<select bind:value={sortByField} on:change={changeSortBy} class="select select-bordered my-4">
 			<option value="" disabled selected>Sort By</option>
-			<option value="firstName">Name</option>
+			<option value="firstName">Firstname</option>
+			<option value="lastName">Lastname</option>
 			<option value="paymentTime">Payment Date</option>
 		</select>
 

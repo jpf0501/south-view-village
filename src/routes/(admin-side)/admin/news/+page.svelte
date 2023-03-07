@@ -1,11 +1,5 @@
 <script>
-	import {
-		onSnapshot,
-		query,
-		collection,
-		orderBy,
-		where,
-	} from 'firebase/firestore';
+	import { onSnapshot, query, collection, orderBy, where } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
 	import Pagination from '../Pagination.svelte';
@@ -36,7 +30,11 @@
 	}
 
 	async function changeSortBy() {
-		newsQuery = query(collection(db, 'news'), orderBy(sortByField, 'asc'));
+		if (sortByField === 'title') {
+			newsQuery = query(collection(db, 'news'), orderBy(sortByField, 'asc'));
+		} else {
+			newsQuery = query(collection(db, 'news'), orderBy(sortByField, 'desc'));
+		}
 	}
 
 	async function searchNews() {

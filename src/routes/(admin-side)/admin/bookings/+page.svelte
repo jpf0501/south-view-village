@@ -190,7 +190,8 @@
 					required
 				>
 					<option value="" disabled selected>Search Filter</option>
-					<option value="firstname">Name</option>
+					<option value="firstname">Firstname</option>
+					<option value="lastname">Lastname</option>
 					<option value="email">E-mail Address</option>
 					<option value="eventType">Type of Event</option>
 					<!-- <option value="bookDate">Date and Time</option> -->
@@ -207,7 +208,8 @@
 
 		<select bind:value={sortByField} on:change={changeSortBy} class="select select-bordered my-4">
 			<option value="" disabled selected>Sort By</option>
-			<option value="firstname">Name</option>
+			<option value="firstname">Firstname</option>
+			<option value="lastname">Lastname</option>
 			<option value="email">E-mail Address</option>
 			<option value="eventType">Type of Event</option>
 			<option value="bookDate">Date and Time</option>
