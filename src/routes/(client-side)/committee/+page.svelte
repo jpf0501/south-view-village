@@ -3,7 +3,7 @@
 </svelte:head>
 
 <div class="mx-auto">
-	<h1 class="font-bold text-3xl pt-14 px-8">Home Owners Association</h1>
+	<h1 class="font-bold text-3xl pt-14 px-8 pb-5">Home Owners Association</h1>
 </div>
 
 <!-- head -->
@@ -24,6 +24,11 @@
 			/>
 		</div>
 	</div>
+</div>
+
+<div class="px-14 pt-3 pb-7 text-justify">
+	<p class="pb-8">The Homeowners Association (HOA) of Southview Homes 3 is responsible for overseeing the management and administration of the subdivision. The HOA also serves as a point of contact for both residents and non-residents who have inquiries or concerns about the subdivision. This includes responding to requests for information about the community, as well as addressing complaints or issues raised by residents. In addition to handling inquiries, they are also responsible in handling the budget of the subdivision, which is used to cover the cost of various services and amenities provided to the community.</p>
+	<p>The HOA is also responsible for creating guidelines and rules for the subdivision, which are designed to promote safety, security, and the overall well-being of the community. These guidelines may include rules related to parking, noise levels, and exterior property maintenance, among other things. They are also serving as the community leaders and main organizers for community events and activities. They coordinate and plan events such as holiday celebrations, subdivision-wide pet vaccinations, sports competitions, bazaars, and other community gatherings, fostering a sense of community and social interaction among the residents of Southview Homes 3.</p>
 </div>
 <!-- end head -->
 
