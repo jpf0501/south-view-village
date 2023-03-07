@@ -30,7 +30,7 @@
 		<div class="text-center lg:text-left">
 			<h1 class="text-5xl font-bold pb-6">Login</h1>
 			<p class="py-6">
-				To create an account, you can either go <a href="/createAccount" class="text-blue-700 hover:text-blue-500">here</a> and wait for verification, or contact a Southview Homes 3 committee member for account creation request and
+				To create an account, you can either go <a href="/register" class="text-blue-700 hover:text-blue-500">here</a> and wait for verification, or contact a Southview Homes 3 committee member for account creation request and
 				other inquiries.
 			</p>
 		</div>
@@ -67,7 +67,7 @@
 				</div>
 				<div class="mt-6 form-control">
 					<button class="btn btn-primary">Login</button>
-					<a href="/forgot_Password" class="mx-auto mt-6 hover:underline">Forgot Password?</a>
+					<a href="/forgot-password" class="mx-auto mt-6 hover:underline">Forgot Password?</a>
 				</div>
 			</div>
 		</form>
