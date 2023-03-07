@@ -76,7 +76,7 @@
 		);
 	}
 
-	async function changeStatus(bookingId) {
+	async function changeStatus(bookingId, bookEmail, bookDate) {
 		try {
 			const bookRef = doc(db, 'booking', bookingId);
 			const data = {
@@ -84,10 +84,33 @@
 				dateReviewed: serverTimestamp()
 			};
 			await updateDoc(bookRef, data);
-			toast.success('Booking request has been ' + bookingStatus.toLowerCase() + " !");
+			toast.success('Booking request has been ' + bookingStatus.toLowerCase() + ' !');
+			try {
+				const result = await sendEmail({
+					to: bookEmail,
+					subject: 'Southview Homes 3 Booking Request',
+					html:
+						'<h1>Your booking request that is scheduled on ' +
+						bookDate.toDate().toLocaleDateString('en-us', {
+							year: 'numeric',
+							month: 'long',
+							day: 'numeric'
+						}) +
+						' at ' +
+						bookDate.toDate().toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' }) +
+						' has been ' +
+						bookingStatus.toLowerCase() +
+						' by the admin</ht>'
+				});
+				// console.log(JSON.stringify(result));
+				// alert('Email sent successfuly');
+			} catch (error) {
+				console.log(error);
+				toast.error('Error in sending approval/disapproval booking request in email');
+			}
 		} catch (error) {
 			console.log(error);
-			toast.error("Error in approving/disapproving a booking!")
+			toast.error('Error in approving/disapproving a booking!');
 		}
 	}
 	async function changePaymentStatus(bookingId) {
@@ -262,7 +285,7 @@
 								</form></td
 							>
 							<td
-								><form on:submit|preventDefault={changeStatus(book.id, book.paymentStatus)}>
+								><form on:submit|preventDefault={changeStatus(book.id, book.email, book.bookDate)}>
 									{#if book.paymentStatus == 'Unpaid'}
 										<button
 											on:click={() => (bookingStatus = 'Approved')}
@@ -373,7 +396,10 @@
 						</form>
 					</div>
 					<div>
-						<form on:submit|preventDefault={changeStatus(book.id, book.paymentStatus)} class="py-3">
+						<form
+							on:submit|preventDefault={changeStatus(book.id, book.email, book.bookDate)}
+							class="py-3"
+						>
 							{#if book.paymentStatus == 'Unpaid'}
 								<button
 									on:click={() => (bookingStatus = 'Approved')}
