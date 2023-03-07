@@ -153,7 +153,7 @@
 	<title>Pending Accounts - Southview Homes 3 Admin Panel</title>
 </svelte:head>
 
-<div class="min-w-full min-h-full bg-base-200 px-5">
+<div class="min-w-full min-h-full bg-base-200 py-8 px-5">
 	<h1 class="text-3xl font-semibold py-2">Pending Accounts</h1>
 	<div class="flex flex-col md:flex-row justify-between">
 		<div class="flex flex-col md:flex-row">
@@ -350,7 +350,10 @@
 			</div>
 		{/each}
 	</div>
+
+	<div class="mt-14">
+		<Pagination {currentPage} {totalPages} onPageChange={goToPage} />
+	</div>
+	
 </div>
 
-<!-- pagination button -->
-<Pagination {currentPage} {totalPages} onPageChange={goToPage} />

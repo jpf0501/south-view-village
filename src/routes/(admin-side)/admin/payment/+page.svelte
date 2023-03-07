@@ -136,7 +136,7 @@
 	<title>Payment - Southview Homes 3 Admin Panel</title>
 </svelte:head>
 
-<div class="min-w-full min-h-full bg-base-200 px-5">
+<div class="min-w-full min-h-full bg-base-200 py-8 px-5">
 	<h1 class="text-3xl font-semibold py-2">Payment</h1>
 	<div class="flex justify-end">
 		<a href="/admin/payment/history" class="btn btn-primary ">Payment History</a>
@@ -278,7 +278,8 @@
 			</div>
 		{/each}
 	</div>
-</div>
 
-<!-- pagination button -->
-<Pagination {currentPage} {totalPages} onPageChange={goToPage} />
+	<div class="mt-14">
+		<Pagination {currentPage} {totalPages} onPageChange={goToPage} />
+	</div>
+</div>

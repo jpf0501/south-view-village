@@ -103,7 +103,7 @@
 			>
 				{#if !$userStore}
 					<li><a href="/login">Login</a></li>
-					<li class="pb-2"><a href="/createAccount">Register</a></li>
+					<li class="pb-2"><a href="/register">Register</a></li>
 				{:else}
 					<p class="text-sm font-semibold px-4 py-3">Hello {user.firstNameDisplay}</p>
 					<li><a href="/profile">Profile</a></li>

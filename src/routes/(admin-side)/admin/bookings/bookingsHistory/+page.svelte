@@ -137,7 +137,7 @@
 	<title>Booking History - Southview Homes 3 Admin Panel</title>
 </svelte:head>
 
-<div class="min-w-full min-h-full bg-base-200 px-5">
+<div class="min-w-full min-h-full bg-base-200 py-8 px-5">
 	<h1 class="text-3xl font-semibold py-2">Bookings History</h1>
 	<div class="flex justify-end">
 		<a href="/admin/bookings/" class="btn btn-primary ">Go to Bookings</a>
@@ -318,8 +318,8 @@
 			<!-- {/if} -->
 		{/each}
 	</div>
-</div>
 
-<!-- pagination button -->
-<Pagination {currentPage} {totalPages} onPageChange={goToPage} />
-<!-- mema comment -->
+	<div class="mt-14">
+		<Pagination {currentPage} {totalPages} onPageChange={goToPage} />
+	</div>
+</div>

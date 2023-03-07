@@ -18,13 +18,13 @@
 </script>
 
 <div class="min-h-screen bg-gray-200 flex justify-center items-center">
-	<div class="w-full max-w-md p-6 mx-auto bg-white rounded-md shadow-md">
-		<h1 class="text-2xl font-medium text-gray-800 mb-4">Forgot Password</h1>
+	<div class="w-full max-w-md p-6 mx-auto bg-white rounded-md shadow-2xl">
+		<h1 class="text-2xl font-medium text-gray-800 mb-6">Forgot Password</h1>
 		<form on:submit|preventDefault={resetPassword}>
-			<p class="text-base text-gray-700 mb-2">
-				Please enter your email address to reset your password
+			<p class="text-base text-gray-700 mb-6">
+				Please enter your email address to reset your password.
 			</p>
-			<div class="mb-4">
+			<div class="mb-7">
 				<label class="block text-gray-700 font-medium mb-2" for="email"> Email Address </label>
 				<input
 					class="form-input rounded-md shadow-sm w-full"
