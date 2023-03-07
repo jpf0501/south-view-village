@@ -77,7 +77,7 @@
 	<title>Southview Homes 3 Admin Panel</title>
 </svelte:head>
 
-<div class="min-w-full min-h-full bg-base-200 px-5">
+<div class="min-w-full min-h-full bg-base-200 py-8 px-5">
 	<h1 class="text-3xl font-semibold py-2">Dashboard</h1>
 	<div class="flex flex-col md:flex-row pt-4">
 		<div class="basis-1/3 flex flex-col items-center lg:items-end space-y-4 p-5">
