@@ -62,6 +62,7 @@
 				<li><a href="/admin/calendar">Calendar</a></li>
 				<li><a href="/admin/news">News</a></li>
 				<li><a href="/admin/payment">Payment</a></li>
+				<li><a href="/admin/inquiries">Inquiries</a></li>
 			</ul>
 		</div>
 		<a href="/admin" class="btn btn-ghost normal-case text-xl"
@@ -78,6 +79,7 @@
 			<li><a href="/admin/calendar">Calendar</a></li>
 			<li><a href="/admin/news">News</a></li>
 			<li><a href="/admin/payment">Payment</a></li>
+			<li><a href="/admin/inquiries">Inquiries</a></li>
 		</ul>
 	</div>
 	<div class="navbar-end">
