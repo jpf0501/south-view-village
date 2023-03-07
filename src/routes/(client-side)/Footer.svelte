@@ -28,28 +28,28 @@
 	</div>
 </footer> -->
 
-<footer class="footer p-10 bg-base-200 text-base-content">
-  <div class="py-5">
+<footer class="footer md:place-items-center p-10 bg-base-200 text-base-content">
+  <div class="py-5 self-start">
 	<div class="flex items-center">
 		<img class="mask mask-circle" src="/logo.png" alt="Southview Homes 3 Logo"/>
-		<p class="pl-3 font-bold">Southview Homes 3</p>
+		<p class="text-lg pl-3 font-bold">Southview Homes 3</p>
 	</div>
 	<p class="pt-4">Copyright © {year} Southview Homes 3</p>
 	<p>All Rights Reserved</p>
   </div> 
-  <div class="py-5">
+  <div class="py-5 self-start">
 	<span class="footer-title">Quick Links</span>
     <a href="/calendar" class="link link-hover">Calendar</a> 
     <a href="/committee" class="link link-hover">News</a> 
     <a href="/news" class="link link-hover">Committee</a> 
     <a href="/reservation" class="link link-hover">Reservation</a>
   </div> 
-  <div class="py-5">
+  <div class="py-5 self-start">
 	<span class="footer-title">Legal</span>
-    <a href="/terms-of-use" class="link link-hover">Terms of Use</a> 
+    <a href="/terms-and-conditions" class="link link-hover">Terms and Conditions</a> 
     <a href="/privacy-policy" class="link link-hover">Privacy Policy</a>
   </div> 
-  <div class="py-5">
+  <div class="py-5 self-start">
     <span class="footer-title pb-2">Contact</span> 
 	<div class="flex items-center">
 		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
