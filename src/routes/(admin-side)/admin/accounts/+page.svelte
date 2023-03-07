@@ -107,7 +107,7 @@
 		</select>
 
 		<a class="btn btn-primary my-4" href="/admin/accounts/create">Add User</a>
-		<a class="btn btn-primary my-4" href="/admin/accounts/pendingAccounts">Account Request</a>
+		<a class="btn btn-primary my-4" href="/admin/accounts/pending">Account Approval</a>
 	</div>
 
 	<!-- Medium to large screen -->

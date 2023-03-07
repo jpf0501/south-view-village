@@ -67,7 +67,7 @@
 <div class="min-w-full min-h-full bg-base-200 py-8 px-5">
 	<h1 class="text-3xl font-semibold py-2">Payment History</h1>
 	<div class="flex justify-end">
-		<a href="/admin/payment/" class="btn btn-primary ">Go to Payment</a>
+		<a href="/admin/payment/" class="btn btn-primary ">Go Back</a>
 	</div>
 	<div class="flex flex-col md:flex-row justify-between">
 		<div class="flex flex-col md:flex-row">

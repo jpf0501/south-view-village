@@ -154,7 +154,7 @@
 </svelte:head>
 
 <div class="min-w-full min-h-full bg-base-200 py-8 px-5">
-	<h1 class="text-3xl font-semibold py-2">Pending Accounts</h1>
+	<h1 class="text-3xl font-semibold py-2">Account Approval</h1>
 	<div class="flex flex-col md:flex-row justify-between">
 		<div class="flex flex-col md:flex-row">
 			<form
@@ -195,7 +195,7 @@
 			<option value="pendingEmail">Email</option>
 		</select>
 
-		<a class="btn btn-primary my-4" href="/admin/accounts">Accounts</a>
+		<a class="btn btn-primary my-4" href="/admin/accounts">Go Back</a>
 	</div>
 
 	<!-- Medium to large screen -->

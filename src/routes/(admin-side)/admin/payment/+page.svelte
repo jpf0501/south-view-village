@@ -139,7 +139,7 @@
 <div class="min-w-full min-h-full bg-base-200 py-8 px-5">
 	<h1 class="text-3xl font-semibold py-2">Payment</h1>
 	<div class="flex justify-end">
-		<a href="/admin/payment/history" class="btn btn-primary ">Payment History</a>
+		<a href="/admin/payment/history" class="btn btn-primary ">View History</a>
 	</div>
 	<div class="flex flex-col md:flex-row justify-between">
 		<div class="flex flex-col md:flex-row">
