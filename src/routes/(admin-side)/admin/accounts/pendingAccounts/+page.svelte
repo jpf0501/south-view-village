@@ -6,11 +6,13 @@
 		orderBy,
 		where,
 		doc,
-		updateDoc
+		updateDoc,
+		getDocs
 	} from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
 	import Pagination from '../../Pagination.svelte';
+	import toast from 'svelte-french-toast';
 
 	let listOfUsers = [];
 	let sortByField = '';
@@ -83,44 +85,54 @@
 	) {
 		if (isApproved) {
 			try {
-				const response = await fetch('/api/pendingAccounts', {
-					method: 'POST',
-					body: JSON.stringify({
-						email: pendingEmail,
-						password: pendingPassword,
-						firstname: pendingFirstname,
-						firstNameDisplay: pendingFirstNameDisplay,
-						lastname: pendingLastname,
-						lastNameDisplay: pendingLastNameDisplay,
-						addressBlock: pendingAddressBlock,
-						addressLot: pendingAddressLot,
-						addressStreet: pendingAddressStreet,
-						contactNumber: pendingContactNumber,
-						role: pendingRole,
-						paymentStatus: pendingPaymentStatus,
-						paymentHead: pendingPaymentHead	
-					})
-				});
-				const result = await response.json();
-				console.log(result);
+				const accountsQuery = query(collection(db, 'accounts'), where('email', '==', pendingEmail));
+				const accountsSnapshot = await getDocs(accountsQuery);
+				if (accountsSnapshot.docs.length > 0) {
+					toast.error('Email already exists!');
+				} else {
+					const response = await fetch('/api/pendingAccounts', {
+						method: 'POST',
+						body: JSON.stringify({
+							email: pendingEmail,
+							password: pendingPassword,
+							firstname: pendingFirstname,
+							firstNameDisplay: pendingFirstNameDisplay,
+							lastname: pendingLastname,
+							lastNameDisplay: pendingLastNameDisplay,
+							addressBlock: pendingAddressBlock,
+							addressLot: pendingAddressLot,
+							addressStreet: pendingAddressStreet,
+							contactNumber: pendingContactNumber,
+							role: pendingRole,
+							paymentStatus: pendingPaymentStatus,
+							paymentHead: pendingPaymentHead
+						})
+					});
+					const result = await response.json();
+					console.log(result);
 
+					const pendingAccountsRef = doc(db, 'pendingAccounts', pendingID);
+					const data = {
+						isPending: false
+					};
+					await updateDoc(pendingAccountsRef, data);
+					toast.success('Account approved!');
+				}
+			} catch (error) {
+				console.log(error);
+				toast.error("Error in approving account!");
+			}
+		} else {
+			try {
 				const pendingAccountsRef = doc(db, 'pendingAccounts', pendingID);
 				const data = {
 					isPending: false
 				};
 				await updateDoc(pendingAccountsRef, data);
-				alert('Account approved');
-			} catch (error) {
-				console.log(error);
-				alert('Error email is already in use');
-			}
-		} else {
-			const pendingAccountsRef = doc(db, 'pendingAccounts', pendingID);
-			const data = {
-				isPending: false
-			};
-			await updateDoc(pendingAccountsRef, data);
-			alert('Account disaaproved');
+				toast.success('Account disaaproved!');
+			} catch (error) {}
+			console.log(error);
+			toast.error('Error in disapproving an account!');
 		}
 	}
 
