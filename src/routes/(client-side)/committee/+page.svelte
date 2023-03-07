@@ -3,7 +3,7 @@
 </svelte:head>
 
 <div class="mx-auto">
-	<h1 class="font-bold text-3xl py-5">Home Owners Association</h1>
+	<h1 class="font-bold text-3xl pt-14 px-8">Home Owners Association</h1>
 </div>
 
 <!-- head -->
@@ -13,23 +13,25 @@
 			<img
 				src="/images/committee/group_photo_1.jpg"
 				alt="Southview Homes 3 Home Owners Association"
-				class="rounded-lg md:scale-90"
+				class="rounded-lg md:scale-90 shadow-2xl"
 			/>
 		</div>
 		<div class="m-3">
 			<img
 				src="/images/committee/group_photo_2.jpg"
 				alt="Southview Homes 3 Home Owners Association"
-				class="rounded-lg md:scale-90"
+				class="rounded-lg md:scale-90 shadow-2xl"
 			/>
 		</div>
 	</div>
 </div>
 <!-- end head -->
 
+<p class="divider"></p>
+
 <!-- main committee -->
 <div class="mx-auto">
-	<h1 class="font-bold text-3xl">List of Officers</h1>
+	<h1 class="font-bold text-3xl pt-8 px-8">List of Officers</h1>
 </div>
 <div class="m-5">
 	<div class="flex flex-col">
@@ -92,9 +94,11 @@
 </div>
 <!-- end main committee -->
 
+<p class="divider"></p>
+
 <!-- branches -->
 <div class="mx-auto">
-	<h1 class="font-bold text-3xl">Heads of Committees</h1>
+	<h1 class="font-bold text-3xl pt-8 px-8">Heads of Committees</h1>
 </div>
 <div class="m-5">
 	<div class="flex flex-col">
@@ -166,3 +170,5 @@
 	</div>
 </div>
 <!-- end branches -->
+
+<div class="pb-7"></div>
