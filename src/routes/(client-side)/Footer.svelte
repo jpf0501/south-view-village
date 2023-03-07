@@ -48,6 +48,7 @@
 	<span class="footer-title">Legal</span>
     <a href="/terms-and-conditions" class="link link-hover">Terms and Conditions</a> 
     <a href="/privacy-policy" class="link link-hover">Privacy Policy</a>
+	<a href="/rules-and-guidelines" class="link link-hover">Rules and Guidelines</a>
   </div> 
   <div class="py-5 self-start">
     <span class="footer-title pb-2">Contact</span> 
