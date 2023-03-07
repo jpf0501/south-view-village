@@ -108,7 +108,7 @@
 			<option value="dateCreated">Date Created</option>
 			<option value="dateModified">Last Updated</option>
 		</select>
-		<a class="btn btn-primary my-4" href="/admin/news/create">Add Entry</a>
+		<a class="btn btn-primary my-4" href="/admin/news/create">Add News</a>
 	</div>
 
 	<!-- Medium to large screen -->
