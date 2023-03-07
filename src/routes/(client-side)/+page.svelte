@@ -169,7 +169,7 @@
 		<div class="p-8">
 			<h1 class="text-5xl font-bold pb-7 text-center lg:text-left">Clubhouse Renting</h1>
 			<p class="py-6 text-justify">Southview Homes 3 also offers reservations of its clubhouse facility and surrounding amenities for both residents and non-residents. Reservations can include all kinds of events - birthdays, debuts, and everything else.</p>
-			<a href="/community" class="btn btn-primary mt-3">Learn More</a>
+			<a href="/reservation" class="btn btn-primary mt-3">Learn More</a>
 		</div>
 	</div>
 </div>
