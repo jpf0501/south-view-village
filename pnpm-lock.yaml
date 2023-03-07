@@ -20,6 +20,7 @@ specifiers:
   prettier: ^2.8.4
   prettier-plugin-svelte: ^2.9.0
   svelte: ^3.55.1
+  svelte-french-toast: ^1.0.3
   svelte-preprocess: ^5.0.1
   svelte-simple-modal: ^1.5.2
   tailwindcss: ^3.2.7
@@ -30,6 +31,7 @@ dependencies:
   firebase-admin: 11.5.0
   jspdf: 2.5.1
   nodemailer: 6.9.1
+  svelte-french-toast: 1.0.3_svelte@3.55.1
   svelte-simple-modal: 1.5.2_svelte@3.55.1
 
 devDependencies:
@@ -3505,6 +3507,14 @@ packages:
     engines: {node: '>= 0.4'}
     dev: true
 
+  /svelte-french-toast/1.0.3_svelte@3.55.1:
+    resolution: {integrity: sha512-HBdutlqUx5FroucvcmMJstmTJDedXayiOSXubBYW6iL5x1PdHp+bOflGx5NxsOa6+EQckJnnVv1vJYgGsg7ngQ==}
+    dependencies:
+      svelte-writable-derived: 2.1.6_svelte@3.55.1
+    transitivePeerDependencies:
+      - svelte
+    dev: false
+
   /svelte-hmr/0.15.1_svelte@3.55.1:
     resolution: {integrity: sha512-BiKB4RZ8YSwRKCNVdNxK/GfY+r4Kjgp9jCLEy0DuqAKfmQtpL38cQK3afdpjw4sqSs4PLi3jIPJIFp259NkZtA==}
     engines: {node: ^12.20 || ^14.13.1 || >= 16}
@@ -3567,6 +3577,14 @@ packages:
     resolution: {integrity: sha512-kQ+9/bonxMMJe6dGTCPXBkYQQ4zF8rqqPp+PvTWOJB8QtB+Z0S/h7ZJRDZOAnkXTUClwd+Qmb2HHTIXVkjlSvA==}
     peerDependencies:
       svelte: ^3.31.2
+    dependencies:
+      svelte: 3.55.1
+    dev: false
+
+  /svelte-writable-derived/2.1.6_svelte@3.55.1:
+    resolution: {integrity: sha512-vqOXuiESMZyP/kt/RD+nOk2RVHNakDm1K1hmfeGAKc4jzcSp5hEkUi43MDbkVlMurkSBlcMVTQwRQy4LcBT2lw==}
+    peerDependencies:
+      svelte: ^3.2.1
     dependencies:
       svelte: 3.55.1
     dev: false
