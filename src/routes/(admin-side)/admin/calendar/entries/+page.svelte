@@ -171,7 +171,8 @@
 			</div>
 		{/each}
 	</div>
-</div>
 
-<!-- pagination button -->
-<Pagination {currentPage} {totalPages} onPageChange={goToPage} />
+	<div class="mt-14">
+		<Pagination {currentPage} {totalPages} onPageChange={goToPage} />
+	</div>
+</div>

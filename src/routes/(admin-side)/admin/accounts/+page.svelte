@@ -166,7 +166,6 @@
 			</table>
 		</div>
 	</div>
-
 	<!-- Small screen -->
 	<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">
 		{#if noResult}
@@ -207,7 +206,12 @@
 			</div>
 		{/each}
 	</div>
+
+	<div class="mt-14">
+		<Pagination {currentPage} {totalPages} onPageChange={goToPage} />
+	</div>
+
 </div>
 
 <!-- pagination button -->
-<Pagination {currentPage} {totalPages} onPageChange={goToPage} />
+

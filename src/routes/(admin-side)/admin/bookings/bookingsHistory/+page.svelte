@@ -318,8 +318,8 @@
 			<!-- {/if} -->
 		{/each}
 	</div>
-</div>
 
-<!-- pagination button -->
-<Pagination {currentPage} {totalPages} onPageChange={goToPage} />
-<!-- mema comment -->
+	<div class="mt-14">
+		<Pagination {currentPage} {totalPages} onPageChange={goToPage} />
+	</div>
+</div>
