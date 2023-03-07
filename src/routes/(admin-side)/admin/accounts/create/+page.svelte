@@ -3,6 +3,7 @@
 	import { db } from '$lib/firebase/client';
 	import { onSnapshot, query, collection, orderBy } from 'firebase/firestore';
 	import { onDestroy } from 'svelte';
+	import toast from 'svelte-french-toast';
 
 	let account = {
 		email: '',
@@ -61,11 +62,11 @@
 			});
 			const result = await response.json();
 			console.log(result);
-			alert('Save success');
+			toast.success('Account created!');
 			await goto('/admin/accounts');
 		} catch (error) {
 			console.log(error);
-			alert(error);
+			toast.error('Error in creating an account!');
 		}
 	}
 

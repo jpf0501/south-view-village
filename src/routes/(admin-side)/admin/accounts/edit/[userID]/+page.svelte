@@ -11,6 +11,7 @@
 	} from 'firebase/firestore';
 	import { goto } from '$app/navigation';
 	import { onDestroy } from 'svelte';
+	import toast from 'svelte-french-toast';
 
 	/** @type {import('./$types').PageData} */
 	export let data;
@@ -48,22 +49,22 @@
 		user.lastname = user.lastNameDisplay.toLowerCase();
 		try {
 			await updateDoc(doc(db, 'accounts', userID), user);
-			alert('User info updated');
+			toast.success('User has been updated!');
 			await goto('/admin/accounts');
 		} catch (error) {
 			console.log(error);
-			alert('Error updating');
+			toast.error('Error in updating user!');
 		}
 	}
 
 	async function deleteUser() {
 		try {
 			await fetch('/api/accounts/', { method: 'DELETE', body: JSON.stringify({ uid: userID }) });
-			alert('Deleted successfully');
+			toast.success('User deleted!');
 			await goto('/admin/accounts');
 		} catch (error) {
 			console.log(error);
-			alert('Delete error');
+			toast.success('Error in deleting user!');
 		}
 	}
 

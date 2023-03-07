@@ -2,6 +2,7 @@
 	import { db } from '$lib/firebase/client';
 	import { getDoc, updateDoc, deleteDoc, doc, serverTimestamp } from 'firebase/firestore';
 	import { goto } from '$app/navigation';
+	import toast from 'svelte-french-toast';
 
 	/** @type {import('./$types').PageData} */
 	export let data;
@@ -20,22 +21,22 @@
 		try {
 			news.dateModified = serverTimestamp();
 			await updateDoc(doc(db, 'news', newsID), news);
-			alert('News content updated');
+			toast.success('News details updated!');
 			await goto('/admin/news');
 		} catch (error) {
 			console.log(error);
-			alert('Error updating');
+			toast.error('Error in updating news!');
 		}
 	}
 
 	async function deleteNews() {
 		try {
 			await deleteDoc(doc(db, 'news', newsID), news);
-			alert('Entry deleted');
+			toast.success('News deleted!');
 			await goto('/admin/news');
 		} catch (error) {
 			console.log(error);
-			alert('Error deleting');
+			toast.error('Error in deleting news!');
 		}
 	}
 
@@ -43,7 +44,7 @@
 </script>
 
 <svelte:head>
-	<title>Edit Entry - Southview Homes 3 Admin Panel</title>
+	<title>Edit News - Southview Homes 3 Admin Panel</title>
 </svelte:head>
 
 {#if news}
@@ -62,7 +63,7 @@
 				</div>
 				<div class="mt-6">
 					<div class="form-control">
-						<span class="pb-3">Event Desciption</span>
+						<span class="pb-3">News Desciption</span>
 						<textarea
 							class="h-60 textarea textarea-bordered p-3"
 							style="white-space:pre-wrap; resize:none"

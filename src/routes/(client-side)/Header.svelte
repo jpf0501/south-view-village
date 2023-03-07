@@ -9,11 +9,11 @@
 	async function logOut() {
 		try {
 			await signOut(auth);
-			toast.success('Signed Out');
+			toast.success('Signed Out!');
 			goto('/');
 		} catch (error) {
 			console.log(error);
-			toast.error('Error in Signing Out');
+			toast.error('Error in Signing Out!');
 		}
 	}
 

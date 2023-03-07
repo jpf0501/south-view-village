@@ -13,6 +13,7 @@
 	import { onDestroy } from 'svelte';
 	import { createPaymentLink, sendEmail } from '$lib/utils';
 	import Pagination from '../Pagination.svelte';
+	import toast from 'svelte-french-toast';
 
 	const monthName = [
 		'January',
@@ -91,10 +92,10 @@
 				html: `<h1>This is the link for payment for monthly dues of ${currentMonth} ${currentYear}: <a href=${checkoutURL}>Click here</a></h1>`
 			});
 			console.log(JSON.stringify(result));
-			alert('Payment method link sent successfully');
+			toast.success('Payment has been sent!');
 		} catch (error) {
 			console.log(error);
-			alert('Error in sending payment method');
+			toast.error('Error in sending payment!');
 		}
 	}
 
@@ -112,7 +113,7 @@
 				const docRef = doc(db, 'accounts', snapshot.docs[i].id);
 				await updateDoc(docRef, { paymentStatus: 'Unpaid' });
 			}
-			alert('Payment status reset');
+			toast.success('All payment status has been reset!');
 		}
 	}
 

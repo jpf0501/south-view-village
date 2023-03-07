@@ -2,6 +2,7 @@
     import { db } from '$lib/firebase/client';
 	import { getDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
 	import { goto } from '$app/navigation';
+	import toast from 'svelte-french-toast';
 
     /** @type {import('./$types').PageData} */
 	export let data;
@@ -20,22 +21,22 @@
 		event.title = event.titleDisplay.toLowerCase();
 		try {
 			await updateDoc(doc(db, 'event', eventID), event);
-			alert('Event details updated');
+			toast.success('Event details updated!');
 			await goto('/admin/calendar/entries/');
 		} catch (error) {
 			console.log(error);
-			alert('Error updating');
+			toast.error('Error in updating event details!');
 		}
 	}
 
 	async function deleteEvent() {
 		try {
 			await deleteDoc(doc(db, 'event', eventID), event);
-			alert('Event deleted');
+			toast.success('Event deleted!');
 			await goto('/admin/calendar/entries/');
 		} catch (error) {
 			console.log(error);
-			alert('Error deleting');
+			toast.error('Error in deleting event!');
 		}
 	}
 

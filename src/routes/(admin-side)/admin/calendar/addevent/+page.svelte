@@ -2,6 +2,7 @@
 	import { addDoc, collection } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { goto } from '$app/navigation';
+	import toast from 'svelte-french-toast';
 
 	// const dateMin = new Date(Date.now() + 8.64e7).toLocaleDateString('en-ca');
 	// const dateMax = new Date(Date.now() + 8.64e7 + 6.048e8 * 2).toLocaleDateString('en-ca');
@@ -20,11 +21,11 @@
 				description: event.eventDescription.trim(),
 				date: event.eventDate
 			});
-			alert('Event form submitted');
+			toast.success('Event added!');
 			await goto('/admin/calendar');
 		} catch (error) {
 			console.log(error);
-			alert('Error in Uploading Event');
+			toast.error('Error in adding an event!');
 		}
 	}
 </script>

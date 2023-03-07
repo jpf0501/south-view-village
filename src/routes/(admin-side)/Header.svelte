@@ -4,14 +4,16 @@
 	import { signOut } from 'firebase/auth';
 	import { goto } from '$app/navigation';
 	import { getDoc, doc } from 'firebase/firestore';
+	import toast from 'svelte-french-toast';
 
 	async function logOut() {
 		try {
 			await signOut(auth);
+			toast.success('Signed Out!')
 			goto('/');
 		} catch (error) {
 			console.log(error);
-			alert('Signing out error');
+			toast.error('Error in Signing Out!');
 		}
 	}
 

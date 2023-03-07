@@ -13,6 +13,7 @@
 	import { onDestroy } from 'svelte';
 	import { createPaymentLink, sendEmail } from '$lib/utils';
 	import Pagination from '../Pagination.svelte';
+	import toast from 'svelte-french-toast';
 
 	let listOfBooking = [];
 	let sortByField = '';
@@ -83,9 +84,10 @@
 				dateReviewed: serverTimestamp()
 			};
 			await updateDoc(bookRef, data);
-			alert('Booking request has been ' + bookingStatus);
+			toast.success('Booking request has been ' + bookingStatus.toLowerCase() + " !");
 		} catch (error) {
 			console.log(error);
+			toast.error("Error in approving/disapproving a booking!")
 		}
 	}
 	async function changePaymentStatus(bookingId) {
@@ -95,8 +97,10 @@
 				paymentStatus: bookingPaymentStatus
 			};
 			await updateDoc(bookRef, data);
+			toast.success('Booking status changed!');
 		} catch (error) {
 			console.log(error);
+			toast.error('Error in changing booking status!');
 		}
 	}
 
@@ -115,10 +119,10 @@
 				html: `<h1>This is the link for payment for reservation in booking: <a href=${checkoutURL}>Click here</a></h1>`
 			});
 			console.log(JSON.stringify(result));
-			alert('Email for payment method sent successfully');
+			toast.success('Payment has been sent!');
 		} catch (error) {
 			console.log(error);
-			alert('Error in sending payment method');
+			toast.error('Error in sending payment!');
 		}
 	}
 	async function resetButton() {
