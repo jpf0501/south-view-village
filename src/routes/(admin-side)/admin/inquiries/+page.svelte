@@ -3,7 +3,6 @@
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
 	import Pagination from '../Pagination.svelte';
-	import { sendEmail } from '$lib/utils';
 
 	let listOfInquiry = [];
 	let sortByField = '';
@@ -62,7 +61,7 @@
 			totalRecords = querySnapshot.docs.length;
 			totalPages = Math.ceil(totalRecords / pageSize);
 		});
-		listOfInquiry.length < 0 ? (noResult = true) : (noResult = false);
+		listOfInquiry.length === 0 ? (noResult = true) : (noResult = false);
 		onDestroy(() => unsubscribe());
 	}
 	function goToPage(page) {
