@@ -1,9 +1,16 @@
 <script>
-	import { onSnapshot, query, collection, orderBy, where, getCountFromServer } from 'firebase/firestore';
+	import {
+		onSnapshot,
+		query,
+		collection,
+		orderBy,
+		where,
+		getCountFromServer
+	} from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
 	import { jsPDF } from 'jspdf';
-	import autoTable from 'jspdf-autotable'
+	import autoTable from 'jspdf-autotable';
 	import Pagination from '../../Pagination.svelte';
 
 	const monthName = [
@@ -23,18 +30,18 @@
 
 	let date = new Date();
 	let currentYear = date.getFullYear();
-	let previousMonth = (date.getMonth()).toString().padStart(2, "0");
-	let currentMonth = (date.getMonth() + 1).toString().padStart(2, "0");
-	let day = "01";
-  	let startDate = new Date(`${currentYear}-${previousMonth}-${day}`);
+	let previousMonth = date.getMonth().toString().padStart(2, '0');
+	let currentMonth = (date.getMonth() + 1).toString().padStart(2, '0');
+	let day = '01';
+	let startDate = new Date(`${currentYear}-${previousMonth}-${day}`);
 	let endDate;
-	if (currentMonth === "12") {
-  		// if current month is December, set end date to January of next year
-  		endDate = new Date(`${currentYear + 1}-01-${day}`);
+	if (currentMonth === '12') {
+		// if current month is December, set end date to January of next year
+		endDate = new Date(`${currentYear + 1}-01-${day}`);
 	} else {
-  		// otherwise, set end date to next month
-  		let nextMonth = (date.getMonth() + 1).toString().padStart(2, "0");
-  		endDate = new Date(`${currentYear}-${nextMonth}-${day}`);
+		// otherwise, set end date to next month
+		let nextMonth = (date.getMonth() + 1).toString().padStart(2, '0');
+		endDate = new Date(`${currentYear}-${nextMonth}-${day}`);
 	}
 
 	let listOfBooking = [];
@@ -45,10 +52,15 @@
 	let searchByValue = '';
 	let bookingsQuery = query(
 		collection(db, 'booking'),
-		where('status', 'in', ['Approved', 'Disapproved']),
+		where('status', 'in', ['Approved', 'Disapproved', 'Cancelled']),
 		orderBy('dateReviewed', 'desc')
 	);
-	let generateQuery = query(collection(db, 'booking'), where('status', '==', 'Approved'), where('dateReviewed', '>=', startDate), where('dateReviewed', '<', endDate));
+	let generateQuery = query(
+		collection(db, 'booking'),
+		where('status', '==', 'Approved'),
+		where('dateReviewed', '>=', startDate),
+		where('dateReviewed', '<', endDate)
+	);
 
 	let noResult = false;
 
@@ -72,14 +84,14 @@
 		if (sortByField == 'bookDate') {
 			bookingsQuery = query(
 				collection(db, 'booking'),
-				where('status', 'in', ['Approved', 'Disapproved']),
+				where('status', 'in', ['Approved', 'Disapproved', 'Cancelled']),
 				orderBy(sortByField, 'desc'),
 				orderBy('dateReviewed', 'desc')
 			);
 		} else {
 			bookingsQuery = query(
 				collection(db, 'booking'),
-				where('status', 'in', ['Approved', 'Disapproved']),
+				where('status', 'in', ['Approved', 'Disapproved', 'Cancelled']),
 				orderBy(sortByField, 'asc'),
 				orderBy('dateReviewed', 'desc')
 			);
@@ -90,7 +102,7 @@
 		if (sortByStatus == '') {
 			bookingsQuery = query(
 				collection(db, 'booking'),
-				where('status', 'in', ['Approved', 'Disapproved']),
+				where('status', 'in', ['Approved', 'Disapproved', 'Cancelled']),
 				orderBy('dateReviewed', 'desc')
 			);
 		} else {
@@ -109,7 +121,7 @@
 			where(searchByField, '>=', searchByValueCase),
 			where(searchByField, '<=', searchByValueCase + '~'),
 			orderBy(searchByField, 'asc'),
-			where('status', 'in', ['Approved', 'Disapproved']),
+			where('status', 'in', ['Approved', 'Disapproved', 'Cancelled']),
 			orderBy('dateReviewed', 'desc')
 		);
 	}
@@ -117,7 +129,7 @@
 	async function resetButton() {
 		bookingsQuery = query(
 			collection(db, 'booking'),
-			where('status', 'in', ['Approved', 'Disapproved']),
+			where('status', 'in', ['Approved', 'Disapproved', 'Cancelled']),
 			orderBy('dateReviewed', 'desc')
 		);
 		searchByValue = '';
@@ -125,47 +137,70 @@
 
 	async function generateTable(generateQuery) {
 		const unsubscribe = onSnapshot(generateQuery, (querySnapshot) => {
-				listOfReports = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-			});
+			listOfReports = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+		});
 		onDestroy(() => unsubscribe());
 	}
 
 	async function generateReport() {
 		const report = new jsPDF();
 
-		let approvedQuery = query(collection(db, 'booking'), where('status', '==', 'Approved'), where('dateReviewed', '>=', startDate), where('dateReviewed', '<', endDate));
-		let entrySnapshotCount = await getCountFromServer(generateQuery)
-		let approvedSnapshotCount = await getCountFromServer(approvedQuery)
-		let entryCount = entrySnapshotCount.data().count
-		let approvedCount = approvedSnapshotCount.data().count
-		let totalEarnings = 500 * entryCount
-		let width = report.internal.pageSize.getWidth()
+		let approvedQuery = query(
+			collection(db, 'booking'),
+			where('status', '==', 'Approved'),
+			where('dateReviewed', '>=', startDate),
+			where('dateReviewed', '<', endDate)
+		);
+		let entrySnapshotCount = await getCountFromServer(generateQuery);
+		let approvedSnapshotCount = await getCountFromServer(approvedQuery);
+		let entryCount = entrySnapshotCount.data().count;
+		let approvedCount = approvedSnapshotCount.data().count;
+		let totalEarnings = 500 * entryCount;
+		let width = report.internal.pageSize.getWidth();
 
-		totalEarnings = Number(totalEarnings.toFixed(2)).toLocaleString()
+		totalEarnings = Number(totalEarnings.toFixed(2)).toLocaleString();
 
-		report.addImage("/logo.png", "PNG", 68, 12, 11, 7);
+		report.addImage('/logo.png', 'PNG', 68, 12, 11, 7);
 		report.setFont('Times', 'bold').text('Southview Homes 3', 84, 18);
-		report.setFont('Times', 'normal').setFontSize(9).text('SVH3 Clubhouse, San Vicente Road, Brgy., San Vicente, San Pedro, Laguna', width/2, 27, {align: 'center'});
+		report
+			.setFont('Times', 'normal')
+			.setFontSize(9)
+			.text(
+				'SVH3 Clubhouse, San Vicente Road, Brgy., San Vicente, San Pedro, Laguna',
+				width / 2,
+				27,
+				{ align: 'center' }
+			);
 		report.line(10, 34, 200, 34);
-		report.setFont('Times', 'bold').setFontSize(11).text(`${monthName[previousMonth - 1]} ${currentYear} Reservation Earnings Report`, width/2, 45, {align: 'center'});
-		report.setFontSize(10).text('Total Number of Reservations', 18, 75)
-		report.text('Reservation Fee (Per Reservation Basis)', 18, 83)
-		report.text('Reservation Status Numbers', 18, 91)
-		report.text('Total Earned Amount', 18, 135) // 125
-		report.text('Signed By', 168, 235, {align: 'right'})
-		report.setFont('Times', 'normal').text('Approved', 27, 101)
+		report
+			.setFont('Times', 'bold')
+			.setFontSize(11)
+			.text(
+				`${monthName[previousMonth - 1]} ${currentYear} Reservation Earnings Report`,
+				width / 2,
+				45,
+				{ align: 'center' }
+			);
+		report.setFontSize(10).text('Total Number of Reservations', 18, 75);
+		report.text('Reservation Fee (Per Reservation Basis)', 18, 83);
+		report.text('Reservation Status Numbers', 18, 91);
+		report.text('Total Earned Amount', 18, 135); // 125
+		report.text('Signed By', 168, 235, { align: 'right' });
+		report.setFont('Times', 'normal').text('Approved', 27, 101);
 		// report.text('Cancelled', 27, 109)
-		report.text(`${entryCount} Entries`, 190, 75, {align: 'right'})
-		report.text('PHP 500.00', 190, 83, {align: 'right'})
-		report.text(`${approvedCount} Entries`, 190, 101, {align: 'right'})
-		report.text(`PHP ${totalEarnings}.00`, 190, 135, {align: 'right'})
+		report.text(`${entryCount} Entries`, 190, 75, { align: 'right' });
+		report.text('PHP 500.00', 190, 83, { align: 'right' });
+		report.text(`${approvedCount} Entries`, 190, 101, { align: 'right' });
+		report.text(`PHP ${totalEarnings}.00`, 190, 135, { align: 'right' });
 		report.line(18, 128, 190, 128);
 		report.line(130, 250, 190, 250);
-		report.text('HOA Treasurer', 171, 258, {align: 'right'})
-		report.addPage()
-		report.autoTable({ margin: { top: 20, bottom: 20 }, html: '#generate-table' })
-		
-		report.save(`Southview-Homes-3-${monthName[previousMonth - 1]}-${currentYear}-Reservation-Report.pdf`);
+		report.text('HOA Treasurer', 171, 258, { align: 'right' });
+		report.addPage();
+		report.autoTable({ margin: { top: 20, bottom: 20 }, html: '#generate-table' });
+
+		report.save(
+			`Southview-Homes-3-${monthName[previousMonth - 1]}-${currentYear}-Reservation-Report.pdf`
+		);
 	}
 
 	$: {
@@ -180,7 +215,7 @@
 	function goToPage(page) {
 		currentPage = page;
 	}
-	$: generateTable(generateQuery)
+	$: generateTable(generateQuery);
 </script>
 
 <svelte:head>
@@ -203,36 +238,33 @@
 	</thead>
 	<tbody>
 		{#each listOfReports as book, j}
-		<tr>
-			<td>{j + 1}</td>
-							<td>{book.firstNameDisplay + ' ' + book.lastNameDisplay}</td>
-							<!-- <td>{book.email}</td> -->
-							<!-- <td>{book.contactNumber}</td> -->
-							<td>{book.eventTypeDisplay}</td>
-							<td
-								>{book.bookDate.toDate().toLocaleDateString('en-us', {
-									year: 'numeric',
-									month: 'long',
-									day: 'numeric'
-								}) +
-									' ' +
-									book.bookDate
-										.toDate()
-										.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}</td
-							>
-							<td>
-								{#if book.status == 'Approved'}
-									<td class="p-3 text-sm whitespace-nowrap text-green-500 font-bold"
-										>{book.status}</td
-									>
-								{:else if book.status == 'Disapproved'}
-									<td class="p-3 text-sm whitespace-nowrap text-red-500 font-bold">{book.status}</td
-									>
-								{:else if book.status == 'Pending'}
-									<td class="p-3 text-sm whitespace-nowrap">{book.status}</td>
-								{/if}
-							</td>
-							<!-- <td
+			<tr>
+				<td>{j + 1}</td>
+				<td>{book.firstNameDisplay + ' ' + book.lastNameDisplay}</td>
+				<!-- <td>{book.email}</td> -->
+				<!-- <td>{book.contactNumber}</td> -->
+				<td>{book.eventTypeDisplay}</td>
+				<td
+					>{book.bookDate.toDate().toLocaleDateString('en-us', {
+						year: 'numeric',
+						month: 'long',
+						day: 'numeric'
+					}) +
+						' ' +
+						book.bookDate
+							.toDate()
+							.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}</td
+				>
+				<td>
+					{#if book.status == 'Approved'}
+						<td class="p-3 text-sm whitespace-nowrap text-green-500 font-bold">{book.status}</td>
+					{:else if book.status == 'Disapproved'}
+						<td class="p-3 text-sm whitespace-nowrap text-red-500 font-bold">{book.status}</td>
+					{:else if book.status == 'Pending'}
+						<td class="p-3 text-sm whitespace-nowrap">{book.status}</td>
+					{/if}
+				</td>
+				<!-- <td
 								>{book.dateReviewed.toDate().toLocaleDateString('en-us', {
 									year: 'numeric',
 									month: 'long',
@@ -243,8 +275,8 @@
 										.toDate()
 										.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}</td
 							> -->
-							<td>PHP 500.00</td>
-		</tr>
+				<td>PHP 500.00</td>
+			</tr>
 		{/each}
 	</tbody>
 </table>
@@ -298,6 +330,7 @@
 			<option value="" selected>Status Filter</option>
 			<option value="Approved">Approved</option>
 			<option value="Disapproved">Disapproved</option>
+			<option value="Cancelled">Cancelled</option>
 		</select>
 		<div class="my-4">
 			<button class="btn btn-primary" on:click={generateReport}>Generate Report</button>
@@ -346,14 +379,14 @@
 										.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}</td
 							>
 							<td>
-								{#if book.status == 'Approved'}
+								{#if book.status === 'Approved'}
 									<td class="p-3 text-sm whitespace-nowrap text-green-500 font-bold"
 										>{book.status}</td
 									>
-								{:else if book.status == 'Disapproved'}
+								{:else if book.status === 'Disapproved'}
 									<td class="p-3 text-sm whitespace-nowrap text-red-500 font-bold">{book.status}</td
 									>
-								{:else if book.status == 'Pending'}
+								{:else if book.status === 'Cancelled'}
 									<td class="p-3 text-sm whitespace-nowrap">{book.status}</td>
 								{/if}
 							</td>
@@ -411,10 +444,12 @@
 					</div>
 					<div class="font-bold">
 						Status:
-						{#if book.status == 'Approved'}
+						{#if book.status === 'Approved'}
 							<span class="text-green-500">{book.status}</span>
-						{:else if book.status == 'Disapproved'}
+						{:else if book.status === 'Disapproved'}
 							<span class="text-red-500">{book.status}</span>
+						{:else if book.status === 'Cancelled'}
+							<span class="">{book.status}</span>
 						{/if}
 					</div>
 					<div>

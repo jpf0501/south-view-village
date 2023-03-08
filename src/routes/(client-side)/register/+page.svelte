@@ -134,6 +134,8 @@
 						type="text"
 						placeholder="Enter OTP"
 						autocomplete="off"
+						minlength="6"
+						maxlength="6"
 						bind:value={userOTP}
 					/>
 				</div>

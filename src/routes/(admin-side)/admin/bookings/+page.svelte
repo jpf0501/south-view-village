@@ -105,11 +105,11 @@
 				// alert('Email sent successfuly');
 			} catch (error) {
 				console.log(error);
-				toast.error('Error in sending approval/disapproval booking request in email');
+				toast.error('Error in sending update of booking request in email');
 			}
 		} catch (error) {
 			console.log(error);
-			toast.error('Error in approving/disapproving a booking!');
+			toast.error('Error in updating a booking!');
 		}
 	}
 	async function changePaymentStatus(bookingId) {
@@ -317,6 +317,11 @@
 											class="btn btn-error text-white">Dissaprove</button
 										>
 									{/if}
+									<button
+										on:click={() => (bookingStatus = 'Cancelled')}
+										type="submit"
+										class="btn btn-warning text-white">Cancel</button
+									>
 								</form></td
 							>
 							<td>
@@ -431,6 +436,11 @@
 									class="btn btn-error text-white">Dissaprove</button
 								>
 							{/if}
+							<button
+									on:click={() => (bookingStatus = 'Cancelled')}
+									type="submit"
+									class="btn btn-error text-white">Dissaprove</button
+								>
 						</form>
 						<button
 							on:click={sendPaymentEmail(book.email, book.id)}
