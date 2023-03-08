@@ -6,11 +6,27 @@
 	import autoTable from 'jspdf-autotable'
 	import Pagination from '../../Pagination.svelte';
 
+	const monthName = [
+		'January',
+		'February',
+		'March',
+		'April',
+		'May',
+		'June',
+		'July',
+		'August',
+		'September',
+		'October',
+		'November',
+		'December'
+	];
+
 	let date = new Date();
 	let currentYear = date.getFullYear();
-	let currentMonth = (date.getMonth()).toString().padStart(2, "0");
+	let previousMonth = (date.getMonth()).toString().padStart(2, "0");
+	let currentMonth = (date.getMonth() + 1).toString().padStart(2, "0");
 	let day = "01";
-  	let startDate = new Date(`${currentYear}-${currentMonth}-${day}`);
+  	let startDate = new Date(`${currentYear}-${previousMonth}-${day}`);
 	let endDate;
 	if (currentMonth === "12") {
   		// if current month is December, set end date to January of next year
@@ -116,19 +132,40 @@
 
 	async function generateReport() {
 		const report = new jsPDF();
-		let entrySnapshotCount = await getCountFromServer(generateQuery);
-		let entryCount = entrySnapshotCount.data().count;
-		let totalEarnings = 500 * entryCount
 
-		report.addImage("/logo.png", "PNG", 36, 12, 11, 7);
-		report.text('Southview Homes 3 Booking History Report', 50, 18);
-		report.setFontSize(10)
-		report.text('SVH3 Clubhouse, San Vicente Road, Brgy., San Vicente, San Pedro, Laguna', 43, 27);
+		let approvedQuery = query(collection(db, 'booking'), where('status', '==', 'Approved'), where('dateReviewed', '>=', startDate), where('dateReviewed', '<', endDate));
+		let entrySnapshotCount = await getCountFromServer(generateQuery)
+		let approvedSnapshotCount = await getCountFromServer(approvedQuery)
+		let entryCount = entrySnapshotCount.data().count
+		let approvedCount = approvedSnapshotCount.data().count
+		let totalEarnings = 500 * entryCount
+		let width = report.internal.pageSize.getWidth()
+
+		totalEarnings = Number(totalEarnings.toFixed(2)).toLocaleString()
+
+		report.addImage("/logo.png", "PNG", 68, 12, 11, 7);
+		report.setFont('Times', 'bold').text('Southview Homes 3', 84, 18);
+		report.setFont('Times', 'normal').setFontSize(9).text('SVH3 Clubhouse, San Vicente Road, Brgy., San Vicente, San Pedro, Laguna', width/2, 27, {align: 'center'});
 		report.line(10, 34, 200, 34);
-		report.autoTable({ margin: { top: 40, bottom: 40}, html: '#generate-table' })
-		report.text(`Total bookings paid: ${entryCount} entries`, 150, 194)
-		report.text(`Total earned: PHP ${totalEarnings}`, 150, 200)
-		report.save('Southview-Homes-3-Booking-Report.pdf');
+		report.setFont('Times', 'bold').setFontSize(11).text(`${monthName[previousMonth - 1]} ${currentYear} Reservation Earnings Report`, width/2, 45, {align: 'center'});
+		report.setFontSize(10).text('Total Number of Reservations', 18, 75)
+		report.text('Reservation Fee (Per Reservation Basis)', 18, 83)
+		report.text('Reservation Status Numbers', 18, 91)
+		report.text('Total Earned Amount', 18, 135) // 125
+		report.text('Signed By', 168, 235, {align: 'right'})
+		report.setFont('Times', 'normal').text('Approved', 27, 101)
+		// report.text('Cancelled', 27, 109)
+		report.text(`${entryCount} Entries`, 190, 75, {align: 'right'})
+		report.text('PHP 500.00', 190, 83, {align: 'right'})
+		report.text(`${approvedCount} Entries`, 190, 101, {align: 'right'})
+		report.text(`PHP ${totalEarnings}.00`, 190, 135, {align: 'right'})
+		report.line(18, 128, 190, 128);
+		report.line(130, 250, 190, 250);
+		report.text('HOA Treasurer', 171, 258, {align: 'right'})
+		report.addPage()
+		report.autoTable({ margin: { top: 20, bottom: 20 }, html: '#generate-table' })
+		
+		report.save(`Southview-Homes-3-${monthName[previousMonth - 1]}-${currentYear}-Reservation-Report.pdf`);
 	}
 
 	$: {
@@ -155,12 +192,13 @@
 		<tr>
 			<th />
 			<th class="text-lg">Name</th>
-			<th class="text-lg">Email Address</th>
-			<th class="text-lg">Contact Number</th>
+			<!-- <th class="text-lg">Email Address</th>
+			<th class="text-lg">Contact Number</th> -->
 			<th class="text-lg">Type of Event</th>
 			<th class="text-lg">Date and Time</th>
 			<th class="text-lg">Booking Status</th>
-			<th class="text-lg">Date Reviewed</th>
+			<!-- <th class="text-lg">Date Reviewed</th> -->
+			<th class="text-lg">Amount Paid</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -168,8 +206,8 @@
 		<tr>
 			<td>{j + 1}</td>
 							<td>{book.firstNameDisplay + ' ' + book.lastNameDisplay}</td>
-							<td>{book.email}</td>
-							<td>{book.contactNumber}</td>
+							<!-- <td>{book.email}</td> -->
+							<!-- <td>{book.contactNumber}</td> -->
 							<td>{book.eventTypeDisplay}</td>
 							<td
 								>{book.bookDate.toDate().toLocaleDateString('en-us', {
@@ -177,7 +215,7 @@
 									month: 'long',
 									day: 'numeric'
 								}) +
-									' at ' +
+									' ' +
 									book.bookDate
 										.toDate()
 										.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}</td
@@ -194,7 +232,7 @@
 									<td class="p-3 text-sm whitespace-nowrap">{book.status}</td>
 								{/if}
 							</td>
-							<td
+							<!-- <td
 								>{book.dateReviewed.toDate().toLocaleDateString('en-us', {
 									year: 'numeric',
 									month: 'long',
@@ -204,7 +242,8 @@
 									book.dateReviewed
 										.toDate()
 										.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}</td
-							>
+							> -->
+							<td>PHP 500.00</td>
 		</tr>
 		{/each}
 	</tbody>
