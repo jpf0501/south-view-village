@@ -29,18 +29,18 @@
 				response: inquiry.response
 			};
 			await updateDoc(inquiryRef, changeData);
+			goto('/admin/inquiries');
 			try {
 				await sendEmail({
 					to: email,
 					subject: 'Southview Homes 3 Inquiries',
-					html: `<h1>Hello ${name}, </h1> <div> We have receive your inquiry about</div><div>${message}</div><h1>Our Response is </h1><div>${response}</div>`
+					html: `<h1>Hello ${name}, </h1> <div> We have receive your inquiry about</div><div style="white-space:pre-wrap">${message}</div><h1>Our Response is </h1><div style="white-space:pre-wrap">${response}</div>`
 				});
 				toast.success('Response sent!');
 			} catch (error) {
 				console.log(error);
 				toast.error('Error in sending reponse of the inquiry');
 			}
-			goto('/admin/inquiries');
 		} catch (error) {
 			console.log(error);
 			toast.error('Error sending response!');
@@ -65,36 +65,36 @@
 </svelte:head>
 
 {#if inquiry}
-	<div class="min-h-screen hero bg-base-200">
-		<div class="w-full max-w-4xl p-6 mx-auto shadow-2xl border rounded-xl bg-base-100">
-			<h1 class="text-2xl mt-2">Inquiry by {inquiry.nameDisplay}</h1>
-			<form>
-				<div class="form-control">
-					<span class="pb-3">Inquiry</span>
-					<div class="h-60 border-black border-2">
+	<div class="min-h-screen bg-gray-100 flex flex-col justify-center items-center">
+		<div class="w-full max-w-4xl p-6 mx-auto shadow-lg rounded-xl bg-white">
+			<h1 class="text-2xl font-bold mb-4">Inquiry by {inquiry.nameDisplay}</h1>
+			<form class="w-full">
+				<div class="flex flex-col mb-6">
+					<div class="text-gray-700 font-bold mb-2">Inquiry</div>
+					<div class="h-60 border rounded-md p-4 overflow-y-scroll">
 						{inquiry.message}
 					</div>
 				</div>
-				<div class="form-control">
-					<span class="pb-3">Response</span>
+				<div class="flex flex-col mb-6">
+					<div class="text-gray-700 font-bold mb-2">Response</div>
 					<textarea
-						class="h-60 textarea textarea-bordered p-3"
-						style="white-space:pre-wrap; resize:none"
+						class="h-60 border rounded-md p-4 resize-none"
 						required
 						bind:value={inquiry.response}
 					/>
 				</div>
-
 				<div class="flex justify-end mt-8">
 					<button
 						on:click={answerInquiry(inquiry.name, inquiry.email, inquiry.message, inquiry.response)}
 						type="submit"
-						class="btn btn-primary">Submit</button
+						class="btn btn-primary"
 					>
+						Submit
+					</button>
 					<a href="/admin/inquiries" class="btn btn-error mx-1 text-white">Cancel</a>
-					<button on:click={deleteInquiry} type="submit" class="btn btn-warning mx-1 text-white"
-						>Delete</button
-					>
+					<button on:click={deleteInquiry} type="submit" class="btn btn-warning mx-1 text-white">
+						Delete
+					</button>
 				</div>
 			</form>
 		</div>
