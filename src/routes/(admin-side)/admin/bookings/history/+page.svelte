@@ -1,11 +1,22 @@
 <script>
-	import { onSnapshot, query, collection, orderBy, where, getDocs } from 'firebase/firestore';
+	import { onSnapshot, query, collection, orderBy, where, getCountFromServer } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
 	import { jsPDF } from 'jspdf';
+	import autoTable from 'jspdf-autotable'
 	import Pagination from '../../Pagination.svelte';
 
+	let date = new Date();
+	let currentYear = date.getFullYear();
+	// let previousMonth = (date.getMonth()).toString().padStart(2, "0");
+	let currentMonth = (date.getMonth() + 1).toString().padStart(2, "0");
+	let nextMonth = (date.getMonth() + 2).toString().padStart(2, "0");
+	let day = "01";
+	let startDate = new Date(`${currentYear}-${currentMonth}-${day}`);
+	let endDate = new Date(`${currentYear}-${nextMonth}-${day}`);
+
 	let listOfBooking = [];
+	let listOfReports = [];
 	let sortByField = '';
 	let sortByStatus = '';
 	let searchByField = '';
@@ -15,6 +26,7 @@
 		where('status', 'in', ['Approved', 'Disapproved']),
 		orderBy('dateReviewed', 'desc')
 	);
+	let generateQuery = query(collection(db, 'booking'), where('status', '==', 'Approved'), where('dateReviewed', '>=', startDate), where('dateReviewed', '<', endDate));
 
 	let noResult = false;
 
@@ -89,33 +101,27 @@
 		searchByValue = '';
 	}
 
+	async function generateTable(generateQuery) {
+		const unsubscribe = onSnapshot(generateQuery, (querySnapshot) => {
+				listOfReports = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+			});
+		onDestroy(() => unsubscribe());
+	}
+
 	async function generateReport() {
-		const reportQuery = query(collection(db, 'booking'), where('status', '!=', 'Pending'));
-		const reportSnap = await getDocs(reportQuery);
-
 		const report = new jsPDF();
+		let entrySnapshotCount = await getCountFromServer(generateQuery);
+		let entryCount = entrySnapshotCount.data().count;
+		let totalEarnings = 500 * entryCount
 
-		let text = '';
-
-		reportSnap.forEach((booking) => {
-			text += `Name: ${booking.data().firstNameDisplay} ${booking.data().lastNameDisplay}\n`;
-			text += `E-mail Address: ${booking.data().email}\n`;
-			text += `Contact No.: ${booking.data().contactNumber}\n`;
-			text += `Event Type: ${booking.data().eventTypeDisplay}\n`;
-			text += `Date Reserved: ${booking.data().dateReserved.toDate().toLocaleDateString()} ${booking
-				.data()
-				.dateReserved.toDate()
-				.toLocaleTimeString()}\n`;
-			text += `Booking Status: ${booking.data().status}\n`;
-			text += `Date Reviewed: ${booking.data().dateReviewed.toDate().toLocaleDateString()} ${booking
-				.data()
-				.dateReviewed.toDate()
-				.toLocaleTimeString()}\n`;
-			text += `Payment Status: ${booking.data().paymentStatus}\n\n`;
-		});
-
-		report.text('Southview Homes 3 Booking History Report', 10, 18);
-		report.text(text, 10, 34);
+		report.addImage("/logo.png", "PNG", 36, 12, 11, 7);
+		report.text('Southview Homes 3 Booking History Report', 50, 18);
+		report.setFontSize(10)
+		report.text('SVH3 Clubhouse, San Vicente Road, Brgy., San Vicente, San Pedro, Laguna', 43, 27);
+		report.line(10, 34, 200, 34);
+		report.autoTable({ margin: { top: 40, bottom: 40}, html: '#generate-table' })
+		report.text(`Total bookings paid: ${entryCount} entries`, 150, 194)
+		report.text(`Total earned: PHP ${totalEarnings}`, 150, 200)
 		report.save('Southview-Homes-3-Booking-Report.pdf');
 	}
 
@@ -131,11 +137,72 @@
 	function goToPage(page) {
 		currentPage = page;
 	}
+	$: generateTable(generateQuery)
 </script>
 
 <svelte:head>
 	<title>Booking History - Southview Homes 3 Admin Panel</title>
 </svelte:head>
+
+<table class="hidden" id="generate-table">
+	<thead>
+		<tr>
+			<th />
+			<th class="text-lg">Name</th>
+			<th class="text-lg">Email Address</th>
+			<th class="text-lg">Contact Number</th>
+			<th class="text-lg">Type of Event</th>
+			<th class="text-lg">Date and Time</th>
+			<th class="text-lg">Booking Status</th>
+			<th class="text-lg">Date Reviewed</th>
+		</tr>
+	</thead>
+	<tbody>
+		{#each listOfReports as book, j}
+		<tr>
+			<td>{j + 1}</td>
+							<td>{book.firstNameDisplay + ' ' + book.lastNameDisplay}</td>
+							<td>{book.email}</td>
+							<td>{book.contactNumber}</td>
+							<td>{book.eventTypeDisplay}</td>
+							<td
+								>{book.bookDate.toDate().toLocaleDateString('en-us', {
+									year: 'numeric',
+									month: 'long',
+									day: 'numeric'
+								}) +
+									' at ' +
+									book.bookDate
+										.toDate()
+										.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}</td
+							>
+							<td>
+								{#if book.status == 'Approved'}
+									<td class="p-3 text-sm whitespace-nowrap text-green-500 font-bold"
+										>{book.status}</td
+									>
+								{:else if book.status == 'Disapproved'}
+									<td class="p-3 text-sm whitespace-nowrap text-red-500 font-bold">{book.status}</td
+									>
+								{:else if book.status == 'Pending'}
+									<td class="p-3 text-sm whitespace-nowrap">{book.status}</td>
+								{/if}
+							</td>
+							<td
+								>{book.dateReviewed.toDate().toLocaleDateString('en-us', {
+									year: 'numeric',
+									month: 'long',
+									day: 'numeric'
+								}) +
+									' at ' +
+									book.dateReviewed
+										.toDate()
+										.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}</td
+							>
+		</tr>
+		{/each}
+	</tbody>
+</table>
 
 <div class="min-w-full min-h-full bg-base-200 py-8 px-5">
 	<h1 class="text-3xl font-semibold py-2">Bookings History</h1>
