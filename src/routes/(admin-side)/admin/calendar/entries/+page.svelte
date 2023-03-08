@@ -25,7 +25,6 @@
 				.map((doc) => ({ id: doc.id, ...doc.data() }))
 				.slice(startIndex, endIndex);
 		});
-		listOfEvents.length === 0 ? (noResult = true) : (noResult = false);
 		onDestroy(() => unsubscribe());
 	}
 
@@ -53,6 +52,7 @@
 			totalRecords = querySnapshot.docs.length;
 			totalPages = Math.ceil(totalRecords / pageSize);
 		});
+		listOfEvents.length === 0 ? (noResult = true) : (noResult = false);
 		onDestroy(() => unsubscribe());
 	}
 	function goToPage(page) {

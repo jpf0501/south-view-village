@@ -25,7 +25,6 @@
 				.map((doc) => ({ id: doc.id, ...doc.data() }))
 				.slice(startIndex, endIndex);
 		});
-		listOfNews.length === 0 ? (noResult = true) : (noResult = false);
 		onDestroy(() => unsubscribe());
 	}
 
@@ -61,6 +60,7 @@
 			totalRecords = querySnapshot.docs.length;
 			totalPages = Math.ceil(totalRecords / pageSize);
 		});
+		listOfNews.length === 0 ? (noResult = true) : (noResult = false);
 		onDestroy(() => unsubscribe());
 	}
 	function goToPage(page) {
