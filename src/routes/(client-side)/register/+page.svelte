@@ -1,9 +1,18 @@
 <script>
 	import { goto } from '$app/navigation';
 	import { db } from '$lib/firebase/client';
-	import { onSnapshot, query, collection, orderBy, addDoc } from 'firebase/firestore';
+	import {
+		onSnapshot,
+		query,
+		collection,
+		orderBy,
+		addDoc,
+		where,
+		getDocs
+	} from 'firebase/firestore';
 	import { onDestroy } from 'svelte';
 	import toast from 'svelte-french-toast';
+	import { sendEmail } from '$lib/utils';
 
 	let account = {
 		email: '',
@@ -23,6 +32,12 @@
 	let streetQuery = query(collection(db, 'street'), orderBy('streetName', 'asc'));
 	let listOfStreets = [];
 
+	let showOTP = false;
+	let userOTP = '';
+	let OTP = '';
+
+	const digits = '0123456789';
+
 	const blockValue = Array.from({ length: 23 }, (_, i) => ({
 		value: i + 1
 	}));
@@ -39,6 +54,42 @@
 	}
 
 	async function submitHandler() {
+		const accountsQuery = query(collection(db, 'accounts'), where('email', '==', account.email));
+		const accountsSnapshot = await getDocs(accountsQuery);
+		if (accountsSnapshot.docs.length > 0) {
+			toast.error('Email already used');
+			return;
+		}
+		if (account.password !== account.passwordcheck) {
+			toast.error('Password do not match');
+			return;
+		}
+		if (account.password.length < 6 && account.passwordcheck.length < 6) {
+			toast.error('Your password must at least be 6 characters');
+			return;
+		}
+		for (let i = 0; i < 6; i++) {
+			OTP += digits[Math.floor(Math.random() * 10)];
+		}
+		try {
+			await sendEmail({
+				to: account.email,
+				subject: 'Your OTP code',
+				html: `<h1>Your OTP is: ${OTP}</h1>`
+			});
+			showOTP = true;
+			toast.success('OTP sent');
+		} catch (error) {
+			console.log(error);
+			toast.error('Error in sending OTP');
+		}
+	}
+
+	async function confirmOTP() {
+		if (userOTP !== OTP) {
+			toast.error('Incorrect OTP');
+			return;
+		}
 		try {
 			await addDoc(collection(db, 'pendingAccounts'), {
 				pendingEmail: account.email,
@@ -71,6 +122,40 @@
 	<title>Create Account - Southview Homes 3</title>
 </svelte:head>
 
+{#if showOTP}
+	<div class="grid place-items-center bg-gray-200 h-screen">
+		<div class="bg-white rounded-lg shadow-lg p-8">
+			<h2 class="text-2xl font-bold mb-4">Enter OTP</h2>
+			<form class="mb-4" on:submit|preventDefault={confirmOTP}>
+				<div class="mb-4">
+					<label class="block text-gray-700 font-bold mb-2" for="otp"> OTP </label>
+					<input
+						class="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+						type="text"
+						placeholder="Enter OTP"
+						autocomplete="off"
+						bind:value={userOTP}
+					/>
+				</div>
+				<div class="flex items-center justify-between">
+					<button
+						class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+						type="submit"
+					>
+						Submit
+					</button>
+					<button
+						class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+						type="button"
+						on:click={() => (showOTP = false)}
+					>
+						Cancel
+					</button>
+				</div>
+			</form>
+		</div>
+	</div>
+{/if}
 <main>
 	<div class="min-h-screen hero bg-base-200 py-8">
 		<div class="w-full max-w-4xl p-6 mx-auto shadow-2xl border rounded-xl bg-base-100">
