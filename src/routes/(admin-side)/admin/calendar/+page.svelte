@@ -3,13 +3,13 @@
 	import { Modal } from 'svelte-simple-modal';
 
 	const daysOfTheWeek = [
-		'Sunday',
-		'Monday',
-		'Tuesday',
-		'Wednesday',
-		'Thursday',
-		'Friday',
-		'Saturday'
+		'Sun',
+		'Mon',
+		'Tue',
+		'Wed',
+		'Thu',
+		'Fri',
+		'Sat'
 	];
 	const monthNames = [
 		'January',

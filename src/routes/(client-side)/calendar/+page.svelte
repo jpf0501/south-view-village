@@ -3,13 +3,13 @@
 	import { Modal } from 'svelte-simple-modal';
 
 	const daysOfTheWeek = [
-		'Sunday',
-		'Monday',
-		'Tuesday',
-		'Wednesday',
-		'Thursday',
-		'Friday',
-		'Saturday'
+		'Sun',
+		'Mon',
+		'Tue',
+		'Wed',
+		'Thu',
+		'Fri',
+		'Sat'
 	];
 	const monthNames = [
 		'January',
@@ -81,7 +81,7 @@
 					</button>
 				</div>
 				<div class="navbar-center">
-					<h1 class="text-xl normal-case">{monthNames[currentMonth - 1]} {currentYear}</h1>
+					<h1 class="text-xl normal-case sm:text-xs">{monthNames[currentMonth - 1]} {currentYear}</h1>
 				</div>
 				<div class="navbar-end">
 					<button on:click={nextMonth} class="btn btn-circle btn-ghost">
