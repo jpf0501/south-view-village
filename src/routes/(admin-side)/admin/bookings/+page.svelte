@@ -439,7 +439,7 @@
 							<button
 									on:click={() => (bookingStatus = 'Cancelled')}
 									type="submit"
-									class="btn btn-error text-white">Dissaprove</button
+									class="btn btn-error text-white">Cancel</button
 								>
 						</form>
 						<button
