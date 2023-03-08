@@ -51,11 +51,11 @@
 					dateReserved: guest.dateReserved,
 					dateReviewed: guest.dateReserved,
 				});
-				toast.success('Reservation Form Submitted!')
+				toast.success('Reservation submitted!')
 				await goto('/calendar');
 			} catch (error) {
 				console.log(error);
-				toast.error('Error in Submitting Reservation!')
+				toast.error('Error in submitting reservation!')
 			}
 		} else {
 			try {

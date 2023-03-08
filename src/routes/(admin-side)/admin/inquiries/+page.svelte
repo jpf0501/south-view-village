@@ -107,7 +107,6 @@
 			<option value="name">Name</option>
 			<option value="email">Email</option>
 		</select>
-		<a class="btn btn-primary my-4" href="/admin/news/create">Add News</a>
 	</div>
 
 	<!-- Medium to large screen -->

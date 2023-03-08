@@ -214,6 +214,7 @@
 			<option value="eventType">Type of Event</option>
 			<option value="bookDate">Date and Time</option>
 		</select>
+		<a class="btn btn-primary my-4" href="/admin/bookings/create">Add a Booking</a>
 	</div>
 
 	<!-- Medium to large screen -->

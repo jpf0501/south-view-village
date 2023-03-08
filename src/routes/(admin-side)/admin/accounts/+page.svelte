@@ -66,6 +66,9 @@
 
 <div class="min-w-full min-h-full bg-base-200 py-8 px-5">
 	<h1 class="text-3xl font-semibold py-2">Accounts</h1>
+	<div class="flex justify-end">
+		<a class="btn btn-primary my-4" href="/admin/accounts/pending">Account Approval</a>
+	</div>
 	<div class="flex flex-col md:flex-row justify-between">
 		<div class="flex flex-col md:flex-row">
 			<form
@@ -92,7 +95,6 @@
 					bind:value={searchByValue}
 				/>
 			</form>
-
 			<button on:click={resetButton} class="btn btn-primary my-4 mx-2">Reset</button>
 		</div>
 
@@ -107,7 +109,6 @@
 		</select>
 
 		<a class="btn btn-primary my-4" href="/admin/accounts/create">Add User</a>
-		<a class="btn btn-primary my-4" href="/admin/accounts/pending">Account Approval</a>
 	</div>
 
 	<!-- Medium to large screen -->
