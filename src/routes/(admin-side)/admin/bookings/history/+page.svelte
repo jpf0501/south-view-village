@@ -8,12 +8,18 @@
 
 	let date = new Date();
 	let currentYear = date.getFullYear();
-	// let previousMonth = (date.getMonth()).toString().padStart(2, "0");
-	let currentMonth = (date.getMonth() + 1).toString().padStart(2, "0");
-	let nextMonth = (date.getMonth() + 2).toString().padStart(2, "0");
+	let currentMonth = (date.getMonth()).toString().padStart(2, "0");
 	let day = "01";
-	let startDate = new Date(`${currentYear}-${currentMonth}-${day}`);
-	let endDate = new Date(`${currentYear}-${nextMonth}-${day}`);
+  	let startDate = new Date(`${currentYear}-${currentMonth}-${day}`);
+	let endDate;
+	if (currentMonth === "12") {
+  		// if current month is December, set end date to January of next year
+  		endDate = new Date(`${currentYear + 1}-01-${day}`);
+	} else {
+  		// otherwise, set end date to next month
+  		let nextMonth = (date.getMonth() + 1).toString().padStart(2, "0");
+  		endDate = new Date(`${currentYear}-${nextMonth}-${day}`);
+	}
 
 	let listOfBooking = [];
 	let listOfReports = [];
