@@ -11,6 +11,7 @@
 	import { onDestroy } from 'svelte';
 	import { jsPDF } from 'jspdf';
 	import autoTable from 'jspdf-autotable';
+	import toast from 'svelte-french-toast';
 	import Pagination from '../../Pagination.svelte';
 
 	const monthName = [
@@ -29,12 +30,21 @@
 	];
 
 	let date = new Date();
+	let previousYear = (date.getFullYear() - 1)
 	let currentYear = date.getFullYear();
 	let previousMonth = date.getMonth().toString().padStart(2, '0');
 	let currentMonth = (date.getMonth() + 1).toString().padStart(2, '0');
 	let day = '01';
-	let startDate = new Date(`${currentYear}-${previousMonth}-${day}`);
-	let endDate;
+	let startDate, endDate;
+
+	if (currentMonth === '01') {
+		// if current month is January, set start date to December of last year
+		startDate = new Date(`${previousYear}-12-${day}`);
+	} else {
+		// set start date to last month date
+		startDate = new Date(`${currentYear}-${previousMonth}-${day}`);
+	}
+	
 	if (currentMonth === '12') {
 		// if current month is December, set end date to January of next year
 		endDate = new Date(`${currentYear + 1}-01-${day}`);
@@ -182,26 +192,39 @@
 				{ align: 'center' }
 			);
 		report.line(10, 34, 200, 34);
-		report
-			.setFont('Times', 'bold')
-			.setFontSize(11)
-			.text(
-				`${monthName[previousMonth - 1]} ${currentYear} Reservation Earnings Report`,
-				width / 2,
-				45,
-				{ align: 'center' }
-			);
+		report.setFont('Times', 'bold').setFontSize(11)
+		if (currentMonth == '01') {
+			report.text(`${monthName[previousMonth - 1]} ${previousYear} Reservation Earnings Report`, width / 2, 45, { align: 'center' });
+		} else {
+			report.text(`${monthName[previousMonth - 1]} ${currentYear} Reservation Earnings Report`, width / 2, 45, { align: 'center' });
+		}	
 		report.setFontSize(10).text('Total Number of Reservations', 18, 75);
-		report.text('Reservation Fee (Per Reservation Basis)', 18, 83);
-		report.text('Reservation Status Numbers', 18, 91);
+		report.text('Reservation Fee', 18, 83);
+		report.text('Reservation Record Numbers', 18, 91);
 		report.text('Total Earned Amount', 18, 135); // 125
 		report.text('Signed By', 168, 235, { align: 'right' });
-		report.setFont('Times', 'normal').text('Approved', 27, 101);
-		report.text('Cancelled', 27, 109)
-		report.text(`${entryCount} Entries`, 190, 75, { align: 'right' });
+		report.setFont('Times', 'normal').text('Approved Reservations', 27, 101);
+		report.text('Cancelled Reservations', 27, 109)
+		if (entryCount === 1) {
+			report.text(`${entryCount} Records`, 190, 75, { align: 'right' });
+		} else {
+			report.text(`${entryCount} Records`, 190, 75, { align: 'right' });
+		}
 		report.text('PHP 500.00', 190, 83, { align: 'right' });
-		report.text(`${approvedCount} Entries`, 190, 101, { align: 'right' });
-		report.text(`${cancelledCount} Entries`, 190, 109, { align: 'right' });
+		if (approvedCount === 0) {
+			report.text('No Entries', 190, 101, { align: 'right' });
+		} else if (approvedCount === 1) { 
+			report.text(`${approvedCount} Entry`, 190, 101, { align: 'right' });
+		} else {
+			report.text(`${approvedCount} Entries`, 190, 101, { align: 'right' });
+		}
+		if (cancelledCount === 0) {
+			report.text('No Entries', 190, 109, { align: 'right' });
+		} else if (cancelledCount === 1) { 
+			report.text(`${cancelledCount} Entry`, 190, 109, { align: 'right' });
+		} else {
+			report.text(`${cancelledCount} Entries`, 190, 109, { align: 'right' });
+		}
 		report.text(`PHP ${totalEarnings}.00`, 190, 135, { align: 'right' });
 		report.line(18, 128, 190, 128);
 		report.line(130, 250, 190, 250);
@@ -209,9 +232,21 @@
 		report.addPage();
 		report.autoTable({ margin: { top: 20, bottom: 20 }, html: '#generate-table' });
 
-		report.save(
+		if (currentMonth == '01') {
+			report.save(
+			`Southview-Homes-3-${monthName[previousMonth - 1]}-${previousYear}-Reservation-Report.pdf`
+			);
+		} else {
+			report.save(
 			`Southview-Homes-3-${monthName[previousMonth - 1]}-${currentYear}-Reservation-Report.pdf`
-		);
+			);
+		}
+
+		if (currentMonth == '01') {
+			toast.success(`Reservation report for ${monthName[previousMonth - 1]} ${previousYear} generated!`)
+		} else {
+			toast.success(`Reservation report for ${monthName[previousMonth - 1]} ${currentYear} generated!`)
+		}
 	}
 
 	$: {
