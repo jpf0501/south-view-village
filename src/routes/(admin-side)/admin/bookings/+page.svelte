@@ -303,6 +303,19 @@
 											class="btn btn-success text-white">Approve</button
 										>
 									{/if}
+									{#if book.paymentStatus == 'Unpaid'}
+										<button
+											on:click={() => (bookingStatus = 'Cancelled')}
+											type="submit"
+											class="btn btn-warning text-white" disabled>Cancel</button
+										>
+									{:else}
+											<button
+											on:click={() => (bookingStatus = 'Cancelled')}
+											type="submit"
+											class="btn btn-warning text-white">Cancel</button
+										>
+									{/if}
 									{#if book.paymentStatus == 'Paid'}
 										<button
 											on:click={() => (bookingStatus = 'Disapproved')}
@@ -317,11 +330,6 @@
 											class="btn btn-error text-white">Dissaprove</button
 										>
 									{/if}
-									<button
-										on:click={() => (bookingStatus = 'Cancelled')}
-										type="submit"
-										class="btn btn-warning text-white">Cancel</button
-									>
 								</form></td
 							>
 							<td>
