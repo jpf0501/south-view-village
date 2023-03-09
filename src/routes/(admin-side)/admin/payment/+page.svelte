@@ -38,7 +38,12 @@
 	let sortByField = '';
 	let searchByField = '';
 	let searchByValue = '';
-	let accountsQuery = query(collection(db, 'accounts'), where('paymentHead', '==', true), where('role', '==', 'Resident'));
+	let accountsQuery = query(
+		collection(db, 'accounts'),
+		where('paymentHead', '==', true),
+		where('role', '==', 'Resident'),
+		where('paymentStatus', '==', 'Unpaid')
+	);
 
 	let noResult = false;
 
@@ -63,6 +68,7 @@
 			collection(db, 'accounts'),
 			where('paymentHead', '==', true),
 			where('role', '==', 'Resident'),
+			where('paymentStatus', '==', 'Unpaid'),
 			orderBy(sortByField, 'asc')
 		);
 	}
@@ -75,6 +81,7 @@
 			where(searchByField, '<=', searchByValueCase + '~'),
 			where('paymentHead', '==', true),
 			where('role', '==', 'Resident'),
+			where('paymentStatus', '==', 'Unpaid')
 		);
 	}
 
@@ -101,7 +108,12 @@
 	}
 
 	async function resetButton() {
-		accountsQuery = query(collection(db, 'accounts'), where('paymentHead', '==', true), where('role', '==', 'Resident'),);
+		accountsQuery = query(
+			collection(db, 'accounts'),
+			where('paymentHead', '==', true),
+			where('role', '==', 'Resident'),
+			where('paymentStatus', '==', 'Unpaid')
+		);
 		searchByValue = '';
 	}
 
