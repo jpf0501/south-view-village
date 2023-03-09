@@ -29,6 +29,9 @@
 		paymentHead: '',
 		isPending: true
 	};
+
+	let empty = {};
+
 	let streetQuery = query(collection(db, 'street'), orderBy('streetName', 'asc'));
 	let listOfStreets = [];
 
@@ -54,19 +57,75 @@
 	}
 
 	async function sendOTP() {
+		if (
+			!account.email ||
+			!account.password ||
+			!account.passwordcheck ||
+			!account.firstname ||
+			!account.lastname ||
+			!account.addressBlock ||
+			!account.addressLot ||
+			!account.addressStreet ||
+			!account.contactNumber ||
+			!account.paymentHead
+		) {
+			if (!account.email) {
+				empty.email = true;
+			}
+			if (!account.password) {
+				empty.password = true;
+			}
+			if (!account.passwordcheck) {
+				empty.passwordcheck = true;
+			}
+			if (!account.firstname) {
+				empty.firstname = true;
+			}
+			if (!account.lastname) {
+				empty.lastname = true;
+			}
+			if (!account.addressBlock) {
+				empty.addressBlock = true;
+			}
+			if (!account.addressLot) {
+				empty.addressLot = true;
+			}
+			if (!account.addressStreet) {
+				empty.addressStreet = true;
+			}
+			if (!account.contactNumber) {
+				empty.contactNumber = true;
+			}
+			if (!account.paymentHead) {
+				empty.paymentHead = true;
+			}
+			setTimeout(function () {
+				empty = {};
+			}, 2000);
+			return;
+		}
+		if (account.password.length < 6) {
+			empty.passwordKulang = true;
+			setTimeout(function () {
+				empty = {};
+			}, 2000);
+			return;
+		}
+		if (account.password !== account.passwordcheck) {
+			empty.passwordMatch = true;
+			setTimeout(function () {
+				empty = {};
+			}, 2000);
+			return;
+		}
 		OTP = '';
 		const accountsQuery = query(collection(db, 'accounts'), where('email', '==', account.email));
 		const accountsSnapshot = await getDocs(accountsQuery);
 		if (accountsSnapshot.docs.length > 0) {
-			toast.error('Email already used');
-			return;
-		}
-		if (account.password !== account.passwordcheck) {
-			toast.error('Password do not match');
-			return;
-		}
-		if (account.password.length < 6 && account.passwordcheck.length < 6) {
-			toast.error("Password must have at least 6 characters");
+			empty.emailIsUsed = true;
+			setTimeout(function () {
+				empty = {};
+			}, 2000);
 			return;
 		}
 		for (let i = 0; i < 6; i++) {
@@ -175,12 +234,14 @@
 							<label for="fname" class="label">
 								<span class="label-text">First Name</span>
 							</label>
+							{#if empty.firstname}
+								<p class="text-red-500 text-sm italic">First Name is required</p>
+							{/if}
 							<input
 								type="text"
 								placeholder="Juan"
 								name="fname"
 								class="input input-bordered"
-								required
 								bind:value={account.firstname}
 							/>
 						</div>
@@ -188,12 +249,14 @@
 							<label for="lname" class="label">
 								<span class="label-text">Last Name</span>
 							</label>
+							{#if empty.lastname}
+								<p class="text-red-500 text-sm italic">Last Name is required</p>
+							{/if}
 							<input
 								type="text"
 								placeholder="Dela Cruz"
 								name="lname"
 								class="input input-bordered"
-								required
 								bind:value={account.lastname}
 							/>
 						</div>
@@ -203,11 +266,10 @@
 							<label for="Block" class="label">
 								<span class="label-text">Block</span>
 							</label>
-							<select
-								class="select select-bordered w-full"
-								required
-								bind:value={account.addressBlock}
-							>
+							{#if empty.addressBlock}
+								<p class="text-red-500 text-sm italic">Block is required</p>
+							{/if}
+							<select class="select select-bordered w-full" bind:value={account.addressBlock}>
 								<option value="" disabled>Select block</option>
 								{#each blockValue as block}
 									<option value={block.value}>{block.value}</option>
@@ -218,11 +280,10 @@
 							<label for="Lot" class="label">
 								<span class="label-text">Lot</span>
 							</label>
-							<select
-								class="select select-bordered w-full"
-								required
-								bind:value={account.addressLot}
-							>
+							{#if empty.addressLot}
+								<p class="text-red-500 text-sm italic">Lot is required</p>
+							{/if}
+							<select class="select select-bordered w-full" bind:value={account.addressLot}>
 								<option value="" disabled>Select lot</option>
 								{#each lotValue as lot}
 									<option value={lot.value}>{lot.value}</option>
@@ -233,10 +294,12 @@
 							<label for="Street" class="label">
 								<span class="label-text">Street</span>
 							</label>
+							{#if empty.addressStreet}
+								<p class="text-red-500 text-sm italic">Street is required</p>
+							{/if}
 							<select
 								class="select select-bordered w-full"
 								aria-label="Default select example"
-								required
 								bind:value={account.addressStreet}
 							>
 								<option value="" selected disabled>Select street</option>
@@ -251,12 +314,17 @@
 							<label for="fname" class="label">
 								<span class="label-text">E-mail Address</span>
 							</label>
+							{#if empty.email}
+								<p class="text-red-500 text-sm italic">Email is required</p>
+							{/if}
+							{#if empty.emailIsUsed}
+								<p class="text-red-500 text-sm italic">Email is already used</p>
+							{/if}
 							<input
 								type="text"
 								placeholder="juandelacruz@gmail.com"
 								name="email"
 								class="input input-bordered"
-								required
 								bind:value={account.email}
 							/>
 						</div>
@@ -266,11 +334,16 @@
 							<label for="password" class="label">
 								<span class="label-text">Password</span>
 							</label>
+							{#if empty.password}
+								<p class="text-red-500 text-sm italic">Password is required</p>
+							{/if}
+							{#if empty.passwordKulang}
+								<p class="text-red-500 text-sm italic">Password must be at least 6 characters</p>
+							{/if}
 							<input
 								class="input input-bordered"
 								type="password"
 								placeholder="Password"
-								required
 								bind:value={account.password}
 							/>
 						</div>
@@ -278,44 +351,32 @@
 							<label for="cpassword" class="label">
 								<span class="label-text">Confirm Password</span>
 							</label>
+							{#if empty.passwordcheck}
+								<p class="text-red-500 text-sm italic">Confirm Password is required.</p>
+							{/if}
+							{#if empty.passwordMatch}
+								<p class="text-red-500 text-sm italic">Password do not match</p>
+							{/if}
 							<input
 								class="input input-bordered"
 								type="password"
 								placeholder="Confirm Password"
-								required
 								bind:value={account.passwordcheck}
 							/>
-							{#if account.password != account.passwordcheck && account.passwordcheck != ''}
-								<span class="alert alert-error shadow-lg my-3 w-full">
-									<div>
-										<svg
-											xmlns="http://www.w3.org/2000/svg"
-											class="stroke-current flex-shrink-0 h-6 w-6"
-											fill="none"
-											viewBox="0 0 24 24"
-											><path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2"
-												d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-											/></svg
-										>
-										<span>Passwords do not match</span>
-									</div>
-								</span>
-							{/if}
 						</div>
 					</div>
 					<div class="grid grid-cols-2 gap-6 mt-6 md:grid-cols-3">
 						<div class="form-control">
 							<label for="paymentHead" class="label">
 								<span class="label-text">Payment Head</span>
-							</label>		
+							</label>
+							{#if empty.paymentHead}
+								<p class="text-red-500 text-sm italic">Payment Head is required</p>
+							{/if}
 							<div class="mb-3">
 								<select
 									class="select select-bordered w-full"
 									aria-label="Default select example"
-									required
 									bind:value={account.paymentHead}
 								>
 									<option value="" selected disabled>Select</option>
@@ -328,6 +389,9 @@
 							<label for="lname" class="label">
 								<span class="label-text">Contact No.</span>
 							</label>
+							{#if empty.contactNumber}
+								<p class="text-red-500 text-sm italic">Contact number is required</p>
+							{/if}
 							<input
 								type="tel"
 								onkeypress="return event.charCode >= 48 && event.charCode <= 57"
@@ -337,7 +401,6 @@
 								pattern={String.raw`^(09)\d{9}$`}
 								name="contact"
 								class="input input-bordered"
-								required
 								bind:value={account.contactNumber}
 							/>
 						</div>
