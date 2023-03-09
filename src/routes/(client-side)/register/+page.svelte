@@ -128,23 +128,40 @@
 </svelte:head>
 
 {#if showOTP}
-<div class="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-	<div class="bg-white rounded-lg shadow-lg p-8 w-full md:w-2/3 lg:w-1/2 xl:w-1/3">
-	  <h2 class="text-2xl font-bold mb-4 text-center">Enter OTP</h2>
-	  <form class="mb-4 flex flex-col items-center" on:submit|preventDefault={confirmOTP}>
-		<div class="w-full mb-4">
-		  <label class="block text-gray-700 font-bold mb-2" for="otp">OTP</label>
-		  <input class="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="text" placeholder="Enter OTP" autocomplete="off" maxlength="6" bind:value={userOTP} />
+	<div class="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+		<div class="bg-white rounded-lg shadow-lg p-8 w-full md:w-2/3 lg:w-1/2 xl:w-1/3">
+			<h2 class="text-2xl font-bold mb-4 text-center">Enter OTP</h2>
+			<form class="mb-4 flex flex-col items-center" on:submit|preventDefault={confirmOTP}>
+				<div class="w-full mb-4">
+					<label class="block text-gray-700 font-bold mb-2" for="otp">OTP</label>
+					<input
+						class="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+						type="text"
+						placeholder="Enter OTP"
+						autocomplete="off"
+						maxlength="6"
+						bind:value={userOTP}
+					/>
+				</div>
+				<div class="w-full flex flex-col md:flex-row items-center justify-between">
+					<button
+						class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mb-2 md:mb-0 md:mr-2"
+						type="submit">Submit</button
+					>
+					<button
+						class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mb-2 md:mb-0 md:mr-2"
+						type="button"
+						on:click={sendOTP}>Resend OTP</button
+					>
+					<button
+						class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+						type="button"
+						on:click={() => (showOTP = false)}>Cancel</button
+					>
+				</div>
+			</form>
 		</div>
-		<div class="w-full flex flex-col md:flex-row items-center justify-between">
-		  <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mb-2 md:mb-0 md:mr-2" type="submit">Submit</button>
-		  <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mb-2 md:mb-0 md:mr-2" type="button" on:click={sendOTP}>Resend OTP</button>
-		  <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button" on:click={() => (showOTP = false)}>Cancel</button>
-		</div>
-	  </form>
 	</div>
-  </div>
-  
 {:else}
 	<main>
 		<div class="min-h-screen hero bg-base-200 py-8">
@@ -153,7 +170,7 @@
 					<h1 class="text-2xl">Create Account</h1>
 				</div>
 				<form on:submit|preventDefault={sendOTP}>
-					<div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2">
+					<div class="grid grid-cols-2 gap-6 mt-6 md:grid-cols-2">
 						<div class="form-control">
 							<label for="fname" class="label">
 								<span class="label-text">First Name</span>
@@ -181,7 +198,7 @@
 							/>
 						</div>
 					</div>
-					<div class="grid grid-cols-1 gap-6 mt-4 md:grid-cols-5">
+					<div class="grid grid-cols-2 gap-6 mt-4 md:grid-cols-5">
 						<div class="form-control">
 							<label for="Block" class="label">
 								<span class="label-text">Block</span>
@@ -242,83 +259,85 @@
 								required
 								bind:value={account.email}
 							/>
-							<div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2">
-								<div class="form-control">
-									<label for="password" class="label">
-										<span class="label-text">Password</span>
-									</label>
-									<input
-										class="input input-bordered"
-										type="password"
-										placeholder="New Password"
-										required
-										bind:value={account.password}
-									/>
-								</div>
-								<div class="form-control">
-									<label for="cpassword" class="label">
-										<span class="label-text">Confirm Password</span>
-									</label>
-									<input
-										class="input input-bordered"
-										type="password"
-										placeholder="Confirm Password"
-										required
-										bind:value={account.passwordcheck}
-									/>
-									{#if account.password != account.passwordcheck && account.passwordcheck != ''}
-										<div class="alert alert-error shadow-lg my-3 w-full">
-											<div>
-												<svg
-													xmlns="http://www.w3.org/2000/svg"
-													class="stroke-current flex-shrink-0 h-6 w-6"
-													fill="none"
-													viewBox="0 0 24 24"
-													><path
-														stroke-linecap="round"
-														stroke-linejoin="round"
-														stroke-width="2"
-														d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-													/></svg
-												>
-												<span>Passwords do not match</span>
-											</div>
-										</div>
-									{/if}
-								</div>
-							</div>
-							<div class="form-control">
-								<span class="label-text mb-3">Payment Head</span>
-								<div class="mb-3">
-									<select
-										class="select select-bordered w-full"
-										aria-label="Default select example"
-										required
-										bind:value={account.paymentHead}
-									>
-										<option value="" selected disabled>Select</option>
-										<option value={true}>Yes</option>
-										<option value={false}>No</option>
-									</select>
-								</div>
-							</div>
-							<div class="form-control">
-								<label for="lname" class="label">
-									<span class="label-text">Contact No.</span>
-								</label>
-								<input
-									type="tel"
-									onkeypress="return event.charCode >= 48 && event.charCode <= 57"
-									minlength="11"
-									maxlength="11"
-									placeholder="09123456789"
-									pattern={String.raw`^(09)\d{9}$`}
-									name="contact"
-									class="input input-bordered"
+						</div>
+					</div>
+					<div class="grid grid-cols-2 gap-6 mt-6 md:grid-cols-3">
+						<div class="form-control">
+							<label for="password" class="label">
+								<span class="label-text">Password</span>
+							</label>
+							<input
+								class="input input-bordered"
+								type="password"
+								placeholder="New Password"
+								required
+								bind:value={account.password}
+							/>
+						</div>
+						<div class="form-control">
+							<label for="cpassword" class="label">
+								<span class="label-text">Confirm Password</span>
+							</label>
+							<input
+								class="input input-bordered"
+								type="password"
+								placeholder="Confirm Password"
+								required
+								bind:value={account.passwordcheck}
+							/>
+							{#if account.password != account.passwordcheck && account.passwordcheck != ''}
+								<span class="alert alert-error shadow-lg my-3 w-full">
+									<div>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											class="stroke-current flex-shrink-0 h-6 w-6"
+											fill="none"
+											viewBox="0 0 24 24"
+											><path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+											/></svg
+										>
+										<span>Passwords do not match</span>
+									</div>
+								</span>
+							{/if}
+						</div>
+					</div>
+					<div class="grid grid-cols-2 gap-6 mt-6 md:grid-cols-3">
+						<div class="form-control">
+							<span class="label-text mb-3">Payment Head</span>
+							<div class="mb-3">
+								<select
+									class="select select-bordered w-full"
+									aria-label="Default select example"
 									required
-									bind:value={account.contactNumber}
-								/>
+									bind:value={account.paymentHead}
+								>
+									<option value="" selected disabled>Select</option>
+									<option value={true}>Yes</option>
+									<option value={false}>No</option>
+								</select>
 							</div>
+						</div>
+						<div class="form-control">
+							<label for="lname" class="label">
+								<span class="label-text">Contact No.</span>
+							</label>
+							<input
+								type="tel"
+								onkeypress="return event.charCode >= 48 && event.charCode <= 57"
+								minlength="11"
+								maxlength="11"
+								placeholder="09123456789"
+								pattern={String.raw`^(09)\d{9}$`}
+								name="contact"
+								class="input input-bordered"
+								required
+								bind:value={account.contactNumber}
+							/>
 						</div>
 					</div>
 					<div class="flex justify-end mt-8">
