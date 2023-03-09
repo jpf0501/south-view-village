@@ -71,7 +71,13 @@
 			!account.addressLot ||
 			!account.addressStreet ||
 			!account.contactNumber ||
-			account.paymentHead.length === 0
+			account.paymentHead.length === 0 ||
+			!regex.test(account.firstname) ||
+			!regex.test(account.lastname) ||
+			!emailRegex.test(account.email) ||
+			account.password.length < 6 ||
+			account.password !== account.passwordcheck ||
+			accountsSnapshot.docs.length > 0
 		) {
 			if (!account.email) {
 				empty.email = true;
@@ -103,19 +109,6 @@
 			if (account.paymentHead.length === 0) {
 				empty.paymentHead = true;
 			}
-			setTimeout(function () {
-				empty = {};
-			}, 2000);
-			return;
-		}
-		if (
-			!regex.test(account.firstname) ||
-			!regex.test(account.lastname) ||
-			!emailRegex.test(account.email) ||
-			account.password.length < 6 ||
-			account.password !== account.passwordcheck ||
-			accountsSnapshot.docs.length > 0
-		) {
 			if (!regex.test(account.firstname)) {
 				empty.invalidFirstname = true;
 			}
@@ -249,8 +242,7 @@
 							</label>
 							{#if empty.firstname}
 								<p class="text-red-500 text-sm italic mb-1">First Name is required</p>
-							{/if}
-							{#if empty.invalidFirstname}
+							{:else if empty.invalidFirstname}
 								<p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
 							{/if}
 							<input
@@ -267,8 +259,7 @@
 							</label>
 							{#if empty.lastname}
 								<p class="text-red-500 text-sm italic mb-1">Last Name is required</p>
-							{/if}
-							{#if empty.invalidLastname}
+							{:else if empty.invalidLastname}
 								<p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
 							{/if}
 							<input
@@ -335,11 +326,9 @@
 							</label>
 							{#if empty.email}
 								<p class="text-red-500 text-sm italic mb-1">Email is required</p>
-							{/if}
-							{#if empty.emailIsUsed}
+							{:else if empty.emailIsUsed}
 								<p class="text-red-500 text-sm italic mb-1">Email is already used</p>
-							{/if}
-							{#if empty.invalidEmail}
+							{:else if empty.invalidEmail}
 								<p class="text-red-500 text-sm italic mb-1">Invalid email</p>
 							{/if}
 							<input
@@ -358,8 +347,7 @@
 							</label>
 							{#if empty.password}
 								<p class="text-red-500 text-sm italic mb-1">Password is required</p>
-							{/if}
-							{#if empty.passwordKulang}
+							{:else if empty.passwordKulang}
 								<p class="text-red-500 text-sm italic mb-1">
 									Password must be at least 6 characters
 								</p>
@@ -377,8 +365,7 @@
 							</label>
 							{#if empty.passwordcheck}
 								<p class="text-red-500 text-sm italic mb-1">Confirm Password is required.</p>
-							{/if}
-							{#if empty.passwordNotMatch}
+							{:else if empty.passwordNotMatch}
 								<p class="text-red-500 text-sm italic mb-1">Password do not match</p>
 							{/if}
 							<input
