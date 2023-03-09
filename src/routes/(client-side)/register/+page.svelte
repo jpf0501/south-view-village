@@ -57,6 +57,10 @@
 	}
 
 	async function sendOTP() {
+		const regex = /^[a-zA-Z -]*$/;
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		const accountsQuery = query(collection(db, 'accounts'), where('email', '==', account.email));
+		const accountsSnapshot = await getDocs(accountsQuery);
 		if (
 			!account.email ||
 			!account.password ||
@@ -67,7 +71,7 @@
 			!account.addressLot ||
 			!account.addressStreet ||
 			!account.contactNumber ||
-			!account.paymentHead
+			account.paymentHead.length === 0
 		) {
 			if (!account.email) {
 				empty.email = true;
@@ -96,7 +100,7 @@
 			if (!account.contactNumber) {
 				empty.contactNumber = true;
 			}
-			if (!account.paymentHead) {
+			if (account.paymentHead.length === 0) {
 				empty.paymentHead = true;
 			}
 			setTimeout(function () {
@@ -104,30 +108,38 @@
 			}, 2000);
 			return;
 		}
-		if (account.password.length < 6) {
-			empty.passwordKulang = true;
-			setTimeout(function () {
-				empty = {};
-			}, 2000);
-			return;
-		}
-		if (account.password !== account.passwordcheck) {
-			empty.passwordMatch = true;
+		if (
+			!regex.test(account.firstname) ||
+			!regex.test(account.lastname) ||
+			!emailRegex.test(account.email) ||
+			account.password.length < 6 ||
+			account.password !== account.passwordcheck ||
+			accountsSnapshot.docs.length > 0
+		) {
+			if (!regex.test(account.firstname)) {
+				empty.invalidFirstname = true;
+			}
+			if (!regex.test(account.lastname)) {
+				empty.invalidLastname = true;
+			}
+			if (!emailRegex.test(account.email)) {
+				empty.invalidEmail = true;
+			}
+			if (accountsSnapshot.docs.length > 0) {
+				empty.emailIsUsed = true;
+			}
+			if (account.password.length < 6) {
+				empty.passwordKulang = true;
+			}
+			if (account.password !== account.passwordcheck) {
+				empty.passwordNotMatch = true;
+			}
 			setTimeout(function () {
 				empty = {};
 			}, 2000);
 			return;
 		}
 		OTP = '';
-		const accountsQuery = query(collection(db, 'accounts'), where('email', '==', account.email));
-		const accountsSnapshot = await getDocs(accountsQuery);
-		if (accountsSnapshot.docs.length > 0) {
-			empty.emailIsUsed = true;
-			setTimeout(function () {
-				empty = {};
-			}, 2000);
-			return;
-		}
 		for (let i = 0; i < 6; i++) {
 			OTP += digits[Math.floor(Math.random() * 10)];
 		}
@@ -146,14 +158,15 @@
 	}
 
 	async function confirmOTP() {
-		if (userOTP !== OTP) {
-			toast.error('Incorrect OTP');
-			return;
-		}
 		if (!userOTP) {
 			toast.error('OTP required');
 			return;
 		}
+		if (userOTP !== OTP) {
+			toast.error('Incorrect OTP');
+			return;
+		}
+
 		try {
 			await addDoc(collection(db, 'pendingAccounts'), {
 				pendingEmail: account.email,
@@ -235,7 +248,10 @@
 								<span class="label-text">First Name</span>
 							</label>
 							{#if empty.firstname}
-								<p class="text-red-500 text-sm italic">First Name is required</p>
+								<p class="text-red-500 text-sm italic mb-1">First Name is required</p>
+							{/if}
+							{#if empty.invalidFirstname}
+								<p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
 							{/if}
 							<input
 								type="text"
@@ -250,7 +266,10 @@
 								<span class="label-text">Last Name</span>
 							</label>
 							{#if empty.lastname}
-								<p class="text-red-500 text-sm italic">Last Name is required</p>
+								<p class="text-red-500 text-sm italic mb-1">Last Name is required</p>
+							{/if}
+							{#if empty.invalidLastname}
+								<p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
 							{/if}
 							<input
 								type="text"
@@ -267,7 +286,7 @@
 								<span class="label-text">Block</span>
 							</label>
 							{#if empty.addressBlock}
-								<p class="text-red-500 text-sm italic">Block is required</p>
+								<p class="text-red-500 text-sm italic mb-1">Block is required</p>
 							{/if}
 							<select class="select select-bordered w-full" bind:value={account.addressBlock}>
 								<option value="" disabled>Select block</option>
@@ -281,7 +300,7 @@
 								<span class="label-text">Lot</span>
 							</label>
 							{#if empty.addressLot}
-								<p class="text-red-500 text-sm italic">Lot is required</p>
+								<p class="text-red-500 text-sm italic mb-1">Lot is required</p>
 							{/if}
 							<select class="select select-bordered w-full" bind:value={account.addressLot}>
 								<option value="" disabled>Select lot</option>
@@ -295,7 +314,7 @@
 								<span class="label-text">Street</span>
 							</label>
 							{#if empty.addressStreet}
-								<p class="text-red-500 text-sm italic">Street is required</p>
+								<p class="text-red-500 text-sm italic mb-1">Street is required</p>
 							{/if}
 							<select
 								class="select select-bordered w-full"
@@ -315,10 +334,13 @@
 								<span class="label-text">E-mail Address</span>
 							</label>
 							{#if empty.email}
-								<p class="text-red-500 text-sm italic">Email is required</p>
+								<p class="text-red-500 text-sm italic mb-1">Email is required</p>
 							{/if}
 							{#if empty.emailIsUsed}
-								<p class="text-red-500 text-sm italic">Email is already used</p>
+								<p class="text-red-500 text-sm italic mb-1">Email is already used</p>
+							{/if}
+							{#if empty.invalidEmail}
+								<p class="text-red-500 text-sm italic mb-1">Invalid email</p>
 							{/if}
 							<input
 								type="text"
@@ -335,10 +357,12 @@
 								<span class="label-text">Password</span>
 							</label>
 							{#if empty.password}
-								<p class="text-red-500 text-sm italic">Password is required</p>
+								<p class="text-red-500 text-sm italic mb-1">Password is required</p>
 							{/if}
 							{#if empty.passwordKulang}
-								<p class="text-red-500 text-sm italic">Password must be at least 6 characters</p>
+								<p class="text-red-500 text-sm italic mb-1">
+									Password must be at least 6 characters
+								</p>
 							{/if}
 							<input
 								class="input input-bordered"
@@ -352,10 +376,10 @@
 								<span class="label-text">Confirm Password</span>
 							</label>
 							{#if empty.passwordcheck}
-								<p class="text-red-500 text-sm italic">Confirm Password is required.</p>
+								<p class="text-red-500 text-sm italic mb-1">Confirm Password is required.</p>
 							{/if}
-							{#if empty.passwordMatch}
-								<p class="text-red-500 text-sm italic">Password do not match</p>
+							{#if empty.passwordNotMatch}
+								<p class="text-red-500 text-sm italic mb-1">Password do not match</p>
 							{/if}
 							<input
 								class="input input-bordered"
@@ -371,7 +395,7 @@
 								<span class="label-text">Payment Head</span>
 							</label>
 							{#if empty.paymentHead}
-								<p class="text-red-500 text-sm italic">Payment Head is required</p>
+								<p class="text-red-500 text-sm italic mb-1">Payment Head is required</p>
 							{/if}
 							<div class="mb-3">
 								<select
@@ -390,7 +414,7 @@
 								<span class="label-text">Contact No.</span>
 							</label>
 							{#if empty.contactNumber}
-								<p class="text-red-500 text-sm italic">Contact number is required</p>
+								<p class="text-red-500 text-sm italic mb-1">Contact number is required</p>
 							{/if}
 							<input
 								type="tel"
