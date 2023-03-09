@@ -57,7 +57,7 @@
 	);
 	let generateQuery = query(
 		collection(db, 'booking'),
-		where('status', '==', 'Approved'),
+		where('status', 'in', ['Approved', 'Cancelled']),
 		where('dateReviewed', '>=', startDate),
 		where('dateReviewed', '<', endDate)
 	);
@@ -151,10 +151,20 @@
 			where('dateReviewed', '>=', startDate),
 			where('dateReviewed', '<', endDate)
 		);
+
+		let cancelledQuery = query(
+			collection(db, 'booking'),
+			where('status', '==', 'Cancelled'),
+			where('dateReviewed', '>=', startDate),
+			where('dateReviewed', '<', endDate)
+		);
+
 		let entrySnapshotCount = await getCountFromServer(generateQuery);
 		let approvedSnapshotCount = await getCountFromServer(approvedQuery);
+		let cancelledSnapshotCount = await getCountFromServer(cancelledQuery);
 		let entryCount = entrySnapshotCount.data().count;
 		let approvedCount = approvedSnapshotCount.data().count;
+		let cancelledCount = cancelledSnapshotCount.data().count;
 		let totalEarnings = 500 * entryCount;
 		let width = report.internal.pageSize.getWidth();
 
@@ -187,10 +197,11 @@
 		report.text('Total Earned Amount', 18, 135); // 125
 		report.text('Signed By', 168, 235, { align: 'right' });
 		report.setFont('Times', 'normal').text('Approved', 27, 101);
-		// report.text('Cancelled', 27, 109)
+		report.text('Cancelled', 27, 109)
 		report.text(`${entryCount} Entries`, 190, 75, { align: 'right' });
 		report.text('PHP 500.00', 190, 83, { align: 'right' });
 		report.text(`${approvedCount} Entries`, 190, 101, { align: 'right' });
+		report.text(`${cancelledCount} Entries`, 190, 109, { align: 'right' });
 		report.text(`PHP ${totalEarnings}.00`, 190, 135, { align: 'right' });
 		report.line(18, 128, 190, 128);
 		report.line(130, 250, 190, 250);
@@ -259,6 +270,8 @@
 					{#if book.status == 'Approved'}
 						<td class="p-3 text-sm whitespace-nowrap text-green-500 font-bold">{book.status}</td>
 					{:else if book.status == 'Disapproved'}
+						<td class="p-3 text-sm whitespace-nowrap text-red-500 font-bold">{book.status}</td>
+					{:else if book.status == 'Cancelled'}
 						<td class="p-3 text-sm whitespace-nowrap text-red-500 font-bold">{book.status}</td>
 					{:else if book.status == 'Pending'}
 						<td class="p-3 text-sm whitespace-nowrap">{book.status}</td>
@@ -379,14 +392,13 @@
 										.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}</td
 							>
 							<td>
-								{#if book.status === 'Approved'}
-									<td class="p-3 text-sm whitespace-nowrap text-green-500 font-bold"
-										>{book.status}</td
-									>
-								{:else if book.status === 'Disapproved'}
-									<td class="p-3 text-sm whitespace-nowrap text-red-500 font-bold">{book.status}</td
-									>
-								{:else if book.status === 'Cancelled'}
+								{#if book.status == 'Approved'}
+									<td class="p-3 text-sm whitespace-nowrap text-green-500 font-bold">{book.status}</td>
+								{:else if book.status == 'Disapproved'}
+									<td class="p-3 text-sm whitespace-nowrap text-red-500 font-bold">{book.status}</td>
+								{:else if book.status == 'Cancelled'}
+									<td class="p-3 text-sm whitespace-nowrap text-red-500 font-bold">{book.status}</td>
+								{:else if book.status == 'Pending'}
 									<td class="p-3 text-sm whitespace-nowrap">{book.status}</td>
 								{/if}
 							</td>
@@ -447,6 +459,8 @@
 						{#if book.status === 'Approved'}
 							<span class="text-green-500">{book.status}</span>
 						{:else if book.status === 'Disapproved'}
+							<span class="text-red-500">{book.status}</span>
+							{:else if book.status == 'Cancelled'}
 							<span class="text-red-500">{book.status}</span>
 						{:else if book.status === 'Cancelled'}
 							<span class="">{book.status}</span>
