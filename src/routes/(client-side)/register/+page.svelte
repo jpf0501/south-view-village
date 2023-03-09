@@ -30,11 +30,9 @@
 		isPending: true
 	};
 
-	let empty = {};
-
 	let streetQuery = query(collection(db, 'street'), orderBy('streetName', 'asc'));
 	let listOfStreets = [];
-
+	let empty = {};
 	let showOTP = false;
 	let userOTP = '';
 	let OTP = '';
@@ -179,6 +177,7 @@
 			});
 			toast.success('Creation of Account Request Sent');
 			await goto('/login');
+			showOTP = false;
 		} catch (error) {
 			console.log(error);
 			toast.error('Error in Creating an Account');
