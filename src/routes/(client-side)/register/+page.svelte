@@ -33,9 +33,10 @@
 	let streetQuery = query(collection(db, 'street'), orderBy('streetName', 'asc'));
 	let listOfStreets = [];
 	let empty = {};
+	let errors = {};
+	let OTP = '';
 	let showOTP = false;
 	let userOTP = '';
-	let OTP = '';
 
 	const digits = '0123456789';
 
@@ -55,116 +56,78 @@
 	}
 
 	async function sendOTP() {
+		OTP = '';
 		const regex = /^[a-zA-Z -]*$/;
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 		const accountsQuery = query(collection(db, 'accounts'), where('email', '==', account.email));
 		const accountsSnapshot = await getDocs(accountsQuery);
+
+		const requiredFields = [
+			'email',
+			'password',
+			'passwordcheck',
+			'firstname',
+			'lastname',
+			'addressBlock',
+			'addressLot',
+			'addressStreet',
+			'contactNumber'
+		];
+
+		empty = requiredFields.reduce((acc, field) => {
+			if (!account[field]) acc[field] = true;
+			return acc;
+		}, {});
+
 		if (
-			!account.email ||
-			!account.password ||
-			!account.passwordcheck ||
-			!account.firstname ||
-			!account.lastname ||
-			!account.addressBlock ||
-			!account.addressLot ||
-			!account.addressStreet ||
-			!account.contactNumber ||
-			account.paymentHead.length === 0 ||
-			!regex.test(account.firstname) ||
-			!regex.test(account.lastname) ||
 			!emailRegex.test(account.email) ||
 			account.password.length < 6 ||
 			account.password !== account.passwordcheck ||
-			accountsSnapshot.docs.length > 0
+			accountsSnapshot.docs.length > 0 ||
+			!regex.test(account.firstname) ||
+			!regex.test(account.lastname) ||
+			account.paymentHead.length === 0
 		) {
-			if (!account.email) {
-				empty.email = true;
-			}
-			if (!account.password) {
-				empty.password = true;
-			}
-			if (!account.passwordcheck) {
-				empty.passwordcheck = true;
-			}
-			if (!account.firstname) {
-				empty.firstname = true;
-			}
-			if (!account.lastname) {
-				empty.lastname = true;
-			}
-			if (!account.addressBlock) {
-				empty.addressBlock = true;
-			}
-			if (!account.addressLot) {
-				empty.addressLot = true;
-			}
-			if (!account.addressStreet) {
-				empty.addressStreet = true;
-			}
-			if (!account.contactNumber) {
-				empty.contactNumber = true;
-			}
-			if (account.paymentHead.length === 0) {
-				empty.paymentHead = true;
-			}
-			if (!regex.test(account.firstname)) {
-				empty.invalidFirstname = true;
-			}
-			if (!regex.test(account.lastname)) {
-				empty.invalidLastname = true;
-			}
-			if (!emailRegex.test(account.email)) {
-				empty.invalidEmail = true;
-			}
-			if (accountsSnapshot.docs.length > 0) {
-				empty.emailIsUsed = true;
-			}
-			if (account.password.length < 6) {
-				empty.passwordKulang = true;
-			}
-			if (account.password !== account.passwordcheck) {
-				empty.passwordNotMatch = true;
-			}
+			errors = {
+				invalidEmail: !emailRegex.test(account.email),
+				passwordKulang: account.password.length < 6,
+				passwordNotMatch: account.password !== account.passwordcheck,
+				emailIsUsed: accountsSnapshot.docs.length > 0,
+				invalidFirstname: !regex.test(account.firstname),
+				invalidLastname: !regex.test(account.lastname),
+				paymentHead: account.paymentHead.length === 0
+			};
+			Object.assign(empty, errors);
 			setTimeout(function () {
 				empty = {};
+				errors = {};
 			}, 2000);
 			return;
 		}
-		OTP = '';
-		for (let i = 0; i < 6; i++) {
-			OTP += digits[Math.floor(Math.random() * 10)];
-		}
-		try {
-			await sendEmail({
-				to: account.email,
-				subject: 'Your OTP code',
-				html: `<h1>Your OTP is: ${OTP}</h1>`
-			});
-			showOTP = true;
-			toast.success('OTP sent');
-		} catch (error) {
-			console.log(error);
-			toast.error('Error in sending OTP');
-		}
+
+		OTP = Array.from({ length: 6 }, () => digits[Math.floor(Math.random() * digits.length)]).join(
+			''
+		);
+		await sendEmail({
+			to: account.email,
+			subject: 'Your OTP code',
+			html: `<h1>Your OTP is: ${OTP}</h1>`
+		});
+		showOTP = true;
+		toast.success('OTP sent');
 	}
 
 	async function confirmOTP() {
-		if (!userOTP) {
-			toast.error('OTP required');
-			return;
-		}
-		if (userOTP !== OTP) {
-			toast.error('Incorrect OTP');
-			return;
-		}
+		if (!userOTP) return toast.error('OTP required');
+		if (userOTP !== OTP) return toast.error('Incorrect OTP');
 
 		try {
-			await addDoc(collection(db, 'pendingAccounts'), {
+			const pendingAccount = {
 				pendingEmail: account.email,
 				pendingPassword: account.password,
-				pendingFirstname: account.firstname.trim().toLowerCase(),
+				pendingFirstname: account.firstname,
 				pendingFirstNameDisplay: account.firstname,
-				pendingLastname: account.lastname.trim().toLowerCase(),
+				pendingLastname: account.lastname,
 				pendingLastNameDisplay: account.lastname,
 				pendingAddressBlock: account.addressBlock,
 				pendingAddressLot: account.addressLot,
@@ -173,10 +136,12 @@
 				pendingRole: account.role,
 				pendingPaymentStatus: account.paymentStatus,
 				pendingPaymentHead: account.paymentHead,
-				isPending: account.isPending
-			});
+				isPending: true
+			};
+
+			await addDoc(collection(db, 'pendingAccounts'), pendingAccount);
 			toast.success('Creation of Account Request Sent');
-			await goto('/login');
+			goto('/login');
 			showOTP = false;
 		} catch (error) {
 			console.log(error);

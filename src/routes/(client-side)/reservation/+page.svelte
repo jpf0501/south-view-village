@@ -43,140 +43,42 @@
 	async function sendOTP() {
 		const regex = /^[a-zA-Z -]*$/;
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-		if (user) {
-			if (
-				!user.email ||
-				!user.firstname ||
-				!user.lastname ||
-				!user.contactNumber ||
-				!guest.eventType ||
-				!guest.time ||
-				!guest.date ||
-				!regex.test(user.firstname) ||
-				!regex.test(user.lastname) ||
-				!emailRegex.test(user.email)
-			) {
-				if (!user.email) {
-					empty.email = true;
-				}
-				if (!user.firstname) {
-					empty.firstname = true;
-				}
-				if (!user.lastname) {
-					empty.lastname = true;
-				}
-				if (!user.contactNumber) {
-					empty.contactNumber = true;
-				}
-				if (!guest.eventType) {
-					empty.eventType = true;
-				}
-				if (!guest.time) {
-					empty.time = true;
-				}
-				if (!guest.date) {
-					empty.date = true;
-				}
-				if (!regex.test(user.firstname)) {
-					empty.invalidFirstname = true;
-				}
-				if (!regex.test(user.lastname)) {
-					empty.invalidLastname = true;
-				}
-				if (!emailRegex.test(user.email)) {
-					empty.invalidEmail = true;
-				}
-				setTimeout(function () {
-					empty = {};
-				}, 2000);
-				return;
-			}
-			OTP = '';
-			for (let i = 0; i < 6; i++) {
-				OTP += digits[Math.floor(Math.random() * 10)];
-			}
-			try {
-				await sendEmail({
-					to: user.email,
-					subject: 'Your OTP code',
-					html: `<h1>Your OTP is: ${OTP}</h1>`
-				});
-				showOTP = true;
-				toast.success('OTP sent');
-			} catch (error) {
-				console.log(error);
-				toast.error('Error in sending OTP');
-			}
-		} else {
-			if (
-				!guest.email ||
-				!guest.firstname ||
-				!guest.lastname ||
-				!guest.contactNumber ||
-				!guest.eventType ||
-				!guest.time ||
-				!guest.date ||
-				!regex.test(guest.firstname) ||
-				!regex.test(guest.lastname) ||
-				!emailRegex.test(guest.email)
-			)
-				try {
-					{
-						if (!guest.email) {
-							empty.email = true;
-						}
-						if (!guest.firstname) {
-							empty.firstname = true;
-						}
-						if (!guest.lastname) {
-							empty.lastname = true;
-						}
-						if (!guest.contactNumber) {
-							empty.contactNumber = true;
-						}
-						if (!guest.eventType) {
-							empty.eventType = true;
-						}
-						if (!guest.time) {
-							empty.time = true;
-						}
-						if (!guest.date) {
-							empty.date = true;
-						}
-						if (!regex.test(guest.firstname)) {
-							empty.invalidFirstname = true;
-						}
-						if (!regex.test(guest.lastname)) {
-							empty.invalidLastname = true;
-						}
-						if (!emailRegex.test(guest.email)) {
-							empty.invalidEmail = true;
-						}
-						setTimeout(function () {
-							empty = {};
-						}, 2000);
-						return;
-					}
-				} catch (error) {
-					console.log(error);
-				}
-			OTP = '';
-			for (let i = 0; i < 6; i++) {
-				OTP += digits[Math.floor(Math.random() * 10)];
-			}
-			console.log(OTP);
-			try {
-				await sendEmail({
-					to: guest.email,
-					subject: 'Your OTP code',
-					html: `<h1>Your OTP is: ${OTP}</h1>`
-				});
-				showOTP = true;
-				toast.success('OTP sent');
-			} catch (error) {
-				console.log(error);
-				toast.error('Error in sending OTP');
-			}
+		let data = user || guest;
+
+		empty = {
+			email: !data.email,
+			firstname: !data.firstname,
+			lastname: !data.lastname,
+			contactNumber: !data.contactNumber,
+			eventType: !guest.eventType,
+			time: !guest.time,
+			date: !guest.date,
+			invalidFirstname: !regex.test(data.firstname),
+			invalidLastname: !regex.test(data.lastname),
+			invalidEmail: !emailRegex.test(data.email)
+		};
+
+		if (Object.values(empty).some((v) => v)) {
+			setTimeout(() => {
+				empty = {};
+			}, 2000);
+			return;
+		}
+		let OTP = '';
+		for (let i = 0; i < 6; i++) {
+			OTP += Math.floor(Math.random() * 10);
+		}
+		try {
+			await sendEmail({
+				to: data.email,
+				subject: 'Your OTP code',
+				html: `<h1>Your OTP is: ${OTP}</h1>`
+			});
+			showOTP = true;
+			toast.success('OTP sent');
+		} catch (error) {
+			console.error(error);
+			toast.error('Error in sending OTP');
 		}
 	}
 
