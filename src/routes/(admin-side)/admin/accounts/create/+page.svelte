@@ -1,7 +1,7 @@
 <script>
 	import { goto } from '$app/navigation';
 	import { db } from '$lib/firebase/client';
-	import { onSnapshot, query, collection, orderBy } from 'firebase/firestore';
+	import { onSnapshot, query, collection, orderBy, where, getDocs } from 'firebase/firestore';
 	import { onDestroy } from 'svelte';
 	import toast from 'svelte-french-toast';
 
@@ -22,6 +22,9 @@
 	let streetQuery = query(collection(db, 'street'), orderBy('streetName', 'asc'));
 	let listOfStreets = [];
 
+	let empty = {};
+	let errors = {};
+
 	const blockValue = Array.from({ length: 23 }, (_, i) => ({
 		value: i + 1
 	}));
@@ -39,17 +42,53 @@
 
 	async function submitHandler() {
 		try {
-			if (account.password !== account.passwordcheck) {
-				toast.error('Password do not match!');
-				return
-			}
-			if(!account.password && !account.passwordcheck ){
-				toast.error('Password is required')
-				return
-			}
-			if(account.password.length <6){
-				toast.error("Password must have at least 6 characters");
-				return
+			const regex = /^[a-zA-Z -]*$/;
+			const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+			const accountsQuery = query(collection(db, 'accounts'), where('email', '==', account.email));
+			const accountsSnapshot = await getDocs(accountsQuery);
+
+			const requiredFields = [
+				'email',
+				'password',
+				'passwordcheck',
+				'firstname',
+				'lastname',
+				'addressBlock',
+				'addressLot',
+				'addressStreet',
+				'contactNumber',
+				'role'
+			];
+
+			empty = requiredFields.reduce((acc, field) => {
+				if (!account[field]) acc[field] = true;
+				return acc;
+			}, {});
+
+			if (
+				!emailRegex.test(account.email) ||
+				account.password.length < 6 ||
+				account.password !== account.passwordcheck ||
+				accountsSnapshot.docs.length > 0 ||
+				!regex.test(account.firstname) ||
+				!regex.test(account.lastname) ||
+				account.paymentHead.length === 0
+			) {
+				errors = {
+					invalidEmail: !emailRegex.test(account.email),
+					passwordKulang: account.password.length < 6,
+					passwordNotMatch: account.password !== account.passwordcheck,
+					emailIsUsed: accountsSnapshot.docs.length > 0,
+					invalidFirstname: !regex.test(account.firstname),
+					invalidLastname: !regex.test(account.lastname),
+					paymentHead: account.paymentHead.length === 0
+				};
+				Object.assign(empty, errors);
+				setTimeout(function () {
+					empty = {};
+					errors = {};
+				}, 2000);
+				return;
 			}
 			const response = await fetch('/api/accounts', {
 				method: 'POST',
@@ -98,12 +137,16 @@
 						<label for="fname" class="label">
 							<span class="label-text">First Name</span>
 						</label>
+						{#if empty.firstname}
+							<p class="text-red-500 text-sm italic mb-1">First Name is required</p>
+						{:else if empty.invalidFirstname}
+							<p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
+						{/if}
 						<input
 							type="text"
 							placeholder="Juan"
 							name="fname"
 							class="input input-bordered"
-							required
 							bind:value={account.firstname}
 						/>
 					</div>
@@ -111,12 +154,16 @@
 						<label for="lname" class="label">
 							<span class="label-text">Last Name</span>
 						</label>
+						{#if empty.lastname}
+							<p class="text-red-500 text-sm italic mb-1">Last Name is required</p>
+						{:else if empty.invalidLastname}
+							<p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
+						{/if}
 						<input
 							type="text"
 							placeholder="Dela Cruz"
 							name="lname"
 							class="input input-bordered"
-							required
 							bind:value={account.lastname}
 						/>
 					</div>
@@ -126,11 +173,10 @@
 						<label for="Block" class="label">
 							<span class="label-text">Block</span>
 						</label>
-						<select
-							class="select select-bordered w-full"
-							required
-							bind:value={account.addressBlock}
-						>
+						{#if empty.addressBlock}
+							<p class="text-red-500 text-sm italic mb-1">Block is required</p>
+						{/if}
+						<select class="select select-bordered w-full" bind:value={account.addressBlock}>
 							<option value="" disabled>Select block</option>
 							{#each blockValue as block}
 								<option value={block.value}>{block.value}</option>
@@ -141,7 +187,10 @@
 						<label for="Lot" class="label">
 							<span class="label-text">Lot</span>
 						</label>
-						<select class="select select-bordered w-full" required bind:value={account.addressLot}>
+						{#if empty.addressLot}
+							<p class="text-red-500 text-sm italic mb-1">Lot is required</p>
+						{/if}
+						<select class="select select-bordered w-full" bind:value={account.addressLot}>
 							<option value="" disabled>Select lot</option>
 							{#each lotValue as lot}
 								<option value={lot.value}>{lot.value}</option>
@@ -152,10 +201,12 @@
 						<label for="Street" class="label">
 							<span class="label-text">Street</span>
 						</label>
+						{#if empty.addressStreet}
+							<p class="text-red-500 text-sm italic mb-1">Street is required</p>
+						{/if}
 						<select
 							class="select select-bordered w-full"
 							aria-label="Default select example"
-							required
 							bind:value={account.addressStreet}
 						>
 							<option value="" selected disabled>Select street</option>
@@ -170,13 +221,19 @@
 						<label for="fname" class="label">
 							<span class="label-text">E-mail Address</span>
 						</label>
+						{#if empty.email}
+							<p class="text-red-500 text-sm italic mb-1">Email is required</p>
+						{:else if empty.emailIsUsed}
+							<p class="text-red-500 text-sm italic mb-1">Email is already used</p>
+						{:else if empty.invalidEmail}
+							<p class="text-red-500 text-sm italic mb-1">Invalid email</p>
+						{/if}
 						<input
 							type="text"
 							placeholder="juandelacruz@gmail.com"
 							name="email"
 							class="input input-bordered"
 							autocomplete="email"
-							required
 							bind:value={account.email}
 						/>
 					</div>
@@ -186,12 +243,16 @@
 						<label for="password" class="label">
 							<span class="label-text">Password</span>
 						</label>
+						{#if empty.password}
+							<p class="text-red-500 text-sm italic mb-1">Password is required</p>
+						{:else if empty.passwordKulang}
+							<p class="text-red-500 text-sm italic mb-1">Password must be at least 6 characters</p>
+						{/if}
 						<input
 							class="input input-bordered"
 							type="password"
 							placeholder="Password"
 							autocomplete="current-password"
-							required
 							bind:value={account.password}
 						/>
 					</div>
@@ -199,33 +260,18 @@
 						<label for="cpassword" class="label">
 							<span class="label-text">Confirm Password</span>
 						</label>
+						{#if empty.passwordcheck}
+							<p class="text-red-500 text-sm italic mb-1">Confirm Password is required.</p>
+						{:else if empty.passwordNotMatch}
+							<p class="text-red-500 text-sm italic mb-1">Password do not match</p>
+						{/if}
 						<input
 							class="input input-bordered"
 							type="password"
 							placeholder="Confirm Password"
 							autocomplete="new-password"
-							required
 							bind:value={account.passwordcheck}
 						/>
-						{#if account.password != account.passwordcheck && account.passwordcheck != ''}
-							<span class="alert alert-error shadow-lg my-3 w-full">
-								<div>
-									<svg
-										xmlns="http://www.w3.org/2000/svg"
-										class="stroke-current flex-shrink-0 h-6 w-6"
-										fill="none"
-										viewBox="0 0 24 24"
-										><path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-										/></svg
-									>
-									<span>Passwords do not match</span>
-								</div>
-							</span>
-						{/if}
 					</div>
 				</div>
 				<div class="grid grid-cols-2 gap-6 mt-6 md:grid-cols-4">
@@ -233,10 +279,12 @@
 						<label for="role" class="label">
 							<span class="label-text">Role</span>
 						</label>
+						{#if empty.role}
+							<p class="text-red-500 text-sm italic mb-1">Role is required</p>
+						{/if}
 						<select
 							class="select select-bordered w-full"
 							aria-label="Default select example"
-							required
 							bind:value={account.role}
 						>
 							<option value="" selected disabled>Select</option>
@@ -248,10 +296,12 @@
 						<label for="paymentHead" class="label">
 							<span class="label-text">Payment Head</span>
 						</label>
+						{#if empty.paymentHead}
+							<p class="text-red-500 text-sm italic mb-1">Payment Head is required</p>
+						{/if}
 						<select
 							class="select select-bordered w-full"
 							aria-label="Default select example"
-							required
 							bind:value={account.paymentHead}
 						>
 							<option value="" selected disabled>Select</option>
@@ -263,6 +313,9 @@
 						<label for="lname" class="label">
 							<span class="label-text">Contact No.</span>
 						</label>
+						{#if empty.contactNumber}
+							<p class="text-red-500 text-sm italic mb-1">Contact number is required</p>
+						{/if}
 						<input
 							type="tel"
 							onkeypress="return event.charCode >= 48 && event.charCode <= 57"
@@ -272,7 +325,6 @@
 							pattern={String.raw`^(09)\d{9}$`}
 							name="contact"
 							class="input input-bordered"
-							required
 							bind:value={account.contactNumber}
 						/>
 					</div>

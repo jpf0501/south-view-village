@@ -21,6 +21,9 @@
 	let streetQuery = query(collection(db, 'street'), orderBy('streetName', 'asc'));
 	let listOfStreets = [];
 
+	let empty = {};
+	let errors = {};
+
 	const blockValue = Array.from({ length: 23 }, (_, i) => ({
 		value: i + 1
 	}));
@@ -47,6 +50,26 @@
 	async function updateUser() {
 		user.firstname = user.firstNameDisplay.toLowerCase();
 		user.lastname = user.lastNameDisplay.toLowerCase();
+		const regex = /^[a-zA-Z -]*$/;
+
+		const requiredFields = ['firstname', 'lastname', 'contactNumber'];
+
+		empty = requiredFields.reduce((acc, field) => {
+			if (!user[field]) acc[field] = true;
+			return acc;
+		}, {});
+		if (!regex.test(user.firstname) || !regex.test(user.lastname)) {
+			errors = {
+				invalidFirstname: !regex.test(user.firstname),
+				invalidLastname: !regex.test(user.lastname)
+			};
+			Object.assign(empty, errors);
+			setTimeout(function () {
+				empty = {};
+				errors = {};
+			}, 2000);
+			return;
+		}
 		try {
 			await updateDoc(doc(db, 'accounts', userID), user);
 			toast.success('User has been updated!');
@@ -77,7 +100,7 @@
 
 {#if user}
 	<main>
-		<div class="min-h-screen hero bg-base-200">
+		<form on:submit|preventDefault={updateUser} class="min-h-screen hero bg-base-200">
 			<div class="w-full max-w-4xl p-6 mx-auto shadow-2xl border rounded-xl bg-base-100">
 				<h1 class="text-2xl mt-2">Edit Account</h1>
 				<div class="grid grid-cols-2 gap-6 mt-6 md:grid-cols-3">
@@ -85,11 +108,15 @@
 						<label for="fname" class="label">
 							<span class="label-text">First Name</span>
 						</label>
+						{#if empty.firstname}
+							<p class="text-red-500 text-sm italic mb-1">First Name is required</p>
+						{:else if empty.invalidFirstname}
+							<p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
+						{/if}
 						<input
 							type="text"
 							name="fname"
 							class="input input-bordered"
-							required
 							bind:value={user.firstNameDisplay}
 						/>
 					</div>
@@ -97,11 +124,15 @@
 						<label for="lname" class="label">
 							<span class="label-text">Last Name</span>
 						</label>
+						{#if empty.lastname}
+							<p class="text-red-500 text-sm italic mb-1">Last Name is required</p>
+						{:else if empty.invalidLastname}
+							<p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
+						{/if}
 						<input
 							type="text"
 							name="lname"
 							class="input input-bordered"
-							required
 							bind:value={user.lastNameDisplay}
 						/>
 					</div>
@@ -181,6 +212,9 @@
 						<label for="lname" class="label">
 							<span class="label-text">Contact No.</span>
 						</label>
+						{#if empty.contactNumber}
+							<p class="text-red-500 text-sm italic mb-1">Contact number is required</p>
+						{/if}
 						<input
 							type="tel"
 							onkeypress="return event.charCode >= 48 && event.charCode <= 57"
@@ -195,14 +229,14 @@
 					</div>
 				</div>
 				<div class="flex justify-end mt-8">
-					<button on:click={updateUser} type="submit" class="btn btn-primary mx-1 px-5">Save</button
+					<button type="submit" class="btn btn-primary mx-1 px-5">Save</button
 					>
 					<a href="/admin/accounts" class="btn btn-error mx-1 px-4 text-white">Cancel</a>
-					<button on:click={deleteUser} type="submit" class="btn btn-warning mx-1 text-white"
+					<button on:click={deleteUser} type="button" class="btn btn-warning mx-1 text-white"
 						>Delete</button
 					>
 				</div>
 			</div>
-		</div>
+		</form>
 	</main>
 {/if}
