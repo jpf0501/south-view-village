@@ -80,7 +80,7 @@
 		<div class="min-h-screen hero bg-base-200">
 			<div class="w-full max-w-4xl p-6 mx-auto shadow-2xl border rounded-xl bg-base-100">
 				<h1 class="text-2xl mt-2">Edit Account</h1>
-				<div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2">
+				<div class="grid grid-cols-2 gap-6 mt-6 md:grid-cols-3">
 					<div class="form-control">
 						<label for="fname" class="label">
 							<span class="label-text">First Name</span>
@@ -106,7 +106,7 @@
 						/>
 					</div>
 				</div>
-				<div class="grid grid-cols-1 gap-6 mt-4 md:grid-cols-5">
+				<div class="grid grid-cols-2 gap-6 mt-4 md:grid-cols-5">
 					<div class="form-control">
 						<label for="Block" class="label">
 							<span class="label-text">Block</span>
@@ -146,54 +146,53 @@
 						</select>
 					</div>
 				</div>
-				<div class="grid grid-cols-1 gap-6 mt-4 md:grid-cols-2">
+				<div class="grid grid-cols-2 gap-6 mt-6 md:grid-cols-4">
 					<div class="form-control">
-						<span class="label-text mb-3">Role</span>
-						<div class="mb-3">
-							<select
-								class="select select-bordered w-full"
-								aria-label="Default select example"
-								required
-								bind:value={user.role}
-							>
-								<option value="" selected disabled>Select role</option>
-								<option value="Resident">Resident</option>
-								<option value="Admin">Admin</option>
-							</select>
-						</div>
+						<label for="role" class="label">
+							<span class="label-text">Role</span>
+						</label>
+						<select
+							class="select select-bordered w-full"
+							aria-label="Default select example"
+							required
+							bind:value={user.role}
+						>
+							<option value="" selected disabled>Select</option>
+							<option value="Admin">Admin</option>
+							<option value="Resident">Resident</option>
+						</select>
 					</div>
 					<div class="form-control">
-						<span class="label-text mb-3">Payment Head</span>
-						<div class="mb-3">
-							<select
-								class="select select-bordered w-full"
-								aria-label="Default select example"
-								required
-								bind:value={user.paymentHead}
-							>
-								<option value="" selected disabled>Select</option>
-								<option value={true}>Yes</option>
-								<option value={false}>No</option>
-							</select>
-						</div>
+						<label for="paymentHead" class="label">
+							<span class="label-text">Payment Head</span>
+						</label>
+						<select
+							class="select select-bordered w-full"
+							aria-label="Default select example"
+							required
+							bind:value={user.paymentHead}
+						>
+							<option value="" selected disabled>Select</option>
+							<option value={true}>Yes</option>
+							<option value={false}>No</option>
+						</select>
 					</div>
-				</div>
-				<div class="form-control">
-					<label for="lname" class="label">
-						<span class="label-text">Contact No.</span>
-					</label>
-					<input
-						type="tel"
-						onkeypress="return event.charCode >= 48 && event.charCode <= 57"
-						minlength="11"
-						maxlength="11"
-						placeholder="09123456789"
-						pattern={String.raw`^(09)\d{9}$`}
-						name="contact"
-						class="input input-bordered"
-						required
-						bind:value={user.contactNumber}
-					/>
+					<div class="form-control">
+						<label for="lname" class="label">
+							<span class="label-text">Contact No.</span>
+						</label>
+						<input
+							type="tel"
+							onkeypress="return event.charCode >= 48 && event.charCode <= 57"
+							minlength="11"
+							maxlength="11"
+							placeholder="09123456789"
+							pattern={String.raw`^(09)\d{9}$`}
+							name="contact"
+							class="input input-bordered"
+							bind:value={user.contactNumber}
+						/>
+					</div>
 				</div>
 				<div class="flex justify-end mt-8">
 					<button on:click={updateUser} type="submit" class="btn btn-primary mx-1 px-5">Save</button

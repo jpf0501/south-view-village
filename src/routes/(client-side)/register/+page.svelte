@@ -66,7 +66,7 @@
 			return;
 		}
 		if (account.password.length < 6 && account.passwordcheck.length < 6) {
-			toast.error('Your password must at least be 6 characters');
+			toast.error("Password must have at least 6 characters");
 			return;
 		}
 		for (let i = 0; i < 6; i++) {
@@ -269,7 +269,7 @@
 							<input
 								class="input input-bordered"
 								type="password"
-								placeholder="New Password"
+								placeholder="Password"
 								required
 								bind:value={account.password}
 							/>
@@ -308,7 +308,9 @@
 					</div>
 					<div class="grid grid-cols-2 gap-6 mt-6 md:grid-cols-3">
 						<div class="form-control">
-							<span class="label-text mb-3">Payment Head</span>
+							<label for="paymentHead" class="label">
+								<span class="label-text">Payment Head</span>
+							</label>		
 							<div class="mb-3">
 								<select
 									class="select select-bordered w-full"
