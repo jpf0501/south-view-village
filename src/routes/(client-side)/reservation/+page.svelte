@@ -33,8 +33,8 @@
 	async function getUser() {
 		const snapshot = await getDoc(doc(db, 'accounts', $userStore.uid));
 		user = snapshot.data();
-		guest.firstname = user.firstNameDisplay;
-		guest.lastname = user.lastNameDisplay;
+		user.firstname = user.firstNameDisplay;
+		user.lastname = user.lastNameDisplay;
 	}
 	$: if ($userStore) {
 		getUser();
@@ -43,17 +43,6 @@
 	async function sendOTP() {
 		const regex = /^[a-zA-Z -]*$/;
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-		// if(user){
-		// 	console.log(user.email)
-		// } else{
-		// 	console.log(guest.firstname)
-		// 	console.log(guest.lastname)
-		// 	console.log(guest.email)
-		// 	console.log(guest.contactNumber)
-		// 	console.log(guest.eventType)
-		// 	console.log(guest.date)
-		// 	console.log(guest.time)
-		// }
 		if (user) {
 			if (
 				!user.email ||
