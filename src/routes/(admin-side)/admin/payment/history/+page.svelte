@@ -4,6 +4,7 @@
 	import { onDestroy } from 'svelte';
 	import { jsPDF } from 'jspdf';
 	import autoTable from 'jspdf-autotable';
+	import toast from 'svelte-french-toast';
 	import Pagination from '../../Pagination.svelte';
 
 	const monthName = [
@@ -22,12 +23,21 @@
 	];
 
 	let date = new Date();
+	let previousYear = (date.getFullYear() - 1)
 	let currentYear = date.getFullYear();
 	let previousMonth = date.getMonth().toString().padStart(2, '0');
 	let currentMonth = (date.getMonth() + 1).toString().padStart(2, '0');
 	let day = '01';
-	let startDate = new Date(`${currentYear}-${previousMonth}-${day}`);
-	let endDate;
+	let startDate, endDate;
+
+	if (currentMonth === '01') {
+		// if current month is January, set start date to December of last year
+		startDate = new Date(`${previousYear}-12-${day}`);
+	} else {
+		// set start date to last month date
+		startDate = new Date(`${currentYear}-${previousMonth}-${day}`);
+	}
+	
 	if (currentMonth === '12') {
 		// if current month is December, set end date to January of next year
 		endDate = new Date(`${currentYear + 1}-01-${day}`);
@@ -121,15 +131,12 @@
 				{ align: 'center' }
 			);
 		report.line(10, 34, 200, 34);
-		report
-			.setFont('Times', 'bold')
-			.setFontSize(11)
-			.text(
-				`${monthName[previousMonth - 1]} ${currentYear} Monthly Dues Earning Report`,
-				width / 2,
-				45,
-				{ align: 'center' }
-			);
+		report.setFont('Times', 'bold').setFontSize(11)
+		if (currentMonth == '01') {
+			report.text(`${monthName[previousMonth - 1]} ${previousYear} Monthly Dues Earnings Report`, width / 2, 45, { align: 'center' });
+		} else {
+			report.text(`${monthName[previousMonth - 1]} ${currentYear} Monthly Dues Earnings Report`, width / 2, 45, { align: 'center' });
+		}
 		report.setFontSize(10).text('Total Count of Paid Residents', 18, 62);
 		report.text('Monthly Due Fee', 18, 70);
 		report.text('Resident Count Summary by Street', 18, 78);
@@ -142,10 +149,20 @@
 			const residentCountSnapshot = await getCountFromServer(residentQuery);
 			const residentCount = residentCountSnapshot.data().count
 			report.text(`${street.streetName}`, 27, y);
-			report.text(`${residentCount} Residents`, 190, y, { align: 'right' });
+			if (residentCount === 0) {
+				report.text('No payment records', 190, y, { align: 'right' });
+			} else if (residentCount === 1) { 
+				report.text(`${residentCount} Resident`, 190, y, { align: 'right' });
+			} else {
+				report.text(`${residentCount} Residents`, 190, y, { align: 'right' });
+			}
 			y += yOffset;
 		}
-		report.text(`${entryCount} Residents`, 190, 62, { align: 'right' });
+		if (entryCount === 1) {
+			report.text(`${entryCount} Resident`, 190, 62, { align: 'right' });
+		} else {
+			report.text(`${entryCount} Residents`, 190, 62, { align: 'right' });
+		}
 		report.text('PHP 500.00', 190, 70, { align: 'right' });
 		report.text(`PHP ${totalEarnings}.00`, 190, 220, { align: 'right' });
 		report.line(18, 213, 190, 213);
@@ -153,10 +170,22 @@
 		report.text('HOA Treasurer', 171, 268, { align: 'right' });
 		report.addPage();
 		report.autoTable({ margin: { top: 20, bottom: 20 }, html: '#generate-table' });
-
-		report.save(
+		toast.remove('Lol')
+		if (currentMonth == '01') {
+			report.save(
+			`Southview-Homes-3-${monthName[previousMonth - 1]}-${previousYear}-Monthly-Dues-Report.pdf`
+			);
+		} else {
+			report.save(
 			`Southview-Homes-3-${monthName[previousMonth - 1]}-${currentYear}-Monthly-Dues-Report.pdf`
-		);
+			);
+		}
+
+		if (currentMonth == '01') {
+			toast.success(`Monthly dues report for ${monthName[previousMonth - 1]} ${previousYear} generated!`)
+		} else {
+			toast.success(`Monthly dues report for ${monthName[previousMonth - 1]} ${currentYear} generated!`)
+		}
 	}
 
 	$: {
