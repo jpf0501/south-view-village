@@ -175,6 +175,7 @@
 							placeholder="juandelacruz@gmail.com"
 							name="email"
 							class="input input-bordered"
+							autocomplete="email"
 							required
 							bind:value={account.email}
 						/>
@@ -189,6 +190,7 @@
 							class="input input-bordered"
 							type="password"
 							placeholder="Password"
+							autocomplete="current-password"
 							required
 							bind:value={account.password}
 						/>
@@ -201,6 +203,7 @@
 							class="input input-bordered"
 							type="password"
 							placeholder="Confirm Password"
+							autocomplete="new-password"
 							required
 							bind:value={account.passwordcheck}
 						/>

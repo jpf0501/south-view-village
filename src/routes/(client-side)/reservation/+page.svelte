@@ -28,8 +28,6 @@
 	let userOTP = '';
 	let OTP = '';
 
-	const digits = '0123456789';
-
 	async function getUser() {
 		const snapshot = await getDoc(doc(db, 'accounts', $userStore.uid));
 		user = snapshot.data();
