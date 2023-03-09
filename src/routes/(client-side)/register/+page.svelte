@@ -335,6 +335,7 @@
 								placeholder="juandelacruz@gmail.com"
 								name="email"
 								class="input input-bordered"
+								autocomplete="new-email"
 								bind:value={account.email}
 							/>
 						</div>
@@ -355,6 +356,7 @@
 								class="input input-bordered"
 								type="password"
 								placeholder="Password"
+								autocomplete="new-password"
 								bind:value={account.password}
 							/>
 						</div>
@@ -371,6 +373,7 @@
 								class="input input-bordered"
 								type="password"
 								placeholder="Confirm Password"
+								autocomplete="new-confirmPassword"
 								bind:value={account.passwordcheck}
 							/>
 						</div>

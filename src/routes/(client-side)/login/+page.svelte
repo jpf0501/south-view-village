@@ -48,6 +48,7 @@
 						placeholder="Email"
 						name="email"
 						class="input input-bordered"
+						autocomplete="email"
 						required
 						bind:value={user}
 					/>
@@ -61,6 +62,7 @@
 						placeholder="Password"
 						name="password"
 						class="input input-bordered"
+						autocomplete="new-password"
 						required
 						bind:value={password}
 					/>
