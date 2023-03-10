@@ -7,7 +7,7 @@
 	const dateMin = new Date(Date.now() + 8.64e7).toLocaleDateString('en-ca');
 	const dateMax = new Date(Date.now() + 8.64e7 + 6.048e8 * 2).toLocaleDateString('en-ca');
 
-	let empty = {};
+	let errors = {};
 
 	let guest = {
 		firstname: '',
@@ -26,7 +26,7 @@
 		const regex = /^[a-zA-Z -]*$/;
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-		empty = {
+		errors = {
 			email: !guest.email,
 			firstname: !guest.firstname,
 			lastname: !guest.lastname,
@@ -39,9 +39,9 @@
 			invalidEmail: !emailRegex.test(guest.email)
 		};
 
-		if (Object.values(empty).some((v) => v)) {
+		if (Object.values(errors).some((v) => v)) {
 			setTimeout(() => {
-				empty = {};
+				errors = {};
 			}, 2000);
 			return;
 		}
@@ -81,9 +81,9 @@
 			<div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2">
 				<div class="form-control">
 					<span class="label-text">First Name</span>
-					{#if empty.firstname}
+					{#if errors.firstname}
 						<p class="text-red-500 text-sm italic mb-1">First Name is required</p>
-					{:else if empty.invalidFirstname}
+					{:else if errors.invalidFirstname}
 						<p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
 					{/if}
 					<input
@@ -95,9 +95,9 @@
 				</div>
 				<div class="form-control">
 					<span class="label-text">Last Name</span>
-					{#if empty.lastname}
+					{#if errors.lastname}
 						<p class="text-red-500 text-sm italic mb-1">Last Name is required</p>
-					{:else if empty.invalidLastname}
+					{:else if errors.invalidLastname}
 						<p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
 					{/if}
 					<input
@@ -109,9 +109,9 @@
 				</div>
 				<div class="form-control">
 					<span class="label-text">E-mail Address</span>
-					{#if empty.email}
+					{#if errors.email}
 						<p class="text-red-500 text-sm italic mb-1">Email is required</p>
-					{:else if empty.invalidEmail}
+					{:else if errors.invalidEmail}
 						<p class="text-red-500 text-sm italic mb-1">Invalid email</p>
 					{/if}
 					<input
@@ -124,7 +124,7 @@
 				</div>
 				<div class="form-control">
 					<span class="label-text">Contact No.</span>
-					{#if empty.contactNumber}
+					{#if errors.contactNumber}
 						<p class="text-red-500 text-sm italic mb-1">Contact number is required</p>
 					{/if}
 					<input
@@ -141,7 +141,7 @@
 				</div>
 				<div class="form-control">
 					<span class="label-text">Type of Event</span>
-					{#if empty.eventType}
+					{#if errors.eventType}
 						<p class="text-red-500 text-sm italic mb-1">Event type is required</p>
 					{/if}
 					<input
@@ -153,7 +153,7 @@
 				</div>
 				<div class="form-control">
 					<span class="label-text">Date</span>
-					{#if empty.date}
+					{#if errors.date}
 						<p class="text-red-500 text-sm italic mb-1">Date is required</p>
 					{/if}
 					<input
@@ -166,7 +166,7 @@
 				</div>
 				<div class="form-control">
 					<span class="label-text">Time</span>
-					{#if empty.time}
+					{#if errors.time}
 						<p class="text-red-500 text-sm italic mb-1">Time is required</p>
 					{/if}
 					<input
@@ -180,7 +180,7 @@
 			</div>
 			<div class="flex justify-end mt-8">
 				<button type="submit" class="btn btn-primary">Submit Schedule</button>
-				<button type="reset" class="btn btn-error mx-1 text-white">Clear Input</button>
+				<a href="/admin/bookings" class="btn btn-error mx-1 text-white">Cancel</a>
 			</div>
 		</form>
 	</div>

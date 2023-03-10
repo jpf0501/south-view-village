@@ -32,7 +32,6 @@
 
 	let streetQuery = query(collection(db, 'street'), orderBy('streetName', 'asc'));
 	let listOfStreets = [];
-	let empty = {};
 	let errors = {};
 	let OTP = '';
 	let showOTP = false;
@@ -62,44 +61,27 @@
 		const accountsQuery = query(collection(db, 'accounts'), where('email', '==', account.email));
 		const accountsSnapshot = await getDocs(accountsQuery);
 
-		const requiredFields = [
-			'email',
-			'password',
-			'passwordcheck',
-			'firstname',
-			'lastname',
-			'addressBlock',
-			'addressLot',
-			'addressStreet',
-			'contactNumber'
-		];
+		errors = {
+			email: !account.email,
+			password: !account.password,
+			passwordcheck: !account.passwordcheck,
+			firstname: !account.firstname,
+			lastname: !account.lastname,
+			addressBlock: !account.addressBlock,
+			addressLot: !account.addressLot,
+			addressStreet: !account.addressStreet,
+			contactNumber: !account.contactNumber,
+			emailIsUsed: accountsSnapshot.docs.length > 0,
+			invalidEmail: !emailRegex.test(account.email),	
+			invalidFirstname: !regex.test(account.firstname),
+			invalidLastname: !regex.test(account.lastname),
+			passwordKulang: account.password.length < 7,
+			passwordNotMatch: account.password !== account.passwordcheck,
+			paymentHead: account.paymentHead.length === 0		
+		};
 
-		empty = requiredFields.reduce((acc, field) => {
-			if (!account[field]) acc[field] = true;
-			return acc;
-		}, {});
-
-		if (
-			!emailRegex.test(account.email) ||
-			account.password.length < 6 ||
-			account.password !== account.passwordcheck ||
-			accountsSnapshot.docs.length > 0 ||
-			!regex.test(account.firstname) ||
-			!regex.test(account.lastname) ||
-			account.paymentHead.length === 0
-		) {
-			errors = {
-				invalidEmail: !emailRegex.test(account.email),
-				passwordKulang: account.password.length < 6,
-				passwordNotMatch: account.password !== account.passwordcheck,
-				emailIsUsed: accountsSnapshot.docs.length > 0,
-				invalidFirstname: !regex.test(account.firstname),
-				invalidLastname: !regex.test(account.lastname),
-				paymentHead: account.paymentHead.length === 0
-			};
-			Object.assign(empty, errors);
-			setTimeout(function () {
-				empty = {};
+		if (Object.values(errors).some((v) => v)) {
+			setTimeout(() => {
 				errors = {};
 			}, 2000);
 			return;
@@ -204,9 +186,9 @@
 							<label for="fname" class="label">
 								<span class="label-text">First Name</span>
 							</label>
-							{#if empty.firstname}
+							{#if errors.firstname}
 								<p class="text-red-500 text-sm italic mb-1">First Name is required</p>
-							{:else if empty.invalidFirstname}
+							{:else if errors.invalidFirstname}
 								<p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
 							{/if}
 							<input
@@ -221,9 +203,9 @@
 							<label for="lname" class="label">
 								<span class="label-text">Last Name</span>
 							</label>
-							{#if empty.lastname}
+							{#if errors.lastname}
 								<p class="text-red-500 text-sm italic mb-1">Last Name is required</p>
-							{:else if empty.invalidLastname}
+							{:else if errors.invalidLastname}
 								<p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
 							{/if}
 							<input
@@ -240,7 +222,7 @@
 							<label for="Block" class="label">
 								<span class="label-text">Block</span>
 							</label>
-							{#if empty.addressBlock}
+							{#if errors.addressBlock}
 								<p class="text-red-500 text-sm italic mb-1">Block is required</p>
 							{/if}
 							<select class="select select-bordered w-full" bind:value={account.addressBlock}>
@@ -254,7 +236,7 @@
 							<label for="Lot" class="label">
 								<span class="label-text">Lot</span>
 							</label>
-							{#if empty.addressLot}
+							{#if errors.addressLot}
 								<p class="text-red-500 text-sm italic mb-1">Lot is required</p>
 							{/if}
 							<select class="select select-bordered w-full" bind:value={account.addressLot}>
@@ -268,7 +250,7 @@
 							<label for="Street" class="label">
 								<span class="label-text">Street</span>
 							</label>
-							{#if empty.addressStreet}
+							{#if errors.addressStreet}
 								<p class="text-red-500 text-sm italic mb-1">Street is required</p>
 							{/if}
 							<select
@@ -288,11 +270,11 @@
 							<label for="fname" class="label">
 								<span class="label-text">E-mail Address</span>
 							</label>
-							{#if empty.email}
+							{#if errors.email}
 								<p class="text-red-500 text-sm italic mb-1">Email is required</p>
-							{:else if empty.emailIsUsed}
+							{:else if errors.emailIsUsed}
 								<p class="text-red-500 text-sm italic mb-1">Email is already used</p>
-							{:else if empty.invalidEmail}
+							{:else if errors.invalidEmail}
 								<p class="text-red-500 text-sm italic mb-1">Invalid email</p>
 							{/if}
 							<input
@@ -310,9 +292,9 @@
 							<label for="password" class="label">
 								<span class="label-text">Password</span>
 							</label>
-							{#if empty.password}
+							{#if errors.password}
 								<p class="text-red-500 text-sm italic mb-1">Password is required</p>
-							{:else if empty.passwordKulang}
+							{:else if errors.passwordKulang}
 								<p class="text-red-500 text-sm italic mb-1">
 									Password must be at least 6 characters
 								</p>
@@ -329,9 +311,9 @@
 							<label for="cpassword" class="label">
 								<span class="label-text">Confirm Password</span>
 							</label>
-							{#if empty.passwordcheck}
+							{#if errors.passwordcheck}
 								<p class="text-red-500 text-sm italic mb-1">Confirm Password is required.</p>
-							{:else if empty.passwordNotMatch}
+							{:else if errors.passwordNotMatch}
 								<p class="text-red-500 text-sm italic mb-1">Password do not match</p>
 							{/if}
 							<input
@@ -348,7 +330,7 @@
 							<label for="paymentHead" class="label">
 								<span class="label-text">Payment Head</span>
 							</label>
-							{#if empty.paymentHead}
+							{#if errors.paymentHead}
 								<p class="text-red-500 text-sm italic mb-1">Payment Head is required</p>
 							{/if}
 							<div class="mb-3">
@@ -367,7 +349,7 @@
 							<label for="lname" class="label">
 								<span class="label-text">Contact No.</span>
 							</label>
-							{#if empty.contactNumber}
+							{#if errors.contactNumber}
 								<p class="text-red-500 text-sm italic mb-1">Contact number is required</p>
 							{/if}
 							<input

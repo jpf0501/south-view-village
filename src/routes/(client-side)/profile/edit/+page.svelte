@@ -21,6 +21,10 @@
 		goto('/');
 	}
 	async function updateInfo() {
+		if(!user.contactNumber){
+			toast.error("Please enter your contact number")
+			return
+		}
 		try {
 			await updateDoc(doc(db, 'accounts', $userStore.uid), user);
 			toast.success('Update Success!')

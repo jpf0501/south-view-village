@@ -23,7 +23,7 @@
 		dateReserved: serverTimestamp()
 	};
 
-	let empty = {};
+	let errors = {};
 	let showOTP = false;
 	let userOTP = '';
 	let OTP = '';
@@ -43,7 +43,7 @@
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 		let data = user || guest;
 
-		empty = {
+		errors = {
 			email: !data.email,
 			firstname: !data.firstname,
 			lastname: !data.lastname,
@@ -56,9 +56,9 @@
 			invalidEmail: !emailRegex.test(data.email)
 		};
 
-		if (Object.values(empty).some((v) => v)) {
+		if (Object.values(errors).some((v) => v)) {
 			setTimeout(() => {
-				empty = {};
+				errors = {};
 			}, 2000);
 			return;
 		}
@@ -188,9 +188,9 @@
 					{#if user}
 						<div class="form-control">
 							<span class="label-text">First Name</span>
-							{#if empty.firstname}
+							{#if errors.firstname}
 								<p class="text-red-500 text-sm italic mb-1">First Name is required</p>
-							{:else if empty.invalidFirstname}
+							{:else if errors.invalidFirstname}
 								<p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
 							{/if}
 							<input
@@ -202,9 +202,9 @@
 						</div>
 						<div class="form-control">
 							<span class="label-text">Last Name</span>
-							{#if empty.lastname}
+							{#if errors.lastname}
 								<p class="text-red-500 text-sm italic mb-1">Last Name is required</p>
-							{:else if empty.invalidLastname}
+							{:else if errors.invalidLastname}
 								<p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
 							{/if}
 							<input
@@ -216,9 +216,9 @@
 						</div>
 						<div class="form-control ">
 							<span class="label-text">E-mail Address</span>
-							{#if empty.email}
+							{#if errors.email}
 								<p class="text-red-500 text-sm italic mb-1">Email is required</p>
-							{:else if empty.invalidEmail}
+							{:else if errors.invalidEmail}
 								<p class="text-red-500 text-sm italic mb-1">Invalid email</p>
 							{/if}
 							<input
@@ -230,7 +230,7 @@
 						</div>
 						<div class="form-control">
 							<span class="label-text">Contact No.</span>
-							{#if empty.contactNumber}
+							{#if errors.contactNumber}
 								<p class="text-red-500 text-sm italic mb-1">Contact number is required</p>
 							{/if}
 							<input
@@ -247,9 +247,9 @@
 					{:else}
 						<div class="form-control">
 							<span class="label-text">First Name</span>
-							{#if empty.firstname}
+							{#if errors.firstname}
 								<p class="text-red-500 text-sm italic mb-1">First Name is required</p>
-							{:else if empty.invalidFirstname}
+							{:else if errors.invalidFirstname}
 								<p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
 							{/if}
 							<input
@@ -261,9 +261,9 @@
 						</div>
 						<div class="form-control">
 							<span class="label-text">Last Name</span>
-							{#if empty.lastname}
+							{#if errors.lastname}
 								<p class="text-red-500 text-sm italic mb-1">Last Name is required</p>
-							{:else if empty.invalidLastname}
+							{:else if errors.invalidLastname}
 								<p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
 							{/if}
 							<input
@@ -275,9 +275,9 @@
 						</div>
 						<div class="form-control">
 							<span class="label-text">E-mail Address</span>
-							{#if empty.email}
+							{#if errors.email}
 								<p class="text-red-500 text-sm italic mb-1">Email is required</p>
-							{:else if empty.invalidEmail}
+							{:else if errors.invalidEmail}
 								<p class="text-red-500 text-sm italic mb-1">Invalid email</p>
 							{/if}
 							<input
@@ -290,7 +290,7 @@
 						</div>
 						<div class="form-control">
 							<span class="label-text">Contact No.</span>
-							{#if empty.contactNumber}
+							{#if errors.contactNumber}
 								<p class="text-red-500 text-sm italic mb-1">Contact number is required</p>
 							{/if}
 							<input
@@ -308,7 +308,7 @@
 					{/if}
 					<div class="form-control">
 						<span class="label-text">Type of Event</span>
-						{#if empty.eventType}
+						{#if errors.eventType}
 							<p class="text-red-500 text-sm italic mb-1">Event type is required</p>
 						{/if}
 						<input
@@ -320,7 +320,7 @@
 					</div>
 					<div class="form-control">
 						<span class="label-text">Date</span>
-						{#if empty.date}
+						{#if errors.date}
 							<p class="text-red-500 text-sm italic mb-1">Date is required</p>
 						{/if}
 						<input
@@ -333,7 +333,7 @@
 					</div>
 					<div class="form-control">
 						<span class="label-text">Time</span>
-						{#if empty.time}
+						{#if errors.time}
 							<p class="text-red-500 text-sm italic mb-1">Time is required</p>
 						{/if}
 						<input

@@ -8,6 +8,10 @@
 	let newPasswordCheck = '';
 
 	async function changePassword() {
+		if(!newPassword || !newPasswordCheck){
+			toast.error("New Password and Confirm New Password must not be empty!")
+			return;
+		}
 		if (newPassword !== newPasswordCheck) {
 			toast.error('Password not match!');
 			return;
@@ -43,7 +47,6 @@
 					type="password"
 					autocomplete="new-password"
 					bind:value={newPassword}
-					required
 				/>
 			</div>
 			<div class="form-control">
@@ -53,7 +56,6 @@
 					type="password"
 					autocomplete="new-password"
 					bind:value={newPasswordCheck}
-					required
 				/>
 			</div>
 		</div>

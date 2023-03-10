@@ -21,7 +21,6 @@
 	let streetQuery = query(collection(db, 'street'), orderBy('streetName', 'asc'));
 	let listOfStreets = [];
 
-	let empty = {};
 	let errors = {};
 
 	const blockValue = Array.from({ length: 23 }, (_, i) => ({
@@ -52,20 +51,16 @@
 		user.lastname = user.lastNameDisplay.toLowerCase();
 		const regex = /^[a-zA-Z -]*$/;
 
-		const requiredFields = ['firstname', 'lastname', 'contactNumber'];
+		errors = {
+			firstname: !user.firstname,
+			lastname: !user.lastname,
+			contactNumber: !user.contactNumber,
+			invalidFirstname: !regex.test(user.firstname),
+			invalidLastname: !regex.test(user.lastname)
+		};
 
-		empty = requiredFields.reduce((acc, field) => {
-			if (!user[field]) acc[field] = true;
-			return acc;
-		}, {});
-		if (!regex.test(user.firstname) || !regex.test(user.lastname)) {
-			errors = {
-				invalidFirstname: !regex.test(user.firstname),
-				invalidLastname: !regex.test(user.lastname)
-			};
-			Object.assign(empty, errors);
-			setTimeout(function () {
-				empty = {};
+		if (Object.values(errors).some((v) => v)) {
+			setTimeout(() => {
 				errors = {};
 			}, 2000);
 			return;
@@ -108,9 +103,9 @@
 						<label for="fname" class="label">
 							<span class="label-text">First Name</span>
 						</label>
-						{#if empty.firstname}
+						{#if errors.firstname}
 							<p class="text-red-500 text-sm italic mb-1">First Name is required</p>
-						{:else if empty.invalidFirstname}
+						{:else if errors.invalidFirstname}
 							<p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
 						{/if}
 						<input
@@ -124,9 +119,9 @@
 						<label for="lname" class="label">
 							<span class="label-text">Last Name</span>
 						</label>
-						{#if empty.lastname}
+						{#if errors.lastname}
 							<p class="text-red-500 text-sm italic mb-1">Last Name is required</p>
-						{:else if empty.invalidLastname}
+						{:else if errors.invalidLastname}
 							<p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
 						{/if}
 						<input
@@ -212,7 +207,7 @@
 						<label for="lname" class="label">
 							<span class="label-text">Contact No.</span>
 						</label>
-						{#if empty.contactNumber}
+						{#if errors.contactNumber}
 							<p class="text-red-500 text-sm italic mb-1">Contact number is required</p>
 						{/if}
 						<input
@@ -229,8 +224,7 @@
 					</div>
 				</div>
 				<div class="flex justify-end mt-8">
-					<button type="submit" class="btn btn-primary mx-1 px-5">Save</button
-					>
+					<button type="submit" class="btn btn-primary mx-1 px-5">Save</button>
 					<a href="/admin/accounts" class="btn btn-error mx-1 px-4 text-white">Cancel</a>
 					<button on:click={deleteUser} type="button" class="btn btn-warning mx-1 text-white"
 						>Delete</button

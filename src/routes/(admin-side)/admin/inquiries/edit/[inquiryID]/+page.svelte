@@ -10,6 +10,7 @@
 	const { inquiryID } = data;
 
 	let inquiry = null;
+	let errors = {};
 
 	async function getInquiry() {
 		try {
@@ -22,6 +23,17 @@
 	}
 
 	async function answerInquiry(name, email, message, response) {
+		errors = {
+			response: !inquiry.response,
+			responseKulang: !inquiry.response.length < 11
+		};
+		if (Object.values(errors).some((v) => v)) {
+			setTimeout(() => {
+				errors = {};
+			}, 2000);
+			return;
+		}
+
 		try {
 			const inquiryRef = doc(db, 'inquiries', inquiryID);
 			const changeData = {
@@ -77,9 +89,13 @@
 				</div>
 				<div class="flex flex-col mb-6">
 					<div class="text-gray-700 font-bold mb-2">Response</div>
+					{#if errors.response}
+						<p class="text-red-500 text-sm italic mb-1">Response is required</p>
+						{:else if errors.responseKulang}
+						<p class="text-red-500 text-sm italic mb-1">Response must at least be 10 characters</p>
+					{/if}
 					<textarea
 						class="h-60 border rounded-md p-4 resize-none"
-						required
 						bind:value={inquiry.response}
 					/>
 				</div>

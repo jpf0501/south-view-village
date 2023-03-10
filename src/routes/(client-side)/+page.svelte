@@ -12,7 +12,6 @@
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
 	import toast from 'svelte-french-toast';
-	import { goto } from '$app/navigation';
 
 	let dateToday = new Date().toLocaleDateString('fr-CA', {
 		year: 'numeric',
@@ -35,7 +34,7 @@
 		message: ''
 	};
 
-	let empty = {};
+	let errors = {};
 
 	async function getNews(newsQuery) {
 		const unsubscribe = onSnapshot(newsQuery, (querySnapshot) => {
@@ -54,34 +53,19 @@
 	async function inquiryHandler() {
 		const regex = /^[a-zA-Z -]*$/;
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-		if (
-			!inquiry.name ||
-			!inquiry.email ||
-			!inquiry.message ||
-			!regex.test(inquiry.name) ||
-			!emailRegex.test(inquiry.email) ||
-			inquiry.message.length < 21
-		) {
-			if (!inquiry.name) {
-				empty.name = true;
-			}
-			if (!inquiry.email) {
-				empty.email = true;
-			}
-			if (!inquiry.message) {
-				empty.message = true;
-			}
-			if (!regex.test(inquiry.name)) {
-				empty.invalidName = true;
-			}
-			if (!emailRegex.test(inquiry.email)) {
-				empty.invalidEmail = true;
-			}
-			if (inquiry.message.length < 21) {
-				empty.messageKulang = true;
-			}
-			setTimeout(function () {
-				empty = {};
+		
+		errors = {
+			email: !inquiry.email,
+			name: !inquiry.name,
+			message: !inquiry.message,
+			invalidEmail: !emailRegex.test(inquiry.email),	
+			invalidName: !regex.test(inquiry.name),
+			messageKulang: inquiry.message.length < 11,
+		};
+
+		if (Object.values(errors).some((v) => v)) {
+			setTimeout(() => {
+				errors = {};
 			}, 2000);
 			return;
 		}
@@ -298,10 +282,10 @@
 	<form on:submit|preventDefault={inquiryHandler}>
 		<div class="form-control w-full max-w-xl pt-6 pb-4 mx-auto">
 			<div class="flex flex-row py-5 gap-3">
-				{#if empty.name}
+				{#if errors.name}
 					<p class="text-red-500 text-sm italic mb-1">Name is required</p>
 				{/if}
-				{#if empty.invalidName}
+				{#if errors.invalidName}
 					<p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
 				{/if}
 				<input
@@ -310,9 +294,9 @@
 					class="input input-bordered w-full max-w-xs"
 					bind:value={inquiry.name}
 				/>
-				{#if empty.email}
+				{#if errors.email}
 					<p class="text-red-500 text-sm italic mb-1">Email is required</p>
-				{:else if empty.invalidEmail}
+				{:else if errors.invalidEmail}
 					<p class="text-red-500 text-sm italic mb-1">Invalid email</p>
 				{/if}
 				<input
@@ -322,10 +306,10 @@
 					bind:value={inquiry.email}
 				/>
 			</div>
-			{#if empty.message}
+			{#if errors.message}
 				<p class="text-red-500 text-sm italic mb-1">Message is required</p>
-			{:else if empty.messageKulang}
-				<p class="text-red-500 text-sm italic mb-1">Message must be at least 20 characters</p>
+			{:else if errors.messageKulang}
+				<p class="text-red-500 text-sm italic mb-1">Message must be at least 10 characters</p>
 			{/if}
 			<textarea
 				class="textarea textarea-bordered h-32 w-auto"

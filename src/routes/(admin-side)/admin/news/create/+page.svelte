@@ -8,8 +8,22 @@
 		title: '',
 		content: ''
 	};
+	let errors = {};
 
 	async function submitHandler() {
+		errors = {
+			title: !news.title,
+			content: !news.content,
+			contentKulang: news.content.length < 11
+		};
+
+		if (Object.values(errors).some((v) => v)) {
+			setTimeout(() => {
+				errors = {};
+			}, 2000);
+			return;
+		}
+
 		try {
 			await addDoc(collection(db, 'news'), {
 				title: news.title.trim().toLowerCase(),
@@ -33,20 +47,26 @@
 		<form on:submit|preventDefault={submitHandler}>
 			<div class="form-control">
 				<span class="pb-3">News Title</span>
+				{#if errors.title}
+						<p class="text-red-500 text-sm italic mb-1">News title is required</p>
+					{/if}
 				<input
 					type="text"
 					class="input input-bordered p-3 mt-2"
 					bind:value={news.title}
-					required
 				/>
 			</div>
 			<div class="mt-6">
 				<div class="form-control">
 					<span class="pb-3">Event Desciption</span>
+					{#if errors.content}
+						<p class="text-red-500 text-sm italic mb-1">News content is required</p>
+						{:else if errors.contentKulang}
+						<p class="text-red-500 text-sm italic mb-1">News content must at least be 10 characters</p>
+					{/if}
 					<textarea
 						class="h-60 textarea textarea-bordered p-3"
 						style="white-space:pre-wrap; resize:none"
-						required
 						bind:value={news.content}
 					/>
 				</div>
