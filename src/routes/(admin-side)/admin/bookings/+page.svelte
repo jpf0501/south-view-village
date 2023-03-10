@@ -20,7 +20,6 @@
 	let searchByField = '';
 	let searchByValue = '';
 	let bookingStatus = '';
-	let bookingPaymentStatus = '';
 	let bookingsQuery = query(
 		collection(db, 'booking'),
 		where('status', '==', 'Pending'),
@@ -85,7 +84,7 @@
 			await updateDoc(bookRef, data);
 			toast.success('Booking request has been ' + bookingStatus.toLowerCase() + ' !');
 			try {
-				const result = await sendEmail({
+				await sendEmail({
 					to: bookEmail,
 					subject: 'Southview Homes 3 Booking Request',
 					html:
@@ -112,22 +111,8 @@
 			toast.error('Error in updating a booking!');
 		}
 	}
-	async function changePaymentStatus(bookingId) {
-		try {
-			const bookRef = doc(db, 'booking', bookingId);
-			const data = {
-				paymentStatus: bookingPaymentStatus
-			};
-			await updateDoc(bookRef, data);
-			toast.success('Booking status changed!');
-		} catch (error) {
-			console.log(error);
-			toast.error('Error in changing booking status!');
-		}
-	}
 
 	async function sendPaymentEmail(bookEmail, bookID) {
-		// console.log(bookID)
 		try {
 			const paymentLinkData = await createPaymentLink(
 				'Clubhouse Reservation Downpayment',
@@ -241,7 +226,6 @@
 				{/if}
 				<tbody>
 					{#each listOfBooking as book, i}
-						<!-- {#if book.status == 'Pending'} -->
 						<tr class="hover">
 							<td>{i + (currentPage - 1) * pageSize + 1}</td>
 							<td>{book.firstNameDisplay + ' ' + book.lastNameDisplay}</td>
@@ -270,23 +254,7 @@
 											.toDate()
 											.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}</td
 								> -->
-							<td class="text-center"
-								><form on:submit|preventDefault={changePaymentStatus(book.id)}>
-									{#if book.paymentStatus == 'Paid'}
-										<button type="submit" on:click={() => (bookingPaymentStatus = 'Unpaid')}>
-											<span class="p-3 text-sm whitespace-nowrap text-green-500 font-bold">
-												{book.paymentStatus}
-											</span>
-										</button>
-									{:else if book.paymentStatus == 'Unpaid'}
-										<button type="submit" on:click={() => (bookingPaymentStatus = 'Paid')}>
-											<span class="p-3 text-sm whitespace-nowrap text-red-500 font-bold">
-												{book.paymentStatus}
-											</span>
-										</button>
-									{/if}
-								</form></td
-							>
+							<td class="text-center">{book.paymentStatus}</td>
 							<td
 								><form on:submit|preventDefault={changeStatus(book.id, book.email, book.bookDate)}>
 									{#if book.paymentStatus == 'Unpaid'}
@@ -301,19 +269,6 @@
 											on:click={() => (bookingStatus = 'Approved')}
 											type="submit"
 											class="btn btn-success text-white">Approve</button
-										>
-									{/if}
-									{#if book.paymentStatus == 'Unpaid'}
-										<button
-											on:click={() => (bookingStatus = 'Cancelled')}
-											type="submit"
-											class="btn btn-warning text-white" disabled>Cancel</button
-										>
-									{:else}
-											<button
-											on:click={() => (bookingStatus = 'Cancelled')}
-											type="submit"
-											class="btn btn-warning text-white">Cancel</button
 										>
 									{/if}
 									{#if book.paymentStatus == 'Paid'}
@@ -344,7 +299,6 @@
 								{/if}
 							</td>
 						</tr>
-						<!-- {/if} -->
 					{/each}
 				</tbody>
 			</table>
@@ -393,23 +347,9 @@
 									.toDate()
 									.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}
 						</div> -->
-					<div class="flex flex-row">
+					<div class="">
 						<span class="my-1 font-bold">Status:</span>
-						<form on:submit|preventDefault={changePaymentStatus(book.id)}>
-							{#if book.paymentStatus == 'Paid'}
-								<button type="submit" on:click={() => (bookingPaymentStatus = 'Unpaid')}>
-									<span class="p-3 text-sm whitespace-nowrap text-green-500 font-bold">
-										{book.paymentStatus}
-									</span>
-								</button>
-							{:else if book.paymentStatus == 'Unpaid'}
-								<button type="submit" on:click={() => (bookingPaymentStatus = 'Paid')}>
-									<span class="p-3 text-sm whitespace-nowrap text-red-500 font-bold">
-										{book.paymentStatus}
-									</span>
-								</button>
-							{/if}
-						</form>
+						{book.paymentStatus}
 					</div>
 					<div>
 						<form
@@ -444,11 +384,6 @@
 									class="btn btn-error text-white">Dissaprove</button
 								>
 							{/if}
-							<button
-									on:click={() => (bookingStatus = 'Cancelled')}
-									type="submit"
-									class="btn btn-error text-white">Cancel</button
-								>
 						</form>
 						<button
 							on:click={sendPaymentEmail(book.email, book.id)}
