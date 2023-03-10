@@ -371,7 +371,7 @@
 					</div>
 					<div>
 						<span class="my-1 font-bold">Type of Event:</span>
-						{book.contactNumber}
+						{book.eventTypeDisplay}
 					</div>
 					<div>
 						<span class="my-1 font-bold">Date and Time:</span>
