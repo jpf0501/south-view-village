@@ -29,12 +29,13 @@
 		paymentHead: '',
 		isPending: true
 	};
+
 	let streetQuery = query(collection(db, 'street'), orderBy('streetName', 'asc'));
 	let listOfStreets = [];
-
+	let errors = {};
+	let OTP = '';
 	let showOTP = false;
 	let userOTP = '';
-	let OTP = '';
 
 	const digits = '0123456789';
 
@@ -55,53 +56,67 @@
 
 	async function sendOTP() {
 		OTP = '';
+		// letter and '-'
+		const regex = /^[a-zA-Z -]*$/;
+		// must have at least 1 letter
+		const firstnameRegex = account.firstname.length > 0 && /[a-zA-Z]/.test(account.firstname);
+		const lastnameRegex = account.lastname.length > 0 && /[a-zA-Z]/.test(account.lastname);
+		// must ba an email
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 		const accountsQuery = query(collection(db, 'accounts'), where('email', '==', account.email));
 		const accountsSnapshot = await getDocs(accountsQuery);
-		if (accountsSnapshot.docs.length > 0) {
-			toast.error('Email already used');
+
+		errors = {
+			email: !account.email,
+			password: !account.password,
+			passwordcheck: !account.passwordcheck,
+			firstname: !account.firstname,
+			lastname: !account.lastname,
+			addressBlock: !account.addressBlock,
+			addressLot: !account.addressLot,
+			addressStreet: !account.addressStreet,
+			contactNumber: !account.contactNumber,
+			emailIsUsed: accountsSnapshot.docs.length > 0,
+			invalidEmail: !emailRegex.test(account.email),
+			invalidFirstnameRequired: !firstnameRegex,
+			invalidLastnameRequired: !lastnameRegex,
+			invalidFirstname: !regex.test(account.firstname),
+			invalidLastname: !regex.test(account.lastname),
+			passwordKulang: account.password.length < 6,
+			passwordNotMatch: account.password !== account.passwordcheck,
+			paymentHead: account.paymentHead.length === 0
+		};
+
+		if (Object.values(errors).some((v) => v)) {
+			setTimeout(() => {
+				errors = {};
+			}, 2000);
 			return;
 		}
-		if (account.password !== account.passwordcheck) {
-			toast.error('Password do not match');
-			return;
-		}
-		if (account.password.length < 6 && account.passwordcheck.length < 6) {
-			toast.error("Password must have at least 6 characters");
-			return;
-		}
-		for (let i = 0; i < 6; i++) {
-			OTP += digits[Math.floor(Math.random() * 10)];
-		}
-		try {
-			await sendEmail({
-				to: account.email,
-				subject: 'Your OTP code',
-				html: `<h1>Your OTP is: ${OTP}</h1>`
-			});
-			showOTP = true;
-			toast.success('OTP sent');
-		} catch (error) {
-			console.log(error);
-			toast.error('Error in sending OTP');
-		}
+
+		OTP = Array.from({ length: 6 }, () => digits[Math.floor(Math.random() * digits.length)]).join(
+			''
+		);
+		await sendEmail({
+			to: account.email,
+			subject: 'Your OTP code',
+			html: `<h1>Your OTP is: ${OTP}</h1>`
+		});
+		showOTP = true;
+		toast.success('OTP sent');
 	}
 
 	async function confirmOTP() {
-		if (userOTP !== OTP) {
-			toast.error('Incorrect OTP');
-			return;
-		}
-		if (!userOTP) {
-			toast.error('OTP required');
-			return;
-		}
+		if (!userOTP) return toast.error('OTP required');
+		if (userOTP !== OTP) return toast.error('Incorrect OTP');
+
 		try {
-			await addDoc(collection(db, 'pendingAccounts'), {
+			const pendingAccount = {
 				pendingEmail: account.email,
 				pendingPassword: account.password,
-				pendingFirstname: account.firstname.trim().toLowerCase(),
+				pendingFirstname: account.firstname,
 				pendingFirstNameDisplay: account.firstname,
-				pendingLastname: account.lastname.trim().toLowerCase(),
+				pendingLastname: account.lastname,
 				pendingLastNameDisplay: account.lastname,
 				pendingAddressBlock: account.addressBlock,
 				pendingAddressLot: account.addressLot,
@@ -110,10 +125,13 @@
 				pendingRole: account.role,
 				pendingPaymentStatus: account.paymentStatus,
 				pendingPaymentHead: account.paymentHead,
-				isPending: account.isPending
-			});
+				isPending: true
+			};
+
+			await addDoc(collection(db, 'pendingAccounts'), pendingAccount);
 			toast.success('Creation of Account Request Sent');
-			await goto('/login');
+			goto('/login');
+			showOTP = false;
 		} catch (error) {
 			console.log(error);
 			toast.error('Error in Creating an Account');
@@ -175,12 +193,18 @@
 							<label for="fname" class="label">
 								<span class="label-text">First Name</span>
 							</label>
+							{#if errors.firstname}
+								<p class="text-red-500 text-sm italic mb-1">First Name is required</p>
+							{:else if errors.invalidFirstname}
+								<p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
+								{:else if errors.invalidFirstnameRequired}
+							<p class="text-red-500 text-sm italic mb-1">Firstname must have a letter</p>
+							{/if}
 							<input
 								type="text"
 								placeholder="Juan"
 								name="fname"
 								class="input input-bordered"
-								required
 								bind:value={account.firstname}
 							/>
 						</div>
@@ -188,12 +212,18 @@
 							<label for="lname" class="label">
 								<span class="label-text">Last Name</span>
 							</label>
+							{#if errors.lastname}
+								<p class="text-red-500 text-sm italic mb-1">Last Name is required</p>
+							{:else if errors.invalidLastname}
+								<p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
+								{:else if errors.invalidLastnameRequired}
+							<p class="text-red-500 text-sm italic mb-1">Lastname must have a letter</p>
+							{/if}
 							<input
 								type="text"
 								placeholder="Dela Cruz"
 								name="lname"
 								class="input input-bordered"
-								required
 								bind:value={account.lastname}
 							/>
 						</div>
@@ -203,11 +233,10 @@
 							<label for="Block" class="label">
 								<span class="label-text">Block</span>
 							</label>
-							<select
-								class="select select-bordered w-full"
-								required
-								bind:value={account.addressBlock}
-							>
+							{#if errors.addressBlock}
+								<p class="text-red-500 text-sm italic mb-1">Block is required</p>
+							{/if}
+							<select class="select select-bordered w-full" bind:value={account.addressBlock}>
 								<option value="" disabled>Select block</option>
 								{#each blockValue as block}
 									<option value={block.value}>{block.value}</option>
@@ -218,11 +247,10 @@
 							<label for="Lot" class="label">
 								<span class="label-text">Lot</span>
 							</label>
-							<select
-								class="select select-bordered w-full"
-								required
-								bind:value={account.addressLot}
-							>
+							{#if errors.addressLot}
+								<p class="text-red-500 text-sm italic mb-1">Lot is required</p>
+							{/if}
+							<select class="select select-bordered w-full" bind:value={account.addressLot}>
 								<option value="" disabled>Select lot</option>
 								{#each lotValue as lot}
 									<option value={lot.value}>{lot.value}</option>
@@ -233,10 +261,12 @@
 							<label for="Street" class="label">
 								<span class="label-text">Street</span>
 							</label>
+							{#if errors.addressStreet}
+								<p class="text-red-500 text-sm italic mb-1">Street is required</p>
+							{/if}
 							<select
 								class="select select-bordered w-full"
 								aria-label="Default select example"
-								required
 								bind:value={account.addressStreet}
 							>
 								<option value="" selected disabled>Select street</option>
@@ -251,12 +281,19 @@
 							<label for="fname" class="label">
 								<span class="label-text">E-mail Address</span>
 							</label>
+							{#if errors.email}
+								<p class="text-red-500 text-sm italic mb-1">Email is required</p>
+							{:else if errors.emailIsUsed}
+								<p class="text-red-500 text-sm italic mb-1">Email is already used</p>
+							{:else if errors.invalidEmail}
+								<p class="text-red-500 text-sm italic mb-1">Invalid email</p>
+							{/if}
 							<input
 								type="text"
 								placeholder="juandelacruz@gmail.com"
 								name="email"
 								class="input input-bordered"
-								required
+								autocomplete="new-email"
 								bind:value={account.email}
 							/>
 						</div>
@@ -266,11 +303,18 @@
 							<label for="password" class="label">
 								<span class="label-text">Password</span>
 							</label>
+							{#if errors.password}
+								<p class="text-red-500 text-sm italic mb-1">Password is required</p>
+							{:else if errors.passwordKulang}
+								<p class="text-red-500 text-sm italic mb-1">
+									Password must be at least 6 characters
+								</p>
+							{/if}
 							<input
 								class="input input-bordered"
 								type="password"
 								placeholder="Password"
-								required
+								autocomplete="new-password"
 								bind:value={account.password}
 							/>
 						</div>
@@ -278,44 +322,32 @@
 							<label for="cpassword" class="label">
 								<span class="label-text">Confirm Password</span>
 							</label>
+							{#if errors.passwordcheck}
+								<p class="text-red-500 text-sm italic mb-1">Confirm Password is required.</p>
+							{:else if errors.passwordNotMatch}
+								<p class="text-red-500 text-sm italic mb-1">Password do not match</p>
+							{/if}
 							<input
 								class="input input-bordered"
 								type="password"
 								placeholder="Confirm Password"
-								required
+								autocomplete="new-confirmPassword"
 								bind:value={account.passwordcheck}
 							/>
-							{#if account.password != account.passwordcheck && account.passwordcheck != ''}
-								<span class="alert alert-error shadow-lg my-3 w-full">
-									<div>
-										<svg
-											xmlns="http://www.w3.org/2000/svg"
-											class="stroke-current flex-shrink-0 h-6 w-6"
-											fill="none"
-											viewBox="0 0 24 24"
-											><path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2"
-												d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-											/></svg
-										>
-										<span>Passwords do not match</span>
-									</div>
-								</span>
-							{/if}
 						</div>
 					</div>
 					<div class="grid grid-cols-2 gap-6 mt-6 md:grid-cols-3">
 						<div class="form-control">
 							<label for="paymentHead" class="label">
 								<span class="label-text">Payment Head</span>
-							</label>		
+							</label>
+							{#if errors.paymentHead}
+								<p class="text-red-500 text-sm italic mb-1">Payment Head is required</p>
+							{/if}
 							<div class="mb-3">
 								<select
 									class="select select-bordered w-full"
 									aria-label="Default select example"
-									required
 									bind:value={account.paymentHead}
 								>
 									<option value="" selected disabled>Select</option>
@@ -328,6 +360,9 @@
 							<label for="lname" class="label">
 								<span class="label-text">Contact No.</span>
 							</label>
+							{#if errors.contactNumber}
+								<p class="text-red-500 text-sm italic mb-1">Contact number is required</p>
+							{/if}
 							<input
 								type="tel"
 								onkeypress="return event.charCode >= 48 && event.charCode <= 57"
@@ -337,7 +372,6 @@
 								pattern={String.raw`^(09)\d{9}$`}
 								name="contact"
 								class="input input-bordered"
-								required
 								bind:value={account.contactNumber}
 							/>
 						</div>
