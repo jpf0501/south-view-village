@@ -28,55 +28,89 @@
 	let showOTP = false;
 	let userOTP = '';
 	let OTP = '';
+	let extraEmail = '';
 
 	async function getUser() {
 		const snapshot = await getDoc(doc(db, 'accounts', $userStore.uid));
 		user = snapshot.data();
 		user.firstname = user.firstNameDisplay;
 		user.lastname = user.lastNameDisplay;
-	}
-	$: if ($userStore) {
-		getUser();
+		extraEmail = user.email;
 	}
 
-	async function sendOTP() {
-		OTP = ''
+	async function submitHandler() {
+		try {
+			const isValid = await checkInput();
+			if (!isValid) {
+				toast.error('Form validation failed');
+				return;
+			}
+			if (user) {
+				await checkEmailOfCurrentuser();
+			} else {
+				await sendOTP();
+			}
+		} catch (error) {
+			console.log('Error during submission', error);
+			toast.error('Error during submission');
+		}
+	}
+
+	async function checkInput() {
 		// letter and '-'
 		const regex = /^[a-zA-Z -]*$/;
-		// must have at least 1 letter
-
 		// must ba an email
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-		let data = user || guest;
-		const firstnameRegex = data.firstname.length > 0 && /[a-zA-Z]/.test(data.firstname);
-		const lastnameRegex = data.lastname.length > 0 && /[a-zA-Z]/.test(data.lastname);
+		// must have at least 1 letter
+		const firstnameRegex = guest.firstname.length > 0 && /[a-zA-Z]/.test(guest.firstname);
+		const lastnameRegex = guest.lastname.length > 0 && /[a-zA-Z]/.test(guest.lastname);
+
 		errors = {
-			email: !data.email,
-			firstname: !data.firstname,
-			lastname: !data.lastname,
-			contactNumber: !data.contactNumber,
+			email: !guest.email,
+			firstname: !guest.firstname,
+			lastname: !guest.lastname,
+			contactNumber: !guest.contactNumber,
 			eventType: !guest.eventType,
 			time: !guest.time,
 			date: !guest.date,
-			invalidFirstname: !regex.test(data.firstname),
-			invalidLastname: !regex.test(data.lastname),
+			invalidFirstname: !regex.test(guest.firstname),
+			invalidLastname: !regex.test(guest.lastname),
 			invalidFirstnameRequired: !firstnameRegex,
 			invalidLastnameRequired: !lastnameRegex,
-			invalidEmail: !emailRegex.test(data.email)
+			invalidEmail: !emailRegex.test(guest.email)
 		};
-
+		if (user) {
+			errors = {
+				email: !user.email,
+				firstname: !user.firstname,
+				lastname: !user.lastname,
+				contactNumber: !user.contactNumber
+			};
+		}
 		if (Object.values(errors).some((v) => v)) {
 			setTimeout(() => {
 				errors = {};
 			}, 2000);
 			return;
 		}
+		return true;
+	}
+
+	async function checkEmailOfCurrentuser() {
+		user.email === extraEmail ? await submitToAdmin() : await sendOTP();
+	}
+
+	async function sendOTP() {
+		if (user) {
+			guest.email = user.email;
+		}
+		OTP = '';
 		OTP = Array.from({ length: 6 }, () => digits[Math.floor(Math.random() * digits.length)]).join(
 			''
 		);
 		try {
 			await sendEmail({
-				to: data.email,
+				to: guest.email,
 				subject: 'Your OTP code',
 				html: `<h1>Your OTP is: ${OTP}</h1>`
 			});
@@ -91,55 +125,49 @@
 	async function confirmOTP() {
 		if (!userOTP) return toast.error('OTP required');
 		if (userOTP !== OTP) return toast.error('Incorrect OTP');
+		await submitToAdmin();
+	}
 
-		if (user !== null) {
-			try {
-				await addDoc(collection(db, 'booking'), {
-					firstname: guest.firstname.trim().toLowerCase(),
-					firstNameDisplay: guest.firstname,
-					lastname: guest.lastname.trim().toLowerCase(),
-					lastNameDisplay: guest.lastname,
-					email: user.email.trim().toLowerCase(),
-					contactNumber: user.contactNumber,
-					status: guest.status,
-					paymentStatus: guest.paymentStatus,
-					eventType: guest.eventType.trim().toLowerCase(),
-					eventTypeDisplay: guest.eventType,
-					bookDate: new Date(guest.date + ' ' + guest.time),
-					dateReserved: guest.dateReserved,
-					dateReviewed: guest.dateReserved
-				});
-				toast.success('Reservation submitted!');
-				await goto('/calendar');
-			} catch (error) {
-				console.log(error);
-				toast.error('Error in submitting reservation!');
-			}
+	async function submitToAdmin() {
+		const bookingData = {
+			status: guest.status,
+			paymentStatus: guest.paymentStatus,
+			eventType: guest.eventType.trim().toLowerCase(),
+			eventTypeDisplay: guest.eventType,
+			bookDate: new Date(guest.date + ' ' + guest.time),
+			dateReserved: guest.dateReserved,
+			dateReviewed: guest.dateReserved
+		};
+
+		if (user) {
+			(bookingData.firstname = user.firstname.trim().toLowerCase()),
+				(bookingData.firstNameDisplay = user.firstname),
+				(bookingData.lastname = user.lastname.trim().toLowerCase()),
+				(bookingData.lastNameDisplay = user.lastname),
+				(bookingData.email = user.email.trim().toLowerCase());
+			bookingData.contactNumber = user.contactNumber;
 		} else {
-			try {
-				await addDoc(collection(db, 'booking'), {
-					firstname: guest.firstname.trim().toLowerCase(),
-					firstNameDisplay: guest.firstname,
-					lastname: guest.lastname.trim().toLowerCase(),
-					lastNameDisplay: guest.lastname,
-					email: guest.email.trim().toLowerCase(),
-					contactNumber: guest.contactNumber,
-					status: guest.status,
-					paymentStatus: guest.paymentStatus,
-					eventType: guest.eventType.trim().toLowerCase(),
-					eventTypeDisplay: guest.eventType,
-					bookDate: new Date(guest.date + ' ' + guest.time),
-					dateReserved: guest.dateReserved,
-					dateReviewed: guest.dateReserved
-				});
-				toast.success('Reservation Form Submitted!');
-				await goto('/calendar');
-				showOTP = false;
-			} catch (error) {
-				console.log(error);
-				toast.error('Error in Submitting Reservation!');
-			}
+			(bookingData.firstname = guest.firstname.trim().toLowerCase()),
+				(bookingData.firstNameDisplay = guest.firstname),
+				(bookingData.lastname = guest.lastname.trim().toLowerCase()),
+				(bookingData.lastNameDisplay = guest.lastname),
+				(bookingData.email = guest.email.trim().toLowerCase());
+			bookingData.contactNumber = guest.contactNumber;
 		}
+
+		try {
+			await addDoc(collection(db, 'booking'), bookingData);
+			toast.success('Reservation submitted!');
+			await goto('/calendar');
+			showOTP = false;
+		} catch (error) {
+			console.log(error);
+			toast.error('Error in submitting reservation!');
+		}
+	}
+
+	$: if ($userStore) {
+		getUser();
 	}
 </script>
 
@@ -171,7 +199,7 @@
 					<button
 						class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mb-2 md:mb-0 md:mr-2"
 						type="button"
-						on:click={sendOTP}>Resend OTP</button
+						on:click={submitHandler}>Resend OTP</button
 					>
 					<button
 						class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
@@ -186,7 +214,7 @@
 	<div class="min-h-screen hero bg-base-200">
 		<div class="w-full max-w-4xl p-6 mx-auto shadow-2xl border rounded-xl bg-base-100">
 			<h1 class="text-2xl mt-2">Clubhouse Reservation Form</h1>
-			<form on:submit|preventDefault={sendOTP}>
+			<form on:submit|preventDefault={submitHandler}>
 				<div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2">
 					{#if user}
 						<div class="form-control">
