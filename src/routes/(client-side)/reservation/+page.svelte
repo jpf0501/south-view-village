@@ -7,6 +7,7 @@
 	import { sendEmail } from '$lib/utils';
 
 	let user = null;
+	const digits = '0123456789';
 	const dateMin = new Date(Date.now() + 8.64e7).toLocaleDateString('en-ca');
 	const dateMax = new Date(Date.now() + 8.64e7 + 6.048e8 * 2).toLocaleDateString('en-ca');
 
@@ -39,10 +40,11 @@
 	}
 
 	async function sendOTP() {
+		OTP = ''
 		// letter and '-'
 		const regex = /^[a-zA-Z -]*$/;
 		// must have at least 1 letter
-		
+
 		// must ba an email
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 		let data = user || guest;
@@ -69,10 +71,9 @@
 			}, 2000);
 			return;
 		}
-		let OTP = '';
-		for (let i = 0; i < 6; i++) {
-			OTP += Math.floor(Math.random() * 10);
-		}
+		OTP = Array.from({ length: 6 }, () => digits[Math.floor(Math.random() * digits.length)]).join(
+			''
+		);
 		try {
 			await sendEmail({
 				to: data.email,
@@ -88,14 +89,9 @@
 	}
 
 	async function confirmOTP() {
-		if (!userOTP) {
-			toast.error('OTP required');
-			return;
-		}
-		if (userOTP !== OTP) {
-			toast.error('Incorrect OTP');
-			return;
-		}
+		if (!userOTP) return toast.error('OTP required');
+		if (userOTP !== OTP) return toast.error('Incorrect OTP');
+
 		if (user !== null) {
 			try {
 				await addDoc(collection(db, 'booking'), {
