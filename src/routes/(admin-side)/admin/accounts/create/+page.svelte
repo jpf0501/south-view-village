@@ -62,7 +62,7 @@
 			invalidEmail: !emailRegex.test(account.email),	
 			invalidFirstname: !regex.test(account.firstname),
 			invalidLastname: !regex.test(account.lastname),
-			passwordKulang: account.password.length < 7,
+			passwordKulang: account.password.length < 6,
 			passwordNotMatch: account.password !== account.passwordcheck
 		};
 

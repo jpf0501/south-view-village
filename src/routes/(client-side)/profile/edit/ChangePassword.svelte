@@ -16,7 +16,7 @@
 			toast.error('Password not match!');
 			return;
 		}
-		if (newPassword.length < 7) {
+		if (newPassword.length < 6) {
 			toast.error('Password must at least be 6 characters');
 			return;
 		}
