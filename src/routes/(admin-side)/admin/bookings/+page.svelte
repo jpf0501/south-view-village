@@ -45,21 +45,13 @@
 	}
 
 	async function changeSortBy() {
-		if (sortByField == 'bookDate') {
-			bookingsQuery = query(
-				collection(db, 'booking'),
-				where('status', '==', 'Pending'),
-				orderBy(sortByField, 'desc'),
-				orderBy('dateReserved', 'asc')
-			);
-		} else {
-			bookingsQuery = query(
-				collection(db, 'booking'),
-				where('status', '==', 'Pending'),
-				orderBy(sortByField, 'asc'),
-				orderBy('dateReserved', 'asc')
-			);
-		}
+		const order = sortByField === 'bookDate' ? 'desc' : 'asc';
+		bookingsQuery = query(
+			collection(db, 'booking'),
+			where('status', '==', 'Pending'),
+			orderBy(sortByField, order),
+			orderBy('dateReserved', 'asc')
+		);
 	}
 
 	async function searchBookings() {

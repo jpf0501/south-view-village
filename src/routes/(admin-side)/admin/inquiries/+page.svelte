@@ -38,16 +38,12 @@
 
 	async function searchInquiries() {
 		let searchByValueCase = searchByValue.toLowerCase();
-		if (searchByValue == '') {
-			inquiryQuery = query(collection(db, 'inquiries'), where('hadAnswered', '==', false));
-		} else {
-			inquiryQuery = query(
-				collection(db, 'inquiries'),
-				where(searchByField, '>=', searchByValueCase),
-				where(searchByField, '<=', searchByValueCase + '~'),
-				where('hadAnswered', '==', false)
-			);
-		}
+		inquiryQuery = query(
+			collection(db, 'inquiries'),
+			where(searchByField, '>=', searchByValueCase),
+			where(searchByField, '<=', searchByValueCase + '~'),
+			where('hadAnswered', '==', false)
+		);
 	}
 
 	async function resetButton() {

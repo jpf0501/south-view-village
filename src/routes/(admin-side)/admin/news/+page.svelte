@@ -29,24 +29,17 @@
 	}
 
 	async function changeSortBy() {
-		if (sortByField === 'title') {
-			newsQuery = query(collection(db, 'news'), orderBy(sortByField, 'asc'));
-		} else {
-			newsQuery = query(collection(db, 'news'), orderBy(sortByField, 'desc'));
-		}
+		const order = sortByField === 'title' ? 'asc' : 'desc';
+		newsQuery = query(collection(db, 'news'), orderBy(sortByField, order));
 	}
 
 	async function searchNews() {
 		let searchByValueCase = searchByValue.toLowerCase();
-		if (searchByValue == '') {
-			newsQuery = query(collection(db, 'news'));
-		} else {
-			newsQuery = query(
-				collection(db, 'news'),
-				where(searchByField, '>=', searchByValueCase),
-				where(searchByField, '<=', searchByValueCase + '~')
-			);
-		}
+		newsQuery = query(
+			collection(db, 'news'),
+			where(searchByField, '>=', searchByValueCase),
+			where(searchByField, '<=', searchByValueCase + '~')
+		);
 	}
 
 	async function resetButton() {

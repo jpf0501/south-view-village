@@ -30,7 +30,7 @@
 	];
 
 	let date = new Date();
-	let previousYear = (date.getFullYear() - 1)
+	let previousYear = date.getFullYear() - 1;
 	let currentYear = date.getFullYear();
 	let previousMonth = date.getMonth().toString().padStart(2, '0');
 	let currentMonth = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -44,7 +44,7 @@
 		// set start date to last month date
 		startDate = new Date(`${currentYear}-${previousMonth}-${day}`);
 	}
-	
+
 	if (currentMonth === '12') {
 		// if current month is December, set end date to January of next year
 		endDate = new Date(`${currentYear + 1}-01-${day}`);
@@ -91,37 +91,23 @@
 	}
 
 	async function changeSortBy() {
-		if (sortByField == 'bookDate') {
-			bookingsQuery = query(
-				collection(db, 'booking'),
-				where('status', 'in', ['Approved', 'Disapproved', 'Cancelled']),
-				orderBy(sortByField, 'desc'),
-				orderBy('dateReviewed', 'desc')
-			);
-		} else {
-			bookingsQuery = query(
-				collection(db, 'booking'),
-				where('status', 'in', ['Approved', 'Disapproved', 'Cancelled']),
-				orderBy(sortByField, 'asc'),
-				orderBy('dateReviewed', 'desc')
-			);
-		}
+		const order = sortByField === 'bookDate' ? 'desc' : 'asc';
+		bookingsQuery = query(
+			collection(db, 'booking'),
+			where('status', 'in', ['Approved', 'Disapproved', 'Cancelled']),
+			orderBy(sortByField, order),
+			orderBy('dateReviewed', 'desc')
+		);
 	}
 
 	async function changeSortByStatus() {
-		if (sortByStatus == '') {
-			bookingsQuery = query(
-				collection(db, 'booking'),
-				where('status', 'in', ['Approved', 'Disapproved', 'Cancelled']),
-				orderBy('dateReviewed', 'desc')
-			);
-		} else {
-			bookingsQuery = query(
-				collection(db, 'booking'),
-				where('status', '==', sortByStatus),
-				orderBy('dateReviewed', 'desc')
-			);
-		}
+		bookingsQuery = query(
+			collection(db, 'booking'),
+			sortByStatus
+				? where('status', '==', sortByStatus)
+				: where('status', 'in', ['Approved', 'Disapproved', 'Cancelled']),
+			orderBy('dateReviewed', 'desc')
+		);
 	}
 
 	async function searchBookings() {
@@ -192,19 +178,29 @@
 				{ align: 'center' }
 			);
 		report.line(10, 34, 200, 34);
-		report.setFont('Times', 'bold').setFontSize(11)
+		report.setFont('Times', 'bold').setFontSize(11);
 		if (currentMonth == '01') {
-			report.text(`${monthName[previousMonth - 1]} ${previousYear} Reservation Earnings Report`, width / 2, 45, { align: 'center' });
+			report.text(
+				`${monthName[previousMonth - 1]} ${previousYear} Reservation Earnings Report`,
+				width / 2,
+				45,
+				{ align: 'center' }
+			);
 		} else {
-			report.text(`${monthName[previousMonth - 1]} ${currentYear} Reservation Earnings Report`, width / 2, 45, { align: 'center' });
-		}	
+			report.text(
+				`${monthName[previousMonth - 1]} ${currentYear} Reservation Earnings Report`,
+				width / 2,
+				45,
+				{ align: 'center' }
+			);
+		}
 		report.setFontSize(10).text('Total Number of Reservations', 18, 75);
 		report.text('Reservation Fee', 18, 83);
 		report.text('Reservation Record Numbers', 18, 91);
 		report.text('Total Earned Amount', 18, 135); // 125
 		report.text('Signed By', 168, 235, { align: 'right' });
 		report.setFont('Times', 'normal').text('Approved Reservations', 27, 101);
-		report.text('Cancelled Reservations', 27, 109)
+		report.text('Cancelled Reservations', 27, 109);
 		if (entryCount === 1) {
 			report.text(`${entryCount} Records`, 190, 75, { align: 'right' });
 		} else {
@@ -213,14 +209,14 @@
 		report.text('PHP 500.00', 190, 83, { align: 'right' });
 		if (approvedCount === 0) {
 			report.text('No Entries', 190, 101, { align: 'right' });
-		} else if (approvedCount === 1) { 
+		} else if (approvedCount === 1) {
 			report.text(`${approvedCount} Entry`, 190, 101, { align: 'right' });
 		} else {
 			report.text(`${approvedCount} Entries`, 190, 101, { align: 'right' });
 		}
 		if (cancelledCount === 0) {
 			report.text('No Entries', 190, 109, { align: 'right' });
-		} else if (cancelledCount === 1) { 
+		} else if (cancelledCount === 1) {
 			report.text(`${cancelledCount} Entry`, 190, 109, { align: 'right' });
 		} else {
 			report.text(`${cancelledCount} Entries`, 190, 109, { align: 'right' });
@@ -234,18 +230,22 @@
 
 		if (currentMonth == '01') {
 			report.save(
-			`Southview-Homes-3-${monthName[previousMonth - 1]}-${previousYear}-Reservation-Report.pdf`
+				`Southview-Homes-3-${monthName[previousMonth - 1]}-${previousYear}-Reservation-Report.pdf`
 			);
 		} else {
 			report.save(
-			`Southview-Homes-3-${monthName[previousMonth - 1]}-${currentYear}-Reservation-Report.pdf`
+				`Southview-Homes-3-${monthName[previousMonth - 1]}-${currentYear}-Reservation-Report.pdf`
 			);
 		}
 
 		if (currentMonth == '01') {
-			toast.success(`Reservation report for ${monthName[previousMonth - 1]} ${previousYear} generated!`)
+			toast.success(
+				`Reservation report for ${monthName[previousMonth - 1]} ${previousYear} generated!`
+			);
 		} else {
-			toast.success(`Reservation report for ${monthName[previousMonth - 1]} ${currentYear} generated!`)
+			toast.success(
+				`Reservation report for ${monthName[previousMonth - 1]} ${currentYear} generated!`
+			);
 		}
 	}
 
@@ -378,7 +378,6 @@
 			<option value="" selected>Status Filter</option>
 			<option value="Approved">Approved</option>
 			<option value="Disapproved">Disapproved</option>
-			<option value="Cancelled">Cancelled</option>
 		</select>
 		<div class="my-4">
 			<button class="btn btn-primary" on:click={generateReport}>Generate Report</button>
@@ -428,11 +427,15 @@
 							>
 							<td>
 								{#if book.status == 'Approved'}
-									<td class="p-3 text-sm whitespace-nowrap text-green-500 font-bold">{book.status}</td>
+									<td class="p-3 text-sm whitespace-nowrap text-green-500 font-bold"
+										>{book.status}</td
+									>
 								{:else if book.status == 'Disapproved'}
-									<td class="p-3 text-sm whitespace-nowrap text-red-500 font-bold">{book.status}</td>
+									<td class="p-3 text-sm whitespace-nowrap text-red-500 font-bold">{book.status}</td
+									>
 								{:else if book.status == 'Cancelled'}
-									<td class="p-3 text-sm whitespace-nowrap text-red-500 font-bold">{book.status}</td>
+									<td class="p-3 text-sm whitespace-nowrap text-red-500 font-bold">{book.status}</td
+									>
 								{:else if book.status == 'Pending'}
 									<td class="p-3 text-sm whitespace-nowrap">{book.status}</td>
 								{/if}
@@ -495,7 +498,7 @@
 							<span class="text-green-500">{book.status}</span>
 						{:else if book.status === 'Disapproved'}
 							<span class="text-red-500">{book.status}</span>
-							{:else if book.status == 'Cancelled'}
+						{:else if book.status == 'Cancelled'}
 							<span class="text-red-500">{book.status}</span>
 						{:else if book.status === 'Cancelled'}
 							<span class="">{book.status}</span>
