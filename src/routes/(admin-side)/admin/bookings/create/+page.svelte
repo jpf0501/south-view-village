@@ -23,7 +23,12 @@
 	};
 
 	async function submitHandler() {
+		// letter and '-'
 		const regex = /^[a-zA-Z -]*$/;
+		// must have at least 1 letter
+		const firstnameRegex = guest.firstname.length > 0 && /[a-zA-Z]/.test(guest.firstname);
+		const lastnameRegex = guest.lastname.length > 0 && /[a-zA-Z]/.test(guest.lastname);
+		// must ba an email
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 		errors = {
@@ -36,6 +41,8 @@
 			date: !guest.date,
 			invalidFirstname: !regex.test(guest.firstname),
 			invalidLastname: !regex.test(guest.lastname),
+			invalidFirstnameRequired: !firstnameRegex,
+			invalidLastnameRequired: !lastnameRegex,
 			invalidEmail: !emailRegex.test(guest.email)
 		};
 
@@ -85,6 +92,8 @@
 						<p class="text-red-500 text-sm italic mb-1">First Name is required</p>
 					{:else if errors.invalidFirstname}
 						<p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
+					{:else if errors.invalidFirstnameRequired}
+						<p class="text-red-500 text-sm italic mb-1">Firstname must have a letter</p>
 					{/if}
 					<input
 						type="text"
@@ -99,6 +108,8 @@
 						<p class="text-red-500 text-sm italic mb-1">Last Name is required</p>
 					{:else if errors.invalidLastname}
 						<p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
+					{:else if errors.invalidLastnameRequired}
+						<p class="text-red-500 text-sm italic mb-1">Lastname must have a letter</p>
 					{/if}
 					<input
 						type="text"

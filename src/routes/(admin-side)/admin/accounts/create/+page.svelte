@@ -41,38 +41,45 @@
 
 	async function submitHandler() {
 		try {
+			// letter and '-'
 			const regex = /^[a-zA-Z -]*$/;
+			// must have at least 1 letter
+			const firstnameRegex = account.firstname.length > 0 && /[a-zA-Z]/.test(account.firstname)
+			const lastnameRegex = account.lastname.length > 0 && /[a-zA-Z]/.test(account.lastname)
+			// must ba an email
 			const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 			const accountsQuery = query(collection(db, 'accounts'), where('email', '==', account.email));
 			const accountsSnapshot = await getDocs(accountsQuery);
 
 			errors = {
-			email: !account.email,
-			password: !account.password,
-			passwordcheck: !account.passwordcheck,
-			firstname: !account.firstname,
-			lastname: !account.lastname,
-			addressBlock: !account.addressBlock,
-			addressLot: !account.addressLot,
-			addressStreet: !account.addressStreet,
-			role: !account.role,
-			contactNumber: !account.contactNumber,
-			paymentHead: account.paymentHead.length === 0,	
-			emailIsUsed: accountsSnapshot.docs.length > 0,
-			invalidEmail: !emailRegex.test(account.email),	
-			invalidFirstname: !regex.test(account.firstname),
-			invalidLastname: !regex.test(account.lastname),
-			passwordKulang: account.password.length < 6,
-			passwordNotMatch: account.password !== account.passwordcheck
-		};
+				email: !account.email,
+				password: !account.password,
+				passwordcheck: !account.passwordcheck,
+				firstname: !account.firstname,
+				lastname: !account.lastname,
+				addressBlock: !account.addressBlock,
+				addressLot: !account.addressLot,
+				addressStreet: !account.addressStreet,
+				role: !account.role,
+				contactNumber: !account.contactNumber,
+				paymentHead: account.paymentHead.length === 0,
+				emailIsUsed: accountsSnapshot.docs.length > 0,
+				invalidEmail: !emailRegex.test(account.email),
+				invalidFirstnameRequired: !firstnameRegex,
+				invalidLastnameRequired: !lastnameRegex,
+				invalidFirstname: !regex.test(account.firstname),
+				invalidLastname: !regex.test(account.lastname),
+				passwordKulang: account.password.length < 6,
+				passwordNotMatch: account.password !== account.passwordcheck
+			};
 
-		if (Object.values(errors).some((v) => v)) {
-			setTimeout(() => {
-				errors = {};
-			}, 2000);
-			return;
-		}
-			
+			if (Object.values(errors).some((v) => v)) {
+				setTimeout(() => {
+					errors = {};
+				}, 2000);
+				return;
+			}
+
 			const response = await fetch('/api/accounts', {
 				method: 'POST',
 				body: JSON.stringify({
@@ -124,6 +131,8 @@
 							<p class="text-red-500 text-sm italic mb-1">First Name is required</p>
 						{:else if errors.invalidFirstname}
 							<p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
+						{:else if errors.invalidFirstnameRequired}
+							<p class="text-red-500 text-sm italic mb-1">Firstname must have a letter</p>
 						{/if}
 						<input
 							type="text"
@@ -141,6 +150,8 @@
 							<p class="text-red-500 text-sm italic mb-1">Last Name is required</p>
 						{:else if errors.invalidLastname}
 							<p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
+						{:else if errors.invalidLastnameRequired}
+							<p class="text-red-500 text-sm italic mb-1">Lastname must have a letter</p>
 						{/if}
 						<input
 							type="text"

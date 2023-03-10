@@ -52,15 +52,17 @@
 
 	async function inquiryHandler() {
 		const regex = /^[a-zA-Z -]*$/;
+		const nameRegex = inquiry.name.length > 0 && /[a-zA-Z]/.test(inquiry.name);
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-		
+
 		errors = {
 			email: !inquiry.email,
 			name: !inquiry.name,
 			message: !inquiry.message,
-			invalidEmail: !emailRegex.test(inquiry.email),	
+			invalidEmail: !emailRegex.test(inquiry.email),
 			invalidName: !regex.test(inquiry.name),
-			messageKulang: inquiry.message.length < 11,
+			hasNoLetter: !nameRegex,
+			messageKulang: inquiry.message.length < 11
 		};
 
 		if (Object.values(errors).some((v) => v)) {
@@ -284,9 +286,10 @@
 			<div class="flex flex-row py-5 gap-3">
 				{#if errors.name}
 					<p class="text-red-500 text-sm italic mb-1">Name is required</p>
-				{/if}
-				{#if errors.invalidName}
+				{:else if errors.invalidName}
 					<p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
+				{:else if errors.hasNoLetter}
+					<p class="text-red-500 text-sm italic mb-1">Firstname must have a letter</p>
 				{/if}
 				<input
 					type="text"
