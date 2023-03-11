@@ -6,10 +6,15 @@
 	import toast from 'svelte-french-toast';
 	import { sendEmail } from '$lib/utils';
 
-	let user = null;
-	const digits = '0123456789';
 	const dateMin = new Date(Date.now() + 8.64e7).toLocaleDateString('en-ca');
 	const dateMax = new Date(Date.now() + 8.64e7 + 6.048e8 * 2).toLocaleDateString('en-ca');
+
+	let user = null;
+	let errors = {};
+	let OTP = '';
+	let userOTP = '';
+	let showOTP = false;
+	let extraEmail = '';
 
 	let guest = {
 		firstname: '',
@@ -24,12 +29,6 @@
 		dateReserved: serverTimestamp()
 	};
 
-	let errors = {};
-	let showOTP = false;
-	let userOTP = '';
-	let OTP = '';
-	let extraEmail = '';
-
 	async function getUser() {
 		const snapshot = await getDoc(doc(db, 'accounts', $userStore.uid));
 		user = snapshot.data();
@@ -40,15 +39,15 @@
 
 	async function submitHandler() {
 		try {
-			const isValid = await checkInput();
+			const isValid = checkInput();
 			if (!isValid) {
 				toast.error('Form validation failed');
 				return;
 			}
 			if (user) {
-				await checkEmailOfCurrentuser();
+				user.email === extraEmail ? await submitToAdmin() : sendOTP();
 			} else {
-				await sendOTP();
+				sendOTP();
 			}
 		} catch (error) {
 			console.log('Error during submission', error);
@@ -96,11 +95,8 @@
 		return true;
 	}
 
-	async function checkEmailOfCurrentuser() {
-		user.email === extraEmail ? await submitToAdmin() : await sendOTP();
-	}
-
 	async function sendOTP() {
+		const digits = '0123456789';
 		if (user) {
 			guest.email = user.email;
 		}
@@ -386,7 +382,6 @@
 				</div>
 				<div class="flex justify-end mt-8">
 					<button type="submit" class="btn btn-primary">Submit Schedule</button>
-					<button type="reset" class="btn btn-error mx-1 text-white">Clear Input</button>
 				</div>
 			</form>
 		</div>
