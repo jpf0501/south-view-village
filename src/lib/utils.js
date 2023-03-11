@@ -14,7 +14,7 @@ export const sendEmail = async (
 		})
 	).json();
 
-	export async function createPaymentLink (description = 'Clubhouse Reservation Downpayment', amount = 50000, remarks = '') {
+	export async function createPaymentLink (description = 'Clubhouse Reservation Downpayment', amount = '', remarks = '') {
 		const options = {
 			method: 'POST',
 			headers: {

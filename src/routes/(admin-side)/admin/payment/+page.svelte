@@ -35,6 +35,7 @@
 	const currentYear = date.getFullYear();
 
 	let listOfUsers = [];
+	let showModal = false;
 	let sortByField = '';
 	let searchByField = '';
 	let searchByValue = '';
@@ -44,6 +45,7 @@
 		where('role', '==', 'Resident'),
 		where('paymentStatus', '==', 'Unpaid')
 	);
+	let userFirst, userLast, userID, userEmail, userFee
 
 	let noResult = false;
 
@@ -51,6 +53,20 @@
 	let pageSize = 10;
 	let totalRecords = 1;
 	let totalPages = 0;
+
+	
+  	function openModal(firstName, lastName, email, id) {
+		userFirst = firstName
+		userLast = lastName
+		userID = id
+		userEmail = email
+		userFee = 500;
+    	showModal = true;
+  	};
+
+	  function closeModal() {
+    	showModal = false;
+  	};
 
 	async function getAccounts(accountsQuery, page, pageSize) {
 		const startIndex = (page - 1) * pageSize;
@@ -85,12 +101,16 @@
 		);
 	}
 
-	async function sendPaymentEmail(paymentEmail, paymentID) {
-		console.log(paymentID);
+	async function sendPaymentEmail(paymentEmail, paymentID, paymentFee) {
+		paymentFee = paymentFee + "00"
+		paymentFee = parseFloat(paymentFee)
+		// console.log(paymentID);
+		// console.log(paymentEmail),
+		console.log(paymentFee)
 		try {
 			const paymentLinkData = await createPaymentLink(
 				'Southview Homes 3 Monthly Dues',
-				50000,
+				paymentFee,
 				paymentID
 			);
 			const checkoutURL = paymentLinkData.data.attributes.checkout_url;
@@ -100,6 +120,7 @@
 				html: `<h1>This is the link for payment for monthly dues of ${currentMonth} ${currentYear}: <a href=${checkoutURL}>Click here</a></h1>`
 			});
 			console.log(JSON.stringify(result));
+			showModal = false;
 			toast.success('Payment has been sent!');
 		} catch (error) {
 			console.log(error);
@@ -147,6 +168,23 @@
 <svelte:head>
 	<title>Payment - Southview Homes 3 Admin Panel</title>
 </svelte:head>
+
+{#if showModal}
+  <div class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto">
+    <div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-75"></div>
+    <div class="relative z-50 w-full max-w-md mx-auto bg-white rounded-lg shadow-lg">
+      <div class="p-6">
+        <h2 class="text-lg font-medium">Send Payment Form to {userFirst} {userLast}</h2>
+        <p class="mt-6 text-sm text-gray-500">Enter payment fee (in Philippine peso)</p>
+		<input type="text" placeholder="Enter amount" bind:value={userFee} class="mt-6 input input-bordered w-full max-w-xs" />
+      </div>
+      <div class="flex justify-end px-6 gap-2 py-4">
+        <button class="btn btn-primary" on:click={sendPaymentEmail(userEmail, userID, userFee)}>Send Payment</button>
+		<button class="btn btn-error text-white" on:click={closeModal}>Cancel</button>
+      </div>
+    </div>
+  </div>
+{/if}
 
 <div class="min-w-full min-h-full bg-base-200 py-8 px-5">
 	<h1 class="text-3xl font-semibold py-2">Payment</h1>
@@ -235,7 +273,7 @@
 							<td>
 								{#if user.paymentStatus == 'Unpaid'}
 									<button
-										on:click={sendPaymentEmail(user.email, user.id)}
+										on:click={openModal(user.firstNameDisplay, user.lastNameDisplay, user.email, user.id)}
 										type="button"
 										class="btn btn-primary">Send Payment</button
 									>
@@ -280,7 +318,7 @@
 					<div class="card-actions justify-end">
 						{#if user.paymentStatus == 'Unpaid'}
 							<button
-								on:click={sendPaymentEmail(user.email, user.id)}
+								on:click={openModal(user.firstNameDisplay, user.lastNameDisplay, user.email, user.id)}
 								type="button"
 								class="btn btn-primary">Send Payment</button
 							>
