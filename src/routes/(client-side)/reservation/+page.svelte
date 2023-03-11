@@ -141,17 +141,17 @@
 
 		if (user) {
 			(bookingData.firstname = user.firstname.trim().toLowerCase()),
-				(bookingData.firstNameDisplay = user.firstname),
+				(bookingData.firstNameDisplay = user.firstname.trim()),
 				(bookingData.lastname = user.lastname.trim().toLowerCase()),
-				(bookingData.lastNameDisplay = user.lastname),
-				(bookingData.email = user.email.trim().toLowerCase());
+				(bookingData.lastNameDisplay = user.lastname.trim()),
+				(bookingData.email = user.email.trim());
 			bookingData.contactNumber = user.contactNumber;
 		} else {
 			(bookingData.firstname = guest.firstname.trim().toLowerCase()),
-				(bookingData.firstNameDisplay = guest.firstname),
+				(bookingData.firstNameDisplay = guest.firstname.trim()),
 				(bookingData.lastname = guest.lastname.trim().toLowerCase()),
-				(bookingData.lastNameDisplay = guest.lastname),
-				(bookingData.email = guest.email.trim().toLowerCase());
+				(bookingData.lastNameDisplay = guest.lastname.trim()),
+				(bookingData.email = guest.email.trim());
 			bookingData.contactNumber = guest.contactNumber;
 		}
 

@@ -112,12 +112,12 @@
 
 		try {
 			const pendingAccount = {
-				pendingEmail: account.email,
+				pendingEmail: account.email.trim(),
 				pendingPassword: account.password,
-				pendingFirstname: account.firstname,
-				pendingFirstNameDisplay: account.firstname,
-				pendingLastname: account.lastname,
-				pendingLastNameDisplay: account.lastname,
+				pendingFirstname: account.firstname.trim().toLowerCase(),
+				pendingFirstNameDisplay: account.firstname.trim(),
+				pendingLastname: account.lastname.trim().toLowerCase(),
+				pendingLastNameDisplay: account.lastname.trim(),
 				pendingAddressBlock: account.addressBlock,
 				pendingAddressLot: account.addressLot,
 				pendingAddressStreet: account.addressStreet,

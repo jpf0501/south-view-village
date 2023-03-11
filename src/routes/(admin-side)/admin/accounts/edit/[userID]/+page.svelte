@@ -45,8 +45,8 @@
 	}
 
 	async function updateUser() {
-		user.firstname = user.firstNameDisplay.toLowerCase();
-		user.lastname = user.lastNameDisplay.toLowerCase();
+		user.firstname = user.firstNameDisplay.trim().toLowerCase();
+		user.lastname = user.lastNameDisplay.trim().toLowerCase();
 		try {
 			await updateDoc(doc(db, 'accounts', userID), user);
 			toast.success('User has been updated!');

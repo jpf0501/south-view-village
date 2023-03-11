@@ -54,12 +54,12 @@
 			const response = await fetch('/api/accounts', {
 				method: 'POST',
 				body: JSON.stringify({
-					email: account.email,
+					email: account.email.trim(),
 					password: account.password,
 					firstname: account.firstname.trim().toLowerCase(),
-					firstNameDisplay: account.firstname,
+					firstNameDisplay: account.firstname.trim(),
 					lastname: account.lastname.trim().toLowerCase(),
-					lastNameDisplay: account.lastname,
+					lastNameDisplay: account.lastname.trim(),
 					addressBlock: account.addressBlock,
 					addressLot: account.addressLot,
 					addressStreet: account.addressStreet,
