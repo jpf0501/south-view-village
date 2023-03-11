@@ -50,7 +50,7 @@
 		endDate = new Date(`${currentYear + 1}-01-${day}`);
 	} else {
 		// otherwise, set end date to next month
-		let nextMonth = (date.getMonth() + 1).toString().padStart(2, '0');
+		let nextMonth = (date.getMonth() + 2).toString().padStart(2, '0');
 		endDate = new Date(`${currentYear}-${nextMonth}-${day}`);
 	}
 
@@ -67,7 +67,7 @@
 	);
 	let generateQuery = query(
 		collection(db, 'booking'),
-		where('status', 'in', ['Approved', 'Cancelled']),
+		where('status', '==', 'Approved'),
 		where('dateReviewed', '>=', startDate),
 		where('dateReviewed', '<', endDate)
 	);
