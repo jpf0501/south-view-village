@@ -6,6 +6,8 @@
 	import { getDoc, doc } from 'firebase/firestore';
 	import toast from 'svelte-french-toast';
 
+	let showComplaint = false;
+
 	async function logOut() {
 		try {
 			await signOut(auth);
@@ -28,7 +30,9 @@
 	}
 	$: if ($userStore) {
 		getUser();
+		showComplaint = true;
 	} else if ($userStore === null) {
+		showComplaint = false;
 		goto('/');
 	}
 </script>
@@ -61,6 +65,9 @@
 				<li><a href="/news">News</a></li>
 				<li><a href="/calendar">Calendar</a></li>
 				<li><a href="/reservation">Reservation</a></li>
+				{#if showComplaint}
+					<li><a href="/complaint">Complaint</a></li>
+				{/if}
 			</ul>
 		</div>
 		<a href="/" class="btn btn-ghost normal-case text-xl"
@@ -76,6 +83,9 @@
 			<li><a href="/news">News</a></li>
 			<li><a href="/calendar">Calendar</a></li>
 			<li><a href="/reservation">Reservation</a></li>
+			{#if showComplaint}
+				<li><a href="/complaint">Complaint</a></li>
+			{/if}
 		</ul>
 	</div>
 	<div class="navbar-end">
