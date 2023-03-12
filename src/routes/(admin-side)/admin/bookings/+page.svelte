@@ -66,7 +66,12 @@
 		);
 	}
 
-	async function changeStatus(bookingId, bookEmail, bookDate) {
+	async function approvalHandler(bookingId, bookEmail, bookDate) {
+		changeStatus(bookingId)
+		sendUpdateToEmail(bookEmail, bookDate)
+	}
+
+	async function changeStatus(bookingId){
 		try {
 			const bookRef = doc(db, 'booking', bookingId);
 			const data = {
@@ -75,7 +80,15 @@
 			};
 			await updateDoc(bookRef, data);
 			toast.success('Booking request has been ' + bookingStatus.toLowerCase() + ' !');
-			try {
+			
+		} catch (error) {
+			console.log(error);
+			toast.error('Error in updating a booking!');
+		}
+	}
+
+	async function sendUpdateToEmail(bookEmail, bookDate){
+		try {
 				await sendEmail({
 					to: bookEmail,
 					subject: 'Southview Homes 3 Booking Request',
@@ -92,16 +105,10 @@
 						bookingStatus.toLowerCase() +
 						' by the admin</ht>'
 				});
-				// console.log(JSON.stringify(result));
-				// alert('Email sent successfuly');
 			} catch (error) {
 				console.log(error);
 				toast.error('Error in sending update of booking request in email');
 			}
-		} catch (error) {
-			console.log(error);
-			toast.error('Error in updating a booking!');
-		}
 	}
 
 	async function sendPaymentEmail(bookEmail, bookID) {
@@ -248,7 +255,7 @@
 								> -->
 							<td class="text-center">{book.paymentStatus}</td>
 							<td
-								><form on:submit|preventDefault={changeStatus(book.id, book.email, book.bookDate)}>
+								><form on:submit|preventDefault={approvalHandler(book.id, book.email, book.bookDate)}>
 									{#if book.paymentStatus == 'Unpaid'}
 										<button
 											on:click={() => (bookingStatus = 'Approved')}
@@ -345,7 +352,7 @@
 					</div>
 					<div>
 						<form
-							on:submit|preventDefault={changeStatus(book.id, book.email, book.bookDate)}
+							on:submit|preventDefault={approvalHandler(book.id, book.email, book.bookDate)}
 							class="py-3"
 						>
 							{#if book.paymentStatus == 'Unpaid'}
