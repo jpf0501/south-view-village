@@ -6,8 +6,6 @@
 	import { getDoc, doc } from 'firebase/firestore';
 	import toast from 'svelte-french-toast';
 
-	let showComplaint = false;
-
 	async function logOut() {
 		try {
 			await signOut(auth);
@@ -30,9 +28,7 @@
 	}
 	$: if ($userStore) {
 		getUser();
-		showComplaint = true;
 	} else if ($userStore === null) {
-		showComplaint = false;
 		goto('/');
 	}
 </script>
@@ -65,7 +61,7 @@
 				<li><a href="/news">News</a></li>
 				<li><a href="/calendar">Calendar</a></li>
 				<li><a href="/reservation">Reservation</a></li>
-				{#if showComplaint}
+				{#if $userStore}
 					<li><a href="/complaint">Complaint</a></li>
 				{/if}
 			</ul>
@@ -83,7 +79,7 @@
 			<li><a href="/news">News</a></li>
 			<li><a href="/calendar">Calendar</a></li>
 			<li><a href="/reservation">Reservation</a></li>
-			{#if showComplaint}
+			{#if $userStore}
 				<li><a href="/complaint">Complaint</a></li>
 			{/if}
 		</ul>
@@ -116,6 +112,12 @@
 					<li class="pb-2"><a href="/register">Register</a></li>
 				{:else}
 					<p class="text-sm font-semibold px-4 py-3">Hello {user.firstNameDisplay}</p>
+					<p class="text-sm font-bold px-4 py-3">
+						Monthly Dues: <span
+							class={user.paymentStatus === 'Unpaid' ? 'text-red-500' : 'text-green-500'}
+							>{user.paymentStatus}</span
+						>
+					</p>
 					<li><a href="/profile">Profile</a></li>
 					<li class="pb-2"><button on:click={logOut}>Logout</button></li>
 				{/if}
