@@ -41,7 +41,7 @@
 				dateSubmitted: serverTimestamp(),
 				dateAnswered: serverTimestamp(),
 				hadAnswered: false,
-				reponse: ""
+				response: ""
 			});
 			toast.success('Complaint Sent!');
 			complaint = '';
