@@ -85,19 +85,32 @@
 				class="w-60 h-40 flex flex-col justify-center items-center overflow-hidden shadow-lg border rounded-xl bg-base-100"
 			>
 				<p class="text-3xl font-semibold">{dueCount}</p>
-				<p class="text-md mt-2">Pending Dues</p>
+				{#if dueCount === 1}
+					<p class="text-md mt-2">Unpaid Resident</p>
+				{:else}
+					<p class="text-md mt-2">Unpaid Residents</p>
+				{/if}
 			</div>
 			<div
 				class="w-60 h-40 flex flex-col justify-center items-center overflow-hidden shadow-lg border rounded-xl bg-base-100"
 			>
 				<p class="text-3xl font-semibold">{countOfPendingBooks}</p>
-				<p class="text-md mt-2">Booking Requests</p>
+				{#if countOfPendingBooks === 1}
+					<p class="text-md mt-2">Pending Reservation</p>
+				{:else}
+					<p class="text-md mt-2">Pending Reservations</p>
+				{/if}
 			</div>
 			<div
 				class="w-60 h-40 flex flex-col justify-center items-center overflow-hidden shadow-lg border rounded-xl bg-base-100"
 			>
 				<p class="text-3xl font-semibold">{countOfAccounts}</p>
-				<p class="text-md mt-2">Accounts</p>
+				
+				{#if countOfAccounts === 1}
+					<p class="text-md mt-2">Registered Account</p>
+				{:else}
+					<p class="text-md mt-2">Registered Accounts</p>
+				{/if}
 			</div>
 		</div>
 		<div class="basis-2/3 flex justify-center p-5">
