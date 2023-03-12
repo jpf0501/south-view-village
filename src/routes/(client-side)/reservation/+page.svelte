@@ -16,7 +16,7 @@
 	let showOTP = false;
 	let extraEmail = '';
 
-	let guest = {
+	let bookData = {
 		firstname: '',
 		lastname: '',
 		email: '',
@@ -38,6 +38,12 @@
 	}
 
 	async function submitHandler() {
+		if(user){
+			bookData.firstname = user.firstname
+			bookData.lastname = user.lastname
+			bookData.email= user.email
+			bookData.contactNumber = user.contactNumber
+		}
 		try {
 			const isValid = await checkInput();
 			if (!isValid) {
@@ -61,31 +67,23 @@
 		// must ba an email
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 		// must have at least 1 letter
-		const firstnameRegex = guest.firstname.length > 0 && /[a-zA-Z]/.test(guest.firstname);
-		const lastnameRegex = guest.lastname.length > 0 && /[a-zA-Z]/.test(guest.lastname);
+		const firstnameRegex = bookData.firstname.length > 0 && /[a-zA-Z]/.test(bookData.firstname);
+		const lastnameRegex = bookData.lastname.length > 0 && /[a-zA-Z]/.test(bookData.lastname);
 
 		errors = {
-			email: !guest.email,
-			firstname: !guest.firstname,
-			lastname: !guest.lastname,
-			contactNumber: !guest.contactNumber,
-			eventType: !guest.eventType,
-			time: !guest.time,
-			date: !guest.date,
-			invalidFirstname: !regex.test(guest.firstname),
-			invalidLastname: !regex.test(guest.lastname),
+			email: !bookData.email,
+			firstname: !bookData.firstname,
+			lastname: !bookData.lastname,
+			contactNumber: !bookData.contactNumber,
+			eventType: !bookData.eventType,
+			time: !bookData.time,
+			date: !bookData.date,
+			invalidFirstname: !regex.test(bookData.firstname),
+			invalidLastname: !regex.test(bookData.lastname),
 			invalidFirstnameRequired: !firstnameRegex,
 			invalidLastnameRequired: !lastnameRegex,
-			invalidEmail: !emailRegex.test(guest.email)
+			invalidEmail: !emailRegex.test(bookData.email)
 		};
-		if (user) {
-			errors = {
-				email: !user.email,
-				firstname: !user.firstname,
-				lastname: !user.lastname,
-				contactNumber: !user.contactNumber
-			};
-		}
 		if (Object.values(errors).some((v) => v)) {
 			setTimeout(() => {
 				errors = {};
@@ -97,16 +95,13 @@
 
 	async function sendOTP() {
 		const digits = '0123456789';
-		if (user) {
-			guest.email = user.email;
-		}
 		OTP = '';
 		OTP = Array.from({ length: 6 }, () => digits[Math.floor(Math.random() * digits.length)]).join(
 			''
 		);
 		try {
 			await sendEmail({
-				to: guest.email,
+				to: bookData.email,
 				subject: 'Your OTP code',
 				html: `<h1>Your OTP is: ${OTP}</h1>`
 			});
@@ -126,30 +121,20 @@
 
 	async function submitToAdmin() {
 		const bookingData = {
-			status: guest.status,
-			paymentStatus: guest.paymentStatus,
-			eventType: guest.eventType.trim().toLowerCase(),
-			eventTypeDisplay: guest.eventType,
-			bookDate: new Date(guest.date + ' ' + guest.time),
-			dateReserved: guest.dateReserved,
-			dateReviewed: guest.dateReserved
+			firstname: bookData.firstname.trim().toLowerCase(),
+			firstNameDisplay: bookData.firstname.trim(),
+			lastname: bookData.lastname.trim().toLowerCase(),
+			lastNameDisplay: bookData.lastname.trim(),
+			email: bookData.email.trim(),
+			contactNumber:  bookData.contactNumber,
+			status: bookData.status,
+			paymentStatus: bookData.paymentStatus,
+			eventType: bookData.eventType.trim().toLowerCase(),
+			eventTypeDisplay: bookData.eventType,
+			bookDate: new Date(bookData.date + ' ' + bookData.time),
+			dateReserved: bookData.dateReserved,
+			dateReviewed: bookData.dateReserved
 		};
-
-		if (user) {
-			(bookingData.firstname = user.firstname.trim().toLowerCase()),
-				(bookingData.firstNameDisplay = user.firstname.trim()),
-				(bookingData.lastname = user.lastname.trim().toLowerCase()),
-				(bookingData.lastNameDisplay = user.lastname.trim()),
-				(bookingData.email = user.email.trim());
-			bookingData.contactNumber = user.contactNumber;
-		} else {
-			(bookingData.firstname = guest.firstname.trim().toLowerCase()),
-				(bookingData.firstNameDisplay = guest.firstname.trim()),
-				(bookingData.lastname = guest.lastname.trim().toLowerCase()),
-				(bookingData.lastNameDisplay = guest.lastname.trim()),
-				(bookingData.email = guest.email.trim());
-			bookingData.contactNumber = guest.contactNumber;
-		}
 
 		try {
 			await addDoc(collection(db, 'booking'), bookingData);
@@ -287,7 +272,7 @@
 							{/if}
 							<input
 								type="text"
-								bind:value={guest.firstname}
+								bind:value={bookData.firstname}
 								class="input input-bordered p-3 mt-2"
 								placeholder="Juan"
 							/>
@@ -303,7 +288,7 @@
 							{/if}
 							<input
 								type="text"
-								bind:value={guest.lastname}
+								bind:value={bookData.lastname}
 								class="input input-bordered p-3 mt-2"
 								placeholder="Dela Cruz"
 							/>
@@ -317,7 +302,7 @@
 							{/if}
 							<input
 								type="text"
-								bind:value={guest.email}
+								bind:value={bookData.email}
 								name="email"
 								class="input input-bordered p-3 mt-2"
 								placeholder="juandelacruz@gmail.com"
@@ -335,7 +320,7 @@
 								maxlength="11"
 								placeholder="09123456789"
 								pattern={String.raw`^(09)\d{9}$`}
-								bind:value={guest.contactNumber}
+								bind:value={bookData.contactNumber}
 								name="contact"
 								class="input input-bordered p-3 mt-2"
 							/>
@@ -349,7 +334,7 @@
 						<input
 							type="text"
 							class="input input-bordered p-3 mt-2"
-							bind:value={guest.eventType}
+							bind:value={bookData.eventType}
 							placeholder="Birthday"
 						/>
 					</div>
@@ -363,7 +348,7 @@
 							min={dateMin}
 							max={dateMax}
 							class="input input-bordered p-3 mt-2"
-							bind:value={guest.date}
+							bind:value={bookData.date}
 						/>
 					</div>
 					<div class="form-control">
@@ -376,7 +361,7 @@
 							min="8:00"
 							max="19:00"
 							class="input input-bordered p-3 mt-2"
-							bind:value={guest.time}
+							bind:value={bookData.time}
 						/>
 					</div>
 				</div>
