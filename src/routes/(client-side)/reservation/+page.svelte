@@ -39,15 +39,15 @@
 
 	async function submitHandler() {
 		try {
-			const isValid = checkInput();
+			const isValid = await checkInput();
 			if (!isValid) {
 				toast.error('Form validation failed');
 				return;
 			}
-			if (user) {
-				user.email === extraEmail ? await submitToAdmin() : sendOTP();
+			if (user && user.email === extraEmail) {
+				submitToAdmin();
 			} else {
-				sendOTP();
+				await sendOTP();
 			}
 		} catch (error) {
 			console.log('Error during submission', error);
