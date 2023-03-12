@@ -92,7 +92,7 @@
 		paymentsQuery = query(collection(db, 'payments'));
 		searchByValue = '';
 	}
-	
+
 	async function generateReport() {
 		const report = new jsPDF();
 
@@ -161,7 +161,6 @@
 		report.text('HOA Treasurer', 171, 268, { align: 'right' });
 		report.addPage();
 		report.autoTable({ margin: { top: 20, bottom: 20 }, html: '#generate-table' });
-		toast.remove('Lol')
 		if (currentMonth == '01') {
 			report.save(
 			`Southview-Homes-3-${monthName[previousMonth - 1]}-${previousYear}-Monthly-Dues-Report.pdf`
