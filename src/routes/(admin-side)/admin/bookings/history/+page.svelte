@@ -10,7 +10,7 @@
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
 	import { jsPDF } from 'jspdf';
-	import autoTable from 'jspdf-autotable';
+	import 'jspdf-autotable';
 	import toast from 'svelte-french-toast';
 	import Pagination from '../../Pagination.svelte';
 
