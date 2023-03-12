@@ -1,5 +1,5 @@
 <script>
-	import { onSnapshot, query, collection, orderBy, where, getCountFromServer } from 'firebase/firestore';
+	import { onSnapshot, query, collection, orderBy, where, getCountFromServer, getDocs } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
 	import { jsPDF } from 'jspdf';
@@ -93,20 +93,6 @@
 		searchByValue = '';
 	}
 
-	async function generateTable(generateQuery) {
-		const unsubscribe = onSnapshot(generateQuery, (querySnapshot) => {
-			listOfReports = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-		});
-		onDestroy(() => unsubscribe());
-	}
-
-	async function getStreet() {
-		const unsubscribe = onSnapshot(streetQuery, (querySnapshot) => {
-			listOfStreets = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-		});
-		onDestroy(() => unsubscribe());
-	}
-
 	async function generateReport() {
 		const report = new jsPDF();
 
@@ -118,6 +104,11 @@
 		let width = report.internal.pageSize.getWidth();
 
 		totalEarnings = Number(totalEarnings.toFixed(2)).toLocaleString();
+
+		const generateSnapshot = await getDocs(generateQuery)
+		const streetSnapshot = await getDocs(streetQuery)
+		listOfReports = generateSnapshot.docs.map(doc => doc.data());
+		listOfStreets = streetSnapshot.docs.map(doc => doc.data());
 
 		report.addImage('/logo.png', 'PNG', 68, 12, 11, 7);
 		report.setFont('Times', 'bold').text('Southview Homes 3', 84, 18);
@@ -170,7 +161,6 @@
 		report.text('HOA Treasurer', 171, 268, { align: 'right' });
 		report.addPage();
 		report.autoTable({ margin: { top: 20, bottom: 20 }, html: '#generate-table' });
-		toast.remove('Lol')
 		if (currentMonth == '01') {
 			report.save(
 			`Southview-Homes-3-${monthName[previousMonth - 1]}-${previousYear}-Monthly-Dues-Report.pdf`
@@ -200,9 +190,6 @@
 	function goToPage(page) {
 		currentPage = page;
 	}
-
-	$: generateTable(generateQuery);
-	$: getStreet(streetQuery);
 
 </script>
 
