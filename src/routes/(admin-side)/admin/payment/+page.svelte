@@ -110,6 +110,7 @@
 	}
 
 	async function sendPaymentEmail(paymentEmail, paymentID, paymentFee) {
+		const mailFee = paymentFee
 		paymentFee = paymentFee + "00"
 		paymentFee = parseFloat(paymentFee)
 		// console.log(paymentID);
@@ -124,8 +125,24 @@
 			const checkoutURL = paymentLinkData.data.attributes.checkout_url;
 			const result = await sendEmail({
 				to: paymentEmail,
-				subject: 'Southview Homes 3 Monthly Dues Payment Notice',
-				html: `<h1>This is the link for payment for monthly dues of ${currentMonth} ${currentYear}: <a href=${checkoutURL}>Click here</a></h1>`
+				subject: `Southview Homes 3 ${currentMonth} ${currentYear} Monthly Dues Payment Notice`,
+				html: `<center><h1><img src="https://ssv.vercel.app/logo.png"> Southview Homes 3</h1>
+				<p style="font-size:12px">SVH3 Clubhouse, San Vicente Road, Brgy., San Vicente, San Pedro, Laguna</p><br/>
+				<p style="font-size:13px; text-decoration:underline">This is an automated message. Do not reply.</p></center>
+				<p>We sent you this notice to inform you on the payment of your unpaid monthly dues for the period of ${currentMonth} ${currentYear}, which amounts to a total of PHP ${paymentFeeDisplay}.00 in total. 
+				sThe above amount and period remains unpaid on the record. Please be informed that the default monthly dues amounting Php 500.00 is our monthly obligation, to fund the subdivision's monthly expenses.
+				<br/>1) Security Guard - 4 head counts
+				<br/>2) Street Lights
+				<br/>3) Garbage Pick-up
+				<br/>4) Maintenance - 2 head counts
+				<p>You can pay your monthly dues by using the form provided <a href=${checkoutURL}>here</a>.</p>
+				<p>To avoid inconveniences, we greatly appreciate if you could proceed with the payment of your unpaid dues on or before
+				moving forward. Kindly settle your monthly dues obligation before the assigned deadline.
+				Should you have concern on your unpaid dues please contact the HOA officers or send us an inquiry for any other clarifications.
+				Please disregard this notice if you have settled already the said unpaid dues.
+				Thank you.</p>
+				<p>For other inquiries, feel free give us a call at 8330-4163 / 09063955407. You can also file for an inquiry at our <a href="https://ssv.vercel.app">website</a> or send us an email at <a href="mailto:southviewhomes3mail@gmail.com">southviewhomes3mail@gmail.com</a>.</p>
+				<p>Best regards,<br/>Southview Homes 3 Home Owners Association`
 			});
 			console.log(JSON.stringify(result));
 			showModal = false;
