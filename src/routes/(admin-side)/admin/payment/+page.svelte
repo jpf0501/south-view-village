@@ -35,7 +35,7 @@
 	const currentYear = date.getFullYear();
 
 	let listOfUsers = [];
-	let showModal = false;
+	let showModal, showConfirm = false;
 	let sortByField = '';
 	let searchByField = '';
 	let searchByValue = '';
@@ -64,8 +64,16 @@
     	showModal = true;
   	};
 
-	  function closeModal() {
+	function openConfirmation() {
+		showConfirm = true;
+	}
+
+	function closeModal() {
     	showModal = false;
+  	};
+
+	function closeConfirmation() {
+    	showConfirm = false;
   	};
 
 	async function getAccounts(accountsQuery, page, pageSize) {
@@ -139,16 +147,14 @@
 	}
 
 	async function resetStatus() {
-		let text = 'Would you like to reset payment status?';
-		if (confirm(text) == true) {
-			const accountQuery = query(collection(db, 'accounts'));
-			const snapshot = await getDocs(accountQuery);
-			for (let i = 0; i < snapshot.docs.length; i++) {
-				const docRef = doc(db, 'accounts', snapshot.docs[i].id);
-				await updateDoc(docRef, { paymentStatus: 'Unpaid' });
-			}
-			toast.success('All payment status has been reset!');
+		closeConfirmation()
+		const accountQuery = query(collection(db, 'accounts'), where('role', '==', 'Resident'), where('paymentHead', '==', true));
+		const snapshot = await getDocs(accountQuery);
+		for (let i = 0; i < snapshot.docs.length; i++) {
+			const docRef = doc(db, 'accounts', snapshot.docs[i].id);
+			await updateDoc(docRef, { paymentStatus: 'Unpaid' });
 		}
+		toast.success('All payment status has been reset!');
 	}
 
 	$: {
@@ -169,6 +175,8 @@
 	<title>Payment - Southview Homes 3 Admin Panel</title>
 </svelte:head>
 
+<!-- modal -->
+
 {#if showModal}
   <div class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto">
     <div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-75"></div>
@@ -185,6 +193,23 @@
     </div>
   </div>
 {/if}
+
+{#if showConfirm}
+  <div class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto">
+    <div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-75"></div>
+    <div class="relative z-50 w-full max-w-md mx-auto bg-white rounded-lg shadow-lg">
+      <div class="p-6">
+        <p>Would you like to reset all of the resident's monthly dues payment status for this month? <span class="font-semibold">This action cannot be undone.</span></p>
+      </div>
+      <div class="flex justify-end px-6 gap-2 py-4">
+        <button class="btn btn-primary" on:click={resetStatus}>Reset Payment Status</button>
+		<button class="btn btn-error text-white" on:click={closeConfirmation}>Cancel</button>
+      </div>
+    </div>
+  </div>
+{/if}
+
+<!-- end modal -->
 
 <div class="min-w-full min-h-full bg-base-200 py-8 px-5">
 	<h1 class="text-3xl font-semibold py-2">Payment</h1>
@@ -230,7 +255,7 @@
 			<option value="email">Email</option>
 		</select>
 
-		<button class="btn btn-primary my-4" on:click={resetStatus}>Reset Payment Status</button>
+		<button class="btn btn-primary my-4" on:click={openConfirmation}>Reset Payment Status</button>
 	</div>
 
 	<!-- Medium to large screen -->

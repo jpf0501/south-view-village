@@ -5,7 +5,8 @@
 		collection,
 		orderBy,
 		where,
-		getCountFromServer
+		getCountFromServer,
+		getDocs
 	} from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
@@ -131,15 +132,11 @@
 		searchByValue = '';
 	}
 
-	async function generateTable(generateQuery) {
-		const unsubscribe = onSnapshot(generateQuery, (querySnapshot) => {
-			listOfReports = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-		});
-		onDestroy(() => unsubscribe());
-	}
-
 	async function generateReport() {
 		const report = new jsPDF();
+
+		const generateSnapshot = await getDocs(generateQuery)
+		listOfReports = generateSnapshot.docs.map(doc => doc.data());
 
 		let approvedQuery = query(
 			collection(db, 'booking'),
@@ -148,19 +145,10 @@
 			where('dateReviewed', '<', endDate)
 		);
 
-		let cancelledQuery = query(
-			collection(db, 'booking'),
-			where('status', '==', 'Cancelled'),
-			where('dateReviewed', '>=', startDate),
-			where('dateReviewed', '<', endDate)
-		);
-
 		let entrySnapshotCount = await getCountFromServer(generateQuery);
 		let approvedSnapshotCount = await getCountFromServer(approvedQuery);
-		let cancelledSnapshotCount = await getCountFromServer(cancelledQuery);
 		let entryCount = entrySnapshotCount.data().count;
 		let approvedCount = approvedSnapshotCount.data().count;
-		let cancelledCount = cancelledSnapshotCount.data().count;
 		let totalEarnings = 500 * entryCount;
 		let width = report.internal.pageSize.getWidth();
 
@@ -200,7 +188,6 @@
 		report.text('Total Earned Amount', 18, 135); // 125
 		report.text('Signed By', 168, 235, { align: 'right' });
 		report.setFont('Times', 'normal').text('Approved Reservations', 27, 101);
-		report.text('Cancelled Reservations', 27, 109);
 		if (entryCount === 1) {
 			report.text(`${entryCount} Records`, 190, 75, { align: 'right' });
 		} else {
@@ -213,13 +200,6 @@
 			report.text(`${approvedCount} Entry`, 190, 101, { align: 'right' });
 		} else {
 			report.text(`${approvedCount} Entries`, 190, 101, { align: 'right' });
-		}
-		if (cancelledCount === 0) {
-			report.text('No Entries', 190, 109, { align: 'right' });
-		} else if (cancelledCount === 1) {
-			report.text(`${cancelledCount} Entry`, 190, 109, { align: 'right' });
-		} else {
-			report.text(`${cancelledCount} Entries`, 190, 109, { align: 'right' });
 		}
 		report.text(`PHP ${totalEarnings}.00`, 190, 135, { align: 'right' });
 		report.line(18, 128, 190, 128);
@@ -261,7 +241,7 @@
 	function goToPage(page) {
 		currentPage = page;
 	}
-	$: generateTable(generateQuery);
+
 </script>
 
 <svelte:head>
