@@ -7,13 +7,28 @@
 	let newPassword = '';
 	let newPasswordCheck = '';
 
-	async function changePassword() {
-		if (newPassword !== newPasswordCheck) {
-			toast.error('Password not match!');
+	let errors = {};
+
+	async function checkInput() {
+		errors = {
+			newPassword: !newPassword,
+			newPasswordCheck: !newPasswordCheck,
+			newPasswordLength: newPassword.length < 6,
+			passwordNotMatch: newPassword !== newPasswordCheck
+		};
+		if (Object.values(errors).some((v) => v)) {
+			setTimeout(() => {
+				errors = {};
+			}, 2000);
 			return;
 		}
-		if (newPassword.length < 6) {
-			toast.error('Password must at least be 6 characters!');
+		return true;
+	}
+
+	async function changePassword() {
+		const isValid = await checkInput();
+		if (!isValid) {
+			toast.error('Form validation failed');
 			return;
 		}
 		try {
@@ -38,24 +53,21 @@
 		<div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2">
 			<div class="form-control">
 				<span>New Password</span>
-				<input
-					class="input input-bordered mt-2"
-					type="password"
-					bind:value={newPassword}
-					required
-				/>
+				{#if errors.newPassword}
+					<p class="text-red-500 text-sm italic mb-1">Password is required</p>
+				{:else if errors.newPasswordLength}
+					<p class="text-red-500 text-sm italic mb-1">Password must be at least 6 characters</p>
+				{/if}
+				<input class="input input-bordered mt-2" type="password" bind:value={newPassword} />
 			</div>
 			<div class="form-control">
 				<span>Confirm New Password</span>
-				<input
-					class="input input-bordered mt-2"
-					type="password"
-					bind:value={newPasswordCheck}
-					required
-				/>
-				{#if newPassword != newPasswordCheck && newPasswordCheck != ''}
-					<p class="text-red-500 mt-3">Password doesnt match</p>
+				{#if errors.newPasswordCheck}
+					<p class="text-red-500 text-sm italic mb-1">Confirm password is required</p>
+				{:else if errors.passwordNotMatch}
+					<p class="text-red-500 text-sm italic mb-1">Password do not match</p>
 				{/if}
+				<input class="input input-bordered mt-2" type="password" bind:value={newPasswordCheck} />
 			</div>
 		</div>
 		<div class="flex justify-end mt-8">
