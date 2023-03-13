@@ -33,8 +33,6 @@
 	}
 
 	async function checkInput() {
-		console.log(inquiry.response);
-		console.log(inquiry.message);
 		errors = {
 			response: !inquiry.response,
 			responseKulang: inquiry.response.length < 10
@@ -56,7 +54,6 @@
 				response: response
 			};
 			await updateDoc(inquiryRef, changeData);
-			toast.success("Inquiry answered")
 			goto('/admin/inquiries');
 		} catch (error) {
 			console.log(error);
