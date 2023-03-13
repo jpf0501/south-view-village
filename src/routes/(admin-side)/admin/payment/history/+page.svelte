@@ -1,11 +1,16 @@
 <script>
-	import { onSnapshot, query, collection, orderBy, where, getCountFromServer, getDocs } from 'firebase/firestore';
+	import {
+		query,
+		collection,
+		orderBy,
+		where,
+		getCountFromServer,
+		getDocs
+	} from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
-	import { onDestroy } from 'svelte';
 	import { jsPDF } from 'jspdf';
 	import 'jspdf-autotable';
 	import toast from 'svelte-french-toast';
-	import Pagination from '../../Pagination.svelte';
 
 	const monthName = [
 		'January',
@@ -23,7 +28,7 @@
 	];
 
 	let date = new Date();
-	let previousYear = (date.getFullYear() - 1)
+	let previousYear = date.getFullYear() - 1;
 	let currentYear = date.getFullYear();
 	let previousMonth = date.getMonth().toString().padStart(2, '0');
 	let currentMonth = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -37,7 +42,7 @@
 		// set start date to last month date
 		startDate = new Date(`${currentYear}-${previousMonth}-${day}`);
 	}
-	
+
 	if (currentMonth === '12') {
 		// if current month is December, set end date to January of next year
 		endDate = new Date(`${currentYear + 1}-01-${day}`);
@@ -54,26 +59,12 @@
 	let searchByField = '';
 	let searchByValue = '';
 	let paymentsQuery = query(collection(db, 'payments'));
-	let generateQuery = query(collection(db, 'payments'), where('paymentTime', '>=', startDate), where('paymentTime', '<', endDate));
+	let generateQuery = query(
+		collection(db, 'payments'),
+		where('paymentTime', '>=', startDate),
+		where('paymentTime', '<', endDate)
+	);
 	let streetQuery = query(collection(db, 'street'), orderBy('streetName', 'asc'));
-
-	let noResult = false;
-
-	let currentPage = 1;
-	let pageSize = 10;
-	let totalRecords = 1;
-	let totalPages = 0;
-
-	async function getPayments(paymentsQuery, page, pageSize) {
-		const startIndex = (page - 1) * pageSize;
-		const endIndex = startIndex + pageSize;
-		const unsubscribe = onSnapshot(paymentsQuery, (querySnapshot) => {
-			listOfPayments = querySnapshot.docs
-				.map((doc) => ({ id: doc.id, ...doc.data() }))
-				.slice(startIndex, endIndex);
-		});
-		onDestroy(() => unsubscribe());
-	}
 
 	async function changeSortBy() {
 		paymentsQuery = query(collection(db, 'payments'), orderBy(sortByField, 'asc'));
@@ -96,8 +87,8 @@
 	async function generateReport() {
 		const report = new jsPDF();
 
-		let yOffset = 8 
-		let y = 87
+		let yOffset = 8;
+		let y = 87;
 		let entrySnapshotCount = await getCountFromServer(generateQuery);
 		let entryCount = entrySnapshotCount.data().count;
 		let totalEarnings = 500 * entryCount;
@@ -105,10 +96,10 @@
 
 		totalEarnings = Number(totalEarnings.toFixed(2)).toLocaleString();
 
-		const generateSnapshot = await getDocs(generateQuery)
-		const streetSnapshot = await getDocs(streetQuery)
-		listOfReports = generateSnapshot.docs.map(doc => doc.data());
-		listOfStreets = streetSnapshot.docs.map(doc => doc.data());
+		const generateSnapshot = await getDocs(generateQuery);
+		const streetSnapshot = await getDocs(streetQuery);
+		listOfReports = generateSnapshot.docs.map((doc) => doc.data());
+		listOfStreets = streetSnapshot.docs.map((doc) => doc.data());
 
 		report.addImage('/logo.png', 'PNG', 68, 12, 11, 7);
 		report.setFont('Times', 'bold').text('Southview Homes 3', 84, 18);
@@ -122,27 +113,42 @@
 				{ align: 'center' }
 			);
 		report.line(10, 34, 200, 34);
-		report.setFont('Times', 'bold').setFontSize(11)
+		report.setFont('Times', 'bold').setFontSize(11);
 		if (currentMonth == '01') {
-			report.text(`${monthName[previousMonth - 1]} ${previousYear} Monthly Dues Earnings Report`, width / 2, 45, { align: 'center' });
+			report.text(
+				`${monthName[previousMonth - 1]} ${previousYear} Monthly Dues Earnings Report`,
+				width / 2,
+				45,
+				{ align: 'center' }
+			);
 		} else {
-			report.text(`${monthName[previousMonth - 1]} ${currentYear} Monthly Dues Earnings Report`, width / 2, 45, { align: 'center' });
+			report.text(
+				`${monthName[previousMonth - 1]} ${currentYear} Monthly Dues Earnings Report`,
+				width / 2,
+				45,
+				{ align: 'center' }
+			);
 		}
 		report.setFontSize(10).text('Total Count of Paid Residents', 18, 62);
 		report.text('Monthly Due Fee', 18, 70);
 		report.text('Resident Count Summary by Street', 18, 78);
 		report.text('Total Earned Amount', 18, 220); // 125
 		report.text('Signed By', 168, 245, { align: 'right' });
-		report.setFont('Times', 'normal')
+		report.setFont('Times', 'normal');
 		for (let i = 0; i < listOfStreets.length; i++) {
 			const street = listOfStreets[i];
-			const residentQuery = query(collection(db, 'payments'), where('addressStreet', '==', street.streetName), where('paymentTime', '>=', startDate), where('paymentTime', '<', endDate))
+			const residentQuery = query(
+				collection(db, 'payments'),
+				where('addressStreet', '==', street.streetName),
+				where('paymentTime', '>=', startDate),
+				where('paymentTime', '<', endDate)
+			);
 			const residentCountSnapshot = await getCountFromServer(residentQuery);
-			const residentCount = residentCountSnapshot.data().count
+			const residentCount = residentCountSnapshot.data().count;
 			report.text(`${street.streetName}`, 27, y);
 			if (residentCount === 0) {
 				report.text('No payment records', 190, y, { align: 'right' });
-			} else if (residentCount === 1) { 
+			} else if (residentCount === 1) {
 				report.text(`${residentCount} Resident`, 190, y, { align: 'right' });
 			} else {
 				report.text(`${residentCount} Residents`, 190, y, { align: 'right' });
@@ -163,35 +169,30 @@
 		report.autoTable({ margin: { top: 20, bottom: 20 }, html: '#generate-table' });
 		if (currentMonth == '01') {
 			report.save(
-			`Southview-Homes-3-${monthName[previousMonth - 1]}-${previousYear}-Monthly-Dues-Report.pdf`
+				`Southview-Homes-3-${monthName[previousMonth - 1]}-${previousYear}-Monthly-Dues-Report.pdf`
 			);
 		} else {
 			report.save(
-			`Southview-Homes-3-${monthName[previousMonth - 1]}-${currentYear}-Monthly-Dues-Report.pdf`
+				`Southview-Homes-3-${monthName[previousMonth - 1]}-${currentYear}-Monthly-Dues-Report.pdf`
 			);
 		}
 
 		if (currentMonth == '01') {
-			toast.success(`Monthly dues report for ${monthName[previousMonth - 1]} ${previousYear} generated!`)
+			toast.success(
+				`Monthly dues report for ${monthName[previousMonth - 1]} ${previousYear} generated!`
+			);
 		} else {
-			toast.success(`Monthly dues report for ${monthName[previousMonth - 1]} ${currentYear} generated!`)
+			toast.success(
+				`Monthly dues report for ${monthName[previousMonth - 1]} ${currentYear} generated!`
+			);
 		}
 	}
 
-	$: {
-		getPayments(paymentsQuery, currentPage, pageSize);
-		const unsubscribe = onSnapshot(paymentsQuery, (querySnapshot) => {
-			totalRecords = querySnapshot.docs.length;
-			totalPages = Math.ceil(totalRecords / pageSize);
-		});
-		listOfPayments.length === 0 ? (noResult = true) : (noResult = false);
-		onDestroy(() => unsubscribe());
+	async function getPayments(paymentsQuery) {
+		const paymentsSnapshot = await getDocs(paymentsQuery);
+		listOfPayments = paymentsSnapshot.docs.map((doc) => doc.data());
 	}
-	function goToPage(page) {
-		currentPage = page;
-	}
-
-
+	getPayments(paymentsQuery);
 </script>
 
 <svelte:head>
@@ -215,14 +216,17 @@
 			<tr>
 				<td>{j + 1}</td>
 				<td>{payment.firstNameDisplay} {payment.lastNameDisplay}</td>
-				<td>Block {payment.addressBlock} Lot {payment.addressLot} {payment.addressStreet} Street</td>
+				<td>Block {payment.addressBlock} Lot {payment.addressLot} {payment.addressStreet} Street</td
+				>
 				<td>{payment.email}</td>
 				<td>{payment.contact}</td>
-				<td>{payment.paymentTime.toDate().toLocaleDateString('en-us', {
+				<td
+					>{payment.paymentTime.toDate().toLocaleDateString('en-us', {
 						year: 'numeric',
 						month: 'long',
 						day: 'numeric'
-				})}</td>
+					})}</td
+				>
 				<td>PHP 500.00</td>
 			</tr>
 		{/each}
@@ -284,15 +288,10 @@
 						<th class="text-lg">Payment Date</th>
 					</tr>
 				</thead>
-				{#if noResult}
-					<tr>
-						<td class="py-24 text-center" colspan="8">No user/s Found</td>
-					</tr>
-				{/if}
 				<tbody>
 					{#each listOfPayments as payment, i}
 						<tr class="hover">
-							<td>{i + (currentPage - 1) * pageSize + 1}</td>
+							<td>{i + 1}</td>
 							<td>{payment.firstNameDisplay} {payment.lastNameDisplay}</td>
 							<td
 								>Block {payment.addressBlock} Lot {payment.addressLot}
@@ -316,9 +315,6 @@
 
 	<!-- Small screen -->
 	<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">
-		{#if noResult}
-			<div class="w-full mx-auto">No User/s Found</div>
-		{/if}
 		{#each listOfPayments as user}
 			<div class="card w-[105%] bg-base-100 shadow-xl">
 				<div class="card-body">
@@ -353,9 +349,5 @@
 				</div>
 			</div>
 		{/each}
-	</div>
-
-	<div class="mt-14">
-		<Pagination {currentPage} {totalPages} onPageChange={goToPage} />
 	</div>
 </div>
