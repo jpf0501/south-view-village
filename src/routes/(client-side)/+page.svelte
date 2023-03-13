@@ -35,20 +35,6 @@
 		message: ''
 	};
 
-	async function getNews(newsQuery) {
-		const unsubscribe = onSnapshot(newsQuery, (querySnapshot) => {
-			listOfNews = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-		});
-		onDestroy(() => unsubscribe());
-	}
-
-	async function getEvents(eventQuery) {
-		const unsubscribe = onSnapshot(eventQuery, (querySnapshot) => {
-			listOfEvents = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-		});
-		onDestroy(() => unsubscribe());
-	}
-
 	async function inquiryHandler() {
 		try {
 			await addDoc(collection(db, 'inquiries'), {
