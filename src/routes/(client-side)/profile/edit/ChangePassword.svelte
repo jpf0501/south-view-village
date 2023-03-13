@@ -9,12 +9,16 @@
 
 	async function changePassword() {
 		if (newPassword !== newPasswordCheck) {
-			toast.error('Password not match!')
+			toast.error('Password not match!');
+			return;
+		}
+		if (newPassword.length < 6) {
+			toast.error('Password must at least be 6 characters!');
 			return;
 		}
 		try {
 			await updatePassword(auth.currentUser, newPassword);
-			toast.success('Password Updated!')
+			toast.success('Password Updated!');
 			goto('/profile');
 		} catch (error) {
 			console.log(error);
@@ -55,9 +59,7 @@
 			</div>
 		</div>
 		<div class="flex justify-end mt-8">
-			<button type="submit" class="btn btn-primary mx-1"
-				>Save New Password</button
-			><br />
+			<button type="submit" class="btn btn-primary mx-1">Save New Password</button><br />
 			<button
 				type="button"
 				class="btn btn-error mx-1 px-4 text-white"

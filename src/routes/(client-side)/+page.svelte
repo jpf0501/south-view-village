@@ -1,25 +1,19 @@
 <script>
 	import {
-		onSnapshot,
-		getDocs,
-		query,
 		collection,
-		orderBy,
-		limit,
-		where,
 		addDoc,
 		serverTimestamp
 	} from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
 	import toast from 'svelte-french-toast';
-	import { goto } from '$app/navigation';
+	// import { goto } from '$app/navigation';
 
-	let dateToday = new Date().toLocaleDateString('fr-CA', {
-		year: 'numeric',
-		month: '2-digit',
-		day: '2-digit'
-	});
+	// let dateToday = new Date().toLocaleDateString('fr-CA', {
+	// 	year: 'numeric',
+	// 	month: '2-digit',
+	// 	day: '2-digit'
+	// });
 	// let listOfNews = [];
 	// let listOfEvents = [];
 	// let newsQuery = query(collection(db, 'news'), orderBy('dateCreated', 'desc'), limit(3));
@@ -35,20 +29,6 @@
 		email: '',
 		message: ''
 	};
-
-	async function getNews(newsQuery) {
-		const unsubscribe = onSnapshot(newsQuery, (querySnapshot) => {
-			listOfNews = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-		});
-		onDestroy(() => unsubscribe());
-	}
-
-	async function getEvents(eventQuery) {
-		const unsubscribe = onSnapshot(eventQuery, (querySnapshot) => {
-			listOfEvents = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-		});
-		onDestroy(() => unsubscribe());
-	}
 
 	async function inquiryHandler() {
 		try {

@@ -1,19 +1,17 @@
 <script>
-	import { onSnapshot, query, collection, orderBy, limit } from 'firebase/firestore';
+	import { getDocs, query, collection, orderBy, limit } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
-	import { onDestroy } from 'svelte';
+
 
 	let listOfNews = [];
 	let newsQuery = query(collection(db, 'news'), orderBy('dateCreated', 'desc'), limit(10));
 
 	async function getNews(newsQuery) {
-		const unsubscribe = onSnapshot(newsQuery, (querySnapshot) => {
-			listOfNews = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-		});
-		onDestroy(() => unsubscribe());
+		const newsSnapshot = await getDocs(newsQuery);
+		listOfNews = newsSnapshot.docs.map((doc) => doc.data());
 	}
 
-	$: getNews(newsQuery);
+	getNews(newsQuery);
 
 </script>
 

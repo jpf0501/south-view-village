@@ -2,13 +2,12 @@
 	import { goto } from '$app/navigation';
 	import { db } from '$lib/firebase/client';
 	import {
-		onSnapshot,
+		getDocs,
 		query,
 		collection,
 		orderBy,
 		addDoc,
-		where,
-		getDocs
+		where
 	} from 'firebase/firestore';
 	import { onDestroy } from 'svelte';
 	import toast from 'svelte-french-toast';
@@ -48,10 +47,8 @@
 	}));
 
 	async function getStreet() {
-		const unsubscribe = onSnapshot(streetQuery, (querySnapshot) => {
-			listOfStreets = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-		});
-		onDestroy(() => unsubscribe());
+		const streetSnapshot = await getDocs(streetQuery);
+		listOfStreets = streetSnapshot.docs.map((doc) => doc.data());
 	}
 
 	async function sendOTP() {
@@ -138,7 +135,7 @@
 		}
 	}
 
-	$: getStreet(streetQuery);
+	getStreet(streetQuery);
 </script>
 
 <svelte:head>
