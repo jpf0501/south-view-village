@@ -19,8 +19,48 @@
 		time: '',
 		dateReserved: serverTimestamp()
 	};
+	let errors = {};
 
 	async function submitHandler() {
+		const isValid = await checkInput();
+		if (!isValid) {
+			toast.error('Form validation failed');
+			return;
+		}
+		createBookings();
+	}
+
+	async function checkInput() {
+		const regex = /^[a-zA-Z -]*$/;
+		// must have at least 1 letter
+		const firstnameRegex = guest.firstname.length > 0 && /[a-zA-Z]/.test(guest.firstname);
+		const lastnameRegex = guest.lastname.length > 0 && /[a-zA-Z]/.test(guest.lastname);
+		// must ba an email
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		errors = {
+			email: !guest.email,
+			firstname: !guest.firstname,
+			lastname: !guest.lastname,
+			contactNumber: !guest.contactNumber,
+			eventType: !guest.eventType,
+			time: !guest.time,
+			date: !guest.date,
+			invalidFirstname: !regex.test(guest.firstname),
+			invalidLastname: !regex.test(guest.lastname),
+			invalidFirstnameRequired: !firstnameRegex,
+			invalidLastnameRequired: !lastnameRegex,
+			invalidEmail: !emailRegex.test(guest.email)
+		};
+		if (Object.values(errors).some((v) => v)) {
+			setTimeout(() => {
+				errors = {};
+			}, 2000);
+			return;
+		}
+		return true;
+	}
+
+	async function createBookings() {
 		try {
 			await addDoc(collection(db, 'booking'), {
 				firstname: guest.firstname.trim().toLowerCase(),
@@ -55,88 +95,112 @@
 		<h1 class="text-2xl mt-2">Clubhouse Reservation Form</h1>
 		<form on:submit|preventDefault={submitHandler}>
 			<div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2">
-					<div class="form-control">
-						<span class="label-text">First Name</span>
-						<input
-							type="text"
-							bind:value={guest.firstname}
-							class="input input-bordered p-3 mt-2"
-							placeholder="Juan"
-							required
-						/>
-					</div>
-					<div class="form-control">
-						<span class="label-text">Last Name</span>
-						<input
-							type="text"
-							bind:value={guest.lastname}
-							class="input input-bordered p-3 mt-2"
-							placeholder="Dela Cruz"
-							required
-						/>
-					</div>
-					<div class="form-control">
-						<span class="label-text">E-mail Address</span>
-						<input
-							type="email"
-							bind:value={guest.email}
-							name="email"
-							class="input input-bordered p-3 mt-2"
-							placeholder="juandelacruz@gmail.com"
-							required
-						/>
-					</div>
-					<div class="form-control">
-						<span class="label-text">Contact No.</span>
-						<input
-							type="tel"
-							onkeypress="return event.charCode >= 48 && event.charCode <= 57"
-							minlength="11"
-							maxlength="11"
-							placeholder="09123456789"
-							pattern={String.raw`^(09)\d{9}$`}
-							bind:value={guest.contactNumber}
-							name="contact"
-							class="input input-bordered p-3 mt-2"
-							required
-						/>
-					</div>
+				<div class="form-control">
+					<span class="label-text">First Name</span>
+					{#if errors.firstname}
+						<p class="text-red-500 text-sm italic mb-1">First Name is required</p>
+					{:else if errors.invalidFirstname}
+						<p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
+					{:else if errors.invalidFirstnameRequired}
+						<p class="text-red-500 text-sm italic mb-1">Firstname must have a letter</p>
+					{/if}
+					<input
+						type="text"
+						bind:value={guest.firstname}
+						class="input input-bordered p-3 mt-2"
+						placeholder="Juan"
+					/>
+				</div>
+				<div class="form-control">
+					<span class="label-text">Last Name</span>
+					{#if errors.lastname}
+						<p class="text-red-500 text-sm italic mb-1">Last Name is required</p>
+					{:else if errors.invalidLastname}
+						<p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
+					{:else if errors.invalidLastnameRequired}
+						<p class="text-red-500 text-sm italic mb-1">Lastname must have a letter</p>
+					{/if}
+					<input
+						type="text"
+						bind:value={guest.lastname}
+						class="input input-bordered p-3 mt-2"
+						placeholder="Dela Cruz"
+					/>
+				</div>
+				<div class="form-control">
+					<span class="label-text">E-mail Address</span>
+					{#if errors.email}
+						<p class="text-red-500 text-sm italic mb-1">Email is required</p>
+					{:else if errors.invalidEmail}
+						<p class="text-red-500 text-sm italic mb-1">Invalid email</p>
+					{/if}
+					<input
+						type="text"
+						bind:value={guest.email}
+						name="email"
+						class="input input-bordered p-3 mt-2"
+						placeholder="juandelacruz@gmail.com"
+					/>
+				</div>
+				<div class="form-control">
+					<span class="label-text">Contact No.</span>
+					{#if errors.contactNumber}
+						<p class="text-red-500 text-sm italic mb-1">Contact number is required</p>
+					{/if}
+					<input
+						type="tel"
+						onkeypress="return event.charCode >= 48 && event.charCode <= 57"
+						minlength="11"
+						maxlength="11"
+						placeholder="09123456789"
+						pattern={String.raw`^(09)\d{9}$`}
+						bind:value={guest.contactNumber}
+						name="contact"
+						class="input input-bordered p-3 mt-2"
+					/>
+				</div>
 				<div class="form-control">
 					<span class="label-text">Type of Event</span>
+					{#if errors.eventType}
+						<p class="text-red-500 text-sm italic mb-1">Event type is required</p>
+					{/if}
 					<input
 						type="text"
 						class="input input-bordered p-3 mt-2"
 						bind:value={guest.eventType}
 						placeholder="Birthday"
-						required
 					/>
 				</div>
 				<div class="form-control">
 					<span class="label-text">Date</span>
+					{#if errors.date}
+						<p class="text-red-500 text-sm italic mb-1">Date is required</p>
+					{/if}
 					<input
 						type="date"
 						min={dateMin}
 						max={dateMax}
 						class="input input-bordered p-3 mt-2"
 						bind:value={guest.date}
-						required
 					/>
 				</div>
 				<div class="form-control">
 					<span class="label-text">Time</span>
+					{#if errors.time}
+						<p class="text-red-500 text-sm italic mb-1">Time is required</p>
+					{/if}
 					<input
 						type="time"
 						min="8:00"
 						max="19:00"
 						class="input input-bordered p-3 mt-2"
 						bind:value={guest.time}
-						required
 					/>
 				</div>
 			</div>
 			<div class="flex justify-end mt-8">
 				<button type="submit" class="btn btn-primary">Submit Schedule</button>
-				<a href="/admin/bookings" class="btn btn-error mx-1 px-4 text-white">Cancel</a>
+				<a href="/admin/bookings" class="btn btn-error mx-1 text-white">Cancel</a>
 			</div>
 		</form>
 	</div>
