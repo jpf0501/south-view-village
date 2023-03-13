@@ -10,23 +10,7 @@
 	let searchByValue = '';
 	let accountsQuery = query(collection(db, 'accounts'));
 
-	let noResult = false;
-
-	let currentPage = 1;
-	let pageSize = 10;
-	let totalRecords = 1;
-	let totalPages = 0;
-
-	async function getAccounts(accountsQuery, page, pageSize) {
-		const startIndex = (page - 1) * pageSize;
-		const endIndex = startIndex + pageSize;
-		const unsubscribe = onSnapshot(accountsQuery, (querySnapshot) => {
-			listOfUsers = querySnapshot.docs
-				.map((doc) => ({ id: doc.id, ...doc.data() }))
-				.slice(startIndex, endIndex);
-		});
-		onDestroy(() => unsubscribe());
-	}
+	let unsubscribe = () => {};
 
 	async function changeSortBy() {
 		accountsQuery = query(collection(db, 'accounts'), orderBy(sortByField, 'asc'));
@@ -46,18 +30,15 @@
 		searchByValue = '';
 	}
 
-	$: {
-		getAccounts(accountsQuery, currentPage, pageSize);
-		const unsubscribe = onSnapshot(accountsQuery, (querySnapshot) => {
-			totalRecords = querySnapshot.docs.length;
-			totalPages = Math.ceil(totalRecords / pageSize);
+	function setUpRealtimeListener(accountsQuery) {
+		unsubscribe();
+		unsubscribe = onSnapshot(accountsQuery, (querySnapshot) => {
+			listOfUsers = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 		});
-		listOfUsers.length === 0 ? (noResult = true) : (noResult = false);
-		onDestroy(() => unsubscribe());
 	}
-	function goToPage(page) {
-		currentPage = page;
-	}
+
+	onDestroy(() => unsubscribe());
+	$: setUpRealtimeListener(accountsQuery);
 </script>
 
 <svelte:head>
@@ -127,15 +108,15 @@
 						<th />
 					</tr>
 				</thead>
-				{#if noResult}
+				<!-- {#if noResult}
 					<tr>
 						<td class="py-24 text-center" colspan="8">No Account/s Found</td>
 					</tr>
-				{/if}
+				{/if} -->
 				<tbody>
 					{#each listOfUsers as user, i}
 						<tr class="hover">
-							<td>{i + (currentPage - 1) * pageSize + 1}</td>
+							<td>{i + 1}</td>
 							<td>{user.firstNameDisplay + ' ' + user.lastNameDisplay}</td>
 							<td
 								>{'Block ' +
@@ -171,9 +152,9 @@
 	</div>
 	<!-- Small screen -->
 	<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">
-		{#if noResult}
+		<!-- {#if noResult}
 			<div class="w-full mx-auto">No Account/s Found</div>
-		{/if}
+		{/if} -->
 		{#each listOfUsers as user}
 			<div class="card w-[105%] bg-base-100 shadow-xl">
 				<div class="card-body">
@@ -211,10 +192,8 @@
 	</div>
 
 	<div class="mt-14">
-		<Pagination {currentPage} {totalPages} onPageChange={goToPage} />
+		<!-- <Pagination {currentPage} {totalPages} onPageChange={goToPage} /> -->
 	</div>
-
 </div>
 
 <!-- pagination button -->
-
