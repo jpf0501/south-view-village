@@ -2,52 +2,66 @@
 	import { getDocs, query, collection, orderBy, where } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 
-	let listOfNews = [];
+	let listOfComplaints = [];
 	let sortByField = '';
 	let searchByField = '';
 	let searchByValue = '';
-	let newsQuery = query(collection(db, 'news'));
+	let complaintQuery = query(
+		collection(db, 'complaints'),
+		where('hadAnswered', '==', false),
+		orderBy('dateSubmitted', 'asc')
+	);
 
 	async function changeSortBy() {
-		const order = sortByField === 'title' ? 'asc' : 'desc';
-		newsQuery = query(collection(db, 'news'), orderBy(sortByField, order));
+		complaintQuery = query(
+			collection(db, 'complaints'),
+			where('hadAnswered', '==', false),
+			orderBy(sortByField, 'asc'),
+			orderBy('dateSubmitted', 'asc')
+		);
 	}
 
-	async function searchNews() {
+	async function searchComplaints() {
 		let searchByValueCase = searchByValue.toLowerCase();
-		newsQuery = query(
-			collection(db, 'news'),
+		complaintQuery = query(
+			collection(db, 'complaints'),
 			where(searchByField, '>=', searchByValueCase),
-			where(searchByField, '<=', searchByValueCase + '~')
+			where(searchByField, '<=', searchByValueCase + '~'),
+			where('hadAnswered', '==', false),
+			orderBy('dateSubmitted', 'asc')
 		);
 	}
 
 	async function resetButton() {
-		newsQuery = query(collection(db, 'news'));
+		complaintQuery = query(
+			collection(db, 'complaints'),
+			where('hadAnswered', '==', false),
+			orderBy('dateSubmitted', 'asc')
+		);
 		searchByValue = '';
 	}
 
-	async function getNews(newsQuery) {
-		const newsSnapshot = await getDocs(newsQuery);
-		listOfNews = newsSnapshot.docs.map((doc) => ({
+	async function getComplaints(complaintQuery) {
+		const complaintsSnapshot = await getDocs(complaintQuery);
+		listOfComplaints = complaintsSnapshot.docs.map((doc) => ({
 			id: doc.id,
 			...doc.data()
 		}));
 	}
 
-	getNews(newsQuery);
+	getComplaints(complaintQuery);
 </script>
 
 <svelte:head>
-	<title>News - Southview Homes 3 Admin Panel</title>
+	<title>Complaints - Southview Homes 3 Admin Panel</title>
 </svelte:head>
 
 <div class="min-w-full min-h-full bg-base-200 py-8 px-5">
-	<h1 class="text-3xl font-semibold py-2">News</h1>
+	<h1 class="text-3xl font-semibold py-2">Complaints</h1>
 	<div class="flex flex-col md:flex-row justify-between">
 		<div class="flex flex-col md:flex-row">
 			<form
-				on:submit|preventDefault={searchNews}
+				on:submit|preventDefault={searchComplaints}
 				class="my-4 flex flex-col md:flex-row items-start"
 			>
 				<select
@@ -56,7 +70,9 @@
 					required
 				>
 					<option value="" disabled selected>Search Filter</option>
-					<option value="title">Title</option>
+					<option value="firstname">First Name</option>
+					<option value="lastname">Last Name</option>
+					<option value="email">Email</option>
 					<!-- <option value="dateCreated">Date Created</option>
 					<option value="dateModified">Last Updated</option> -->
 				</select>
@@ -72,11 +88,10 @@
 
 		<select bind:value={sortByField} on:change={changeSortBy} class="select select-bordered my-4">
 			<option value="" disabled selected>Sort By</option>
-			<option value="title">Title</option>
-			<option value="dateCreated">Date Created</option>
-			<option value="dateModified">Last Updated</option>
+			<option value="firstname">First Name</option>
+			<option value="lastname">Last Name</option>
+			<option value="email">Email</option>
 		</select>
-		<a class="btn btn-primary my-4" href="/admin/news/create">Add News</a>
 	</div>
 
 	<!-- Medium to large screen -->
@@ -86,38 +101,31 @@
 				<thead>
 					<tr>
 						<th />
-						<th class="text-lg">Title</th>
-						<th class="text-lg">Date Created</th>
-						<th class="text-lg">Last Updated</th>
+						<th class="text-lg">Name</th>
+						<th class="text-lg">Email</th>
+						<th class="text-lg">Complaint</th>
+						<!-- <th class="text-lg">Date Inquired</th> -->
 						<th />
 					</tr>
 				</thead>
-
 				<tbody>
-					{#each listOfNews as news, i}
+					{#each listOfComplaints as complaint, i}
 						<tr class="hover">
 							<td>{i + 1}</td>
-							<td>{news.titleDisplay}</td>
-							<td
-								>{news.dateCreated
+							<td>{complaint.firstnameDisplay + ' ' + complaint.lastnameDisplay}</td>
+							<td>{complaint.email}</td>
+							<td>{complaint.complaint.substring(0, 50) + '...'}</td>
+							<!-- <td
+								>{inquiry.dateCreated
 									.toDate()
 									.toLocaleDateString('en-us', { year: 'numeric', month: 'long', day: 'numeric' }) +
 									' at ' +
-									news.dateCreated
+									inquiry.dateCreated
 										.toDate()
 										.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}</td
-							>
-							<td
-								>{news.dateModified
-									.toDate()
-									.toLocaleDateString('en-us', { year: 'numeric', month: 'long', day: 'numeric' }) +
-									' at ' +
-									news.dateModified
-										.toDate()
-										.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}</td
-							>
+							> -->
 							<td>
-								<a href={'/admin/news/edit/' + news.id} class="btn glass text-white"
+								<a href={'/admin/complaint/edit/' + complaint.id} class="btn glass text-white"
 									><svg
 										xmlns="http://www.w3.org/2000/svg"
 										width="24"
@@ -138,32 +146,32 @@
 
 	<!-- Small screen -->
 	<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">
-		{#each listOfNews as news}
+		{#each listOfComplaints as complaint}
 			<div class="card w-[105%] bg-base-100 shadow-xl">
 				<div class="card-body">
-					<h2 class="card-title mb-2">{news.titleDisplay}</h2>
+					<h2 class="card-title mb-2">
+						{complaint.firstnameDisplay + ' ' + complaint.lastnameDisplay}
+					</h2>
 					<div>
-						<span class="my-1 font-bold">Date Created:</span>
-						{news.dateCreated
+						<span class="my-1 font-bold">Email: </span>
+						{complaint.email}
+					</div>
+					<div>
+						<span class="my-1 font-bold">Complaint: </span>
+						{complaint.complaint.substring(0, 30) + '...'}
+					</div>
+					<!-- <div>
+						<span class="my-1 font-bold">Date Inquired:</span>
+						{inquiry.dateCreated
 							.toDate()
 							.toLocaleDateString('en-us', { year: 'numeric', month: 'long', day: 'numeric' }) +
 							' at ' +
-							news.dateCreated
+							inquiry.dateCreated
 								.toDate()
 								.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}
-					</div>
-					<div>
-						<span class="my-1 font-bold">Last Updated:</span>
-						{news.dateModified
-							.toDate()
-							.toLocaleDateString('en-us', { year: 'numeric', month: 'long', day: 'numeric' }) +
-							' at ' +
-							news.dateModified
-								.toDate()
-								.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}
-					</div>
+					</div> -->
 					<div class="card-actions justify-end">
-						<a href={'/admin/news/edit/' + news.id} class="btn glass text-white"
+						<a href={'/admin/comaplaint/edit/' + complaint.id} class="btn glass text-white"
 							><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
 								><path
 									d="M7.127 22.562l-7.127 1.438 1.438-7.128 5.689 5.69zm1.414-1.414l11.228-11.225-5.69-5.692-11.227 11.227 5.689 5.69zm9.768-21.148l-2.816 2.817 5.691 5.691 2.816-2.819-5.691-5.689z"

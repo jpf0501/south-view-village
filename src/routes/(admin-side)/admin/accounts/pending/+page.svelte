@@ -11,7 +11,6 @@
 	} from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
-	import Pagination from '../../Pagination.svelte';
 	import toast from 'svelte-french-toast';
 
 	let listOfUsers = [];
@@ -23,26 +22,9 @@
 		where('isPending', '==', true)
 	);
 
-	let noResult = false;
-
-	let currentPage = 1;
-	let pageSize = 10;
-	let totalRecords = 1;
-	let totalPages = 0;
-
 	let isApproved = '';
 
-	async function getPendingAccounts(pendingAccountsQuery, page, pageSize) {
-		const startIndex = (page - 1) * pageSize;
-		const endIndex = startIndex + pageSize;
-		const unsubscribe = onSnapshot(pendingAccountsQuery, (querySnapshot) => {
-			listOfUsers = querySnapshot.docs
-				.map((doc) => ({ id: doc.id, ...doc.data() }))
-				.slice(startIndex, endIndex);
-		});
-		listOfUsers.length === 0 ? (noResult = true) : (noResult = false);
-		onDestroy(() => unsubscribe());
-	}
+	let unsubscribe = () => {};
 
 	async function changeSortBy() {
 		pendingAccountsQuery = query(
@@ -120,7 +102,7 @@
 				}
 			} catch (error) {
 				console.log(error);
-				toast.error("Error in approving account!");
+				toast.error('Error in approving account!');
 			}
 		} else {
 			try {
@@ -136,17 +118,15 @@
 		}
 	}
 
-	$: {
-		getPendingAccounts(pendingAccountsQuery, currentPage, pageSize);
-		const unsubscribe = onSnapshot(pendingAccountsQuery, (querySnapshot) => {
-			totalRecords = querySnapshot.docs.length;
-			totalPages = Math.ceil(totalRecords / pageSize);
+	function setUpRealtimeListener(pendingAccountsQuery) {
+		unsubscribe();
+		unsubscribe = onSnapshot(pendingAccountsQuery, (querySnapshot) => {
+			listOfUsers = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 		});
-		onDestroy(() => unsubscribe());
 	}
-	function goToPage(page) {
-		currentPage = page;
-	}
+
+	onDestroy(() => unsubscribe());
+	$: setUpRealtimeListener(pendingAccountsQuery);
 </script>
 
 <svelte:head>
@@ -154,7 +134,7 @@
 </svelte:head>
 
 <div class="min-w-full min-h-full bg-base-200 py-8 px-5">
-	<h1 class="text-3xl font-semibold py-2">Pending Accounts</h1>
+	<h1 class="text-3xl font-semibold py-2">Account Approval</h1>
 	<div class="flex flex-col md:flex-row justify-between">
 		<div class="flex flex-col md:flex-row">
 			<form
@@ -187,15 +167,15 @@
 
 		<select bind:value={sortByField} on:change={changeSortBy} class="select select-bordered my-4">
 			<option value="" disabled selected>Sort By</option>
-			<option value="pendingFirstname">Firstname</option>
-			<option value="pendingLastname">Lastname</option>
+			<option value="pendingFirstname">First Name</option>
+			<option value="pendingLastname">Last Name</option>
 			<option value="pendingAddressBlock">Block</option>
 			<option value="pendingAddressLot">Lot</option>
 			<option value="pendingAddressStreet">Street</option>
 			<option value="pendingEmail">Email</option>
 		</select>
 
-		<a class="btn btn-primary my-4" href="/admin/accounts">Accounts</a>
+		<a class="btn btn-primary my-4" href="/admin/accounts">Go Back</a>
 	</div>
 
 	<!-- Medium to large screen -->
@@ -214,15 +194,10 @@
 						<th />
 					</tr>
 				</thead>
-				{#if noResult}
-					<tr>
-						<td class="py-24 text-center" colspan="8">No Pending Account/s to Approve Found</td>
-					</tr>
-				{/if}
 				<tbody>
 					{#each listOfUsers as user, i}
 						<tr class="hover">
-							<td>{i + (currentPage - 1) * pageSize + 1}</td>
+							<td>{i + 1}</td>
 							<td>{user.pendingFirstNameDisplay + ' ' + user.pendingLastNameDisplay}</td>
 							<td
 								>{'Block ' +
@@ -281,9 +256,6 @@
 
 	<!-- Small screen -->
 	<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">
-		{#if noResult}
-			<div class="w-full mx-auto">No Pending Account/s to Approve Found</div>
-		{/if}
 		{#each listOfUsers as user}
 			<div class="card w-[105%] bg-base-100 shadow-xl">
 				<div class="card-body">
@@ -352,10 +324,4 @@
 			</div>
 		{/each}
 	</div>
-
-	<div class="mt-14">
-		<Pagination {currentPage} {totalPages} onPageChange={goToPage} />
-	</div>
-	
 </div>
-

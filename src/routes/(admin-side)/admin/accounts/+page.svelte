@@ -1,33 +1,12 @@
 <script>
-	import { onSnapshot, query, collection, orderBy, where } from 'firebase/firestore';
+	import { getDocs, query, collection, orderBy, where } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
-	import { onDestroy } from 'svelte';
-	import Pagination from '../Pagination.svelte';
 
 	let listOfUsers = [];
 	let sortByField = '';
 	let searchByField = '';
 	let searchByValue = '';
 	let accountsQuery = query(collection(db, 'accounts'));
-
-	let noResult = false;
-
-	let currentPage = 1;
-	let pageSize = 10;
-	let totalRecords = 1;
-	let totalPages = 0;
-
-	async function getAccounts(accountsQuery, page, pageSize) {
-		const startIndex = (page - 1) * pageSize;
-		const endIndex = startIndex + pageSize;
-		const unsubscribe = onSnapshot(accountsQuery, (querySnapshot) => {
-			listOfUsers = querySnapshot.docs
-				.map((doc) => ({ id: doc.id, ...doc.data() }))
-				.slice(startIndex, endIndex);
-		});
-		listOfUsers.length === 0 ? (noResult = true) : (noResult = false);
-		onDestroy(() => unsubscribe());
-	}
 
 	async function changeSortBy() {
 		accountsQuery = query(collection(db, 'accounts'), orderBy(sortByField, 'asc'));
@@ -47,17 +26,15 @@
 		searchByValue = '';
 	}
 
-	$: {
-		getAccounts(accountsQuery, currentPage, pageSize);
-		const unsubscribe = onSnapshot(accountsQuery, (querySnapshot) => {
-			totalRecords = querySnapshot.docs.length;
-			totalPages = Math.ceil(totalRecords / pageSize);
-		});
-		onDestroy(() => unsubscribe());
+	async function getAccounts(accountsQuery) {
+		const accountsSnapshot = await getDocs(accountsQuery);
+		listOfUsers = accountsSnapshot.docs.map((doc) => ({
+			id: doc.id,
+			...doc.data()
+		}));
 	}
-	function goToPage(page) {
-		currentPage = page;
-	}
+
+	getAccounts(accountsQuery);
 </script>
 
 <svelte:head>
@@ -66,6 +43,9 @@
 
 <div class="min-w-full min-h-full bg-base-200 py-8 px-5">
 	<h1 class="text-3xl font-semibold py-2">Accounts</h1>
+	<div class="flex justify-end">
+		<a class="btn btn-primary my-4" href="/admin/accounts/pending">Account Approval</a>
+	</div>
 	<div class="flex flex-col md:flex-row justify-between">
 		<div class="flex flex-col md:flex-row">
 			<form
@@ -92,14 +72,13 @@
 					bind:value={searchByValue}
 				/>
 			</form>
-
 			<button on:click={resetButton} class="btn btn-primary my-4 mx-2">Reset</button>
 		</div>
 
 		<select bind:value={sortByField} on:change={changeSortBy} class="select select-bordered my-4">
 			<option value="" disabled selected>Sort By</option>
-			<option value="firstname">Firstame</option>
-			<option value="lastname">Lastame</option>
+			<option value="firstname">First Name</option>
+			<option value="lastname">Last Name</option>
 			<option value="addressBlock">Block</option>
 			<option value="addressLot">Lot</option>
 			<option value="addressStreet">Street</option>
@@ -107,7 +86,6 @@
 		</select>
 
 		<a class="btn btn-primary my-4" href="/admin/accounts/create">Add User</a>
-		<a class="btn btn-primary my-4" href="/admin/accounts/pendingAccounts">Account Request</a>
 	</div>
 
 	<!-- Medium to large screen -->
@@ -126,15 +104,15 @@
 						<th />
 					</tr>
 				</thead>
-				{#if noResult}
+				<!-- {#if noResult}
 					<tr>
 						<td class="py-24 text-center" colspan="8">No Account/s Found</td>
 					</tr>
-				{/if}
+				{/if} -->
 				<tbody>
 					{#each listOfUsers as user, i}
 						<tr class="hover">
-							<td>{i + (currentPage - 1) * pageSize + 1}</td>
+							<td>{i + 1}</td>
 							<td>{user.firstNameDisplay + ' ' + user.lastNameDisplay}</td>
 							<td
 								>{'Block ' +
@@ -170,9 +148,9 @@
 	</div>
 	<!-- Small screen -->
 	<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">
-		{#if noResult}
+		<!-- {#if noResult}
 			<div class="w-full mx-auto">No Account/s Found</div>
-		{/if}
+		{/if} -->
 		{#each listOfUsers as user}
 			<div class="card w-[105%] bg-base-100 shadow-xl">
 				<div class="card-body">
@@ -210,10 +188,8 @@
 	</div>
 
 	<div class="mt-14">
-		<Pagination {currentPage} {totalPages} onPageChange={goToPage} />
+		<!-- <Pagination {currentPage} {totalPages} onPageChange={goToPage} /> -->
 	</div>
-
 </div>
 
 <!-- pagination button -->
-

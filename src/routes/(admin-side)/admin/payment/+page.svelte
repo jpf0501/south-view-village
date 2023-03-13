@@ -12,7 +12,6 @@
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
 	import { createPaymentLink, sendEmail } from '$lib/utils';
-	import Pagination from '../Pagination.svelte';
 	import toast from 'svelte-french-toast';
 
 	const monthName = [
@@ -35,28 +34,40 @@
 	const currentYear = date.getFullYear();
 
 	let listOfUsers = [];
+	let showModal,
+		showConfirm = false;
 	let sortByField = '';
 	let searchByField = '';
 	let searchByValue = '';
-	let accountsQuery = query(collection(db, 'accounts'), where('paymentHead', '==', true), where('role', '==', 'Resident'));
+	let accountsQuery = query(
+		collection(db, 'accounts'),
+		where('paymentHead', '==', true),
+		where('role', '==', 'Resident'),
+		where('paymentStatus', '==', 'Unpaid')
+	);
+	let userFirst, userLast, userID, userEmail, userFee;
 
-	let noResult = false;
+	let unsubscribe = () => {};
 
-	let currentPage = 1;
-	let pageSize = 10;
-	let totalRecords = 1;
-	let totalPages = 0;
+	function openModal(firstName, lastName, email, id) {
+		userFirst = firstName;
+		userLast = lastName;
+		userID = id;
+		userEmail = email;
+		userFee = 500;
+		showModal = true;
+	}
 
-	async function getAccounts(accountsQuery, page, pageSize) {
-		const startIndex = (page - 1) * pageSize;
-		const endIndex = startIndex + pageSize;
-		const unsubscribe = onSnapshot(accountsQuery, (querySnapshot) => {
-			listOfUsers = querySnapshot.docs
-				.map((doc) => ({ id: doc.id, ...doc.data() }))
-				.slice(startIndex, endIndex);
-		});
-		listOfUsers.length === 0 ? (noResult = true) : (noResult = false);
-		onDestroy(() => unsubscribe());
+	function openConfirmation() {
+		showConfirm = true;
+	}
+
+	function closeModal() {
+		showModal = false;
+	}
+
+	function closeConfirmation() {
+		showConfirm = false;
 	}
 
 	async function changeSortBy() {
@@ -64,6 +75,7 @@
 			collection(db, 'accounts'),
 			where('paymentHead', '==', true),
 			where('role', '==', 'Resident'),
+			where('paymentStatus', '==', 'Unpaid'),
 			orderBy(sortByField, 'asc')
 		);
 	}
@@ -76,24 +88,47 @@
 			where(searchByField, '<=', searchByValueCase + '~'),
 			where('paymentHead', '==', true),
 			where('role', '==', 'Resident'),
+			where('paymentStatus', '==', 'Unpaid')
 		);
 	}
 
-	async function sendPaymentEmail(paymentEmail, paymentID) {
-		console.log(paymentID);
+	async function sendPaymentEmail(paymentEmail, paymentID, paymentFee) {
+		const mailFee = paymentFee;
+		paymentFee = paymentFee + '00';
+		paymentFee = parseFloat(paymentFee);
+		// console.log(paymentID);
+		// console.log(paymentEmail),
+		console.log(paymentFee);
 		try {
 			const paymentLinkData = await createPaymentLink(
 				'Southview Homes 3 Monthly Dues',
-				50000,
+				paymentFee,
 				paymentID
 			);
 			const checkoutURL = paymentLinkData.data.attributes.checkout_url;
 			const result = await sendEmail({
 				to: paymentEmail,
-				subject: 'Southview Homes 3 Monthly Dues Payment Notice',
-				html: `<h1>This is the link for payment for monthly dues of ${currentMonth} ${currentYear}: <a href=${checkoutURL}>Click here</a></h1>`
+				subject: `Southview Homes 3 ${currentMonth} ${currentYear} Monthly Dues Payment Notice`,
+				html: `<center><h1><img src="https://ssv.vercel.app/logo.png"> Southview Homes 3</h1>
+				<p style="font-size:12px">SVH3 Clubhouse, San Vicente Road, Brgy., San Vicente, San Pedro, Laguna</p><br/>
+				<p style="font-size:13px; text-decoration:underline">This is an automated message. Do not reply.</p></center>
+				<p>We sent you this notice to inform you on the payment of your unpaid monthly dues for the period of ${currentMonth} ${currentYear}, which amounts to a total of PHP ${mailFee}.00 in total. 
+				sThe above amount and period remains unpaid on the record. Please be informed that the default monthly dues amounting Php 500.00 is our monthly obligation, to fund the subdivision's monthly expenses.
+				<br/>1) Security Guard - 4 head counts
+				<br/>2) Street Lights
+				<br/>3) Garbage Pick-up
+				<br/>4) Maintenance - 2 head counts
+				<p>You can pay your monthly dues by using the form provided <a href=${checkoutURL}>here</a>.</p>
+				<p>To avoid inconveniences, we greatly appreciate if you could proceed with the payment of your unpaid dues on or before
+				moving forward. Kindly settle your monthly dues obligation before the assigned deadline.
+				Should you have concern on your unpaid dues please contact the HOA officers or send us an inquiry for any other clarifications.
+				Please disregard this notice if you have settled already the said unpaid dues.
+				Thank you.</p>
+				<p>For other inquiries, feel free give us a call at 8330-4163 / 09063955407. You can also file for an inquiry at our <a href="https://ssv.vercel.app">website</a> or send us an email at <a href="mailto:southviewhomes3mail@gmail.com">southviewhomes3mail@gmail.com</a>.</p>
+				<p>Best regards,<br/>Southview Homes 3 Home Owners Association`
 			});
 			console.log(JSON.stringify(result));
+			showModal = false;
 			toast.success('Payment has been sent!');
 		} catch (error) {
 			console.log(error);
@@ -102,44 +137,100 @@
 	}
 
 	async function resetButton() {
-		accountsQuery = query(collection(db, 'accounts'), where('paymentHead', '==', true), where('role', '==', 'Resident'),);
+		accountsQuery = query(
+			collection(db, 'accounts'),
+			where('paymentHead', '==', true),
+			where('role', '==', 'Resident'),
+			where('paymentStatus', '==', 'Unpaid')
+		);
 		searchByValue = '';
 	}
 
 	async function resetStatus() {
-		let text = 'Would you like to reset payment status?';
-		if (confirm(text) == true) {
-			const accountQuery = query(collection(db, 'accounts'));
-			const snapshot = await getDocs(accountQuery);
-			for (let i = 0; i < snapshot.docs.length; i++) {
-				const docRef = doc(db, 'accounts', snapshot.docs[i].id);
-				await updateDoc(docRef, { paymentStatus: 'Unpaid' });
-			}
-			toast.success('All payment status has been reset!');
+		closeConfirmation();
+		const accountQuery = query(
+			collection(db, 'accounts'),
+			where('role', '==', 'Resident'),
+			where('paymentHead', '==', true)
+		);
+		const snapshot = await getDocs(accountQuery);
+		for (let i = 0; i < snapshot.docs.length; i++) {
+			const docRef = doc(db, 'accounts', snapshot.docs[i].id);
+			await updateDoc(docRef, { paymentStatus: 'Unpaid' });
 		}
+		toast.success('All payment status has been reset!');
 	}
 
-	$: {
-		getAccounts(accountsQuery, currentPage, pageSize);
-		const unsubscribe = onSnapshot(accountsQuery, (querySnapshot) => {
-			totalRecords = querySnapshot.docs.length;
-			totalPages = Math.ceil(totalRecords / pageSize);
+	function setUpRealtimeListener(accountsQuery) {
+		unsubscribe();
+		unsubscribe = onSnapshot(accountsQuery, (querySnapshot) => {
+			listOfUsers = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 		});
-		onDestroy(() => unsubscribe());
 	}
-	function goToPage(page) {
-		currentPage = page;
-	}
+
+	onDestroy(() => unsubscribe());
+	$: setUpRealtimeListener(accountsQuery);
 </script>
 
 <svelte:head>
 	<title>Payment - Southview Homes 3 Admin Panel</title>
 </svelte:head>
 
+<!-- modal -->
+
+{#if showModal}
+	<div
+		class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto"
+	>
+		<div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-75" />
+		<div class="relative z-50 w-full max-w-md mx-auto bg-white rounded-lg shadow-lg">
+			<div class="p-6">
+				<h2 class="text-lg font-medium">Send Payment Form to {userFirst} {userLast}</h2>
+				<p class="mt-6 text-sm text-gray-500">Enter payment fee (in Philippine peso)</p>
+				<input
+					type="text"
+					placeholder="Enter amount"
+					bind:value={userFee}
+					class="mt-6 input input-bordered w-full max-w-xs"
+				/>
+			</div>
+			<div class="flex justify-end px-6 gap-2 py-4">
+				<button class="btn btn-primary" on:click={sendPaymentEmail(userEmail, userID, userFee)}
+					>Send Payment</button
+				>
+				<button class="btn btn-error text-white" on:click={closeModal}>Cancel</button>
+			</div>
+		</div>
+	</div>
+{/if}
+
+{#if showConfirm}
+	<div
+		class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto"
+	>
+		<div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-75" />
+		<div class="relative z-50 w-full max-w-md mx-auto bg-white rounded-lg shadow-lg">
+			<div class="p-6">
+				<p>
+					Would you like to reset all of the resident's monthly dues payment status for this month? <span
+						class="font-semibold">This action cannot be undone.</span
+					>
+				</p>
+			</div>
+			<div class="flex justify-end px-6 gap-2 py-4">
+				<button class="btn btn-primary" on:click={resetStatus}>Reset Payment Status</button>
+				<button class="btn btn-error text-white" on:click={closeConfirmation}>Cancel</button>
+			</div>
+		</div>
+	</div>
+{/if}
+
+<!-- end modal -->
+
 <div class="min-w-full min-h-full bg-base-200 py-8 px-5">
 	<h1 class="text-3xl font-semibold py-2">Payment</h1>
 	<div class="flex justify-end">
-		<a href="/admin/payment/history" class="btn btn-primary ">Payment History</a>
+		<a href="/admin/payment/history" class="btn btn-primary ">View History</a>
 	</div>
 	<div class="flex flex-col md:flex-row justify-between">
 		<div class="flex flex-col md:flex-row">
@@ -153,8 +244,8 @@
 					required
 				>
 					<option value="" disabled selected>Search Filter</option>
-					<option value="firstname">Firstname</option>
-					<option value="lastname">Lastname</option>
+					<option value="firstname">First Name</option>
+					<option value="lastname">Last Name</option>
 					<!-- <option value="addressBlock">Block</option>
 					<option value="addressLot">Lot</option>
 					<option value="addressStreet">Street</option> -->
@@ -180,7 +271,7 @@
 			<option value="email">Email</option>
 		</select>
 
-		<button class="btn btn-primary my-4" on:click={resetStatus}>Reset Payment Status</button>
+		<button class="btn btn-primary my-4" on:click={openConfirmation}>Reset Payment Status</button>
 	</div>
 
 	<!-- Medium to large screen -->
@@ -198,15 +289,10 @@
 						<th />
 					</tr>
 				</thead>
-				{#if noResult}
-					<tr>
-						<td class="py-24 text-center" colspan="8">No User/s Found</td>
-					</tr>
-				{/if}
 				<tbody>
 					{#each listOfUsers as user, i}
 						<tr class="hover">
-							<td>{i + (currentPage - 1) * pageSize + 1}</td>
+							<td>{i + 1}</td>
 							<td>{user.firstNameDisplay + ' ' + user.lastNameDisplay}</td>
 							<td
 								>{'Block ' +
@@ -223,7 +309,12 @@
 							<td>
 								{#if user.paymentStatus == 'Unpaid'}
 									<button
-										on:click={sendPaymentEmail(user.email, user.id)}
+										on:click={openModal(
+											user.firstNameDisplay,
+											user.lastNameDisplay,
+											user.email,
+											user.id
+										)}
 										type="button"
 										class="btn btn-primary">Send Payment</button
 									>
@@ -240,9 +331,6 @@
 
 	<!-- Small screen -->
 	<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">
-		{#if noResult}
-			<div class="w-full mx-auto">No user/s Found</div>
-		{/if}
 		{#each listOfUsers as user}
 			<div class="card w-[105%] bg-base-100 shadow-xl">
 				<div class="card-body">
@@ -268,7 +356,12 @@
 					<div class="card-actions justify-end">
 						{#if user.paymentStatus == 'Unpaid'}
 							<button
-								on:click={sendPaymentEmail(user.email, user.id)}
+								on:click={openModal(
+									user.firstNameDisplay,
+									user.lastNameDisplay,
+									user.email,
+									user.id
+								)}
 								type="button"
 								class="btn btn-primary">Send Payment</button
 							>
@@ -279,9 +372,5 @@
 				</div>
 			</div>
 		{/each}
-	</div>
-
-	<div class="mt-14">
-		<Pagination {currentPage} {totalPages} onPageChange={goToPage} />
 	</div>
 </div>

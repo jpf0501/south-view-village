@@ -1,6 +1,7 @@
 <script>
 	import Header from "./Header.svelte";
-	import Navbar from "./Navbar.svelte"; 
+	import Navbar from "./Navbar.svelte";
+	import LoadingScreen from "../LoadingScreen.svelte";
 	import { userStore } from "$lib/store";
 	import { getDoc, doc } from "firebase/firestore";
 	import { db } from "$lib/firebase/client";
@@ -27,7 +28,7 @@
 	}
 </script>
 {#if !show }
-	Loading
+	<LoadingScreen/>
 {:else}
 	<Header/>
 	<div class="pt-16">

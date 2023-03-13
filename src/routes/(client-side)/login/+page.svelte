@@ -12,11 +12,15 @@
 		// console.log(password)
 		try {
 			const cred = await signInWithEmailAndPassword(auth, user, password);
-			toast.success('Login Success!')
+			toast.success('Login Success!');
 			goto('/admin');
 		} catch (error) {
 			console.log(error);
-			toast.error("Invalid Email or Password")
+			if (error.code === 'auth/network-request-failed') {
+				toast.error('Network error. Please check your internet connection.');
+			} else {
+				toast.error('Invalid email or password.');
+			}
 		}
 	}
 </script>
@@ -30,8 +34,11 @@
 		<div class="text-center lg:text-left">
 			<h1 class="text-5xl font-bold pb-6">Login</h1>
 			<p class="py-6">
-				To create an account, you can either go <a href="/register" class="text-blue-700 hover:text-blue-500">here</a> and wait for verification, or contact a Southview Homes 3 committee member for account creation request and
-				other inquiries.
+				To create an account, you can either go <a
+					href="/register"
+					class="text-blue-700 hover:text-blue-500">here</a
+				> and wait for verification, or contact a Southview Homes 3 committee member for account creation
+				request and other inquiries.
 			</p>
 		</div>
 		<form

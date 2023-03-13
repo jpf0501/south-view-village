@@ -1,33 +1,12 @@
 <script>
-	import { onSnapshot, query, collection, orderBy, where } from 'firebase/firestore';
+	import { getDocs, query, collection, orderBy, where } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
-	import { onDestroy } from 'svelte';
-	import Pagination from '../../Pagination.svelte';
 
 	let listOfEvents = [];
 	let sortByField = '';
 	let searchByField = '';
 	let searchByValue = '';
 	let eventQuery = query(collection(db, 'event'));
-
-	let noResult = false;
-
-	let currentPage = 1;
-	let pageSize = 10;
-	let totalRecords = 1;
-	let totalPages = 0;
-
-	async function getEvents(eventQuery, page, pageSize) {
-		const startIndex = (page - 1) * pageSize;
-		const endIndex = startIndex + pageSize;
-		const unsubscribe = onSnapshot(eventQuery, (querySnapshot) => {
-			listOfEvents = querySnapshot.docs
-				.map((doc) => ({ id: doc.id, ...doc.data() }))
-				.slice(startIndex, endIndex);
-		});
-		listOfEvents.length === 0 ? (noResult = true) : (noResult = false);
-		onDestroy(() => unsubscribe());
-	}
 
 	async function changeSortBy() {
 		eventQuery = query(collection(db, 'event'), orderBy(sortByField, 'asc'));
@@ -47,17 +26,15 @@
 		searchByValue = '';
 	}
 
-	$: {
-		getEvents(eventQuery, currentPage, pageSize);
-		const unsubscribe = onSnapshot(eventQuery, (querySnapshot) => {
-			totalRecords = querySnapshot.docs.length;
-			totalPages = Math.ceil(totalRecords / pageSize);
-		});
-		onDestroy(() => unsubscribe());
+	async function getEvents(eventQuery) {
+		const eventsSnapshot = await getDocs(eventQuery);
+		listOfEvents = eventsSnapshot.docs.map((doc) => ({
+			id: doc.id,
+			...doc.data()
+		}));
 	}
-	function goToPage(page) {
-		currentPage = page;
-	}
+
+	getEvents(eventQuery);
 </script>
 
 <svelte:head>
@@ -113,15 +90,10 @@
 					<th />
 				</tr>
 			</thead>
-			{#if noResult}
-				<tr>
-					<td class="py-24 text-center" colspan="8">No Event/s Found</td>
-				</tr>
-			{/if}
 			<tbody>
 				{#each listOfEvents as event, i}
 					<tr class="hover">
-						<td>{i + (currentPage - 1) * pageSize + 1}</td>
+						<td>{i + 1}</td>
 						<td />
 						<td>{event.titleDisplay.substring(0, 20) + '...'}</td>
 						<td>{event.description.substring(0, 50) + '...'}</td>
@@ -143,9 +115,6 @@
 
 	<!-- Small screen -->
 	<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">
-		{#if noResult}
-			<div class="w-full mx-auto">No Event/s Found</div>
-		{/if}
 		{#each listOfEvents as event}
 			<div class="card w-[105%] bg-base-100 shadow-xl">
 				<div class="card-body">
@@ -170,9 +139,5 @@
 				</div>
 			</div>
 		{/each}
-	</div>
-
-	<div class="mt-14">
-		<Pagination {currentPage} {totalPages} onPageChange={goToPage} />
 	</div>
 </div>

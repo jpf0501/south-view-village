@@ -3,13 +3,13 @@
 	import { Modal } from 'svelte-simple-modal';
 
 	const daysOfTheWeek = [
-		'Sunday',
-		'Monday',
-		'Tuesday',
-		'Wednesday',
-		'Thursday',
-		'Friday',
-		'Saturday'
+		'Sun',
+		'Mon',
+		'Tue',
+		'Wed',
+		'Thu',
+		'Fri',
+		'Sat'
 	];
 	const monthNames = [
 		'January',
@@ -114,7 +114,7 @@
 		</section>
 	</main>
 	<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mx-auto pt-8 pb-5">
-		<a href="/admin/calendar/addevent" class="btn btn-primary btn-wide">Add Event in Calendar</a>
+		<a href="/admin/calendar/add-event" class="btn btn-primary btn-wide">Add Event in Calendar</a>
 		<a href="/admin/calendar/entries" class="btn btn-primary btn-wide">Manage Events</a>
 	</div>
 </div>

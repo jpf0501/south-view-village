@@ -12,7 +12,6 @@
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
 	import { createPaymentLink, sendEmail } from '$lib/utils';
-	import Pagination from '../Pagination.svelte';
 	import toast from 'svelte-french-toast';
 
 	let listOfBooking = [];
@@ -20,48 +19,22 @@
 	let searchByField = '';
 	let searchByValue = '';
 	let bookingStatus = '';
-	let bookingPaymentStatus = '';
 	let bookingsQuery = query(
 		collection(db, 'booking'),
 		where('status', '==', 'Pending'),
 		orderBy('dateReserved', 'asc')
 	);
 
-	let noResult = false;
-
-	let currentPage = 1;
-	let pageSize = 10;
-	let totalRecords = 1;
-	let totalPages = 0;
-
-	async function getBookings(bookingsQuery, page, pageSize) {
-		const startIndex = (page - 1) * pageSize;
-		const endIndex = startIndex + pageSize;
-		const unsubscribe = onSnapshot(bookingsQuery, (querySnapshot) => {
-			listOfBooking = querySnapshot.docs
-				.map((doc) => ({ id: doc.id, ...doc.data() }))
-				.slice(startIndex, endIndex);
-		});
-		listOfBooking.length === 0 ? (noResult = true) : (noResult = false);
-		onDestroy(() => unsubscribe());
-	}
+	let unsubscribe = () => {};
 
 	async function changeSortBy() {
-		if (sortByField == 'bookDate') {
-			bookingsQuery = query(
-				collection(db, 'booking'),
-				where('status', '==', 'Pending'),
-				orderBy(sortByField, 'desc'),
-				orderBy('dateReserved', 'asc')
-			);
-		} else {
-			bookingsQuery = query(
-				collection(db, 'booking'),
-				where('status', '==', 'Pending'),
-				orderBy(sortByField, 'asc'),
-				orderBy('dateReserved', 'asc')
-			);
-		}
+		const order = sortByField === 'bookDate' ? 'desc' : 'asc';
+		bookingsQuery = query(
+			collection(db, 'booking'),
+			where('status', '==', 'Pending'),
+			orderBy(sortByField, order),
+			orderBy('dateReserved', 'asc')
+		);
 	}
 
 	async function searchBookings() {
@@ -76,7 +49,12 @@
 		);
 	}
 
-	async function changeStatus(bookingId, bookEmail, bookDate) {
+	async function approvalHandler(bookingId, bookEmail, bookDate) {
+		changeStatus(bookingId)
+		sendUpdateToEmail(bookEmail, bookDate)
+	}
+
+	async function changeStatus(bookingId){
 		try {
 			const bookRef = doc(db, 'booking', bookingId);
 			const data = {
@@ -85,8 +63,16 @@
 			};
 			await updateDoc(bookRef, data);
 			toast.success('Booking request has been ' + bookingStatus.toLowerCase() + ' !');
-			try {
-				const result = await sendEmail({
+			
+		} catch (error) {
+			console.log(error);
+			toast.error('Error in updating a booking!');
+		}
+	}
+
+	async function sendUpdateToEmail(bookEmail, bookDate){
+		try {
+				await sendEmail({
 					to: bookEmail,
 					subject: 'Southview Homes 3 Booking Request',
 					html:
@@ -102,33 +88,13 @@
 						bookingStatus.toLowerCase() +
 						' by the admin</ht>'
 				});
-				// console.log(JSON.stringify(result));
-				// alert('Email sent successfuly');
 			} catch (error) {
 				console.log(error);
-				toast.error('Error in sending approval/disapproval booking request in email');
+				toast.error('Error in sending update of booking request in email');
 			}
-		} catch (error) {
-			console.log(error);
-			toast.error('Error in approving/disapproving a booking!');
-		}
-	}
-	async function changePaymentStatus(bookingId) {
-		try {
-			const bookRef = doc(db, 'booking', bookingId);
-			const data = {
-				paymentStatus: bookingPaymentStatus
-			};
-			await updateDoc(bookRef, data);
-			toast.success('Booking status changed!');
-		} catch (error) {
-			console.log(error);
-			toast.error('Error in changing booking status!');
-		}
 	}
 
 	async function sendPaymentEmail(bookEmail, bookID) {
-		// console.log(bookID)
 		try {
 			const paymentLinkData = await createPaymentLink(
 				'Clubhouse Reservation Downpayment',
@@ -156,17 +122,16 @@
 		);
 		searchByValue = '';
 	}
-	$: {
-		getBookings(bookingsQuery, currentPage, pageSize);
-		const unsubscribe = onSnapshot(bookingsQuery, (querySnapshot) => {
-			totalRecords = querySnapshot.docs.length;
-			totalPages = Math.ceil(totalRecords / pageSize);
+
+	function setUpRealtimeListener(bookingsQuery) {
+		unsubscribe();
+		unsubscribe = onSnapshot(bookingsQuery, (querySnapshot) => {
+			listOfBooking = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 		});
-		onDestroy(() => unsubscribe());
 	}
-	function goToPage(page) {
-		currentPage = page;
-	}
+
+	onDestroy(() => unsubscribe());
+	$: setUpRealtimeListener(bookingsQuery);
 </script>
 
 <svelte:head>
@@ -176,7 +141,7 @@
 <div class="min-w-full min-h-full bg-base-200 py-8 px-5">
 	<h1 class="text-3xl font-semibold py-2">Bookings</h1>
 	<div class="flex justify-end">
-		<a href="/admin/bookings/bookingsHistory" class="btn btn-primary ">Bookings History</a>
+		<a href="/admin/bookings/history" class="btn btn-primary ">View History</a>
 	</div>
 	<div class="flex flex-col md:flex-row justify-between">
 		<div class="flex flex-col md:flex-row">
@@ -190,8 +155,8 @@
 					required
 				>
 					<option value="" disabled selected>Search Filter</option>
-					<option value="firstname">Firstname</option>
-					<option value="lastname">Lastname</option>
+					<option value="firstname">First Name</option>
+					<option value="lastname">Last Name</option>
 					<option value="email">E-mail Address</option>
 					<option value="eventType">Type of Event</option>
 					<!-- <option value="bookDate">Date and Time</option> -->
@@ -214,6 +179,7 @@
 			<option value="eventType">Type of Event</option>
 			<option value="bookDate">Date and Time</option>
 		</select>
+		<a class="btn btn-primary my-4" href="/admin/bookings/create">Add a Booking</a>
 	</div>
 
 	<!-- Medium to large screen -->
@@ -233,16 +199,10 @@
 						<th colspan="2" />
 					</tr>
 				</thead>
-				{#if noResult}
-					<tr>
-						<td class="py-24 text-center" colspan="8">No Pending Booking/s Found</td>
-					</tr>
-				{/if}
 				<tbody>
 					{#each listOfBooking as book, i}
-						<!-- {#if book.status == 'Pending'} -->
 						<tr class="hover">
-							<td>{i + (currentPage - 1) * pageSize + 1}</td>
+							<td>{i + 1}</td>
 							<td>{book.firstNameDisplay + ' ' + book.lastNameDisplay}</td>
 							<td>{book.email}</td>
 							<td>{book.contactNumber}</td>
@@ -269,25 +229,9 @@
 											.toDate()
 											.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}</td
 								> -->
-							<td class="text-center"
-								><form on:submit|preventDefault={changePaymentStatus(book.id)}>
-									{#if book.paymentStatus == 'Paid'}
-										<button type="submit" on:click={() => (bookingPaymentStatus = 'Unpaid')}>
-											<span class="p-3 text-sm whitespace-nowrap text-green-500 font-bold">
-												{book.paymentStatus}
-											</span>
-										</button>
-									{:else if book.paymentStatus == 'Unpaid'}
-										<button type="submit" on:click={() => (bookingPaymentStatus = 'Paid')}>
-											<span class="p-3 text-sm whitespace-nowrap text-red-500 font-bold">
-												{book.paymentStatus}
-											</span>
-										</button>
-									{/if}
-								</form></td
-							>
+							<td class="text-center">{book.paymentStatus}</td>
 							<td
-								><form on:submit|preventDefault={changeStatus(book.id, book.email, book.bookDate)}>
+								><form on:submit|preventDefault={approvalHandler(book.id, book.email, book.bookDate)}>
 									{#if book.paymentStatus == 'Unpaid'}
 										<button
 											on:click={() => (bookingStatus = 'Approved')}
@@ -330,7 +274,6 @@
 								{/if}
 							</td>
 						</tr>
-						<!-- {/if} -->
 					{/each}
 				</tbody>
 			</table>
@@ -339,9 +282,6 @@
 
 	<!-- Small screen -->
 	<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">
-		{#if noResult}
-			<div class="w-full mx-auto">No Pending Booking/s Found</div>
-		{/if}
 		{#each listOfBooking as book}
 			<!-- {#if book.status == 'Pending'} -->
 			<div class="card w-[105%] bg-base-100 shadow-xl">
@@ -357,7 +297,7 @@
 					</div>
 					<div>
 						<span class="my-1 font-bold">Type of Event:</span>
-						{book.contactNumber}
+						{book.eventTypeDisplay}
 					</div>
 					<div>
 						<span class="my-1 font-bold">Date and Time:</span>
@@ -379,27 +319,13 @@
 									.toDate()
 									.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}
 						</div> -->
-					<div class="flex flex-row">
+					<div class="">
 						<span class="my-1 font-bold">Status:</span>
-						<form on:submit|preventDefault={changePaymentStatus(book.id)}>
-							{#if book.paymentStatus == 'Paid'}
-								<button type="submit" on:click={() => (bookingPaymentStatus = 'Unpaid')}>
-									<span class="p-3 text-sm whitespace-nowrap text-green-500 font-bold">
-										{book.paymentStatus}
-									</span>
-								</button>
-							{:else if book.paymentStatus == 'Unpaid'}
-								<button type="submit" on:click={() => (bookingPaymentStatus = 'Paid')}>
-									<span class="p-3 text-sm whitespace-nowrap text-red-500 font-bold">
-										{book.paymentStatus}
-									</span>
-								</button>
-							{/if}
-						</form>
+						{book.paymentStatus}
 					</div>
 					<div>
 						<form
-							on:submit|preventDefault={changeStatus(book.id, book.email, book.bookDate)}
+							on:submit|preventDefault={approvalHandler(book.id, book.email, book.bookDate)}
 							class="py-3"
 						>
 							{#if book.paymentStatus == 'Unpaid'}
@@ -441,9 +367,5 @@
 			</div>
 			<!-- {/if} -->
 		{/each}
-	</div>
-
-	<div class="mt-14">
-		<Pagination {currentPage} {totalPages} onPageChange={goToPage} />
 	</div>
 </div>
