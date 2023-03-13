@@ -28,7 +28,10 @@
 
 	async function getEvents(eventQuery) {
 		const eventsSnapshot = await getDocs(eventQuery);
-		listOfEvents = eventsSnapshot.docs.map((doc) => doc.data());
+		listOfEvents = eventsSnapshot.docs.map((doc) => ({
+			id: doc.id,
+			...doc.data()
+		}));
 	}
 
 	getEvents(eventQuery);
