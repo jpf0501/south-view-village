@@ -8,18 +8,45 @@
 	// const dateMax = new Date(Date.now() + 8.64e7 + 6.048e8 * 2).toLocaleDateString('en-ca');
 
 	let event = {
-		eventTitle: '',
-		eventDate: '',
-		eventDescription: ''
+		title: '',
+		date: '',
+		description: ''
 	};
 
+	let errors = {};
+
 	async function submitHandler() {
+		const isValid = await checkInput();
+		if (!isValid) {
+			toast.error('Form validation failed');
+			return;
+		}
+		addEvent();
+	}
+
+	async function checkInput() {
+		errors = {
+			title: !event.title,
+			description: !event.description,
+			date: !event.date,
+			descriptionKulang: event.description.length < 11
+		};
+		if (Object.values(errors).some((v) => v)) {
+			setTimeout(() => {
+				errors = {};
+			}, 2000);
+			return;
+		}
+		return true;
+	}
+
+	async function addEvent() {
 		try {
 			await addDoc(collection(db, 'event'), {
-				title: event.eventTitle.trim().toLowerCase(),
-				titleDisplay: event.eventTitle.trim(),
-				description: event.eventDescription.trim(),
-				date: event.eventDate
+				title: event.title.trim().toLowerCase(),
+				titleDisplay: event.title.trim(),
+				description: event.description.trim(),
+				date: event.date
 			});
 			toast.success('Event added!');
 			await goto('/admin/calendar');
@@ -41,31 +68,39 @@
 			<div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2">
 				<div class="form-control">
 					<span class="pb-3">Event Title</span>
+					{#if errors.title}
+						<p class="text-red-500 text-sm italic mb-1">Event title is required</p>
+					{/if}
 					<input
 						type="text"
 						class="input input-bordered p-3 mt-2"
-						bind:value={event.eventTitle}
-						required
+						bind:value={event.title}
 					/>
 				</div>
 				<div class="form-control">
 					<span class="pb-3">Event Date</span>
+					{#if errors.date}
+						<p class="text-red-500 text-sm italic mb-1">Event Date is required</p>
+					{/if}
 					<input
 						type="date"
 						class="input input-bordered p-3 mt-2"
-						bind:value={event.eventDate}
-						required
+						bind:value={event.date}
 					/>
 				</div>
 			</div>
 			<div class="mt-6">
 				<div class="form-control">
 					<span class="pb-3">Event Desciption</span>
+					{#if errors.description}
+						<p class="text-red-500 text-sm italic mb-1">Event description is required</p>
+						{:else if errors.descriptionKulang}
+						<p class="text-red-500 text-sm italic mb-1">Description must be at least 10 characters</p>
+					{/if}
 					<textarea
 						class="h-60 textarea textarea-bordered p-3"
 						style="white-space:pre-wrap; resize:none"
-						required
-						bind:value={event.eventDescription}
+						bind:value={event.description}
 					/>
 				</div>
 			</div>
