@@ -1,5 +1,5 @@
 <script>
-	import { onSnapshot, query, collection, orderBy, where } from 'firebase/firestore';
+	import { query, collection, orderBy, where } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
 	import Pagination from '../Pagination.svelte';
@@ -8,32 +8,18 @@
 	let sortByField = '';
 	let searchByField = '';
 	let searchByValue = '';
-	let complaintQuery = query(collection(db, 'complaints'), where('hadAnswered', '==', false), orderBy('dateSubmitted', 'asc'));
-
-	let noResult = false;
-
-	let currentPage = 1;
-	let pageSize = 10;
-	let totalRecords = 1;
-	let totalPages = 0;
-
-	async function getComplaints(complaintQuery, page, pageSize) {
-		const startIndex = (page - 1) * pageSize;
-		const endIndex = startIndex + pageSize;
-		const unsubscribe = onSnapshot(complaintQuery, (querySnapshot) => {
-			listOfComplaints = querySnapshot.docs
-				.map((doc) => ({ id: doc.id, ...doc.data() }))
-				.slice(startIndex, endIndex);
-		});
-		onDestroy(() => unsubscribe());
-	}
+	let complaintQuery = query(
+		collection(db, 'complaints'),
+		where('hadAnswered', '==', false),
+		orderBy('dateSubmitted', 'asc')
+	);
 
 	async function changeSortBy() {
 		complaintQuery = query(
 			collection(db, 'complaints'),
 			where('hadAnswered', '==', false),
 			orderBy(sortByField, 'asc'),
-            orderBy('dateSubmitted', 'asc')
+			orderBy('dateSubmitted', 'asc')
 		);
 	}
 
@@ -44,27 +30,28 @@
 			where(searchByField, '>=', searchByValueCase),
 			where(searchByField, '<=', searchByValueCase + '~'),
 			where('hadAnswered', '==', false),
-            orderBy('dateSubmitted', 'asc')
+			orderBy('dateSubmitted', 'asc')
 		);
 	}
 
 	async function resetButton() {
-		complaintQuery = query(collection(db, 'complaints'), where('hadAnswered', '==', false), orderBy('dateSubmitted', 'asc'));
+		complaintQuery = query(
+			collection(db, 'complaints'),
+			where('hadAnswered', '==', false),
+			orderBy('dateSubmitted', 'asc')
+		);
 		searchByValue = '';
 	}
 
-	$: {
-		getComplaints(complaintQuery, currentPage, pageSize);
-		const unsubscribe = onSnapshot(complaintQuery, (querySnapshot) => {
-			totalRecords = querySnapshot.docs.length;
-			totalPages = Math.ceil(totalRecords / pageSize);
-		});
-		listOfComplaints.length === 0 ? (noResult = true) : (noResult = false);
-		onDestroy(() => unsubscribe());
+	async function getComplaints(complaintQuery) {
+		const complaintsSnapshot = await getDocs(complaintQuery);
+		listOfComplaints = complaintsSnapshot.docs.map((doc) => ({
+			id: doc.id,
+			...doc.data()
+		}));
 	}
-	function goToPage(page) {
-		currentPage = page;
-	}
+
+	getComplaints(complaintQuery);
 </script>
 
 <svelte:head>
@@ -132,7 +119,7 @@
 					{#each listOfComplaints as complaint, i}
 						<tr class="hover">
 							<td>{i + (currentPage - 1) * pageSize + 1}</td>
-							<td>{complaint.firstnameDisplay + " " + complaint.lastnameDisplay}</td>
+							<td>{complaint.firstnameDisplay + ' ' + complaint.lastnameDisplay}</td>
 							<td>{complaint.email}</td>
 							<td>{complaint.complaint.substring(0, 50) + '...'}</td>
 							<!-- <td
@@ -172,7 +159,9 @@
 		{#each listOfComplaints as complaint}
 			<div class="card w-[105%] bg-base-100 shadow-xl">
 				<div class="card-body">
-					<h2 class="card-title mb-2">{complaint.firstnameDisplay + " " + complaint.lastnameDisplay}</h2>
+					<h2 class="card-title mb-2">
+						{complaint.firstnameDisplay + ' ' + complaint.lastnameDisplay}
+					</h2>
 					<div>
 						<span class="my-1 font-bold">Email: </span>
 						{complaint.email}
