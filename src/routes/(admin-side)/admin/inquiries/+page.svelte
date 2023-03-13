@@ -1,32 +1,12 @@
 <script>
-	import { onSnapshot, query, collection, orderBy, where } from 'firebase/firestore';
+	import { getDocs, query, collection, orderBy, where } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
-	import { onDestroy } from 'svelte';
-	import Pagination from '../Pagination.svelte';
 
 	let listOfInquiry = [];
 	let sortByField = '';
 	let searchByField = '';
 	let searchByValue = '';
 	let inquiryQuery = query(collection(db, 'inquiries'), where('hadAnswered', '==', false));
-
-	let noResult = false;
-
-	let currentPage = 1;
-	let pageSize = 10;
-	let totalRecords = 1;
-	let totalPages = 0;
-
-	async function getInquiries(inquiryQuery, page, pageSize) {
-		const startIndex = (page - 1) * pageSize;
-		const endIndex = startIndex + pageSize;
-		const unsubscribe = onSnapshot(inquiryQuery, (querySnapshot) => {
-			listOfInquiry = querySnapshot.docs
-				.map((doc) => ({ id: doc.id, ...doc.data() }))
-				.slice(startIndex, endIndex);
-		});
-		onDestroy(() => unsubscribe());
-	}
 
 	async function changeSortBy() {
 		inquiryQuery = query(
@@ -51,18 +31,15 @@
 		searchByValue = '';
 	}
 
-	$: {
-		getInquiries(inquiryQuery, currentPage, pageSize);
-		const unsubscribe = onSnapshot(inquiryQuery, (querySnapshot) => {
-			totalRecords = querySnapshot.docs.length;
-			totalPages = Math.ceil(totalRecords / pageSize);
-		});
-		listOfInquiry.length === 0 ? (noResult = true) : (noResult = false);
-		onDestroy(() => unsubscribe());
+	async function getInquiries(inquiryQuery) {
+		const inquirySnapshot = await getDocs(inquiryQuery);
+		listOfInquiry = inquirySnapshot.docs.map((doc) => ({
+			id: doc.id,
+			...doc.data()
+		}));
 	}
-	function goToPage(page) {
-		currentPage = page;
-	}
+
+	getInquiries(inquiryQuery);
 </script>
 
 <svelte:head>
@@ -119,15 +96,11 @@
 						<th />
 					</tr>
 				</thead>
-				{#if noResult}
-					<tr>
-						<td class="py-24 text-center" colspan="8">No Inquiries Found</td>
-					</tr>
-				{/if}
+
 				<tbody>
 					{#each listOfInquiry as inquiry, i}
 						<tr class="hover">
-							<td>{i + (currentPage - 1) * pageSize + 1}</td>
+							<td>{i + 1}</td>
 							<td>{inquiry.nameDisplay}</td>
 							<td>{inquiry.email}</td>
 							<td>{inquiry.message.substring(0, 50) + '...'}</td>
@@ -162,9 +135,6 @@
 
 	<!-- Small screen -->
 	<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">
-		{#if noResult}
-			<div class="w-full mx-auto">No Inquiries Found</div>
-		{/if}
 		{#each listOfInquiry as inquiry}
 			<div class="card w-[105%] bg-base-100 shadow-xl">
 				<div class="card-body">
@@ -199,9 +169,5 @@
 				</div>
 			</div>
 		{/each}
-	</div>
-
-	<div class="mt-14">
-		<Pagination {currentPage} {totalPages} onPageChange={goToPage} />
 	</div>
 </div>

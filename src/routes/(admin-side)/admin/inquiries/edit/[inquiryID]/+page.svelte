@@ -21,29 +21,37 @@
 		}
 	}
 
-	async function answerInquiry(name, email, message, response) {
+	async function submitHandler(name, email, message, response) {
+		await answerInquiry(response);
+		sendResponseToEmail(name, email, message, response);
+	}
+
+	async function answerInquiry(response) {
 		try {
 			const inquiryRef = doc(db, 'inquiries', inquiryID);
 			const changeData = {
 				hadAnswered: true,
-				response: inquiry.response
+				response: response
 			};
 			await updateDoc(inquiryRef, changeData);
 			goto('/admin/inquiries');
-			try {
-				await sendEmail({
-					to: email,
-					subject: 'Southview Homes 3 Inquiries',
-					html: `<h1>Hello ${name}, </h1> <div> We have receive your inquiry about</div><div style="white-space:pre-wrap">${message}</div><h1>Our Response is </h1><div style="white-space:pre-wrap">${response}</div>`
-				});
-				toast.success('Response sent!');
-			} catch (error) {
-				console.log(error);
-				toast.error('Error in sending reponse of the inquiry');
-			}
 		} catch (error) {
 			console.log(error);
 			toast.error('Error sending response!');
+		}
+	}
+
+	async function sendResponseToEmail(name, email, message, response) {
+		try {
+			await sendEmail({
+				to: email,
+				subject: 'Southview Homes 3 Inquiries',
+				html: `<h1>Hello ${name}, </h1> <div> We have receive your inquiry about</div><div style="white-space:pre-wrap">${message}</div><h1>Our Response is </h1><div style="white-space:pre-wrap">${response}</div>`
+			});
+			toast.success('Response sent!');
+		} catch (error) {
+			console.log(error);
+			toast.error('Error in sending reponse of the inquiry');
 		}
 	}
 
@@ -85,7 +93,7 @@
 				</div>
 				<div class="flex justify-end mt-8">
 					<button
-						on:click={answerInquiry(inquiry.name, inquiry.email, inquiry.message, inquiry.response)}
+						on:click={submitHandler(inquiry.name, inquiry.email, inquiry.message, inquiry.response)}
 						type="submit"
 						class="btn btn-primary"
 					>

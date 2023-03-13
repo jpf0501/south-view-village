@@ -21,12 +21,12 @@
 		}
 	}
 
-	async function answerComplaint(firstname, lastname, email, complaint, responseOfAdmin){
-		await response(responseOfAdmin)
-		sendResponseToEmail(firstname, lastname, email, complaint)
+	async function submitHandler(firstname, lastname, email, complaint, response){
+		await answerComplaint(response)
+		sendResponseToEmail(firstname, lastname, email, complaint, response)
 	}
 
-	async function response(responOfAdmin) {
+	async function answerComplaint(response) {
 		if (response.length < 10) {
 			toast.error('Response must at least be 10 characters');
 			return;
@@ -35,7 +35,7 @@
 			const complaintRef = doc(db, 'complaints', complaintID);
 			const changeData = {
 				hadAnswered: true,
-				response: responOfAdmin
+				response: response
 			};
 			await updateDoc(complaintRef, changeData);
 			goto('/admin/complaint');
@@ -45,7 +45,7 @@
 		}
 	}
 
-	async function sendResponseToEmail(firstname, lastname, email, complaint){
+	async function sendResponseToEmail(firstname, lastname, email, complaint, response){
 		try {
 				await sendEmail({
 					to: email,
@@ -101,7 +101,7 @@
 				</div>
 				<div class="flex justify-end mt-8">
 					<button
-						on:click={answerComplaint(
+						on:click={submitHandler(
 							complaint.firstnameDisplay,
 							complaint.lastnameDisplay,
 							complaint.email,

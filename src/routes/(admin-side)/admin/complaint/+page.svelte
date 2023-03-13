@@ -1,8 +1,6 @@
 <script>
-	import { query, collection, orderBy, where } from 'firebase/firestore';
+	import { getDocs, query, collection, orderBy, where } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
-	import { onDestroy } from 'svelte';
-	import Pagination from '../Pagination.svelte';
 
 	let listOfComplaints = [];
 	let sortByField = '';
@@ -110,15 +108,10 @@
 						<th />
 					</tr>
 				</thead>
-				{#if noResult}
-					<tr>
-						<td class="py-24 text-center" colspan="8">No Complaints Found</td>
-					</tr>
-				{/if}
 				<tbody>
 					{#each listOfComplaints as complaint, i}
 						<tr class="hover">
-							<td>{i + (currentPage - 1) * pageSize + 1}</td>
+							<td>{i + 1}</td>
 							<td>{complaint.firstnameDisplay + ' ' + complaint.lastnameDisplay}</td>
 							<td>{complaint.email}</td>
 							<td>{complaint.complaint.substring(0, 50) + '...'}</td>
@@ -153,9 +146,6 @@
 
 	<!-- Small screen -->
 	<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">
-		{#if noResult}
-			<div class="w-full mx-auto">No Complaints Found</div>
-		{/if}
 		{#each listOfComplaints as complaint}
 			<div class="card w-[105%] bg-base-100 shadow-xl">
 				<div class="card-body">
@@ -192,9 +182,5 @@
 				</div>
 			</div>
 		{/each}
-	</div>
-
-	<div class="mt-14">
-		<Pagination {currentPage} {totalPages} onPageChange={goToPage} />
 	</div>
 </div>
