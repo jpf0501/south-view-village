@@ -30,7 +30,7 @@
 		});
 		onDestroy(() => unsubscribe());
 	}
-
+	onDestroy(() => unsubscribe());
 	$: getEvents(eventsQuery);
 </script>
 
