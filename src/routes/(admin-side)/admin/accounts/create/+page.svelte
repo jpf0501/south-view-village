@@ -1,8 +1,7 @@
 <script>
 	import { goto } from '$app/navigation';
 	import { db } from '$lib/firebase/client';
-	import { onSnapshot, query, collection, orderBy } from 'firebase/firestore';
-	import { onDestroy } from 'svelte';
+	import { getDocs, query, collection, orderBy } from 'firebase/firestore';
 	import toast from 'svelte-french-toast';
 
 	let account = {
@@ -31,14 +30,8 @@
 	}));
 
 	async function getStreet() {
-		const unsubscribe = onSnapshot(streetQuery, (querySnapshot) => {
-			console.log('set up real time listener');
-			listOfStreets = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-		});
-		onDestroy(() => {
-			console.log('unsubscribe trigger');
-			unsubscribe();
-		});
+		const streetSnapshot = await getDocs(streetQuery);
+		listOfStreets = streetSnapshot.docs.map((doc) => doc.data());
 	}
 
 	async function submitHandler() {
@@ -83,7 +76,7 @@
 		}
 	}
 
-	$: getStreet(streetQuery);
+	getStreet(streetQuery);
 </script>
 
 <svelte:head>
