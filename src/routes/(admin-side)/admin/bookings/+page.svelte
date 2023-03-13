@@ -12,7 +12,6 @@
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
 	import { createPaymentLink, sendEmail } from '$lib/utils';
-	import Pagination from '../Pagination.svelte';
 	import toast from 'svelte-french-toast';
 
 	let listOfBooking = [];
@@ -26,23 +25,7 @@
 		orderBy('dateReserved', 'asc')
 	);
 
-	let noResult = false;
-
-	let currentPage = 1;
-	let pageSize = 10;
-	let totalRecords = 1;
-	let totalPages = 0;
-
-	async function getBookings(bookingsQuery, page, pageSize) {
-		const startIndex = (page - 1) * pageSize;
-		const endIndex = startIndex + pageSize;
-		const unsubscribe = onSnapshot(bookingsQuery, (querySnapshot) => {
-			listOfBooking = querySnapshot.docs
-				.map((doc) => ({ id: doc.id, ...doc.data() }))
-				.slice(startIndex, endIndex);
-		});
-		onDestroy(() => unsubscribe());
-	}
+	let unsubscribe = () => {};
 
 	async function changeSortBy() {
 		const order = sortByField === 'bookDate' ? 'desc' : 'asc';
@@ -139,18 +122,16 @@
 		);
 		searchByValue = '';
 	}
-	$: {
-		getBookings(bookingsQuery, currentPage, pageSize);
-		const unsubscribe = onSnapshot(bookingsQuery, (querySnapshot) => {
-			totalRecords = querySnapshot.docs.length;
-			totalPages = Math.ceil(totalRecords / pageSize);
+
+	function setUpRealtimeListener(bookingsQuery) {
+		unsubscribe();
+		unsubscribe = onSnapshot(bookingsQuery, (querySnapshot) => {
+			listOfBooking = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 		});
-		listOfBooking.length === 0 ? (noResult = true) : (noResult = false);
-		onDestroy(() => unsubscribe());
 	}
-	function goToPage(page) {
-		currentPage = page;
-	}
+
+	onDestroy(() => unsubscribe());
+	$: setUpRealtimeListener(bookingsQuery);
 </script>
 
 <svelte:head>
@@ -218,15 +199,10 @@
 						<th colspan="2" />
 					</tr>
 				</thead>
-				{#if noResult}
-					<tr>
-						<td class="py-24 text-center" colspan="8">No Pending Booking/s Found</td>
-					</tr>
-				{/if}
 				<tbody>
 					{#each listOfBooking as book, i}
 						<tr class="hover">
-							<td>{i + (currentPage - 1) * pageSize + 1}</td>
+							<td>{i + 1}</td>
 							<td>{book.firstNameDisplay + ' ' + book.lastNameDisplay}</td>
 							<td>{book.email}</td>
 							<td>{book.contactNumber}</td>
@@ -306,9 +282,6 @@
 
 	<!-- Small screen -->
 	<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">
-		{#if noResult}
-			<div class="w-full mx-auto">No Pending Booking/s Found</div>
-		{/if}
 		{#each listOfBooking as book}
 			<!-- {#if book.status == 'Pending'} -->
 			<div class="card w-[105%] bg-base-100 shadow-xl">
@@ -394,9 +367,5 @@
 			</div>
 			<!-- {/if} -->
 		{/each}
-	</div>
-
-	<div class="mt-14">
-		<Pagination {currentPage} {totalPages} onPageChange={goToPage} />
 	</div>
 </div>
