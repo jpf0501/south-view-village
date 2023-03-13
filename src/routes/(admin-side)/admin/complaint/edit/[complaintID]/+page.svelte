@@ -21,7 +21,12 @@
 		}
 	}
 
-	async function answerComplaint(firstname, lastname, email, complaint, response) {
+	async function answerComplaint(firstname, lastname, email, complaint, responseOfAdmin){
+		await response(responseOfAdmin)
+		sendResponseToEmail(firstname, lastname, email, complaint)
+	}
+
+	async function response(responOfAdmin) {
 		if (response.length < 10) {
 			toast.error('Response must at least be 10 characters');
 			return;
@@ -30,11 +35,18 @@
 			const complaintRef = doc(db, 'complaints', complaintID);
 			const changeData = {
 				hadAnswered: true,
-				response: response
+				response: responOfAdmin
 			};
 			await updateDoc(complaintRef, changeData);
 			goto('/admin/complaint');
-			try {
+		} catch (error) {
+			console.log(error);
+			toast.error('Error sending response!');
+		}
+	}
+
+	async function sendResponseToEmail(firstname, lastname, email, complaint){
+		try {
 				await sendEmail({
 					to: email,
 					subject: 'Southview Homes 3 Inquiries',
@@ -47,10 +59,6 @@
 				console.log(error);
 				toast.error('Error in sending reponse of the complaint');
 			}
-		} catch (error) {
-			console.log(error);
-			toast.error('Error sending response!');
-		}
 	}
 
 	async function deleteComplaint() {
