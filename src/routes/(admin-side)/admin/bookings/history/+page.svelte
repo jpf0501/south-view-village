@@ -213,7 +213,7 @@
 		listOfBooking = bookingsSnapshot.docs.map((doc) => doc.data());
 	}
 
-	getBookingsHitory(bookingsQuery);
+	$: getBookingsHitory(bookingsQuery);
 </script>
 
 <svelte:head>

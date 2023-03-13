@@ -49,7 +49,7 @@
 		}));
 	}
 
-	getComplaints(complaintQuery);
+	$: getComplaints(complaintQuery);
 </script>
 
 <svelte:head>

@@ -39,7 +39,7 @@
 		}));
 	}
 
-	getInquiries(inquiryQuery);
+	$: getInquiries(inquiryQuery);
 </script>
 
 <svelte:head>

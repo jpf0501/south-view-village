@@ -192,7 +192,7 @@
 		const paymentsSnapshot = await getDocs(paymentsQuery);
 		listOfPayments = paymentsSnapshot.docs.map((doc) => doc.data());
 	}
-	getPayments(paymentsQuery);
+	$: getPayments(paymentsQuery);
 </script>
 
 <svelte:head>
