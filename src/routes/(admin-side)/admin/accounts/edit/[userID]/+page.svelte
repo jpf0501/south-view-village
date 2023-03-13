@@ -1,16 +1,7 @@
 <script>
 	import { db } from '$lib/firebase/client';
-	import {
-		onSnapshot,
-		query,
-		collection,
-		orderBy,
-		getDoc,
-		updateDoc,
-		doc
-	} from 'firebase/firestore';
+	import { getDocs, query, collection, orderBy, getDoc, updateDoc, doc } from 'firebase/firestore';
 	import { goto } from '$app/navigation';
-	import { onDestroy } from 'svelte';
 	import toast from 'svelte-french-toast';
 
 	/** @type {import('./$types').PageData} */
@@ -38,10 +29,8 @@
 	getUser();
 
 	async function getStreet() {
-		const unsubscribe = onSnapshot(streetQuery, (querySnapshot) => {
-			listOfStreets = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-		});
-		onDestroy(() => unsubscribe());
+		const streetSnapshot = await getDocs(streetQuery);
+		listOfStreets = streetSnapshot.docs.map((doc) => doc.data());
 	}
 
 	async function updateUser() {
@@ -68,7 +57,7 @@
 		}
 	}
 
-	$: getStreet(streetQuery);
+	getStreet(streetQuery);
 </script>
 
 <svelte:head>
