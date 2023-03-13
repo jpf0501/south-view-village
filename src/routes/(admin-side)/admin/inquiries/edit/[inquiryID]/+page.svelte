@@ -10,6 +10,7 @@
 	const { inquiryID } = data;
 
 	let inquiry = null;
+	let errors = {};
 
 	async function getInquiry() {
 		try {
@@ -22,8 +23,29 @@
 	}
 
 	async function submitHandler(name, email, message, response) {
+		const isValid = await checkInput();
+		if (!isValid) {
+			toast.error('Form validation failed');
+			return;
+		}
 		await answerInquiry(response);
 		sendResponseToEmail(name, email, message, response);
+	}
+
+	async function checkInput() {
+		console.log(inquiry.response);
+		console.log(inquiry.message);
+		errors = {
+			response: !inquiry.response,
+			responseKulang: inquiry.response.length < 10
+		};
+		if (Object.values(errors).some((v) => v)) {
+			setTimeout(() => {
+				errors = {};
+			}, 2000);
+			return;
+		}
+		return true;
 	}
 
 	async function answerInquiry(response) {
@@ -34,6 +56,7 @@
 				response: response
 			};
 			await updateDoc(inquiryRef, changeData);
+			toast.success("Inquiry answered")
 			goto('/admin/inquiries');
 		} catch (error) {
 			console.log(error);
@@ -48,7 +71,7 @@
 				subject: 'Southview Homes 3 Inquiries',
 				html: `<h1>Hello ${name}, </h1> <div> We have receive your inquiry about</div><div style="white-space:pre-wrap">${message}</div><h1>Our Response is </h1><div style="white-space:pre-wrap">${response}</div>`
 			});
-			toast.success('Response sent!');
+			toast.success('Response sentto email!');
 		} catch (error) {
 			console.log(error);
 			toast.error('Error in sending reponse of the inquiry');
@@ -85,11 +108,13 @@
 				</div>
 				<div class="flex flex-col mb-6">
 					<div class="text-gray-700 font-bold mb-2">Response</div>
-					<textarea
-						class="h-60 border rounded-md p-4 resize-none"
-						required
-						bind:value={inquiry.response}
-					/>
+					{#if errors.response}
+						<p class="text-red-500 text-sm italic mb-1">Response is required</p>
+					{:else if errors.responseKulang}
+						<p class="text-red-500 text-sm italic mb-1">Response must at least be 10 characters</p>
+					{/if}
+					<textarea class="h-60 border rounded-md p-4 resize-none" bind:value={inquiry.response} />
+					<!-- <p class="text-gray-500 text-sm mt-2">{inquiry.response.length} characters</p> -->
 				</div>
 				<div class="flex justify-end mt-8">
 					<button
