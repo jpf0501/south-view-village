@@ -1,6 +1,7 @@
 <script>
 	import {
 		onSnapshot,
+		getDocs,
 		query,
 		collection,
 		orderBy,
@@ -19,15 +20,15 @@
 		month: '2-digit',
 		day: '2-digit'
 	});
-	let listOfNews = [];
-	let listOfEvents = [];
-	let newsQuery = query(collection(db, 'news'), orderBy('dateCreated', 'desc'), limit(3));
-	let eventQuery = query(
-		collection(db, 'event'),
-		limit(3),
-		where('date', '>=', dateToday),
-		orderBy('date', 'asc')
-	);
+	// let listOfNews = [];
+	// let listOfEvents = [];
+	// let newsQuery = query(collection(db, 'news'), orderBy('dateCreated', 'desc'), limit(3));
+	// let eventQuery = query(
+	// 	collection(db, 'event'),
+	// 	limit(3),
+	// 	where('date', '>=', dateToday),
+	// 	orderBy('date', 'asc')
+	// );
 
 	let inquiry = {
 		name: '',
@@ -35,19 +36,26 @@
 		message: ''
 	};
 
-	async function getNews(newsQuery) {
-		const unsubscribe = onSnapshot(newsQuery, (querySnapshot) => {
-			listOfNews = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-		});
-		onDestroy(() => unsubscribe());
-	}
+	// async function getNews(newsQuery) {
+	// 	const unsubscribe = onSnapshot(newsQuery, (querySnapshot) => {
+	// 		listOfNews = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+	// 	});
+	// 	onDestroy(() => unsubscribe());
+	// }
 
-	async function getEvents(eventQuery) {
-		const unsubscribe = onSnapshot(eventQuery, (querySnapshot) => {
-			listOfEvents = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-		});
-		onDestroy(() => unsubscribe());
-	}
+	// async function getEvents(eventQuery) {
+	// 	const unsubscribe = onSnapshot(eventQuery, (querySnapshot) => {
+	// 		listOfEvents = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+	// 	});
+	// 	onDestroy(() => unsubscribe());
+	// }
+
+	// async function getNewsAndEvents(){		
+	// 	const newsSnapshot = await getDocs(newsQuery);
+	// 	listOfNews = newsSnapshot.docs.map((doc) => doc.data());
+	// 	const eventsSnapshot = await getDocs(eventQuery);
+	// 	listOfEvents = eventsSnapshot.docs.map((doc) => doc.data());
+	// }
 
 	async function inquiryHandler() {
 		try {
@@ -72,8 +80,9 @@
 		}
 	}
 
-	$: getNews(newsQuery);
-	$: getEvents(eventQuery);
+	// $: getNews(newsQuery);
+	// $: getEvents(eventQuery);
+	// getNewsAndEvents();
 </script>
 
 <svelte:head>

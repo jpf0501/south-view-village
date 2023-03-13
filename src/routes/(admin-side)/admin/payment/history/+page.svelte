@@ -191,6 +191,7 @@
 		currentPage = page;
 	}
 
+
 </script>
 
 <svelte:head>

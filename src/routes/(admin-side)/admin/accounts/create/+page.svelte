@@ -32,24 +32,28 @@
 
 	async function getStreet() {
 		const unsubscribe = onSnapshot(streetQuery, (querySnapshot) => {
+			console.log('set up real time listener');
 			listOfStreets = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 		});
-		onDestroy(() => unsubscribe());
+		onDestroy(() => {
+			console.log('unsubscribe trigger');
+			unsubscribe();
+		});
 	}
 
 	async function submitHandler() {
 		try {
 			if (account.password !== account.passwordcheck) {
 				toast.error('Password do not match!');
-				return
+				return;
 			}
-			if(!account.password && !account.passwordcheck ){
-				toast.error('Password is required')
-				return
+			if (!account.password && !account.passwordcheck) {
+				toast.error('Password is required');
+				return;
 			}
-			if(account.password.length <6){
-				toast.error("Password must have at least 6 characters");
-				return
+			if (account.password.length < 6) {
+				toast.error('Password must have at least 6 characters');
+				return;
 			}
 			const response = await fetch('/api/accounts', {
 				method: 'POST',
