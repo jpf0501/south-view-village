@@ -36,26 +36,19 @@
 		message: ''
 	};
 
-	// async function getNews(newsQuery) {
-	// 	const unsubscribe = onSnapshot(newsQuery, (querySnapshot) => {
-	// 		listOfNews = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-	// 	});
-	// 	onDestroy(() => unsubscribe());
-	// }
+	async function getNews(newsQuery) {
+		const unsubscribe = onSnapshot(newsQuery, (querySnapshot) => {
+			listOfNews = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+		});
+		onDestroy(() => unsubscribe());
+	}
 
-	// async function getEvents(eventQuery) {
-	// 	const unsubscribe = onSnapshot(eventQuery, (querySnapshot) => {
-	// 		listOfEvents = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-	// 	});
-	// 	onDestroy(() => unsubscribe());
-	// }
-
-	// async function getNewsAndEvents(){		
-	// 	const newsSnapshot = await getDocs(newsQuery);
-	// 	listOfNews = newsSnapshot.docs.map((doc) => doc.data());
-	// 	const eventsSnapshot = await getDocs(eventQuery);
-	// 	listOfEvents = eventsSnapshot.docs.map((doc) => doc.data());
-	// }
+	async function getEvents(eventQuery) {
+		const unsubscribe = onSnapshot(eventQuery, (querySnapshot) => {
+			listOfEvents = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+		});
+		onDestroy(() => unsubscribe());
+	}
 
 	async function inquiryHandler() {
 		try {
