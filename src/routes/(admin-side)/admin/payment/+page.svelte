@@ -12,7 +12,6 @@
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
 	import { createPaymentLink, sendEmail } from '$lib/utils';
-	import Pagination from '../Pagination.svelte';
 	import toast from 'svelte-french-toast';
 
 	const monthName = [
@@ -35,7 +34,8 @@
 	const currentYear = date.getFullYear();
 
 	let listOfUsers = [];
-	let showModal, showConfirm = false;
+	let showModal,
+		showConfirm = false;
 	let sortByField = '';
 	let searchByField = '';
 	let searchByValue = '';
@@ -45,46 +45,29 @@
 		where('role', '==', 'Resident'),
 		where('paymentStatus', '==', 'Unpaid')
 	);
-	let userFirst, userLast, userID, userEmail, userFee
+	let userFirst, userLast, userID, userEmail, userFee;
 
-	let noResult = false;
+	let unsubscribe = () => {};
 
-	let currentPage = 1;
-	let pageSize = 10;
-	let totalRecords = 1;
-	let totalPages = 0;
-
-	
-  	function openModal(firstName, lastName, email, id) {
-		userFirst = firstName
-		userLast = lastName
-		userID = id
-		userEmail = email
+	function openModal(firstName, lastName, email, id) {
+		userFirst = firstName;
+		userLast = lastName;
+		userID = id;
+		userEmail = email;
 		userFee = 500;
-    	showModal = true;
-  	};
+		showModal = true;
+	}
 
 	function openConfirmation() {
 		showConfirm = true;
 	}
 
 	function closeModal() {
-    	showModal = false;
-  	};
+		showModal = false;
+	}
 
 	function closeConfirmation() {
-    	showConfirm = false;
-  	};
-
-	async function getAccounts(accountsQuery, page, pageSize) {
-		const startIndex = (page - 1) * pageSize;
-		const endIndex = startIndex + pageSize;
-		const unsubscribe = onSnapshot(accountsQuery, (querySnapshot) => {
-			listOfUsers = querySnapshot.docs
-				.map((doc) => ({ id: doc.id, ...doc.data() }))
-				.slice(startIndex, endIndex);
-		});
-		onDestroy(() => unsubscribe());
+		showConfirm = false;
 	}
 
 	async function changeSortBy() {
@@ -110,12 +93,12 @@
 	}
 
 	async function sendPaymentEmail(paymentEmail, paymentID, paymentFee) {
-		const mailFee = paymentFee
-		paymentFee = paymentFee + "00"
-		paymentFee = parseFloat(paymentFee)
+		const mailFee = paymentFee;
+		paymentFee = paymentFee + '00';
+		paymentFee = parseFloat(paymentFee);
 		// console.log(paymentID);
 		// console.log(paymentEmail),
-		console.log(paymentFee)
+		console.log(paymentFee);
 		try {
 			const paymentLinkData = await createPaymentLink(
 				'Southview Homes 3 Monthly Dues',
@@ -164,8 +147,12 @@
 	}
 
 	async function resetStatus() {
-		closeConfirmation()
-		const accountQuery = query(collection(db, 'accounts'), where('role', '==', 'Resident'), where('paymentHead', '==', true));
+		closeConfirmation();
+		const accountQuery = query(
+			collection(db, 'accounts'),
+			where('role', '==', 'Resident'),
+			where('paymentHead', '==', true)
+		);
 		const snapshot = await getDocs(accountQuery);
 		for (let i = 0; i < snapshot.docs.length; i++) {
 			const docRef = doc(db, 'accounts', snapshot.docs[i].id);
@@ -174,18 +161,15 @@
 		toast.success('All payment status has been reset!');
 	}
 
-	$: {
-		getAccounts(accountsQuery, currentPage, pageSize);
-		const unsubscribe = onSnapshot(accountsQuery, (querySnapshot) => {
-			totalRecords = querySnapshot.docs.length;
-			totalPages = Math.ceil(totalRecords / pageSize);
+	function setUpRealtimeListener(accountsQuery) {
+		unsubscribe();
+		unsubscribe = onSnapshot(accountsQuery, (querySnapshot) => {
+			listOfUsers = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 		});
-		listOfUsers.length === 0 ? (noResult = true) : (noResult = false);
-		onDestroy(() => unsubscribe());
 	}
-	function goToPage(page) {
-		currentPage = page;
-	}
+
+	onDestroy(() => unsubscribe());
+	$: setUpRealtimeListener(accountsQuery);
 </script>
 
 <svelte:head>
@@ -195,35 +179,50 @@
 <!-- modal -->
 
 {#if showModal}
-  <div class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto">
-    <div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-75"></div>
-    <div class="relative z-50 w-full max-w-md mx-auto bg-white rounded-lg shadow-lg">
-      <div class="p-6">
-        <h2 class="text-lg font-medium">Send Payment Form to {userFirst} {userLast}</h2>
-        <p class="mt-6 text-sm text-gray-500">Enter payment fee (in Philippine peso)</p>
-		<input type="text" placeholder="Enter amount" bind:value={userFee} class="mt-6 input input-bordered w-full max-w-xs" />
-      </div>
-      <div class="flex justify-end px-6 gap-2 py-4">
-        <button class="btn btn-primary" on:click={sendPaymentEmail(userEmail, userID, userFee)}>Send Payment</button>
-		<button class="btn btn-error text-white" on:click={closeModal}>Cancel</button>
-      </div>
-    </div>
-  </div>
+	<div
+		class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto"
+	>
+		<div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-75" />
+		<div class="relative z-50 w-full max-w-md mx-auto bg-white rounded-lg shadow-lg">
+			<div class="p-6">
+				<h2 class="text-lg font-medium">Send Payment Form to {userFirst} {userLast}</h2>
+				<p class="mt-6 text-sm text-gray-500">Enter payment fee (in Philippine peso)</p>
+				<input
+					type="text"
+					placeholder="Enter amount"
+					bind:value={userFee}
+					class="mt-6 input input-bordered w-full max-w-xs"
+				/>
+			</div>
+			<div class="flex justify-end px-6 gap-2 py-4">
+				<button class="btn btn-primary" on:click={sendPaymentEmail(userEmail, userID, userFee)}
+					>Send Payment</button
+				>
+				<button class="btn btn-error text-white" on:click={closeModal}>Cancel</button>
+			</div>
+		</div>
+	</div>
 {/if}
 
 {#if showConfirm}
-  <div class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto">
-    <div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-75"></div>
-    <div class="relative z-50 w-full max-w-md mx-auto bg-white rounded-lg shadow-lg">
-      <div class="p-6">
-        <p>Would you like to reset all of the resident's monthly dues payment status for this month? <span class="font-semibold">This action cannot be undone.</span></p>
-      </div>
-      <div class="flex justify-end px-6 gap-2 py-4">
-        <button class="btn btn-primary" on:click={resetStatus}>Reset Payment Status</button>
-		<button class="btn btn-error text-white" on:click={closeConfirmation}>Cancel</button>
-      </div>
-    </div>
-  </div>
+	<div
+		class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto"
+	>
+		<div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-75" />
+		<div class="relative z-50 w-full max-w-md mx-auto bg-white rounded-lg shadow-lg">
+			<div class="p-6">
+				<p>
+					Would you like to reset all of the resident's monthly dues payment status for this month? <span
+						class="font-semibold">This action cannot be undone.</span
+					>
+				</p>
+			</div>
+			<div class="flex justify-end px-6 gap-2 py-4">
+				<button class="btn btn-primary" on:click={resetStatus}>Reset Payment Status</button>
+				<button class="btn btn-error text-white" on:click={closeConfirmation}>Cancel</button>
+			</div>
+		</div>
+	</div>
 {/if}
 
 <!-- end modal -->
@@ -290,15 +289,10 @@
 						<th />
 					</tr>
 				</thead>
-				{#if noResult}
-					<tr>
-						<td class="py-24 text-center" colspan="8">No User/s Found</td>
-					</tr>
-				{/if}
 				<tbody>
 					{#each listOfUsers as user, i}
 						<tr class="hover">
-							<td>{i + (currentPage - 1) * pageSize + 1}</td>
+							<td>{i + 1}</td>
 							<td>{user.firstNameDisplay + ' ' + user.lastNameDisplay}</td>
 							<td
 								>{'Block ' +
@@ -315,7 +309,12 @@
 							<td>
 								{#if user.paymentStatus == 'Unpaid'}
 									<button
-										on:click={openModal(user.firstNameDisplay, user.lastNameDisplay, user.email, user.id)}
+										on:click={openModal(
+											user.firstNameDisplay,
+											user.lastNameDisplay,
+											user.email,
+											user.id
+										)}
 										type="button"
 										class="btn btn-primary">Send Payment</button
 									>
@@ -332,9 +331,6 @@
 
 	<!-- Small screen -->
 	<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">
-		{#if noResult}
-			<div class="w-full mx-auto">No user/s Found</div>
-		{/if}
 		{#each listOfUsers as user}
 			<div class="card w-[105%] bg-base-100 shadow-xl">
 				<div class="card-body">
@@ -360,7 +356,12 @@
 					<div class="card-actions justify-end">
 						{#if user.paymentStatus == 'Unpaid'}
 							<button
-								on:click={openModal(user.firstNameDisplay, user.lastNameDisplay, user.email, user.id)}
+								on:click={openModal(
+									user.firstNameDisplay,
+									user.lastNameDisplay,
+									user.email,
+									user.id
+								)}
 								type="button"
 								class="btn btn-primary">Send Payment</button
 							>
@@ -371,9 +372,5 @@
 				</div>
 			</div>
 		{/each}
-	</div>
-
-	<div class="mt-14">
-		<Pagination {currentPage} {totalPages} onPageChange={goToPage} />
 	</div>
 </div>

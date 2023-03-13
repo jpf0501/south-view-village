@@ -26,12 +26,15 @@
 		searchByValue = '';
 	}
 
-	async function getPendingAccounts(accountsQuery) {
+	async function getAccounts(accountsQuery) {
 		const accountsSnapshot = await getDocs(accountsQuery);
-		listOfUsers = accountsSnapshot.docs.map((doc) => doc.data());
+		listOfUsers = accountsSnapshot.docs.map((doc) => ({
+			id: doc.id,
+			...doc.data()
+		}));
 	}
 
-	getPendingAccounts(accountsQuery);
+	getAccounts(accountsQuery);
 </script>
 
 <svelte:head>
