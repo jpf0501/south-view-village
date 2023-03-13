@@ -112,7 +112,7 @@
 				html: `<center><h1><img src="https://ssv.vercel.app/logo.png"> Southview Homes 3</h1>
 				<p style="font-size:12px">SVH3 Clubhouse, San Vicente Road, Brgy., San Vicente, San Pedro, Laguna</p><br/>
 				<p style="font-size:13px; text-decoration:underline">This is an automated message. Do not reply.</p></center>
-				<p>We sent you this notice to inform you on the payment of your unpaid monthly dues for the period of ${currentMonth} ${currentYear}, which amounts to a total of PHP ${paymentFeeDisplay}.00 in total. 
+				<p>We sent you this notice to inform you on the payment of your unpaid monthly dues for the period of ${currentMonth} ${currentYear}, which amounts to a total of PHP ${mailFee}.00 in total. 
 				sThe above amount and period remains unpaid on the record. Please be informed that the default monthly dues amounting Php 500.00 is our monthly obligation, to fund the subdivision's monthly expenses.
 				<br/>1) Security Guard - 4 head counts
 				<br/>2) Street Lights
