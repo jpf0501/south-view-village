@@ -1,7 +1,7 @@
 <script>
 	import { db } from '$lib/firebase/client';
 	import {
-		onSnapshot,
+		getDocs,
 		query,
 		collection,
 		getCountFromServer,
@@ -9,7 +9,6 @@
 		limit,
 		orderBy
 	} from 'firebase/firestore';
-	import { onDestroy } from 'svelte';
 
 	let countOfPendingBooks = '';
 	let countOfAccounts = '';
@@ -26,10 +25,6 @@
 		where('date', '>=', dateToday),
 		orderBy('date', 'asc')
 	);
-
-	async function gotoCLientSide() {
-		await goto('/');
-	}
 
 	async function getCount() {
 		try {
@@ -63,13 +58,11 @@
 	}
 
 	async function getUpcoming() {
-		const unsubscribe = onSnapshot(eventQuery, (querySnapshot) => {
-			listOfEvents = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-		});
-		onDestroy(() => unsubscribe());
+		const eventsSnapshot = await getDocs(eventQuery);
+		listOfEvents = eventsSnapshot.docs.map((doc) => doc.data());
 	}
 
-	$: getUpcoming(eventQuery);
+	getUpcoming(eventQuery);
 	getCount();
 </script>
 
