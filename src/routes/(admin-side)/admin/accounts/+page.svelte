@@ -1,16 +1,12 @@
 <script>
-	import { onSnapshot, query, collection, orderBy, where } from 'firebase/firestore';
+	import { getDocs, query, collection, orderBy, where } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
-	import { onDestroy } from 'svelte';
-	import Pagination from '../Pagination.svelte';
 
 	let listOfUsers = [];
 	let sortByField = '';
 	let searchByField = '';
 	let searchByValue = '';
 	let accountsQuery = query(collection(db, 'accounts'));
-
-	let unsubscribe = () => {};
 
 	async function changeSortBy() {
 		accountsQuery = query(collection(db, 'accounts'), orderBy(sortByField, 'asc'));
@@ -30,15 +26,12 @@
 		searchByValue = '';
 	}
 
-	function setUpRealtimeListener(accountsQuery) {
-		unsubscribe();
-		unsubscribe = onSnapshot(accountsQuery, (querySnapshot) => {
-			listOfUsers = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-		});
+	async function getPendingAccounts(accountsQuery) {
+		const accountsSnapshot = await getDocs(accountsQuery);
+		listOfUsers = accountsSnapshot.docs.map((doc) => doc.data());
 	}
 
-	onDestroy(() => unsubscribe());
-	$: setUpRealtimeListener(accountsQuery);
+	getPendingAccounts(accountsQuery);
 </script>
 
 <svelte:head>
