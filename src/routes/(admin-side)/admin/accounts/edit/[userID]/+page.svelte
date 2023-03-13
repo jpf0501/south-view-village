@@ -37,11 +37,11 @@
 	async function checkInput() {
 		const regex = /^[a-zA-Z -]*$/;
 		errors = {
-			firstname: !user.firstname,
-			lastname: !user.lastname,
+			firstname: !user.firstNameDisplay,
+			lastname: !user.lastNameDisplay,
 			contactNumber: !user.contactNumber,
-			invalidFirstname: !regex.test(user.firstname),
-			invalidLastname: !regex.test(user.lastname)
+			invalidFirstname: !regex.test(user.firstNameDisplay),
+			invalidLastname: !regex.test(user.lastNameDisplay)
 		};
 		if (Object.values(errors).some((v) => v)) {
 			setTimeout(() => {

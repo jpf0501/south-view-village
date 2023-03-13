@@ -19,7 +19,7 @@
 
 	async function checkInput() {
 		errors = {
-			title: !event.title,
+			title: !event.titleDisplay,
 			description: !event.description,
 			date: !event.date,
 			descriptionKulang: event.description.length < 11
@@ -75,30 +75,36 @@
 			<div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2">
 				<div class="form-control">
 					<span class="pb-3">Event Title</span>
+					{#if errors.title}
+						<p class="text-red-500 text-sm italic mb-1">Event title is required</p>
+					{/if}
 					<input
 						type="text"
 						class="input input-bordered p-3 mt-2"
 						bind:value={event.titleDisplay}
-						required
 					/>
 				</div>
 				<div class="form-control">
 					<span class="pb-3">Event Date</span>
-					<input
-						type="date"
-						class="input input-bordered p-3 mt-2"
-						bind:value={event.date}
-						required
-					/>
+					{#if errors.date}
+						<p class="text-red-500 text-sm italic mb-1">Event Date is required</p>
+					{/if}
+					<input type="date" class="input input-bordered p-3 mt-2" bind:value={event.date} />
 				</div>
 			</div>
 			<div class="mt-6">
 				<div class="form-control">
 					<span class="pb-3">Event Desciption</span>
+					{#if errors.description}
+						<p class="text-red-500 text-sm italic mb-1">Event description is required</p>
+					{:else if errors.descriptionKulang}
+						<p class="text-red-500 text-sm italic mb-1">
+							Description must be at least be 10 characters
+						</p>
+					{/if}
 					<textarea
 						class="h-60 textarea textarea-bordered p-3"
 						style="white-space:pre-wrap; resize:none"
-						required
 						bind:value={event.description}
 					/>
 				</div>
@@ -106,7 +112,7 @@
 			<div class="flex justify-end mt-8">
 				<button type="submit" on:click={updateEvent} class="btn btn-primary">Save</button>
 				<a href="/admin/calendar/entries/" class="btn btn-error mx-1 text-white">Cancel</a>
-				<button type="submit" on:click={deleteEvent} class="btn btn-warning text-white"
+				<button type="button" on:click={deleteEvent} class="btn btn-warning text-white"
 					>Delete</button
 				>
 			</div>
