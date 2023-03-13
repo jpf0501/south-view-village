@@ -18,7 +18,6 @@
 	}
 
 	async function checkInput() {
-		event.title = event.titleDisplay.toLowerCase();
 		errors = {
 			title: !event.title,
 			description: !event.description,

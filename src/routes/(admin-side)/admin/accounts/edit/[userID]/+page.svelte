@@ -35,8 +35,6 @@
 	}
 
 	async function checkInput() {
-		user.firstname = user.firstNameDisplay.toLowerCase();
-		user.lastname = user.lastNameDisplay.toLowerCase();
 		const regex = /^[a-zA-Z -]*$/;
 		errors = {
 			firstname: !user.firstname,
