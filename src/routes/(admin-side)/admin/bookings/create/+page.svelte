@@ -1,5 +1,5 @@
 <script>
-	import { doc, addDoc, collection, serverTimestamp } from 'firebase/firestore';
+	import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { goto } from '$app/navigation';
 	import toast from 'svelte-french-toast';

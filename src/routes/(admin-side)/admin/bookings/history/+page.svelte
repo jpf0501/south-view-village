@@ -1,19 +1,16 @@
 <script>
 	import {
-		onSnapshot,
+		getDocs,
 		query,
 		collection,
 		orderBy,
 		where,
-		getCountFromServer,
-		getDocs
+		getCountFromServer
 	} from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
-	import { onDestroy } from 'svelte';
 	import { jsPDF } from 'jspdf';
 	import 'jspdf-autotable';
 	import toast from 'svelte-french-toast';
-	import Pagination from '../../Pagination.svelte';
 
 	const monthName = [
 		'January',
@@ -63,7 +60,7 @@
 	let searchByValue = '';
 	let bookingsQuery = query(
 		collection(db, 'booking'),
-		where('status', 'in', ['Approved', 'Disapproved', 'Cancelled']),
+		where('status', 'in', ['Approved', 'Disapproved']),
 		orderBy('dateReviewed', 'desc')
 	);
 	let generateQuery = query(
@@ -72,24 +69,6 @@
 		where('dateReviewed', '>=', startDate),
 		where('dateReviewed', '<', endDate)
 	);
-
-	let noResult = false;
-
-	let currentPage = 1;
-	let pageSize = 10;
-	let totalRecords = 1;
-	let totalPages = 0;
-
-	async function getBookings(bookingsQuery, page, pageSize) {
-		const startIndex = (page - 1) * pageSize;
-		const endIndex = startIndex + pageSize;
-		const unsubscribe = onSnapshot(bookingsQuery, (querySnapshot) => {
-			listOfBooking = querySnapshot.docs
-				.map((doc) => ({ id: doc.id, ...doc.data() }))
-				.slice(startIndex, endIndex);
-		});
-		onDestroy(() => unsubscribe());
-	}
 
 	async function changeSortBy() {
 		const order = sortByField === 'bookDate' ? 'desc' : 'asc';
@@ -135,8 +114,8 @@
 	async function generateReport() {
 		const report = new jsPDF();
 
-		const generateSnapshot = await getDocs(generateQuery)
-		listOfReports = generateSnapshot.docs.map(doc => doc.data());
+		const generateSnapshot = await getDocs(generateQuery);
+		listOfReports = generateSnapshot.docs.map((doc) => doc.data());
 
 		let approvedQuery = query(
 			collection(db, 'booking'),
@@ -229,19 +208,12 @@
 		}
 	}
 
-	$: {
-		getBookings(bookingsQuery, currentPage, pageSize);
-		const unsubscribe = onSnapshot(bookingsQuery, (querySnapshot) => {
-			totalRecords = querySnapshot.docs.length;
-			totalPages = Math.ceil(totalRecords / pageSize);
-		});
-		listOfBooking.length === 0 ? (noResult = true) : (noResult = false);
-		onDestroy(() => unsubscribe());
-	}
-	function goToPage(page) {
-		currentPage = page;
+	async function getBookingsHitory(bookingsQuery) {
+		const bookingsSnapshot = await getDocs(bookingsQuery);
+		listOfBooking = bookingsSnapshot.docs.map((doc) => doc.data());
 	}
 
+	getBookingsHitory(bookingsQuery);
 </script>
 
 <svelte:head>
@@ -380,16 +352,11 @@
 						<th class="text-lg">Date Reviewed</th>
 					</tr>
 				</thead>
-				{#if noResult}
-					<tr>
-						<td class="py-24 text-center" colspan="8">No Booking History Found</td>
-					</tr>
-				{/if}
 				<tbody>
 					{#each listOfBooking as book, i}
 						<!-- {#if book.status != 'Pending'} -->
 						<tr class="hover">
-							<td>{i + (currentPage - 1) * pageSize + 1}</td>
+							<td>{i + 1}</td>
 							<td>{book.firstNameDisplay + ' ' + book.lastNameDisplay}</td>
 							<td>{book.email}</td>
 							<td>{book.contactNumber}</td>
@@ -442,9 +409,6 @@
 	<!-- Small screen -->
 
 	<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">
-		{#if noResult}
-			<div class="w-full mx-auto">No Booking History Found</div>
-		{/if}
 		{#each listOfBooking as book}
 			<!-- {#if book.status == 'Approved' || book.status == 'Disapproved'} -->
 			<div class="card w-[105%] bg-base-100 shadow-xl">
@@ -498,9 +462,5 @@
 			</div>
 			<!-- {/if} -->
 		{/each}
-	</div>
-
-	<div class="mt-14">
-		<Pagination {currentPage} {totalPages} onPageChange={goToPage} />
 	</div>
 </div>
