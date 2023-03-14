@@ -1,13 +1,24 @@
 <script>
 	import { auth } from '$lib/firebase/client';
-	import { updatePassword } from 'firebase/auth';
+	import { updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
 	import { goto } from '$app/navigation';
 	import toast from 'svelte-french-toast';
 	let showChangePassword;
+	let showOldPasswordFiled = false;
 	let newPassword = '';
 	let newPasswordCheck = '';
+	let oldPassword = '';
 
 	let errors = {};
+
+	async function submitHandler() {
+		const isValid = await checkInput();
+		if (!isValid) {
+			toast.error('Form validation failed');
+			return;
+		}
+		showOldPasswordFiled = true;
+	}
 
 	async function checkInput() {
 		errors = {
@@ -25,12 +36,18 @@
 		return true;
 	}
 
-	async function changePassword() {
-		const isValid = await checkInput();
-		if (!isValid) {
-			toast.error('Form validation failed');
+	async function promptForCredentials() {
+		const email = auth.currentUser.email;
+		const credential = EmailAuthProvider.credential(email, oldPassword);
+		try {
+			await reauthenticateWithCredential(auth.currentUser, credential);
+			// console.log('re-authenticate sucess');
+		} catch (error) {
+			console.log(error);
+			toast.error('Incorrect password');
 			return;
 		}
+
 		try {
 			await updatePassword(auth.currentUser, newPassword);
 			toast.success('Password Updated!');
@@ -49,7 +66,7 @@
 {/if}
 
 {#if showChangePassword}
-	<form on:submit={changePassword}>
+	<form on:submit={submitHandler}>
 		<div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2">
 			<div class="form-control">
 				<span>New Password</span>
@@ -79,4 +96,28 @@
 			>
 		</div>
 	</form>
+{/if}
+{#if showOldPasswordFiled}
+	<div
+		class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto"
+	>
+		<div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-75" />
+		<div class="relative z-50 w-full max-w-md mx-auto bg-white rounded-lg shadow-lg">
+			<div class="p-6">
+				<h2 class="text-lg font-medium">Enter Old Password</h2>
+				<input
+					type="paassword"
+					placeholder="Old Password"
+					bind:value={oldPassword}
+					class="mt-6 input input-bordered w-full max-w-xs"
+				/>
+			</div>
+			<div class="flex justify-end px-6 gap-2 py-4">
+				<button class="btn btn-primary" on:click={promptForCredentials}>Submit</button>
+				<button class="btn btn-error text-white" on:click={() => (showOldPasswordFiled = false)}
+					>Cancel</button
+				>
+			</div>
+		</div>
+	</div>
 {/if}
