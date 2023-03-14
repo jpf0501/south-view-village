@@ -3,8 +3,12 @@
 	import { auth, db } from '$lib/firebase/client.js';
 	import { signOut } from 'firebase/auth';
 	import { goto } from '$app/navigation';
-	import { getDoc, doc } from 'firebase/firestore';
+	import { onSnapshot, doc } from 'firebase/firestore';
+	import { onDestroy } from 'svelte';
 	import toast from 'svelte-french-toast';
+
+	let user = '';
+	let unsubscribe = () => {};
 
 	async function logOut() {
 		try {
@@ -17,17 +21,18 @@
 		}
 	}
 
-	let user = '';
-
 	async function getUser() {
 		if (!$userStore) {
 			return;
 		}
-		const snapshot = await getDoc(doc(db, 'accounts', $userStore.uid));
-		user = snapshot.data();
+		unsubscribe();
+		unsubscribe = onSnapshot(doc(db, 'accounts', $userStore.uid), (doc) => {
+			user = doc.data();
+		});
 	}
 	$: if ($userStore) {
 		getUser();
+		onDestroy(() => unsubscribe());
 	} else if ($userStore === null) {
 		goto('/');
 	}
