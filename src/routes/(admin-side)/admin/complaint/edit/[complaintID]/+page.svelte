@@ -137,7 +137,7 @@
 					>
 						Submit
 					</button>
-					<a href="/admin/inquiries" class="btn btn-error mx-1 text-white">Cancel</a>
+					<a href="/admin/complaint" class="btn btn-error mx-1 text-white">Cancel</a>
 					<button on:click={deleteComplaint} type="submit" class="btn btn-warning mx-1 text-white">
 						Delete
 					</button>
