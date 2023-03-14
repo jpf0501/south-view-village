@@ -28,6 +28,7 @@
 			where(searchByField, '>=', searchByValueCase),
 			where(searchByField, '<=', searchByValueCase + '~'),
 			where('hadAnswered', '==', false),
+			orderBy(searchByField, 'asc'),
 			orderBy('dateSubmitted', 'asc')
 		);
 	}
