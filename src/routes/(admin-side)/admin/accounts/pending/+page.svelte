@@ -19,7 +19,7 @@
 	let searchByValue = '';
 	let pendingAccountsQuery = query(
 		collection(db, 'pendingAccounts'),
-		where('isPending', '==', true)
+		where('status', '==', 'Pending')
 	);
 
 	let isApproved = '';
@@ -29,7 +29,7 @@
 	async function changeSortBy() {
 		pendingAccountsQuery = query(
 			collection(db, 'pendingAccounts'),
-			where('isPending', '==', true),
+			where('status', '==', 'Pending'),
 			orderBy(sortByField, 'asc')
 		);
 	}
@@ -38,14 +38,14 @@
 		let searchByValueCase = searchByValue.toLowerCase();
 		pendingAccountsQuery = query(
 			collection(db, 'pendingAccounts'),
-			where('isPending', '==', true),
+			where('status', '==', 'Pending'),
 			where(searchByField, '>=', searchByValueCase),
 			where(searchByField, '<=', searchByValueCase + '~')
 		);
 	}
 
 	async function resetButton() {
-		pendingAccountsQuery = query(collection(db, 'pendingAccounts'), where('isPending', '==', true));
+		pendingAccountsQuery = query(collection(db, 'pendingAccounts'), where('status', '==', 'Pending'));
 		searchByValue = '';
 	}
 
@@ -95,7 +95,7 @@
 
 					const pendingAccountsRef = doc(db, 'pendingAccounts', pendingID);
 					const data = {
-						isPending: false
+						status: 'Approved'
 					};
 					await updateDoc(pendingAccountsRef, data);
 					toast.success('Account approved!');
@@ -108,7 +108,7 @@
 			try {
 				const pendingAccountsRef = doc(db, 'pendingAccounts', pendingID);
 				const data = {
-					isPending: false
+					status: 'Disapproved'
 				};
 				await updateDoc(pendingAccountsRef, data);
 				toast.success('Account disaaproved!');

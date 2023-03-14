@@ -18,7 +18,7 @@
 		role: 'Resident',
 		paymentStatus: 'Unpaid',
 		paymentHead: '',
-		isPending: true
+		status: 'Pending'
 	};
 
 	let streetQuery = query(collection(db, 'street'), orderBy('streetName', 'asc'));
@@ -127,7 +127,7 @@
 				pendingRole: account.role,
 				pendingPaymentStatus: account.paymentStatus,
 				pendingPaymentHead: account.paymentHead,
-				isPending: true
+				status: account.status
 			};
 
 			await addDoc(collection(db, 'pendingAccounts'), pendingAccount);
