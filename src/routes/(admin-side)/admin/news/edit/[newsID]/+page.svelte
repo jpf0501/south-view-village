@@ -9,6 +9,7 @@
 	const { newsID } = data;
 
 	let news = null;
+	let errors = {};
 
 	async function getNews() {
 		const snapshot = await getDoc(doc(db, 'news', newsID));
@@ -16,7 +17,27 @@
 		news.title = news.titleDisplay;
 	}
 
+	async function checkInput() {
+		errors = {
+			title: !news.titleDisplay,
+			content: !news.content,
+			contentKulang: news.content.length < 10
+		};
+		if (Object.values(errors).some((v) => v)) {
+			setTimeout(() => {
+				errors = {};
+			}, 2000);
+			return;
+		}
+		return true;
+	}
+
 	async function updateNews() {
+		const isValid = await checkInput();
+		if (!isValid) {
+			toast.error('Form validation failed');
+			return;
+		}
 		news.title = news.titleDisplay.toLowerCase();
 		try {
 			news.dateModified = serverTimestamp();
@@ -54,20 +75,28 @@
 			<form>
 				<div class="form-control">
 					<span class="pb-3">News Title</span>
+					{#if errors.title}
+						<p class="text-red-500 text-sm italic mb-1">News title is required</p>
+					{/if}
 					<input
 						type="text"
 						class="input input-bordered p-3 mt-2"
 						bind:value={news.titleDisplay}
-						required
 					/>
 				</div>
 				<div class="mt-6">
 					<div class="form-control">
 						<span class="pb-3">News Desciption</span>
+						{#if errors.content}
+							<p class="text-red-500 text-sm italic mb-1">News content is required</p>
+						{:else if errors.contentKulang}
+							<p class="text-red-500 text-sm italic mb-1">
+								News content must at least be 10 characters
+							</p>
+						{/if}
 						<textarea
 							class="h-60 textarea textarea-bordered p-3"
 							style="white-space:pre-wrap; resize:none"
-							required
 							bind:value={news.content}
 						/>
 					</div>

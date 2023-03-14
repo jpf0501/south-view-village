@@ -1,15 +1,7 @@
 <script>
 	import { goto } from '$app/navigation';
 	import { db } from '$lib/firebase/client';
-	import {
-		getDocs,
-		query,
-		collection,
-		orderBy,
-		addDoc,
-		where
-	} from 'firebase/firestore';
-	import { onDestroy } from 'svelte';
+	import { getDocs, query, collection, orderBy, addDoc, where } from 'firebase/firestore';
 	import toast from 'svelte-french-toast';
 	import { sendEmail } from '$lib/utils';
 
@@ -26,7 +18,7 @@
 		role: 'Resident',
 		paymentStatus: 'Unpaid',
 		paymentHead: '',
-		isPending: true
+		status: 'Pending'
 	};
 
 	let streetQuery = query(collection(db, 'street'), orderBy('streetName', 'asc'));
@@ -51,8 +43,16 @@
 		listOfStreets = streetSnapshot.docs.map((doc) => doc.data());
 	}
 
-	async function sendOTP() {
-		OTP = '';
+	async function submitHandler() {
+		const isValid = await checkInput();
+		if (!isValid) {
+			toast.error('Form validation failed');
+			return;
+		}
+		sendOTP();
+	}
+
+	async function checkInput() {
 		// letter and '-'
 		const regex = /^[a-zA-Z -]*$/;
 		// must have at least 1 letter
@@ -90,6 +90,11 @@
 			}, 2000);
 			return;
 		}
+		return true
+	}
+
+	async function sendOTP() {
+		OTP = '';
 
 		OTP = Array.from({ length: 6 }, () => digits[Math.floor(Math.random() * digits.length)]).join(
 			''
@@ -122,7 +127,7 @@
 				pendingRole: account.role,
 				pendingPaymentStatus: account.paymentStatus,
 				pendingPaymentHead: account.paymentHead,
-				isPending: true
+				status: account.status
 			};
 
 			await addDoc(collection(db, 'pendingAccounts'), pendingAccount);
@@ -184,7 +189,7 @@
 				<div class="mt-2">
 					<h1 class="text-2xl">Create Account</h1>
 				</div>
-				<form on:submit|preventDefault={sendOTP}>
+				<form on:submit|preventDefault={submitHandler}>
 					<div class="grid grid-cols-2 gap-6 mt-6 md:grid-cols-2">
 						<div class="form-control">
 							<label for="fname" class="label">
@@ -194,8 +199,8 @@
 								<p class="text-red-500 text-sm italic mb-1">First Name is required</p>
 							{:else if errors.invalidFirstname}
 								<p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
-								{:else if errors.invalidFirstnameRequired}
-							<p class="text-red-500 text-sm italic mb-1">Firstname must have a letter</p>
+							{:else if errors.invalidFirstnameRequired}
+								<p class="text-red-500 text-sm italic mb-1">Firstname must have a letter</p>
 							{/if}
 							<input
 								type="text"
@@ -213,8 +218,8 @@
 								<p class="text-red-500 text-sm italic mb-1">Last Name is required</p>
 							{:else if errors.invalidLastname}
 								<p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
-								{:else if errors.invalidLastnameRequired}
-							<p class="text-red-500 text-sm italic mb-1">Lastname must have a letter</p>
+							{:else if errors.invalidLastnameRequired}
+								<p class="text-red-500 text-sm italic mb-1">Lastname must have a letter</p>
 							{/if}
 							<input
 								type="text"

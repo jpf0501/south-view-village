@@ -34,7 +34,7 @@
 		}));
 	}
 
-	getEvents(eventQuery);
+	$: getEvents(eventQuery);
 </script>
 
 <svelte:head>

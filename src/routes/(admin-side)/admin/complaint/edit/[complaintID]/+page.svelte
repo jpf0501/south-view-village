@@ -10,6 +10,7 @@
 	const { complaintID } = data;
 
 	let complaint = null;
+	let errors = {};
 
 	async function getComplaints() {
 		try {
@@ -21,9 +22,28 @@
 		}
 	}
 
-	async function submitHandler(firstname, lastname, email, complaint, response){
-		await answerComplaint(response)
-		sendResponseToEmail(firstname, lastname, email, complaint, response)
+	async function submitHandler(firstname, lastname, email, complaint, response) {
+		const isValid = await checkInput();
+		if (!isValid) {
+			toast.error('Form validation failed');
+			return;
+		}
+		await answerComplaint(response);
+		sendResponseToEmail(firstname, lastname, email, complaint, response);
+	}
+
+	async function checkInput() {
+		errors = {
+			response: !complaint.response,
+			responseKulang: complaint.response.length < 10
+		};
+		if (Object.values(errors).some((v) => v)) {
+			setTimeout(() => {
+				errors = {};
+			}, 2000);
+			return;
+		}
+		return true;
 	}
 
 	async function answerComplaint(response) {
@@ -45,20 +65,20 @@
 		}
 	}
 
-	async function sendResponseToEmail(firstname, lastname, email, complaint, response){
+	async function sendResponseToEmail(firstname, lastname, email, complaint, response) {
 		try {
-				await sendEmail({
-					to: email,
-					subject: 'Southview Homes 3 Inquiries',
-					html: `<h1>Hello ${
-						firstname + ' ' + lastname
-					}, </h1> <div> We have receive your complaint about</div><div style="white-space:pre-wrap">${complaint}</div><h1>Our Response is </h1><div style="white-space:pre-wrap">${response}</div>`
-				});
-				toast.success('Response sent!');
-			} catch (error) {
-				console.log(error);
-				toast.error('Error in sending reponse of the complaint');
-			}
+			await sendEmail({
+				to: email,
+				subject: 'Southview Homes 3 Complaint',
+				html: `<h1>Hello ${
+					firstname + ' ' + lastname
+				}, </h1> <div> We have receive your complaint about</div><div style="white-space:pre-wrap">${complaint}</div><h1>Our Response is </h1><div style="white-space:pre-wrap">${response}</div>`
+			});
+			toast.success('Response sent!');
+		} catch (error) {
+			console.log(error);
+			toast.error('Error in sending reponse of the complaint');
+		}
 	}
 
 	async function deleteComplaint() {
@@ -93,9 +113,13 @@
 				</div>
 				<div class="flex flex-col mb-6">
 					<div class="text-gray-700 font-bold mb-2">Response</div>
+					{#if errors.response}
+						<p class="text-red-500 text-sm italic mb-1">Response is required</p>
+					{:else if errors.responseKulang}
+						<p class="text-red-500 text-sm italic mb-1">Response must at least be 10 characters</p>
+					{/if}
 					<textarea
 						class="h-60 border rounded-md p-4 resize-none"
-						required
 						bind:value={complaint.response}
 					/>
 				</div>
@@ -113,7 +137,7 @@
 					>
 						Submit
 					</button>
-					<a href="/admin/inquiries" class="btn btn-error mx-1 text-white">Cancel</a>
+					<a href="/admin/complaint" class="btn btn-error mx-1 text-white">Cancel</a>
 					<button on:click={deleteComplaint} type="submit" class="btn btn-warning mx-1 text-white">
 						Delete
 					</button>

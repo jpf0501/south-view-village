@@ -35,7 +35,7 @@
 		}));
 	}
 
-	getNews(newsQuery);
+	$: getNews(newsQuery);
 </script>
 
 <svelte:head>

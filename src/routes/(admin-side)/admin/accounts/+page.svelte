@@ -34,7 +34,7 @@
 		}));
 	}
 
-	getAccounts(accountsQuery);
+	$: getAccounts(accountsQuery);
 </script>
 
 <svelte:head>

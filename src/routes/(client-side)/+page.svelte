@@ -1,28 +1,7 @@
 <script>
-	import {
-		collection,
-		addDoc,
-		serverTimestamp
-	} from 'firebase/firestore';
+	import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
-	import { onDestroy } from 'svelte';
 	import toast from 'svelte-french-toast';
-	// import { goto } from '$app/navigation';
-
-	// let dateToday = new Date().toLocaleDateString('fr-CA', {
-	// 	year: 'numeric',
-	// 	month: '2-digit',
-	// 	day: '2-digit'
-	// });
-	// let listOfNews = [];
-	// let listOfEvents = [];
-	// let newsQuery = query(collection(db, 'news'), orderBy('dateCreated', 'desc'), limit(3));
-	// let eventQuery = query(
-	// 	collection(db, 'event'),
-	// 	limit(3),
-	// 	where('date', '>=', dateToday),
-	// 	orderBy('date', 'asc')
-	// );
 
 	let inquiry = {
 		name: '',
@@ -30,7 +9,36 @@
 		message: ''
 	};
 
+	let errors = {};
+
+	async function checkInput() {
+		const regex = /^[a-zA-Z -]*$/;
+		const nameRegex = inquiry.name.length > 0 && /[a-zA-Z]/.test(inquiry.name);
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		errors = {
+			email: !inquiry.email,
+			name: !inquiry.name,
+			message: !inquiry.message,
+			invalidEmail: !emailRegex.test(inquiry.email),
+			invalidName: !regex.test(inquiry.name),
+			hasNoLetter: !nameRegex,
+			messageKulang: inquiry.message.length < 11
+		};
+		if (Object.values(errors).some((v) => v)) {
+			setTimeout(() => {
+				errors = {};
+			}, 2000);
+			return;
+		}
+		return true;
+	}
+
 	async function inquiryHandler() {
+		const isValid = await checkInput();
+		if (!isValid) {
+			toast.error('Form validation failed');
+			return;
+		}
 		try {
 			await addDoc(collection(db, 'inquiries'), {
 				name: inquiry.name.trim().toLowerCase(),
@@ -52,10 +60,6 @@
 			toast.error('Error in sending inquiry!');
 		}
 	}
-
-	// $: getNews(newsQuery);
-	// $: getEvents(eventQuery);
-	// getNewsAndEvents();
 </script>
 
 <svelte:head>
@@ -245,26 +249,40 @@
 	<form on:submit|preventDefault={inquiryHandler}>
 		<div class="form-control w-full max-w-xl pt-6 pb-4 mx-auto">
 			<div class="flex flex-row py-5 gap-3">
+				{#if errors.name}
+					<p class="text-red-500 text-sm italic mb-1">Name is required</p>
+				{:else if errors.invalidName}
+					<p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
+				{:else if errors.hasNoLetter}
+					<p class="text-red-500 text-sm italic mb-1">Firstname must have a letter</p>
+				{/if}
 				<input
 					type="text"
 					placeholder="Name"
 					class="input input-bordered w-full max-w-xs"
-					required
 					bind:value={inquiry.name}
 				/>
+				{#if errors.email}
+					<p class="text-red-500 text-sm italic mb-1">Email is required</p>
+				{:else if errors.invalidEmail}
+					<p class="text-red-500 text-sm italic mb-1">Invalid email</p>
+				{/if}
 				<input
-					type="email"
+					type="text"
 					placeholder="E-mail Address"
 					class="input input-bordered w-full max-w-xs"
-					required
 					bind:value={inquiry.email}
 				/>
 			</div>
+			{#if errors.message}
+				<p class="text-red-500 text-sm italic mb-1">Message is required</p>
+			{:else if errors.messageKulang}
+				<p class="text-red-500 text-sm italic mb-1">Message must be at least 10 characters</p>
+			{/if}
 			<textarea
 				class="textarea textarea-bordered h-32 w-auto"
 				placeholder="Message"
 				style="resize: none;"
-				required
 				bind:value={inquiry.message}
 			/>
 			<button type="submit" class="btn btn-primary my-8">Submit Inquiry</button>
