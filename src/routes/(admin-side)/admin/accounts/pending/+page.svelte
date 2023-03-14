@@ -10,6 +10,7 @@
 		getDocs
 	} from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
+	import { sendEmail } from '$lib/utils';
 	import { onDestroy } from 'svelte';
 	import toast from 'svelte-french-toast';
 
@@ -22,7 +23,7 @@
 		where('status', '==', 'Pending')
 	);
 
-	let isApproved = '';
+	let pendingAccountStatus = '';
 
 	let unsubscribe = () => {};
 
@@ -45,7 +46,10 @@
 	}
 
 	async function resetButton() {
-		pendingAccountsQuery = query(collection(db, 'pendingAccounts'), where('status', '==', 'Pending'));
+		pendingAccountsQuery = query(
+			collection(db, 'pendingAccounts'),
+			where('status', '==', 'Pending')
+		);
 		searchByValue = '';
 	}
 
@@ -65,46 +69,45 @@
 		pendingPaymentStatus,
 		pendingPaymentHead
 	) {
-		if (isApproved) {
+		if (pendingAccountStatus === 'Approved') {
 			try {
 				const accountsQuery = query(collection(db, 'accounts'), where('email', '==', pendingEmail));
 				const accountsSnapshot = await getDocs(accountsQuery);
 				if (accountsSnapshot.docs.length > 0) {
 					toast.error('Email already exists!');
-				} else {
-					const response = await fetch('/api/pendingAccounts', {
-						method: 'POST',
-						body: JSON.stringify({
-							email: pendingEmail,
-							password: pendingPassword,
-							firstname: pendingFirstname,
-							firstNameDisplay: pendingFirstNameDisplay,
-							lastname: pendingLastname,
-							lastNameDisplay: pendingLastNameDisplay,
-							addressBlock: pendingAddressBlock,
-							addressLot: pendingAddressLot,
-							addressStreet: pendingAddressStreet,
-							contactNumber: pendingContactNumber,
-							role: pendingRole,
-							paymentStatus: pendingPaymentStatus,
-							paymentHead: pendingPaymentHead
-						})
-					});
-					const result = await response.json();
-					console.log(result);
-
-					const pendingAccountsRef = doc(db, 'pendingAccounts', pendingID);
-					const data = {
-						status: 'Approved'
-					};
-					await updateDoc(pendingAccountsRef, data);
-					toast.success('Account approved!');
+					return;
 				}
+				const response = await fetch('/api/pendingAccounts', {
+					method: 'POST',
+					body: JSON.stringify({
+						email: pendingEmail,
+						password: pendingPassword,
+						firstname: pendingFirstname,
+						firstNameDisplay: pendingFirstNameDisplay,
+						lastname: pendingLastname,
+						lastNameDisplay: pendingLastNameDisplay,
+						addressBlock: pendingAddressBlock,
+						addressLot: pendingAddressLot,
+						addressStreet: pendingAddressStreet,
+						contactNumber: pendingContactNumber,
+						role: pendingRole,
+						paymentStatus: pendingPaymentStatus,
+						paymentHead: pendingPaymentHead
+					})
+				});
+				const result = await response.json();
+				// console.log(result);
+				const pendingAccountsRef = doc(db, 'pendingAccounts', pendingID);
+				const data = {
+					status: 'Approved'
+				};
+				await updateDoc(pendingAccountsRef, data);
+				toast.success('Account approved!');
 			} catch (error) {
 				console.log(error);
 				toast.error('Error in approving account!');
 			}
-		} else {
+		} else if (pendingAccountStatus === 'Dissaproved') {
 			try {
 				const pendingAccountsRef = doc(db, 'pendingAccounts', pendingID);
 				const data = {
@@ -115,6 +118,17 @@
 			} catch (error) {}
 			console.log(error);
 			toast.error('Error in disapproving an account!');
+		}
+		try {
+			await sendEmail({
+				to: pendingEmail,
+				subject: 'Southview Homes 3 Account Request',
+				html: `Your account request has been ${pendingAccountStatus.toLocaleLowerCase()} by the admin`
+			});
+			// toast.success("Update of account request send to email")
+		} catch (error) {
+			console.log(error);
+			// toast.error('Update of account request send to email');
 		}
 	}
 
@@ -236,12 +250,12 @@
 									)}
 								>
 									<button
-										on:click={() => (isApproved = true)}
+										on:click={() => (pendingAccountStatus = 'Approved')}
 										type="submit"
 										class="btn btn-success text-white">Approve</button
 									>
 									<button
-										on:click={() => (isApproved = false)}
+										on:click={() => (pendingAccountStatus = 'Dissaproved')}
 										type="submit"
 										class="btn btn-error text-white">Dissaprove</button
 									>
@@ -309,12 +323,12 @@
 							class="py-3"
 						>
 							<button
-								on:click={() => (isApproved = true)}
+								on:click={() => (pendingAccountStatus = 'Approved')}
 								type="submit"
 								class="btn btn-success text-white">Approve</button
 							>
 							<button
-								on:click={() => (isApproved = false)}
+								on:click={() => (pendingAccountStatus = 'Dissaproved')}
 								type="submit"
 								class="btn btn-error text-white">Dissaprove</button
 							>
