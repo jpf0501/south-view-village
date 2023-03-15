@@ -1,11 +1,11 @@
 <script>
-	import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+	import { addDoc, collection, serverTimestamp, getDocs, query, where } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { goto } from '$app/navigation';
 	import toast from 'svelte-french-toast';
 
 	const dateMin = new Date(Date.now() + 8.64e7).toLocaleDateString('en-ca');
-	// const dateMax = new Date(Date.now() + 8.64e7 + 6.048e8 * 2).toLocaleDateString('en-ca');
+	// // const dateMax = new Date(Date.now() + 8.64e7 + 6.048e8 * 2).toLocaleDateString('en-ca');
 
 	let guest = {
 		firstname: '',
@@ -37,6 +37,31 @@
 		const lastnameRegex = guest.lastname.length > 0 && /[a-zA-Z]/.test(guest.lastname);
 		// must ba an email
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		let eventCurrentTimeStamp = new Date(guest.date);
+		let eventTommorowTimeStamp = new Date(guest.date);
+		// computation to get the next day of guess.date in a date type
+		let eventYear = eventTommorowTimeStamp.getFullYear();
+		let eventMonth = eventTommorowTimeStamp.getMonth();
+		let lastDayOfMonth = new Date(eventYear, eventMonth + 1, 0).getDate();
+		if (eventTommorowTimeStamp.getDate() === lastDayOfMonth) {
+			eventMonth++;
+			eventTommorowTimeStamp.setMonth(eventMonth);
+			eventTommorowTimeStamp.setDate(1);
+			if (eventMonth === 12) {
+				eventYear++;
+				eventTommorowTimeStamp.setFullYear(eventYear);
+			}
+		} else {
+			eventTommorowTimeStamp.setDate(eventTommorowTimeStamp.getDate() + 1);
+		}
+		// console.log(eventCurrentTimeStamp);
+		// console.log(eventTommorowTimeStamp);
+		const bookingsQuery = query(
+			collection(db, 'booking'),
+			where('bookDate', '>=', eventCurrentTimeStamp),
+			where('bookDate', '<', eventTommorowTimeStamp)
+		);
+		const bookingsSnapshot = await getDocs(bookingsQuery);
 		errors = {
 			email: !guest.email,
 			firstname: !guest.firstname,
@@ -49,7 +74,8 @@
 			invalidLastname: !regex.test(guest.lastname),
 			invalidFirstnameRequired: !firstnameRegex,
 			invalidLastnameRequired: !lastnameRegex,
-			invalidEmail: !emailRegex.test(guest.email)
+			invalidEmail: !emailRegex.test(guest.email),
+			dateIsReserved: bookingsSnapshot.docs.length > 0
 		};
 		if (Object.values(errors).some((v) => v)) {
 			setTimeout(() => {
@@ -73,7 +99,7 @@
 				paymentStatus: guest.paymentStatus,
 				eventType: guest.eventType.trim().toLowerCase(),
 				eventTypeDisplay: guest.eventType,
-				bookDate: new Date(guest.date + ' ' + guest.time), 
+				bookDate: new Date(guest.date + ' ' + guest.time),
 				dateReserved: guest.dateReserved,
 				dateReviewed: guest.dateReserved
 			});
@@ -175,11 +201,13 @@
 					<span class="label-text">Date</span>
 					{#if errors.date}
 						<p class="text-red-500 text-sm italic mb-1">Date is required</p>
+					{:else if errors.dateIsReserved}
+						<p class="text-red-500 text-sm italic mb-1">That date is already reserved</p>
 					{/if}
 					<input
 						type="date"
-						min={dateMin}
 						class="input input-bordered p-3 mt-2"
+						min={dateMin}
 						bind:value={guest.date}
 					/>
 				</div>
