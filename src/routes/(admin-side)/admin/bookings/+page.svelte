@@ -97,7 +97,7 @@
 				<p>Booking Status Update</p>
 				<p>Dear ${firstname} ${lastname},</p>
 				<p>Thank you for your recent booking request.</p>
-				<p>We are writing to inform you that your booking request has been <strong>${bookingStatus}</strong>. The details of your booking are as follows:</p>
+				<p>We are writing to inform you that your booking request has been <strong>${bookingStatus.toLocaleUpperCase()}</strong>. The details of your booking are as follows:</p>
 				<ul>
 					<li><strong>Booking ID:</strong> ${id}</li>
 					<li><strong>Service/Event/Reservation:</strong> ${event}</li>

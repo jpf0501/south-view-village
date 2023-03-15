@@ -107,17 +107,18 @@
 				console.log(error);
 				toast.error('Error in approving account!');
 			}
-		} else if (pendingAccountStatus === 'Dissaproved') {
+		} else if (pendingAccountStatus === 'Disapproved') {
 			try {
 				const pendingAccountsRef = doc(db, 'pendingAccounts', pendingID);
 				const data = {
 					status: 'Disapproved'
 				};
 				await updateDoc(pendingAccountsRef, data);
-				toast.success('Account disaaproved!');
-			} catch (error) {}
-			console.log(error);
-			toast.error('Error in disapproving an account!');
+				toast.success('Account disapproved!');
+			} catch (error) {
+				console.log(error);
+				toast.error('Error in disapproving an account!');
+			}
 		}
 		try {
 			await sendEmail({
@@ -255,7 +256,7 @@
 										class="btn btn-success text-white">Approve</button
 									>
 									<button
-										on:click={() => (pendingAccountStatus = 'Dissaproved')}
+										on:click={() => (pendingAccountStatus = 'Disapproved')}
 										type="submit"
 										class="btn btn-error text-white">Dissaprove</button
 									>
@@ -328,7 +329,7 @@
 								class="btn btn-success text-white">Approve</button
 							>
 							<button
-								on:click={() => (pendingAccountStatus = 'Dissaproved')}
+								on:click={() => (pendingAccountStatus = 'Disapproved')}
 								type="submit"
 								class="btn btn-error text-white">Dissaprove</button
 							>
