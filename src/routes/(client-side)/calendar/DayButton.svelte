@@ -9,8 +9,6 @@
 	export let month;
 	export let year;
 
-	let listOfEvent = [];
-
 	$: dateString = new Date(`${year}-${month}-${dayNumber}`).toLocaleDateString('fr-CA');
 	$: newDateString = new Date(`${year}-${month}-${dayNumber}`);
 
@@ -22,14 +20,6 @@
 		const querySnapshotE = await getDocs(
 			query(collection(db, 'event'), where('date', '==', dateString))
 		);
-		listOfEvent = querySnapshotE.docs
-			.map((doc) => ({ id: doc.id, ...doc.data() }))
-			.splice(0, 2)
-			.map((event) => ({
-				...event,
-				titleDisplay:
-					event.titleDisplay.slice(0, 18) + (event.titleDisplay.length > 18 ? '...' : '')
-			}));
 		isThereEvent = !querySnapshotE.empty;
 	}
 
@@ -64,19 +54,14 @@
 </script>
 
 <button
-	class="border border-collapse aspect-video"
+	class="border border-collapse aspect-video {isThereEvent && isThereBooking
+		? 'bg-red-500'
+		: ''}{isThereBooking && !isThereEvent ? 'bg-blue-700 text-white' : ''} {isThereEvent &&
+	!isThereBooking
+		? 'bg-green-500'
+		: ''}"
 	on:click={showModal}
 	disabled={!isThereBooking && !isThereEvent}
 >
-	<div>
-		{dayNumber}
-	</div>
-	{#each listOfEvent as event}
-		<div>
-			{event.titleDisplay}
-		</div>
-	{/each}
-	{#if isThereBooking}
-		<div>Clubhouse Reserved</div>
-	{/if}
+	{dayNumber}
 </button>
