@@ -27,7 +27,8 @@
 
 	let unsubscribe = () => {};
 
-	// let showPopUp = false;
+	let showPopUp = false;
+	let markID = '';
 
 	async function changeSortBy() {
 		const order = sortByField === 'bookDate' ? 'desc' : 'asc';
@@ -139,20 +140,20 @@
 		}
 	}
 
-	// async function markAsPaid(id) {
-	// 	try {
-	// 		const bookRef = doc(db, 'booking', id);
-	// 		const data = {
-	// 			paymentStatus: 'Paid'
-	// 		};
-	// 		showPopUp = false;
-	// 		await updateDoc(bookRef, data);
-	// 		toast.success('Booking mark as paid!');
-	// 	} catch (error) {
-	// 		console.log(error);
-	// 		toast.error('Error in marking book as paid!');
-	// 	}
-	// }
+	async function markAsPaid(id) {
+		try {
+			const bookRef = doc(db, 'booking', id);
+			const data = {
+				paymentStatus: 'Paid'
+			};
+			showPopUp = false;
+			await updateDoc(bookRef, data);
+			toast.success('Booking mark as paid!');
+		} catch (error) {
+			console.log(error);
+			toast.error('Error in marking book as paid!');
+		}
+	}
 
 	async function resetButton() {
 		bookingsQuery = query(
@@ -313,38 +314,22 @@
 							>
 							<td>
 								{#if book.paymentStatus === 'Unpaid'}
-									<!-- <button on:click={() => (showPopUp = true)} type="button" class="btn btn-primary"
-										>Mark as Paid</button
-									> -->
+									<button
+										on:click={() => ([showPopUp, markID] = [true, book.id])}
+										type="button"
+										class="btn btn-primary">Mark as Paid</button
+									>
 									<button
 										on:click={sendPaymentEmail(book.email, book.id)}
 										type="button"
 										class="btn btn-primary">Send Payment</button
 									>
 								{:else}
-									<!-- <button type="button" class="btn btn-primary" disabled>Mark as Paid</button> -->
+									<button type="button" class="btn btn-primary" disabled>Mark as Paid</button>
 									<button type="button" class="btn btn-primary" disabled>Send Payment</button>
 								{/if}
 							</td>
 						</tr>
-						<!-- {#if showPopUp}
-							<div
-								class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto"
-							>
-								<div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-75" />
-								<div class="relative z-50 w-full max-w-md mx-auto bg-white rounded-lg shadow-lg">
-									<div class="p-6">
-										<h2 class="text-lg font-medium">Are you sure you want to mark this as paid?</h2>
-									</div>
-									<div class="flex justify-end px-6 gap-2 py-4">
-										<button class="btn btn-primary" on:click={markAsPaid(book.id)}>Yes</button>
-										<button class="btn btn-error text-white" on:click={() => (showPopUp = false)}
-											>No</button
-										>
-									</div>
-								</div>
-							</div>
-						{/if} -->
 					{/each}
 				</tbody>
 			</table>
@@ -436,40 +421,42 @@
 							{/if}
 						</form>
 						{#if book.paymentStatus === 'Unpaid'}
-							<!-- <button on:click={() => (showPopUp = true)} type="button" class="btn btn-primary"
-								>Mark as Paid</button
-							> -->
+							<button
+								on:click={() => ([showPopUp, markID] = [true, book.id])}
+								type="button"
+								class="btn btn-primary">Mark as Paid</button
+							>
 							<button
 								on:click={sendPaymentEmail(book.email, book.id)}
 								type="button"
 								class="btn btn-primary">Send Payment</button
 							>
 						{:else}
-							<!-- <button type="button" class="btn btn-primary" disabled>Mark as Paid</button> -->
+							<button type="button" class="btn btn-primary" disabled>Mark as Paid</button>
 							<button type="button" class="btn btn-primary" disabled>Send Payment</button>
 						{/if}
 					</div>
 				</div>
 			</div>
 			<!-- {/if} -->
-			<!-- {#if showPopUp}
-				<div
-					class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto"
-				>
-					<div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-75" />
-					<div class="relative z-50 w-full max-w-md mx-auto bg-white rounded-lg shadow-lg">
-						<div class="p-6">
-							<h2 class="text-lg font-medium">Are you sure you want to mark this as paid?</h2>
-						</div>
-						<div class="flex justify-end px-6 gap-2 py-4">
-							<button class="btn btn-primary" on:click={markAsPaid(book.id)}>Yes</button>
-							<button class="btn btn-error text-white" on:click={() => (showPopUp = false)}
-								>No</button
-							>
-						</div>
-					</div>
-				</div>
-			{/if} -->
 		{/each}
 	</div>
 </div>
+
+<!-- Pop-up for confirmation of mark as paid -->
+{#if showPopUp}
+	<div
+		class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto"
+	>
+		<div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-75" />
+		<div class="relative z-50 w-full max-w-md mx-auto bg-white rounded-lg shadow-lg">
+			<div class="p-6">
+				<h2 class="text-lg font-medium">Are you sure you want to mark this as paid?</h2>
+			</div>
+			<div class="flex justify-end px-6 gap-2 py-4">
+				<button class="btn btn-primary" on:click={markAsPaid(markID)}>Yes</button>
+				<button class="btn btn-error text-white" on:click={() => (showPopUp = false)}>No</button>
+			</div>
+		</div>
+	</div>
+{/if}
