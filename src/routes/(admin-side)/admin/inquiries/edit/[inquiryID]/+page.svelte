@@ -22,14 +22,14 @@
 		}
 	}
 
-	async function submitHandler(name, email, message, response) {
+	async function submitHandler(name, email, response) {
 		const isValid = await checkInput();
 		if (!isValid) {
 			toast.error('Form validation failed');
 			return;
 		}
 		await answerInquiry(response);
-		sendResponseToEmail(name, email, message, response);
+		sendResponseToEmail(name, email, response);
 	}
 
 	async function checkInput() {
@@ -61,12 +61,23 @@
 		}
 	}
 
-	async function sendResponseToEmail(name, email, message, response) {
+	async function sendResponseToEmail(name, email, response) {
 		try {
 			await sendEmail({
 				to: email,
 				subject: 'Southview Homes 3 Inquiries',
-				html: `<h1>Hello ${name}, </h1> <div> We have receive your inquiry about</div><div style="white-space:pre-wrap">${message}</div><h1>Our Response is </h1><div style="white-space:pre-wrap">${response}</div>`
+				html: `<center><h1><img src="https://ssv.vercel.app/logo.png"> Southview Homes 3</h1>
+				<p style="font-size:12px">SVH3 San Vicente Road, Brgy., San Vicente, San Pedro, Laguna</p><br/>
+				</center>
+					<p>Dear ${name},</p>
+					<p>Thank you for reaching out to us with your question. We appreciate your interest in our community and we are happy to help.</p>
+					<p>In response to your inquiry,</p> 
+					<p>${response}</p>
+					<p>If you need further assistance, please do not hesitate to let us know.</p>
+					<p>We value your feedback and would like to assure you that we are committed to providing excellent customer service. If you have any other questions or concerns, please feel free to contact us.</p>
+					<p>Thank you for your time and interest in Southview Homes 3.</p>
+					<p>Best regards,</p>
+					<p>Soutview Homes 3</p>`
 			});
 			toast.success('Response sentto email!');
 		} catch (error) {
@@ -115,7 +126,7 @@
 				</div>
 				<div class="flex justify-end mt-8">
 					<button
-						on:click={submitHandler(inquiry.name, inquiry.email, inquiry.message, inquiry.response)}
+						on:click={submitHandler(inquiry.nameDisplay, inquiry.email,  inquiry.response)}
 						type="submit"
 						class="btn btn-primary"
 					>

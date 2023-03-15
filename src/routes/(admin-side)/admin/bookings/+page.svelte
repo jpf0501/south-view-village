@@ -27,6 +27,9 @@
 
 	let unsubscribe = () => {};
 
+	let showPopUp = false;
+	let markID = '';
+
 	async function changeSortBy() {
 		const order = sortByField === 'bookDate' ? 'desc' : 'asc';
 		bookingsQuery = query(
@@ -49,71 +52,109 @@
 		);
 	}
 
-	async function approvalHandler(bookingId, bookEmail, bookDate) {
-		changeStatus(bookingId)
-		sendUpdateToEmail(bookEmail, bookDate)
+	async function approvalHandler(id, firstname, lastname, email, bookDate, event) {
+		changeStatus(id);
+		sendUpdateToEmail(id, firstname, lastname, email, bookDate, event);
 	}
 
-	async function changeStatus(bookingId){
+	async function changeStatus(id) {
 		try {
-			const bookRef = doc(db, 'booking', bookingId);
+			const bookRef = doc(db, 'booking', id);
 			const data = {
 				status: bookingStatus,
 				dateReviewed: serverTimestamp()
 			};
 			await updateDoc(bookRef, data);
 			toast.success('Booking request has been ' + bookingStatus.toLowerCase() + ' !');
-			
 		} catch (error) {
 			console.log(error);
 			toast.error('Error in updating a booking!');
 		}
 	}
 
-	async function sendUpdateToEmail(bookEmail, bookDate){
+	async function sendUpdateToEmail(id, firstname, lastname, email, bookDate, event) {
+		let message;
+
+		if (bookingStatus === 'Approved') {
+			message = `
+            <p>We are pleased to confirm your booking and look forward to welcoming you. If you have any further questions or concerns, please do not hesitate to contact us.</p>
+        `;
+		} else if (bookingStatus === 'Disapproved') {
+			message = `
+            <p>Unfortunately, we are unable to approve your booking request at this time. We apologize for any inconvenience this may have caused and encourage you to consider alternative dates or services. If you have any further questions or concerns, please do not hesitate to contact us.</p>
+        `;
+		}
+		let date = bookDate
+			.toDate()
+			.toLocaleDateString('en-us', { year: 'numeric', month: 'long', day: 'numeric' });
+		let time = bookDate
+			.toDate()
+			.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' });
 		try {
-				await sendEmail({
-					to: bookEmail,
-					subject: 'Southview Homes 3 Booking Request',
-					html:
-						'<h1>Your booking request that is scheduled on ' +
-						bookDate.toDate().toLocaleDateString('en-us', {
-							year: 'numeric',
-							month: 'long',
-							day: 'numeric'
-						}) +
-						' at ' +
-						bookDate.toDate().toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' }) +
-						' has been ' +
-						bookingStatus.toLowerCase() +
-						' by the admin</ht>'
-				});
-			} catch (error) {
-				console.log(error);
-				toast.error('Error in sending update of booking request in email');
-			}
+			await sendEmail({
+				to: email,
+				subject: 'Southview Homes 3 Booking Status Update',
+				html: `<center><h1><img src="https://ssv.vercel.app/logo.png"> Southview Homes 3</h1>
+				<p style="font-size:12px">SVH3 San Vicente Road, Brgy., San Vicente, San Pedro, Laguna</p><br/>
+				<p style="font-size:13px; text-decoration:underline">This is an automated message. Do not reply.</p></center>
+				<p>Booking Status Update</p>
+				<p>Dear ${firstname} ${lastname},</p>
+				<p>Thank you for your recent booking request.</p>
+				<p>We are writing to inform you that your booking request has been <strong>${bookingStatus.toLocaleUpperCase()}</strong>. The details of your booking are as follows:</p>
+				<ul>
+					<li><strong>Booking ID:</strong> ${id}</li>
+					<li><strong>Service/Event/Reservation:</strong> ${event}</li>
+					<li><strong>Date:</strong> ${date}</li>
+					<li><strong>Time:</strong> ${time}</li>
+				</ul>
+				<p>${message}</p>
+				<p>Thank you for your interest in Soutvhiew Homes 3. We hope to have the opportunity to serve you in the future.</p>
+				<p>Best regards,</p>
+				<p>Soutview Homes 3</p>
+				`
+			});
+		} catch (error) {
+			console.log(error);
+			toast.error('Error in sending update of booking request in email');
+		}
 	}
 
-	async function sendPaymentEmail(bookEmail, bookID) {
+	async function sendPaymentEmail(email, id) {
 		try {
 			const paymentLinkData = await createPaymentLink(
 				'Clubhouse Reservation Downpayment',
 				50000,
-				bookID
+				id
 			);
 			const checkoutURL = paymentLinkData.data.attributes.checkout_url;
 			const result = await sendEmail({
-				to: bookEmail,
+				to: email,
 				subject: 'Southview Homes 3 Payment Method',
 				html: `<h1>This is the link for payment for reservation in booking: <a href=${checkoutURL}>Click here</a></h1>`
 			});
-			console.log(JSON.stringify(result));
+			// console.log(JSON.stringify(result));
 			toast.success('Payment has been sent!');
 		} catch (error) {
 			console.log(error);
 			toast.error('Error in sending payment!');
 		}
 	}
+
+	async function markAsPaid(id) {
+		try {
+			const bookRef = doc(db, 'booking', id);
+			const data = {
+				paymentStatus: 'Paid'
+			};
+			showPopUp = false;
+			await updateDoc(bookRef, data);
+			toast.success('Booking mark as paid!');
+		} catch (error) {
+			console.log(error);
+			toast.error('Error in marking book as paid!');
+		}
+	}
+
 	async function resetButton() {
 		bookingsQuery = query(
 			collection(db, 'booking'),
@@ -157,7 +198,7 @@
 					<option value="" disabled selected>Search Filter</option>
 					<option value="firstname">First Name</option>
 					<option value="lastname">Last Name</option>
-					<option value="email">E-mail Address</option>
+					<!-- <option value="email">E-mail Address</option> -->
 					<option value="eventType">Type of Event</option>
 					<!-- <option value="bookDate">Date and Time</option> -->
 				</select>
@@ -231,7 +272,16 @@
 								> -->
 							<td class="text-center">{book.paymentStatus}</td>
 							<td
-								><form on:submit|preventDefault={approvalHandler(book.id, book.email, book.bookDate)}>
+								><form
+									on:submit|preventDefault={approvalHandler(
+										book.id,
+										book.firstNameDisplay,
+										book.lastNameDisplay,
+										book.email,
+										book.bookDate,
+										book.eventTypeDisplay
+									)}
+								>
 									{#if book.paymentStatus == 'Unpaid'}
 										<button
 											on:click={() => (bookingStatus = 'Approved')}
@@ -263,13 +313,19 @@
 								</form></td
 							>
 							<td>
-								{#if book.paymentStatus == 'Unpaid'}
+								{#if book.paymentStatus === 'Unpaid'}
+									<button
+										on:click={() => ([showPopUp, markID] = [true, book.id])}
+										type="button"
+										class="btn btn-primary">Mark as Paid</button
+									>
 									<button
 										on:click={sendPaymentEmail(book.email, book.id)}
 										type="button"
 										class="btn btn-primary">Send Payment</button
 									>
 								{:else}
+									<button type="button" class="btn btn-primary" disabled>Mark as Paid</button>
 									<button type="button" class="btn btn-primary" disabled>Send Payment</button>
 								{/if}
 							</td>
@@ -325,7 +381,14 @@
 					</div>
 					<div>
 						<form
-							on:submit|preventDefault={approvalHandler(book.id, book.email, book.bookDate)}
+							on:submit|preventDefault={approvalHandler(
+								book.id,
+								book.firstNameDisplay,
+								book.lastNameDisplay,
+								book.email,
+								book.bookDate,
+								book.eventTypeDisplay
+							)}
 							class="py-3"
 						>
 							{#if book.paymentStatus == 'Unpaid'}
@@ -357,11 +420,21 @@
 								>
 							{/if}
 						</form>
-						<button
-							on:click={sendPaymentEmail(book.email, book.id)}
-							type="button"
-							class="btn btn-primary">Send Payment</button
-						>
+						{#if book.paymentStatus === 'Unpaid'}
+							<button
+								on:click={() => ([showPopUp, markID] = [true, book.id])}
+								type="button"
+								class="btn btn-primary">Mark as Paid</button
+							>
+							<button
+								on:click={sendPaymentEmail(book.email, book.id)}
+								type="button"
+								class="btn btn-primary">Send Payment</button
+							>
+						{:else}
+							<button type="button" class="btn btn-primary" disabled>Mark as Paid</button>
+							<button type="button" class="btn btn-primary" disabled>Send Payment</button>
+						{/if}
 					</div>
 				</div>
 			</div>
@@ -369,3 +442,21 @@
 		{/each}
 	</div>
 </div>
+
+<!-- Pop-up for confirmation of mark as paid -->
+{#if showPopUp}
+	<div
+		class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto"
+	>
+		<div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-75" />
+		<div class="relative z-50 w-full max-w-md mx-auto bg-white rounded-lg shadow-lg">
+			<div class="p-6">
+				<h2 class="text-lg font-medium">Are you sure you want to mark this as paid?</h2>
+			</div>
+			<div class="flex justify-end px-6 gap-2 py-4">
+				<button class="btn btn-primary" on:click={markAsPaid(markID)}>Yes</button>
+				<button class="btn btn-error text-white" on:click={() => (showPopUp = false)}>No</button>
+			</div>
+		</div>
+	</div>
+{/if}

@@ -10,6 +10,7 @@
 		getDocs
 	} from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
+	import { sendEmail } from '$lib/utils';
 	import { onDestroy } from 'svelte';
 	import toast from 'svelte-french-toast';
 
@@ -22,7 +23,7 @@
 		where('status', '==', 'Pending')
 	);
 
-	let isApproved = '';
+	let pendingAccountStatus = '';
 
 	let unsubscribe = () => {};
 
@@ -45,76 +46,149 @@
 	}
 
 	async function resetButton() {
-		pendingAccountsQuery = query(collection(db, 'pendingAccounts'), where('status', '==', 'Pending'));
+		pendingAccountsQuery = query(
+			collection(db, 'pendingAccounts'),
+			where('status', '==', 'Pending')
+		);
 		searchByValue = '';
 	}
 
-	async function approval(
-		pendingID,
-		pendingEmail,
-		pendingPassword,
-		pendingFirstname,
-		pendingFirstNameDisplay,
-		pendingLastname,
-		pendingLastNameDisplay,
-		pendingContactNumber,
-		pendingAddressBlock,
-		pendingAddressLot,
-		pendingAddressStreet,
-		pendingRole,
-		pendingPaymentStatus,
-		pendingPaymentHead
+	async function submitHandler(
+		id,
+		email,
+		password,
+		firstname,
+		firstnameDisplay,
+		lastname,
+		lastnameDisplay,
+		contactNumber,
+		block,
+		lot,
+		street,
+		role,
+		paymentStatus,
+		paymentHead
 	) {
-		if (isApproved) {
+		approval(
+			id,
+			email,
+			password,
+			firstname,
+			firstnameDisplay,
+			lastname,
+			lastnameDisplay,
+			contactNumber,
+			block,
+			lot,
+			street,
+			role,
+			paymentStatus,
+			paymentHead
+		);
+		sendUpdateAccountStatusToEmail(email, firstnameDisplay, lastnameDisplay);
+	}
+
+	async function approval(
+		id,
+		email,
+		password,
+		firstname,
+		firstnameDisplay,
+		lastname,
+		lastnameDisplay,
+		contactNumber,
+		block,
+		lot,
+		street,
+		role,
+		paymentStatus,
+		paymentHead
+	) {
+		if (pendingAccountStatus === 'Approved') {
 			try {
-				const accountsQuery = query(collection(db, 'accounts'), where('email', '==', pendingEmail));
+				const accountsQuery = query(collection(db, 'accounts'), where('email', '==', email));
 				const accountsSnapshot = await getDocs(accountsQuery);
 				if (accountsSnapshot.docs.length > 0) {
 					toast.error('Email already exists!');
-				} else {
-					const response = await fetch('/api/pendingAccounts', {
-						method: 'POST',
-						body: JSON.stringify({
-							email: pendingEmail,
-							password: pendingPassword,
-							firstname: pendingFirstname,
-							firstNameDisplay: pendingFirstNameDisplay,
-							lastname: pendingLastname,
-							lastNameDisplay: pendingLastNameDisplay,
-							addressBlock: pendingAddressBlock,
-							addressLot: pendingAddressLot,
-							addressStreet: pendingAddressStreet,
-							contactNumber: pendingContactNumber,
-							role: pendingRole,
-							paymentStatus: pendingPaymentStatus,
-							paymentHead: pendingPaymentHead
-						})
-					});
-					const result = await response.json();
-					console.log(result);
-
-					const pendingAccountsRef = doc(db, 'pendingAccounts', pendingID);
-					const data = {
-						status: 'Approved'
-					};
-					await updateDoc(pendingAccountsRef, data);
-					toast.success('Account approved!');
+					return;
 				}
+				const response = await fetch('/api/pendingAccounts', {
+					method: 'POST',
+					body: JSON.stringify({
+						email: email,
+						password: password,
+						firstname: firstname,
+						firstNameDisplay: firstnameDisplay,
+						lastname: lastname,
+						lastNameDisplay: lastnameDisplay,
+						addressBlock: block,
+						addressLot: lot,
+						addressStreet: street,
+						contactNumber: contactNumber,
+						role: role,
+						paymentStatus: paymentStatus,
+						paymentHead: paymentHead
+					})
+				});
+				const result = await response.json();
+				// console.log(result);
+				const pendingAccountsRef = doc(db, 'pendingAccounts', id);
+				const data = {
+					status: 'Approved'
+				};
+				await updateDoc(pendingAccountsRef, data);
+				toast.success('Account approved!');
 			} catch (error) {
 				console.log(error);
 				toast.error('Error in approving account!');
 			}
-		} else {
+		} else if (pendingAccountStatus === 'Disapproved') {
 			try {
-				const pendingAccountsRef = doc(db, 'pendingAccounts', pendingID);
+				const pendingAccountsRef = doc(db, 'pendingAccounts', id);
 				const data = {
 					status: 'Disapproved'
 				};
 				await updateDoc(pendingAccountsRef, data);
-				toast.success('Account disaaproved!');
-			} catch (error) {}
+				toast.success('Account disapproved!');
+			} catch (error) {
+				console.log(error);
+				toast.error('Error in disapproving an account!');
+			}
+		}
+	}
+
+	async function sendUpdateAccountStatusToEmail(email, firstname, lastname) {
+		let message;
+
+		if (pendingAccountStatus === 'Approved') {
+			message = `
+            <p>We are pleased to inform you that your account has been approved! You can now access your account.</p>
+        `;
+		} else if (pendingAccountStatus === 'Disapproved') {
+			message = `
+            <p>We regret to inform you that we were not able to approve your account at this time.</p>
+        `;
+		}
+		try {
+			await sendEmail({
+				to: email,
+				subject: 'Southview Homes 3 Account Approval Status',
+				html: `<center><h1><img src="https://ssv.vercel.app/logo.png"> Southview Homes 3</h1>
+				<p style="font-size:12px">SVH3 San Vicente Road, Brgy., San Vicente, San Pedro, Laguna</p><br/>
+				<p style="font-size:13px; text-decoration:underline">This is an automated message. Do not reply.</p></center>
+				<p>Account Status Update</p>
+				<p>Dear ${firstname} ${lastname},</p>
+				<p>We have reviewed your account application and are writing to inform you of your account approval status.</p>
+				<p>${message}</p>
+				<p>If you have any questions or concerns, please do not hesitate to contact us. We are always here to help.</p>
+				<p>Best regards,</p>
+				<p>Soutview Homes 3</p>
+				`
+			});
+			// toast.success("Update of account request send to email")
+		} catch (error) {
 			console.log(error);
-			toast.error('Error in disapproving an account!');
+			toast.error('Error of sending update of account status to email');
 		}
 	}
 
@@ -172,7 +246,7 @@
 			<option value="pendingAddressBlock">Block</option>
 			<option value="pendingAddressLot">Lot</option>
 			<option value="pendingAddressStreet">Street</option>
-			<option value="pendingEmail">Email</option>
+			<!-- <option value="pendingEmail">Email</option> -->
 		</select>
 
 		<a class="btn btn-primary my-4" href="/admin/accounts">Go Back</a>
@@ -218,7 +292,7 @@
 							{/if}
 							<td
 								><form
-									on:submit|preventDefault={approval(
+									on:submit|preventDefault={submitHandler(
 										user.id,
 										user.pendingEmail,
 										user.pendingPassword,
@@ -236,12 +310,12 @@
 									)}
 								>
 									<button
-										on:click={() => (isApproved = true)}
+										on:click={() => (pendingAccountStatus = 'Approved')}
 										type="submit"
 										class="btn btn-success text-white">Approve</button
 									>
 									<button
-										on:click={() => (isApproved = false)}
+										on:click={() => (pendingAccountStatus = 'Disapproved')}
 										type="submit"
 										class="btn btn-error text-white">Dissaprove</button
 									>
@@ -290,7 +364,7 @@
 					</div>
 					<div>
 						<form
-							on:submit|preventDefault={approval(
+							on:submit|preventDefault={submitHandler(
 								user.id,
 								user.pendingEmail,
 								user.pendingPassword,
@@ -309,12 +383,12 @@
 							class="py-3"
 						>
 							<button
-								on:click={() => (isApproved = true)}
+								on:click={() => (pendingAccountStatus = 'Approved')}
 								type="submit"
 								class="btn btn-success text-white">Approve</button
 							>
 							<button
-								on:click={() => (isApproved = false)}
+								on:click={() => (pendingAccountStatus = 'Disapproved')}
 								type="submit"
 								class="btn btn-error text-white">Dissaprove</button
 							>

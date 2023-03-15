@@ -22,14 +22,14 @@
 		}
 	}
 
-	async function submitHandler(firstname, lastname, email, complaint, response) {
+	async function submitHandler(firstname, lastname, email, response) {
 		const isValid = await checkInput();
 		if (!isValid) {
 			toast.error('Form validation failed');
 			return;
 		}
 		await answerComplaint(response);
-		sendResponseToEmail(firstname, lastname, email, complaint, response);
+		sendResponseToEmail(firstname, lastname, email, response);
 	}
 
 	async function checkInput() {
@@ -65,14 +65,22 @@
 		}
 	}
 
-	async function sendResponseToEmail(firstname, lastname, email, complaint, response) {
+	async function sendResponseToEmail(firstname, lastname, email, response) {
 		try {
 			await sendEmail({
 				to: email,
 				subject: 'Southview Homes 3 Complaint',
-				html: `<h1>Hello ${
-					firstname + ' ' + lastname
-				}, </h1> <div> We have receive your complaint about</div><div style="white-space:pre-wrap">${complaint}</div><h1>Our Response is </h1><div style="white-space:pre-wrap">${response}</div>`
+				html: `<center><h1><img src="https://ssv.vercel.app/logo.png"> Southview Homes 3</h1>
+				<p style="font-size:12px">SVH3 San Vicente Road, Brgy., San Vicente, San Pedro, Laguna</p><br/>
+				</center>
+				<p>Dear ${firstname} ${lastname},</p>
+				<p>We apologize for any inconvenience or frustration that you have experienced. We appreciate you bringing this issue to our attention, and we would like to assure you that we take all complaints seriously and are committed to resolving this matter promptly.</p>
+				<p>After reviewing your complaint, we have identified the problem and understand that this issue may have caused you inconvenience and we will take steps to ensure that it does not happen again in the future.</p>
+				<p>In response to your complaint,</p> 
+				<p>${response}</p>
+				<p>Thank you for your patience and understanding as we work to resolve this issue.</p>
+				<p>Best regards,</p>
+				<p>Soutview Homes 3</p>`
 			});
 			toast.success('Response sent!');
 		} catch (error) {
@@ -129,7 +137,6 @@
 							complaint.firstnameDisplay,
 							complaint.lastnameDisplay,
 							complaint.email,
-							complaint.complaint,
 							complaint.response
 						)}
 						type="submit"

@@ -104,7 +104,7 @@
 				})
 			});
 			const result = await response.json();
-			console.log(result);
+			// console.log(result);
 			toast.success('Account created!');
 			await goto('/admin/accounts');
 		} catch (error) {

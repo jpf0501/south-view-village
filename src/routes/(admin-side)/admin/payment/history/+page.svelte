@@ -67,7 +67,8 @@
 	let streetQuery = query(collection(db, 'street'), orderBy('streetName', 'asc'));
 
 	async function changeSortBy() {
-		paymentsQuery = query(collection(db, 'payments'), orderBy(sortByField, 'asc'));
+		const order = sortByField === 'paymentTime' ? 'desc' : 'asc';
+		paymentsQuery = query(collection(db, 'payments'), orderBy(sortByField, order));
 	}
 
 	async function searchAccounts() {

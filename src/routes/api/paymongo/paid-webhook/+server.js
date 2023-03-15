@@ -11,6 +11,10 @@ export async function POST({request}) {
     const body = await request.json()
     await addDoc(collection(db, 'paymongo'), body)
     const paymentDesc = body.data.attributes.data.attributes.description
+    const paymentFee = body.data.attributes.data.attributes.amount
+    paymentFee = paymentFee.toString()
+    paymentFee = paymentFee.slice(0, -2)
+    paymentFee = parseInt(paymentFee)
     const paymentID = body.data.attributes.data.attributes.remarks
     if (paymentDesc == 'Clubhouse Reservation Downpayment') {
         await updateDoc(doc(db, 'booking', paymentID), {paymentStatus: 'Paid'})
@@ -29,7 +33,8 @@ export async function POST({request}) {
 			addressBlock: user.addressBlock,
 			addressLot: user.addressLot,
 			addressStreet: user.addressStreet,
-			paymentTime: serverTimestamp()
+			paymentTime: serverTimestamp(),
+            paymentFee: paymentFee
 		})
     }
     return new Response();

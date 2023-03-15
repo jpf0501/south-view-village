@@ -49,6 +49,9 @@
 
 	let unsubscribe = () => {};
 
+	let showPopUpForMarkAsPaid = false;
+	let markID = '';
+
 	function openModal(firstName, lastName, email, id) {
 		userFirst = firstName;
 		userLast = lastName;
@@ -98,7 +101,7 @@
 		paymentFee = parseFloat(paymentFee);
 		// console.log(paymentID);
 		// console.log(paymentEmail),
-		console.log(paymentFee);
+		// console.log(paymentFee);
 		try {
 			const paymentLinkData = await createPaymentLink(
 				'Southview Homes 3 Monthly Dues',
@@ -127,12 +130,27 @@
 				<p>For other inquiries, feel free give us a call at 8330-4163 / 09063955407. You can also file for an inquiry at our <a href="https://ssv.vercel.app">website</a> or send us an email at <a href="mailto:southviewhomes3mail@gmail.com">southviewhomes3mail@gmail.com</a>.</p>
 				<p>Best regards,<br/>Southview Homes 3 Home Owners Association`
 			});
-			console.log(JSON.stringify(result));
+			// console.log(JSON.stringify(result));
 			showModal = false;
 			toast.success('Payment has been sent!');
 		} catch (error) {
 			console.log(error);
 			toast.error('Error in sending payment!');
+		}
+	}
+
+	async function markAsPaid(id) {
+		try {
+			const accountRef = doc(db, 'accounts', id);
+			const data = {
+				paymentStatus: 'Paid'
+			};
+			showPopUpForMarkAsPaid = false;
+			await updateDoc(accountRef, data);
+			toast.success('Account mark as paid!');
+		} catch (error) {
+			console.log(error);
+			toast.error('Error in marking account as paid!');
 		}
 	}
 
@@ -268,7 +286,7 @@
 			<option value="addressBlock">Block</option>
 			<option value="addressLot">Lot</option>
 			<option value="addressStreet">Street</option>
-			<option value="email">Email</option>
+			<!-- <option value="email">Email</option> -->
 		</select>
 
 		<button class="btn btn-primary my-4" on:click={openConfirmation}>Reset Payment Status</button>
@@ -309,6 +327,11 @@
 							<td>
 								{#if user.paymentStatus == 'Unpaid'}
 									<button
+										on:click={() => ([showPopUpForMarkAsPaid, markID] = [true, user.id])}
+										type="button"
+										class="btn btn-primary">Mark as Paid</button
+									>
+									<button
 										on:click={openModal(
 											user.firstNameDisplay,
 											user.lastNameDisplay,
@@ -319,6 +342,7 @@
 										class="btn btn-primary">Send Payment</button
 									>
 								{:else}
+									<button type="button" class="btn btn-primary" disabled>Mark as paid</button>
 									<button type="button" class="btn btn-primary" disabled>Send Payment</button>
 								{/if}
 							</td>
@@ -356,6 +380,11 @@
 					<div class="card-actions justify-end">
 						{#if user.paymentStatus == 'Unpaid'}
 							<button
+								on:click={() => ([showPopUpForMarkAsPaid, markID] = [true, user.id])}
+								type="button"
+								class="btn btn-primary">Mark as Paid</button
+							>
+							<button
 								on:click={openModal(
 									user.firstNameDisplay,
 									user.lastNameDisplay,
@@ -366,6 +395,7 @@
 								class="btn btn-primary">Send Payment</button
 							>
 						{:else}
+							<button type="button" class="btn btn-primary" disabled>Mark as Paid</button>
 							<button type="button" class="btn btn-primary" disabled>Send Payment</button>
 						{/if}
 					</div>
@@ -374,3 +404,24 @@
 		{/each}
 	</div>
 </div>
+
+
+<!-- Pop-up for confirmation of mark as paid -->
+{#if showPopUpForMarkAsPaid}
+	<div
+		class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto"
+	>
+		<div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-75" />
+		<div class="relative z-50 w-full max-w-md mx-auto bg-white rounded-lg shadow-lg">
+			<div class="p-6">
+				<h2 class="text-lg font-medium">Are you sure you want to mark this as paid?</h2>
+			</div>
+			<div class="flex justify-end px-6 gap-2 py-4">
+				<button class="btn btn-primary" on:click={markAsPaid(markID)}>Yes</button>
+				<button class="btn btn-error text-white" on:click={() => (showPopUpForMarkAsPaid = false)}
+					>No</button
+				>
+			</div>
+		</div>
+	</div>
+{/if}

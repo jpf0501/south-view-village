@@ -78,7 +78,7 @@
 		<select bind:value={sortByField} on:change={changeSortBy} class="select select-bordered my-4">
 			<option value="" disabled selected>Sort By</option>
 			<option value="name">Name</option>
-			<option value="email">Email</option>
+			<option value="email">E-mail Address</option>
 		</select>
 	</div>
 
