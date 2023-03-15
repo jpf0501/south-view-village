@@ -53,25 +53,60 @@
 		searchByValue = '';
 	}
 
+	async function submitHandler(
+		id,
+		email,
+		password,
+		firstname,
+		firstnameDisplay,
+		lastname,
+		lastnameDisplay,
+		contactNumber,
+		block,
+		lot,
+		street,
+		role,
+		paymentStatus,
+		paymentHead
+	) {
+		approval(
+			id,
+			email,
+			password,
+			firstname,
+			firstnameDisplay,
+			lastname,
+			lastnameDisplay,
+			contactNumber,
+			block,
+			lot,
+			street,
+			role,
+			paymentStatus,
+			paymentHead
+		);
+		sendUpdateAccountStatusToEmail(email, firstnameDisplay, lastnameDisplay);
+	}
+
 	async function approval(
-		pendingID,
-		pendingEmail,
-		pendingPassword,
-		pendingFirstname,
-		pendingFirstNameDisplay,
-		pendingLastname,
-		pendingLastNameDisplay,
-		pendingContactNumber,
-		pendingAddressBlock,
-		pendingAddressLot,
-		pendingAddressStreet,
-		pendingRole,
-		pendingPaymentStatus,
-		pendingPaymentHead
+		id,
+		email,
+		password,
+		firstname,
+		firstnameDisplay,
+		lastname,
+		lastnameDisplay,
+		contactNumber,
+		block,
+		lot,
+		street,
+		role,
+		paymentStatus,
+		paymentHead
 	) {
 		if (pendingAccountStatus === 'Approved') {
 			try {
-				const accountsQuery = query(collection(db, 'accounts'), where('email', '==', pendingEmail));
+				const accountsQuery = query(collection(db, 'accounts'), where('email', '==', email));
 				const accountsSnapshot = await getDocs(accountsQuery);
 				if (accountsSnapshot.docs.length > 0) {
 					toast.error('Email already exists!');
@@ -80,24 +115,24 @@
 				const response = await fetch('/api/pendingAccounts', {
 					method: 'POST',
 					body: JSON.stringify({
-						email: pendingEmail,
-						password: pendingPassword,
-						firstname: pendingFirstname,
-						firstNameDisplay: pendingFirstNameDisplay,
-						lastname: pendingLastname,
-						lastNameDisplay: pendingLastNameDisplay,
-						addressBlock: pendingAddressBlock,
-						addressLot: pendingAddressLot,
-						addressStreet: pendingAddressStreet,
-						contactNumber: pendingContactNumber,
-						role: pendingRole,
-						paymentStatus: pendingPaymentStatus,
-						paymentHead: pendingPaymentHead
+						email: email,
+						password: password,
+						firstname: firstname,
+						firstNameDisplay: firstnameDisplay,
+						lastname: lastname,
+						lastNameDisplay: lastnameDisplay,
+						addressBlock: block,
+						addressLot: lot,
+						addressStreet: street,
+						contactNumber: contactNumber,
+						role: role,
+						paymentStatus: paymentStatus,
+						paymentHead: paymentHead
 					})
 				});
 				const result = await response.json();
 				// console.log(result);
-				const pendingAccountsRef = doc(db, 'pendingAccounts', pendingID);
+				const pendingAccountsRef = doc(db, 'pendingAccounts', id);
 				const data = {
 					status: 'Approved'
 				};
@@ -109,7 +144,7 @@
 			}
 		} else if (pendingAccountStatus === 'Disapproved') {
 			try {
-				const pendingAccountsRef = doc(db, 'pendingAccounts', pendingID);
+				const pendingAccountsRef = doc(db, 'pendingAccounts', id);
 				const data = {
 					status: 'Disapproved'
 				};
@@ -120,16 +155,40 @@
 				toast.error('Error in disapproving an account!');
 			}
 		}
+	}
+
+	async function sendUpdateAccountStatusToEmail(email, firstname, lastname) {
+		let message;
+
+		if (pendingAccountStatus === 'Approved') {
+			message = `
+            <p>We are pleased to inform you that your account has been approved! You can now access your account and start enjoying our services.</p>
+        `;
+		} else if (pendingAccountStatus === 'Disapproved') {
+			message = `
+            <p>We regret to inform you that we were not able to approve your account at this time.</p>
+        `;
+		}
 		try {
 			await sendEmail({
-				to: pendingEmail,
-				subject: 'Southview Homes 3 Account Request',
-				html: `Your account request has been ${pendingAccountStatus.toLocaleLowerCase()} by the admin`
+				to: email,
+				subject: 'Southview Homes 3 Account Approval Status',
+				html: `<center><h1><img src="https://ssv.vercel.app/logo.png"> Southview Homes 3</h1>
+				<p style="font-size:12px">SVH3 San Vicente Road, Brgy., San Vicente, San Pedro, Laguna</p><br/>
+				</center>
+				<p>Account Status Update</p>
+				<p>Dear ${firstname} ${lastname},</p>
+				<p>We have reviewed your account application and are writing to inform you of your account approval status.</p>
+				<p>${message}</p>
+				<p>If you have any questions or concerns, please do not hesitate to contact us. We are always here to help.</p>
+				<p>Best regards,</p>
+				<p>Soutview Homes 3</p>
+				`
 			});
 			// toast.success("Update of account request send to email")
 		} catch (error) {
 			console.log(error);
-			// toast.error('Update of account request send to email');
+			toast.error('Error of sending update of account status to email');
 		}
 	}
 
@@ -233,7 +292,7 @@
 							{/if}
 							<td
 								><form
-									on:submit|preventDefault={approval(
+									on:submit|preventDefault={submitHandler(
 										user.id,
 										user.pendingEmail,
 										user.pendingPassword,
@@ -305,7 +364,7 @@
 					</div>
 					<div>
 						<form
-							on:submit|preventDefault={approval(
+							on:submit|preventDefault={submitHandler(
 								user.id,
 								user.pendingEmail,
 								user.pendingPassword,
