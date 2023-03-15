@@ -114,7 +114,7 @@
 				subject: `Southview Homes 3 ${currentMonth} ${currentYear} Monthly Dues Payment Notice`,
 				html: `<center><h1><img src="https://ssv.vercel.app/logo.png"> Southview Homes 3</h1>
 				<p style="font-size:12px">SVH3 Clubhouse, San Vicente Road, Brgy., San Vicente, San Pedro, Laguna</p><br/>
-				<p style="font-size:13px; text-decoration:underline">This is an automated message.</p></center>
+				<p style="font-size:13px; text-decoration:underline">This is an automated message. Do not reply.</p></center>
 				<p><br/>We sent you this notice to inform you on the payment of your unpaid monthly dues for the period of ${currentMonth} ${currentYear}, which amounts to a total of PHP ${new Intl.NumberFormat().format(mailFee)}.00 in total. The above amount and period remains unpaid on the record. Please be informed that the purpose of collecting this fee is to fund the subdivision's monthly expenses, which include the following:
 				<br/><br/>
 				1) Security Guard Salary
