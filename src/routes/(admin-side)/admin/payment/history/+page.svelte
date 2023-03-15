@@ -93,6 +93,7 @@
 		let entrySnapshotCount = await getCountFromServer(generateQuery);
 		let entryCount = entrySnapshotCount.data().count;
 		let totalEarnings = 500 * entryCount;
+		let paymentFee = 0
 		let width = report.internal.pageSize.getWidth();
 
 		totalEarnings = Number(totalEarnings.toFixed(2)).toLocaleString();
@@ -131,11 +132,12 @@
 			);
 		}
 		report.setFontSize(10).text('Total Count of Paid Residents', 18, 62);
-		report.text('Monthly Due Fee', 18, 70);
+		report.text('Standard Monthly Due Fee', 18, 70);
 		report.text('Resident Count Summary by Street', 18, 78);
 		report.text('Total Earned Amount', 18, 220); // 125
 		report.text('Signed By', 168, 245, { align: 'right' });
 		report.setFont('Times', 'normal');
+
 		for (let i = 0; i < listOfStreets.length; i++) {
 			const street = listOfStreets[i];
 			const residentQuery = query(
@@ -156,13 +158,21 @@
 			}
 			y += yOffset;
 		}
+
+		for (let i = 0; i < listOfReports.length; i++) {
+			const payment = listOfReports[i];
+			let paymentAmount = payment.paymentFee
+			paymentFee = paymentFee + paymentAmount
+		}
+
 		if (entryCount === 1) {
 			report.text(`${entryCount} Resident`, 190, 62, { align: 'right' });
 		} else {
 			report.text(`${entryCount} Residents`, 190, 62, { align: 'right' });
 		}
+
 		report.text('PHP 500.00', 190, 70, { align: 'right' });
-		report.text(`PHP ${totalEarnings}.00`, 190, 220, { align: 'right' });
+		report.text(`PHP ${new Intl.NumberFormat().format(paymentFee / 100)}.00`, 190, 220, { align: 'right' });
 		report.line(18, 213, 190, 213);
 		report.line(130, 260, 190, 260);
 		report.text('HOA Treasurer', 171, 268, { align: 'right' });
@@ -228,7 +238,7 @@
 						day: 'numeric'
 					})}</td
 				>
-				<td>PHP 500.00</td>
+				<td>PHP {new Intl.NumberFormat().format(payment.paymentFee / 100)}.00</td>
 			</tr>
 		{/each}
 	</tbody>
@@ -287,6 +297,7 @@
 						<th class="text-lg">Email</th>
 						<th class="text-lg">Contact No.</th>
 						<th class="text-lg">Payment Date</th>
+						<th class="text-lg">Amount</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -307,6 +318,7 @@
 									day: 'numeric'
 								})}</td
 							>
+							<td>PHP {new Intl.NumberFormat().format(payment.paymentFee / 100)}.00</td>
 						</tr>
 					{/each}
 				</tbody>
