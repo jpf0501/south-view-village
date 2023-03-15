@@ -5,7 +5,7 @@
 	import toast from 'svelte-french-toast';
 
 	const dateMin = new Date(Date.now() + 8.64e7).toLocaleDateString('en-ca');
-	const dateMax = new Date(Date.now() + 8.64e7 + 6.048e8 * 2).toLocaleDateString('en-ca');
+	// const dateMax = new Date(Date.now() + 8.64e7 + 6.048e8 * 2).toLocaleDateString('en-ca');
 
 	let guest = {
 		firstname: '',
@@ -73,7 +73,7 @@
 				paymentStatus: guest.paymentStatus,
 				eventType: guest.eventType.trim().toLowerCase(),
 				eventTypeDisplay: guest.eventType,
-				bookDate: new Date(guest.date + ' ' + guest.time),
+				bookDate: new Date(guest.date + ' ' + guest.time), 
 				dateReserved: guest.dateReserved,
 				dateReviewed: guest.dateReserved
 			});
@@ -179,7 +179,6 @@
 					<input
 						type="date"
 						min={dateMin}
-						max={dateMax}
 						class="input input-bordered p-3 mt-2"
 						bind:value={guest.date}
 					/>
