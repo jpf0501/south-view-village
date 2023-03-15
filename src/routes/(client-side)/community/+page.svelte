@@ -91,7 +91,7 @@
 <p class="divider px-5"></p>
 
 <!-- inquiry -->
-<div class="px-5 py-3">
+<!-- <div class="px-5 py-3">
 	<div class="text-center">
 		<h1 class="text-2xl font-bold pb-4">Have an Inquiry?</h1>
 		<p class="text-md py-3">Give us a call at 8330-4163 (Landline) or 09063955407 (Mobile).</p>
@@ -108,6 +108,6 @@
 			<button type="submit" class="btn btn-primary my-8">Submit Message</button>
 		</div>
 	</form>
-</div>
+</div> -->
 <!-- end inquiry -->
 

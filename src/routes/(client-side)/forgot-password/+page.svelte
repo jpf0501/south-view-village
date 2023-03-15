@@ -1,17 +1,30 @@
 <script>
 	import { auth } from '$lib/firebase/client';
+	import { db } from '$lib/firebase/client';
 	import { sendPasswordResetEmail } from 'firebase/auth';
+	import { getDocs, query, collection, where } from 'firebase/firestore';
+	import toast from 'svelte-french-toast';
 
 	let email = '';
+	let errors = {};
 
 	async function resetPassword() {
+		const accountsQuery = query(collection(db, 'accounts'), where('email', '==', email));
+		const accountsSnapshot = await getDocs(accountsQuery);
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		errors = {
+			emailNull: !email,
+			invalidEmail: !emailRegex.test(email)
+		};
+		if (accountsSnapshot.docs.length === 0) {
+			toast.error('No email found');
+			return;
+		}
 		try {
-			// console.log(email);
 			await sendPasswordResetEmail(auth, email);
-			alert('Request Sent');
+			email = '';
+			toast.success('Request for reset password sent');
 		} catch (error) {
-			console.log(error);
-			alert('Email not found');
 			console.log(error);
 		}
 	}
@@ -26,22 +39,25 @@
 			</p>
 			<div class="mb-7">
 				<label class="block text-gray-700 font-medium mb-2" for="email"> Email Address </label>
+				{#if errors.emailNull}
+					<p class="text-red-500 text-sm italic mb-1">Email required</p>
+				{:else if errors.invalidEmail}
+					<p class="text-red-500 text-sm italic mb-1">Invalid email</p>
+				{/if}
 				<input
 					class="form-input rounded-md shadow-sm w-full"
-					type="email"
+					type="text"
 					id="email"
 					name="email"
 					placeholder="you@example.com"
-					required
 					bind:value={email}
 				/>
 			</div>
 			<div class="flex items-center justify-between">
-				<button
-					class="bg-blue-500 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md"
-					type="submit">Reset Password</button
+				<button class="btn btn-primary  text-white font-medium py-2 px-4 rounded-md" type="submit"
+					>Reset Password</button
 				>
-				<a href="/login" class="text-red-500 font-medium hover:text-red-700">Cancel</a>
+				<a href="/login" class="btn btn-error text-white">Cancel</a>
 			</div>
 		</form>
 	</div>
