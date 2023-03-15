@@ -96,7 +96,7 @@
 				subject: 'Southview Homes 3 Booking Status Update',
 				html: `<center><h1><img src="https://ssv.vercel.app/logo.png"> Southview Homes 3</h1>
 				<p style="font-size:12px">SVH3 San Vicente Road, Brgy., San Vicente, San Pedro, Laguna</p><br/>
-				</center>
+				<p style="font-size:13px; text-decoration:underline">This is an automated message. Do not reply.</p></center>
 				<p>Booking Status Update</p>
 				<p>Dear ${firstname} ${lastname},</p>
 				<p>Thank you for your recent booking request.</p>

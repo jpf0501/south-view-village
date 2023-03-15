@@ -22,14 +22,14 @@
 		}
 	}
 
-	async function submitHandler(name, email, message, response) {
+	async function submitHandler(name, email, response) {
 		const isValid = await checkInput();
 		if (!isValid) {
 			toast.error('Form validation failed');
 			return;
 		}
 		await answerInquiry(response);
-		sendResponseToEmail(name, email, message, response);
+		sendResponseToEmail(name, email, response);
 	}
 
 	async function checkInput() {
@@ -61,7 +61,7 @@
 		}
 	}
 
-	async function sendResponseToEmail(name, email, message, response) {
+	async function sendResponseToEmail(name, email, response) {
 		try {
 			await sendEmail({
 				to: email,
@@ -126,7 +126,7 @@
 				</div>
 				<div class="flex justify-end mt-8">
 					<button
-						on:click={submitHandler(inquiry.nameDisplay, inquiry.email, inquiry.message, inquiry.response)}
+						on:click={submitHandler(inquiry.nameDisplay, inquiry.email,  inquiry.response)}
 						type="submit"
 						class="btn btn-primary"
 					>

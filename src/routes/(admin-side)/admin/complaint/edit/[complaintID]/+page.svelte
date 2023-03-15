@@ -22,14 +22,14 @@
 		}
 	}
 
-	async function submitHandler(firstname, lastname, email, complaint, response) {
+	async function submitHandler(firstname, lastname, email, response) {
 		const isValid = await checkInput();
 		if (!isValid) {
 			toast.error('Form validation failed');
 			return;
 		}
 		await answerComplaint(response);
-		sendResponseToEmail(firstname, lastname, email, complaint, response);
+		sendResponseToEmail(firstname, lastname, email, response);
 	}
 
 	async function checkInput() {
@@ -65,7 +65,7 @@
 		}
 	}
 
-	async function sendResponseToEmail(firstname, lastname, email, complaint, response) {
+	async function sendResponseToEmail(firstname, lastname, email, response) {
 		try {
 			await sendEmail({
 				to: email,
@@ -137,7 +137,6 @@
 							complaint.firstnameDisplay,
 							complaint.lastnameDisplay,
 							complaint.email,
-							complaint.complaint,
 							complaint.response
 						)}
 						type="submit"

@@ -162,7 +162,7 @@
 
 		if (pendingAccountStatus === 'Approved') {
 			message = `
-            <p>We are pleased to inform you that your account has been approved! You can now access your account and start enjoying our services.</p>
+            <p>We are pleased to inform you that your account has been approved! You can now access your account.</p>
         `;
 		} else if (pendingAccountStatus === 'Disapproved') {
 			message = `
@@ -175,7 +175,7 @@
 				subject: 'Southview Homes 3 Account Approval Status',
 				html: `<center><h1><img src="https://ssv.vercel.app/logo.png"> Southview Homes 3</h1>
 				<p style="font-size:12px">SVH3 San Vicente Road, Brgy., San Vicente, San Pedro, Laguna</p><br/>
-				</center>
+				<p style="font-size:13px; text-decoration:underline">This is an automated message. Do not reply.</p></center>
 				<p>Account Status Update</p>
 				<p>Dear ${firstname} ${lastname},</p>
 				<p>We have reviewed your account application and are writing to inform you of your account approval status.</p>
