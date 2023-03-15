@@ -27,7 +27,7 @@
 
 	let unsubscribe = () => {};
 
-	let showPopUp = false;
+	// let showPopUp = false;
 
 	async function changeSortBy() {
 		const order = sortByField === 'bookDate' ? 'desc' : 'asc';
@@ -139,20 +139,20 @@
 		}
 	}
 
-	async function markAsPaid(id) {
-		try {
-			const bookRef = doc(db, 'booking', id);
-			const data = {
-				paymentStatus: 'Paid'
-			};
-			showPopUp = false;
-			await updateDoc(bookRef, data);
-			toast.success('Booking mark as paid!');
-		} catch (error) {
-			console.log(error);
-			toast.error('Error in booking mark as paid!');
-		}
-	}
+	// async function markAsPaid(id) {
+	// 	try {
+	// 		const bookRef = doc(db, 'booking', id);
+	// 		const data = {
+	// 			paymentStatus: 'Paid'
+	// 		};
+	// 		showPopUp = false;
+	// 		await updateDoc(bookRef, data);
+	// 		toast.success('Booking mark as paid!');
+	// 	} catch (error) {
+	// 		console.log(error);
+	// 		toast.error('Error in marking book as paid!');
+	// 	}
+	// }
 
 	async function resetButton() {
 		bookingsQuery = query(
@@ -312,32 +312,22 @@
 								</form></td
 							>
 							<td>
-								{#if book.paymentStatus === 'Paid'}
-									<button
-										on:click={() => (showPopUp = true)}
-										type="button"
-										class="btn btn-primary"
-										disabled>Mark as Paid</button
-									>
-								{:else}
-									<button on:click={() => (showPopUp = true)} type="button" class="btn btn-primary"
-										>Mark as Paid</button
-									>
-								{/if}
-							</td>
-							<td>
 								{#if book.paymentStatus === 'Unpaid'}
+									<!-- <button on:click={() => (showPopUp = true)} type="button" class="btn btn-primary"
+										>Mark as Paid</button
+									> -->
 									<button
 										on:click={sendPaymentEmail(book.email, book.id)}
 										type="button"
 										class="btn btn-primary">Send Payment</button
 									>
 								{:else}
+									<!-- <button type="button" class="btn btn-primary" disabled>Mark as Paid</button> -->
 									<button type="button" class="btn btn-primary" disabled>Send Payment</button>
 								{/if}
 							</td>
 						</tr>
-						{#if showPopUp}
+						<!-- {#if showPopUp}
 							<div
 								class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto"
 							>
@@ -354,7 +344,7 @@
 									</div>
 								</div>
 							</div>
-						{/if}
+						{/if} -->
 					{/each}
 				</tbody>
 			</table>
@@ -445,28 +435,24 @@
 								>
 							{/if}
 						</form>
-						{#if book.paymentStatus === 'Paid'}
+						{#if book.paymentStatus === 'Unpaid'}
+							<!-- <button on:click={() => (showPopUp = true)} type="button" class="btn btn-primary"
+								>Mark as Paid</button
+							> -->
 							<button
-								on:click={() => (showPopUp = true)}
+								on:click={sendPaymentEmail(book.email, book.id)}
 								type="button"
-								class="btn btn-primary"
-								disabled>Mark as Paid</button
+								class="btn btn-primary">Send Payment</button
 							>
 						{:else}
-							<button on:click={() => (showPopUp = true)} type="button" class="btn btn-primary"
-								>Mark as Paid</button
-							>
+							<!-- <button type="button" class="btn btn-primary" disabled>Mark as Paid</button> -->
+							<button type="button" class="btn btn-primary" disabled>Send Payment</button>
 						{/if}
-						<button
-							on:click={sendPaymentEmail(book.email, book.id)}
-							type="button"
-							class="btn btn-primary">Send Payment</button
-						>
 					</div>
 				</div>
 			</div>
 			<!-- {/if} -->
-			{#if showPopUp}
+			<!-- {#if showPopUp}
 				<div
 					class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto"
 				>
@@ -483,7 +469,7 @@
 						</div>
 					</div>
 				</div>
-			{/if}
+			{/if} -->
 		{/each}
 	</div>
 </div>

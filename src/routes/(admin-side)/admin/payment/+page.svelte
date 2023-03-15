@@ -49,6 +49,8 @@
 
 	let unsubscribe = () => {};
 
+	// let showPopUpForMarkAsPaid = false;
+
 	function openModal(firstName, lastName, email, id) {
 		userFirst = firstName;
 		userLast = lastName;
@@ -135,6 +137,22 @@
 			toast.error('Error in sending payment!');
 		}
 	}
+
+	// async function markAsPaid(id) {
+	// 	console.log(id);
+	// 	try {
+	// 		const accountRef = doc(db, 'accounts', id);
+	// 		const data = {
+	// 			paymentStatus: 'Paid'
+	// 		};
+	// 		showPopUp = false;
+	// 		await updateDoc(accountRef, data);
+	// 		toast.success('Account mark as paid!');
+	// 	} catch (error) {
+	// 		console.log(error);
+	// 		toast.error('Error in marking account as paid!');
+	// 	}
+	// }
 
 	async function resetButton() {
 		accountsQuery = query(
@@ -291,6 +309,24 @@
 				</thead>
 				<tbody>
 					{#each listOfUsers as user, i}
+						<!-- {#if showPopUpForMarkAsPaid}
+							<div
+								class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto"
+							>
+								<div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-75" />
+								<div class="relative z-50 w-full max-w-md mx-auto bg-white rounded-lg shadow-lg">
+									<div class="p-6">
+										<h2 class="text-lg font-medium">Are you sure you want to mark this as paid?</h2>
+									</div>
+									<div class="flex justify-end px-6 gap-2 py-4">
+										<button class="btn btn-primary" on:click={markAsPaid(user.id)}>Yes</button>
+										<button class="btn btn-error text-white" on:click={() => (showPopUpForMarkAsPaid = false)}
+											>No</button
+										>
+									</div>
+								</div>
+							</div>
+						{/if} -->
 						<tr class="hover">
 							<td>{i + 1}</td>
 							<td>{user.firstNameDisplay + ' ' + user.lastNameDisplay}</td>
@@ -308,6 +344,9 @@
 							<td>{user.paymentStatus}</td>
 							<td>
 								{#if user.paymentStatus == 'Unpaid'}
+									<!-- <button on:click={() => (showPopUpForMarkAsPaid = true)} type="button" class="btn btn-primary"
+										>Mark as Paid</button
+									> -->
 									<button
 										on:click={openModal(
 											user.firstNameDisplay,
@@ -319,6 +358,7 @@
 										class="btn btn-primary">Send Payment</button
 									>
 								{:else}
+									<!-- <button type="button" class="btn btn-primary" disabled>Mark as paid</button> -->
 									<button type="button" class="btn btn-primary" disabled>Send Payment</button>
 								{/if}
 							</td>
@@ -332,6 +372,24 @@
 	<!-- Small screen -->
 	<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">
 		{#each listOfUsers as user}
+			<!-- {#if showPopUpForMarkAsPaid}
+				<div
+					class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto"
+				>
+					<div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-75" />
+					<div class="relative z-50 w-full max-w-md mx-auto bg-white rounded-lg shadow-lg">
+						<div class="p-6">
+							<h2 class="text-lg font-medium">Are you sure you want to mark this as paid?</h2>
+						</div>
+						<div class="flex justify-end px-6 gap-2 py-4">
+							<button class="btn btn-primary" on:click={markAsPaid(user.id)}>Yes</button>
+							<button class="btn btn-error text-white" on:click={() => (showPopUpForMarkAsPaid = false)}
+								>No</button
+							>
+						</div>
+					</div>
+				</div>
+			{/if} -->
 			<div class="card w-[105%] bg-base-100 shadow-xl">
 				<div class="card-body">
 					<h2 class="card-title mb-2">{user.firstNameDisplay + ' ' + user.lastNameDisplay}</h2>
@@ -355,6 +413,9 @@
 					</div>
 					<div class="card-actions justify-end">
 						{#if user.paymentStatus == 'Unpaid'}
+							<!-- <button on:click={() => (showPopUpForMarkAsPaid = true)} type="button" class="btn btn-primary"
+								>Mark as Paid</button
+							> -->
 							<button
 								on:click={openModal(
 									user.firstNameDisplay,
@@ -366,6 +427,7 @@
 								class="btn btn-primary">Send Payment</button
 							>
 						{:else}
+							<!-- <button type="button" class="btn btn-primary" disabled>Mark as Paid</button> -->
 							<button type="button" class="btn btn-primary" disabled>Send Payment</button>
 						{/if}
 					</div>
