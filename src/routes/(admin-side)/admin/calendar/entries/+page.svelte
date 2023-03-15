@@ -9,7 +9,8 @@
 	let eventQuery = query(collection(db, 'event'));
 
 	async function changeSortBy() {
-		eventQuery = query(collection(db, 'event'), orderBy(sortByField, 'asc'));
+		const order = sortByField === 'date' ? 'desc' : 'asc';
+		eventQuery = query(collection(db, 'event'), orderBy(sortByField, order));
 	}
 
 	async function searchEvents() {

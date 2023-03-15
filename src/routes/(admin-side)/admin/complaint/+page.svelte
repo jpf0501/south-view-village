@@ -91,7 +91,7 @@
 			<option value="" disabled selected>Sort By</option>
 			<option value="firstname">First Name</option>
 			<option value="lastname">Last Name</option>
-			<option value="email">Email</option>
+			<!-- <option value="email">Email</option> -->
 		</select>
 	</div>
 

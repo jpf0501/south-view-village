@@ -286,7 +286,7 @@
 			<option value="addressBlock">Block</option>
 			<option value="addressLot">Lot</option>
 			<option value="addressStreet">Street</option>
-			<option value="email">Email</option>
+			<!-- <option value="email">Email</option> -->
 		</select>
 
 		<button class="btn btn-primary my-4" on:click={openConfirmation}>Reset Payment Status</button>

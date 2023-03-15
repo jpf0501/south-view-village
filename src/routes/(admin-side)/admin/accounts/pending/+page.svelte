@@ -246,7 +246,7 @@
 			<option value="pendingAddressBlock">Block</option>
 			<option value="pendingAddressLot">Lot</option>
 			<option value="pendingAddressStreet">Street</option>
-			<option value="pendingEmail">Email</option>
+			<!-- <option value="pendingEmail">Email</option> -->
 		</select>
 
 		<a class="btn btn-primary my-4" href="/admin/accounts">Go Back</a>
