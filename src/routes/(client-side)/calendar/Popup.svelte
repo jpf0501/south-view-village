@@ -50,7 +50,7 @@
 	}
 
 	// Format the next day as yyyy-mm-dd
-	console.log(nextDayTimeStamp);
+	// console.log(nextDayTimeStamp);
 
 	let dateTitle = $calendarDate.split('-');
 	let monthNumber = dateTitle[1];

@@ -101,7 +101,7 @@
 		paymentFee = parseFloat(paymentFee);
 		// console.log(paymentID);
 		// console.log(paymentEmail),
-		console.log(paymentFee);
+		// console.log(paymentFee);
 		try {
 			const paymentLinkData = await createPaymentLink(
 				'Southview Homes 3 Monthly Dues',
@@ -130,7 +130,7 @@
 				<p>For other inquiries, feel free give us a call at 8330-4163 / 09063955407. You can also file for an inquiry at our <a href="https://ssv.vercel.app">website</a> or send us an email at <a href="mailto:southviewhomes3mail@gmail.com">southviewhomes3mail@gmail.com</a>.</p>
 				<p>Best regards,<br/>Southview Homes 3 Home Owners Association`
 			});
-			console.log(JSON.stringify(result));
+			// console.log(JSON.stringify(result));
 			showModal = false;
 			toast.success('Payment has been sent!');
 		} catch (error) {

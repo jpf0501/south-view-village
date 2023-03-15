@@ -46,7 +46,7 @@ export async function POST({ request }) {
 export async function DELETE({ request }) {
 	try {
 		const { uid } = await request.json();
-		console.log(uid);
+		// console.log(uid);
 		await adminAuth.deleteUser(uid)
 		await deleteDoc(doc(db, "accounts", uid))
 		return json({message:"asdasd"})
