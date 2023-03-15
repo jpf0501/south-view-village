@@ -73,11 +73,9 @@
 					<p>Thank you for reaching out to us with your question. We appreciate your interest in our community and we are happy to help.</p>
 					<p>In response to your inquiry,</p> 
 					<p>${response}</p>
-					<br/>
 					<p>If you need further assistance, please do not hesitate to let us know.</p>
 					<p>We value your feedback and would like to assure you that we are committed to providing excellent customer service. If you have any other questions or concerns, please feel free to contact us.</p>
 					<p>Thank you for your time and interest in Southview Homes 3.</p>
-					<br/>
 					<p>Best regards,</p>
 					<p>Soutview Homes 3</p>`
 			});
