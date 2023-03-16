@@ -2,15 +2,7 @@
 	import DayButton from './DayButton.svelte';
 	import { Modal } from 'svelte-simple-modal';
 
-	const daysOfTheWeek = [
-		'Sun',
-		'Mon',
-		'Tue',
-		'Wed',
-		'Thu',
-		'Fri',
-		'Sat'
-	];
+	const daysOfTheWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 	const monthNames = [
 		'January',
 		'February',
@@ -58,7 +50,22 @@
 	<title>Event Calendar - Southview Homes 3 Admin Panel</title>
 </svelte:head>
 
-<div class="flex flex-col gap-4 py-8">
+<div class="flex flex-col gap-4">
+	<div class="flex justify-end py-1">
+		<div class="flex items-center">
+			<span class="h-2 w-2 square-full mr-2 bg-blue-500" />
+			<span class="text-sm font-medium text-gray-500">Bookings</span>
+		</div>
+		<div class="flex items-center ml-6">
+			<span class="h-2 w-2 square-full mr-2 bg-green-500" />
+			<span class="text-sm font-medium text-gray-500">Events</span>
+		</div>
+		<div class="flex items-center ml-6">
+			<span class="h-2 w-2 square-full mr-2 bg-red-500" />
+			<span class="text-sm font-medium text-gray-500">Bookings and Events</span>
+		</div>
+	</div>
+
 	<main>
 		<section>
 			<div class="navbar bg-base-300">

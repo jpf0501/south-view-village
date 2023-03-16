@@ -2,15 +2,7 @@
 	import DayButton from './DayButton.svelte';
 	import { Modal } from 'svelte-simple-modal';
 
-	const daysOfTheWeek = [
-		'Sun',
-		'Mon',
-		'Tue',
-		'Wed',
-		'Thu',
-		'Fri',
-		'Sat'
-	];
+	const daysOfTheWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 	const monthNames = [
 		'January',
 		'February',
@@ -59,6 +51,20 @@
 </svelte:head>
 
 <div class="flex flex-col gap-4 py-8">
+	<div class="flex justify-end py-1">
+		<div class="flex items-center">
+			<span class="h-2 w-2 square-full mr-2 bg-blue-500" />
+			<span class="text-sm font-medium text-gray-500">Bookings</span>
+		</div>
+		<div class="flex items-center ml-6">
+			<span class="h-2 w-2 square-full mr-2 bg-green-500" />
+			<span class="text-sm font-medium text-gray-500">Events</span>
+		</div>
+		<div class="flex items-center ml-6">
+			<span class="h-2 w-2 square-full mr-2 bg-red-500" />
+			<span class="text-sm font-medium text-gray-500">Bookings and Events</span>
+		</div>
+	</div>
 	<main>
 		<section>
 			<div class="navbar bg-base-300">
@@ -81,7 +87,10 @@
 					</button>
 				</div>
 				<div class="navbar-center">
-					<h1 class="text-xl normal-case sm:text-xs">{monthNames[currentMonth - 1]} {currentYear}</h1>
+					<h1 class="text-xl normal-case sm:text-xs">
+						{monthNames[currentMonth - 1]}
+						{currentYear}
+					</h1>
 				</div>
 				<div class="navbar-end">
 					<button on:click={nextMonth} class="btn btn-circle btn-ghost">
