@@ -4,6 +4,8 @@
     import { auth, db } from '$lib/firebase/client.js';
     import { signOut } from 'firebase/auth';
 	import { onDestroy } from 'svelte';
+    import { goto } from '$app/navigation';
+    import toast from 'svelte-french-toast';
 
     let userAccount 
     let unsubscribe = () => {};
