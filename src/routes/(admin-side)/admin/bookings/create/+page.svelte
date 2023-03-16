@@ -37,38 +37,38 @@
 		const lastnameRegex = guest.lastname.length > 0 && /[a-zA-Z]/.test(guest.lastname);
 		// must ba an email
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-		let eventCurrentTimeStamp = new Date(guest.date);
-		eventCurrentTimeStamp.setHours(0);
-		eventCurrentTimeStamp.setMinutes(0);
-		eventCurrentTimeStamp.setSeconds(0);
+		// let eventCurrentTimeStamp = new Date(guest.date);
+		// eventCurrentTimeStamp.setHours(0);
+		// eventCurrentTimeStamp.setMinutes(0);
+		// eventCurrentTimeStamp.setSeconds(0);
 
-		let eventTommorowTimeStamp = new Date(guest.date);
-		eventTommorowTimeStamp.setHours(0);
-		eventTommorowTimeStamp.setMinutes(0);
-		eventTommorowTimeStamp.setSeconds(0);
+		// let eventTommorowTimeStamp = new Date(guest.date);
+		// eventTommorowTimeStamp.setHours(0);
+		// eventTommorowTimeStamp.setMinutes(0);
+		// eventTommorowTimeStamp.setSeconds(0);
 		// computation to get the next day of guess.date in a date type
-		let eventYear = eventTommorowTimeStamp.getFullYear();
-		let eventMonth = eventTommorowTimeStamp.getMonth();
-		let lastDayOfMonth = new Date(eventYear, eventMonth + 1, 0).getDate();
-		if (eventTommorowTimeStamp.getDate() === lastDayOfMonth) {
-			eventMonth++;
-			eventTommorowTimeStamp.setMonth(eventMonth);
-			eventTommorowTimeStamp.setDate(1);
-			if (eventMonth === 12) {
-				eventYear++;
-				eventTommorowTimeStamp.setFullYear(eventYear);
-			}
-		} else {
-			eventTommorowTimeStamp.setDate(eventTommorowTimeStamp.getDate() + 1);
-		}
+		// let eventYear = eventTommorowTimeStamp.getFullYear();
+		// let eventMonth = eventTommorowTimeStamp.getMonth();
+		// let lastDayOfMonth = new Date(eventYear, eventMonth + 1, 0).getDate();
+		// if (eventTommorowTimeStamp.getDate() === lastDayOfMonth) {
+		// 	eventMonth++;
+		// 	eventTommorowTimeStamp.setMonth(eventMonth);
+		// 	eventTommorowTimeStamp.setDate(1);
+		// 	if (eventMonth === 12) {
+		// 		eventYear++;
+		// 		eventTommorowTimeStamp.setFullYear(eventYear);
+		// 	}
+		// } else {
+		// 	eventTommorowTimeStamp.setDate(eventTommorowTimeStamp.getDate() + 1);
+		// }
 		// console.log(eventCurrentTimeStamp);
 		// console.log(eventTommorowTimeStamp);
-		const bookingsQuery = query(
-			collection(db, 'booking'),
-			where('bookDate', '>=', eventCurrentTimeStamp),
-			where('bookDate', '<', eventTommorowTimeStamp)
-		);
-		const bookingsSnapshot = await getDocs(bookingsQuery);
+		// const bookingsQuery = query(
+		// 	collection(db, 'booking'),
+		// 	where('bookDate', '>=', eventCurrentTimeStamp),
+		// 	where('bookDate', '<', eventTommorowTimeStamp)
+		// );
+		// const bookingsSnapshot = await getDocs(bookingsQuery);
 		errors = {
 			email: !guest.email,
 			firstname: !guest.firstname,
@@ -82,7 +82,7 @@
 			invalidFirstnameRequired: !firstnameRegex,
 			invalidLastnameRequired: !lastnameRegex,
 			invalidEmail: !emailRegex.test(guest.email),
-			dateIsReserved: bookingsSnapshot.docs.length > 0
+			// dateIsReserved: bookingsSnapshot.docs.length > 0
 		};
 		if (Object.values(errors).some((v) => v)) {
 			setTimeout(() => {
@@ -208,8 +208,8 @@
 					<span class="label-text">Date</span>
 					{#if errors.date}
 						<p class="text-red-500 text-sm italic mb-1">Date is required</p>
-					{:else if errors.dateIsReserved}
-						<p class="text-red-500 text-sm italic mb-1">That date is already reserved</p>
+					<!-- {:else if errors.dateIsReserved}
+						<p class="text-red-500 text-sm italic mb-1">That date is already reserved</p> -->
 					{/if}
 					<input
 						type="date"
