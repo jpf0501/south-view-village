@@ -38,7 +38,14 @@
 		// must ba an email
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 		let eventCurrentTimeStamp = new Date(guest.date);
+		eventCurrentTimeStamp.setHours(0);
+		eventCurrentTimeStamp.setMinutes(0);
+		eventCurrentTimeStamp.setSeconds(0);
+
 		let eventTommorowTimeStamp = new Date(guest.date);
+		eventTommorowTimeStamp.setHours(0);
+		eventTommorowTimeStamp.setMinutes(0);
+		eventTommorowTimeStamp.setSeconds(0);
 		// computation to get the next day of guess.date in a date type
 		let eventYear = eventTommorowTimeStamp.getFullYear();
 		let eventMonth = eventTommorowTimeStamp.getMonth();

@@ -33,6 +33,8 @@
 		if (month === 12) {
 			afterDateString = new Date(`${year + 1}-01-01`);
 		}
+		// console.log(newDateString)
+		// console.log(afterDateString)
 		const querySnapshotB = await getDocs(
 			query(
 				collection(db, 'booking'),

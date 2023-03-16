@@ -20,11 +20,15 @@
 
 	// convert $calendarDate to a Date object
 	let currentDayTimeStamp = new Date($calendarDate);
-
+	currentDayTimeStamp.setHours(0);
+	currentDayTimeStamp.setMinutes(0);
+	currentDayTimeStamp.setSeconds(0);
 	// Convert $calendarDate to a Date object
 	// Para makuha date object ng next day
 	let nextDayTimeStamp = new Date($calendarDate);
-
+	nextDayTimeStamp.setHours(0);
+	nextDayTimeStamp.setMinutes(0);
+	nextDayTimeStamp.setSeconds(0);
 	// Get the year and month of $calendarDate
 	let year = nextDayTimeStamp.getFullYear();
 	let month = nextDayTimeStamp.getMonth();
@@ -77,6 +81,8 @@
 
 		!booksSnapshot.empty ? (isThereBooking = true) : (isThereBooking = false);
 		!eventsSnapshot.empty ? (isThereEvent = true) : (isThereEvent = false);
+		// console.log(currentDayTimeStamp);
+		// console.log(nextDayTimeStamp);
 	}
 
 	getEventsAndBookings();

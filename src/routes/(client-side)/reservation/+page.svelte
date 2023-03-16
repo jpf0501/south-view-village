@@ -1,6 +1,15 @@
 <script>
 	import { userStore } from '$lib/store';
-	import { getDoc, doc, addDoc, collection, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
+	import {
+		getDoc,
+		doc,
+		addDoc,
+		collection,
+		serverTimestamp,
+		query,
+		where,
+		getDocs
+	} from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { goto } from '$app/navigation';
 	import toast from 'svelte-french-toast';
@@ -71,7 +80,14 @@
 		const lastnameRegex = bookData.lastname.length > 0 && /[a-zA-Z]/.test(bookData.lastname);
 
 		let eventCurrentTimeStamp = new Date(bookData.date);
+		eventCurrentTimeStamp.setHours(0);
+		eventCurrentTimeStamp.setMinutes(0);
+		eventCurrentTimeStamp.setSeconds(0);
+
 		let eventTommorowTimeStamp = new Date(bookData.date);
+		eventTommorowTimeStamp.setHours(0);
+		eventTommorowTimeStamp.setMinutes(0);
+		eventTommorowTimeStamp.setSeconds(0);
 		// computation to get the next day of guess.date in a date type
 		let eventYear = eventTommorowTimeStamp.getFullYear();
 		let eventMonth = eventTommorowTimeStamp.getMonth();
