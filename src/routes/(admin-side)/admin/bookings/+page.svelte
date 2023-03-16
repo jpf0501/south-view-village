@@ -72,7 +72,7 @@
 		}
 	}
 
-	async function sendUpdateToEmail(firstname, lastname, email, bookDate, event) {
+	async function sendUpdateToEmail(id, firstname, lastname, email, bookDate, event) {
 		let message;
 
 		if (bookingStatus === 'Approved') {
@@ -106,7 +106,16 @@
 				<p>Thank you for your recent booking request.</p>
 				<p>We are writing to inform you that your booking request has been <strong>${bookingStatus.toLocaleUpperCase()}</strong>. The details of your booking are as follows:</p>
 				<ul>
-					<li><strong>Type of Reservation:</strong> ${event}</li>
+					<li><strong>Booking ID:</strong> ${id}</li>
+					<li><strong>Type of Event:</strong> ${event}</li>
+					<li><strong>Date:</strong> ${bookDate.toDate().toLocaleDateString('en-us', {
+						year: 'numeric',
+						month: 'long',
+						day: 'numeric'
+					})}</li>
+					<li><strong>Time:</strong> ${bookDate
+						.toDate()
+						.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}</li>
 				</ul>
 				<p>${message}</p>
 				<p>Thank you for your interest in booking our clubhouse here in Southview Homes 3. We hope to have the opportunity to serve you again in the future.</p>
@@ -131,22 +140,7 @@
 			const result = await sendEmail({
 				to: email,
 				subject: 'Southview Homes 3 Reservation Payment Form',
-				html: `<center><h1><img src="https://ssv.vercel.app/logo.png"> Southview Homes 3</h1>
-				<p style="font-size:12px">SVH3 San Vicente Road, Brgy., San Vicente, San Pedro, Laguna</p><br/>
-				<p style="font-size:13px; text-decoration:underline">This is an automated message. Do not reply.</p></center>
-				<p>Booking Status Update</p>
-				<p>Hello ${firstname} ${lastname},</p>
-				<p>Thank you for your recent booking request.</p>
-				<p>We are writing to inform you that your booking request has been <strong>${bookingStatus.toLocaleUpperCase()}</strong>. The details of your booking are as follows:</p>
-				<ul>
-					<li><strong>Type of Reservation:</strong> ${event}</li>
-					<li><strong>Date:</strong> ${date}</li>
-					<li><strong>Time:</strong> ${time}</li>
-				</ul>
-				<p>${message}</p>
-				<p>Thank you for your interest in booking our clubhouse here in Southview Homes 3. We hope to have the opportunity to serve you again in the future.</p>
-				<p>Best regards,</p>
-				<p>Southview Homes 3</p>
+				html: `This is the payment link <a href="${checkoutURL}">Click here for payment link</a>
 				`
 			});
 			// console.log(JSON.stringify(result));
