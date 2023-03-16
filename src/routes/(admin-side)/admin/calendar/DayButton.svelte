@@ -26,6 +26,14 @@
 	async function checkIfExistingBook(newDateString) {
 		const lastDayOfMonth = new Date(year, month, 0).getDate();
 		let afterDateString = new Date(`${year}-${month}-${Math.min(dayNumber + 1, lastDayOfMonth)}`);
+
+		newDateString.setHours(0);
+		newDateString.setMinutes(0);
+		newDateString.setSeconds(0);
+		afterDateString.setHours(0);
+		afterDateString.setMinutes(0);
+		afterDateString.setSeconds(0);
+		
 		if (dayNumber === lastDayOfMonth) {
 			// if next day is the first day of the next month
 			afterDateString = new Date(`${year}-${month + 1}-01`);

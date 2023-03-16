@@ -42,7 +42,6 @@
 	let accountsQuery = query(
 		collection(db, 'accounts'),
 		where('paymentHead', '==', true),
-		where('role', '==', 'Resident'),
 		where('paymentStatus', '==', 'Unpaid')
 	);
 	let userFirst, userLast, userID, userEmail, userFee;
@@ -77,7 +76,6 @@
 		accountsQuery = query(
 			collection(db, 'accounts'),
 			where('paymentHead', '==', true),
-			where('role', '==', 'Resident'),
 			where('paymentStatus', '==', 'Unpaid'),
 			orderBy(sortByField, 'asc')
 		);
@@ -90,7 +88,6 @@
 			where(searchByField, '>=', searchByValueCase),
 			where(searchByField, '<=', searchByValueCase + '~'),
 			where('paymentHead', '==', true),
-			where('role', '==', 'Resident'),
 			where('paymentStatus', '==', 'Unpaid')
 		);
 	}
@@ -99,9 +96,6 @@
 		const mailFee = paymentFee;
 		paymentFee = paymentFee + '00';
 		paymentFee = parseFloat(paymentFee);
-		// console.log(paymentID);
-		// console.log(paymentEmail),
-		// console.log(paymentFee);
 		try {
 			const paymentLinkData = await createPaymentLink(
 				'Southview Homes 3 Monthly Dues',
@@ -128,7 +122,6 @@
 				<p>For other inquiries, feel free give us a call at 8330-4163 / 09063955407. You can also file for an inquiry at our <a href="https://ssv.vercel.app">website</a> or send us an email at <a href="mailto:southviewhomes3mail@gmail.com">southviewhomes3mail@gmail.com</a>.</p>
 				<p><br/>Best regards,<br/>Southview Homes 3 Home Owners Association`
 			});
-			// console.log(JSON.stringify(result));
 			showModal = false;
 			toast.success('Payment has been sent!');
 		} catch (error) {
@@ -156,7 +149,6 @@
 		accountsQuery = query(
 			collection(db, 'accounts'),
 			where('paymentHead', '==', true),
-			where('role', '==', 'Resident'),
 			where('paymentStatus', '==', 'Unpaid')
 		);
 		searchByValue = '';
@@ -166,7 +158,6 @@
 		closeConfirmation();
 		const accountQuery = query(
 			collection(db, 'accounts'),
-			where('role', '==', 'Resident'),
 			where('paymentHead', '==', true)
 		);
 		const snapshot = await getDocs(accountQuery);
