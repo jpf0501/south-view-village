@@ -15,8 +15,6 @@
 		addressLot: '',
 		addressStreet: '',
 		contactNumber: '',
-		role: 'Resident',
-		paymentStatus: 'Unpaid',
 		paymentHead: '',
 		status: 'Pending'
 	};
@@ -124,8 +122,6 @@
 				pendingAddressLot: account.addressLot,
 				pendingAddressStreet: account.addressStreet,
 				pendingContactNumber: account.contactNumber,
-				pendingRole: account.role,
-				pendingPaymentStatus: account.paymentStatus,
 				pendingPaymentHead: account.paymentHead,
 				status: account.status
 			};

@@ -65,8 +65,6 @@
 		block,
 		lot,
 		street,
-		role,
-		paymentStatus,
 		paymentHead
 	) {
 		approval(
@@ -81,8 +79,6 @@
 			block,
 			lot,
 			street,
-			role,
-			paymentStatus,
 			paymentHead
 		);
 		sendUpdateAccountStatusToEmail(email, firstnameDisplay, lastnameDisplay);
@@ -100,8 +96,6 @@
 		block,
 		lot,
 		street,
-		role,
-		paymentStatus,
 		paymentHead
 	) {
 		if (pendingAccountStatus === 'Approved') {
@@ -125,8 +119,6 @@
 						addressLot: lot,
 						addressStreet: street,
 						contactNumber: contactNumber,
-						role: role,
-						paymentStatus: paymentStatus,
 						paymentHead: paymentHead
 					})
 				});
@@ -263,7 +255,6 @@
 						<th class="text-lg">Address</th>
 						<th class="text-lg">Email</th>
 						<th class="text-lg">Contact No.</th>
-						<th class="text-lg">Role</th>
 						<th class="text-lg">Payment Head</th>
 						<th />
 					</tr>
@@ -284,7 +275,6 @@
 							>
 							<td>{user.pendingEmail}</td>
 							<td>{user.pendingContactNumber}</td>
-							<td>{user.pendingRole}</td>
 							{#if user.pendingPaymentHead}
 								<td class="text-center">Yes</td>
 							{:else}
@@ -304,8 +294,6 @@
 										user.pendingAddressBlock,
 										user.pendingAddressLot,
 										user.pendingAddressStreet,
-										user.pendingRole,
-										user.pendingPaymentStatus,
 										user.pendingPaymentHead
 									)}
 								>
@@ -336,10 +324,6 @@
 					<h2 class="card-title mb-2">
 						{user.pendingFirstNameDisplay + ' ' + user.pendingLastNameDisplay}
 					</h2>
-					<div>
-						<span class="my-1 font-bold">Role:</span>
-						{user.pendingRole}
-					</div>
 					<div>
 						<span class="my-1 font-bold">Address:</span>
 						{'Block ' +
@@ -376,8 +360,6 @@
 								user.pendingAddressBlock,
 								user.pendingAddressLot,
 								user.pendingAddressStreet,
-								user.pendingRole,
-								user.pendingPaymentStatus,
 								user.pendingPaymentHead
 							)}
 							class="py-3"
