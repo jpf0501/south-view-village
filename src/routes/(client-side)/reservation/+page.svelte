@@ -195,7 +195,7 @@
 </script>
 
 <svelte:head>
-	<title>Clubhouse Reservation - Official Website of Southview Homes 3 Subdivision</title>
+	<title>Clubhouse Reservation Form - Official Website of Southview Homes 3 Subdivision</title>
 </svelte:head>
 
 {#if showOTP}
