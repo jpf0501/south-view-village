@@ -28,7 +28,7 @@
 				<tr>
 					<td>
 						<section>
-							<h1 class="divider w-full" />
+							<div class="divider w-full" />
 							<article class="w-full max-w-5xl mx-auto">
 								<div class="flex flex-row-2 justify-between">
 									<h1 class="font-bold text-2xl py-4">{news.titleDisplay}</h1>
@@ -76,7 +76,7 @@
 									>Read more</a
 								>
 							</article>
-							<h1 class="divider w-full" />
+							<div class="divider w-full" />
 						</section>
 					</td>
 				</tr>

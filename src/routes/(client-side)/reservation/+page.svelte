@@ -15,8 +15,7 @@
 	import toast from 'svelte-french-toast';
 	import { sendEmail } from '$lib/utils';
 
-	const dateMin = new Date(Date.now() + 8.64e7).toLocaleDateString('en-ca');
-	const dateMax = new Date(Date.now() + 8.64e7 + 6.048e8 * 2).toLocaleDateString('en-ca');
+	const dateMin = new Date(Date.now() + 8.64e7 + 6.048e8 * 2).toLocaleDateString('fr-CA');
 
 	let user = null;
 	let errors = {};

@@ -108,6 +108,7 @@
 				class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
 			>
 				<p class="text-sm font-semibold px-4 py-3">Hello {user.firstNameDisplay}</p>
+				<li><a href="/">Exit Dashboard</a></li>
 				<li class="pb-2"><button on:click={logOut}>Logout</button></li>
 			</ul>
 		</div>

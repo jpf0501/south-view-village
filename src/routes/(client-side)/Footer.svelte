@@ -40,8 +40,8 @@
   <div class="py-5 self-start">
 	<span class="footer-title">Quick Links</span>
     <a href="/calendar" class="link link-hover">Calendar</a> 
-    <a href="/committee" class="link link-hover">News</a> 
-    <a href="/news" class="link link-hover">Committee</a> 
+    <a href="/news" class="link link-hover">News</a> 
+    <a href="/committee" class="link link-hover">Committee</a> 
     <a href="/reservation" class="link link-hover">Reservation</a>
   </div> 
   <div class="py-5 self-start">
