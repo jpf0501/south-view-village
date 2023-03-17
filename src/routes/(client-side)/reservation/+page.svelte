@@ -181,8 +181,7 @@
 
 		try {
 			await addDoc(collection(db, 'booking'), bookingData);
-			toast.success('Reservation submitted!');
-			await goto('/calendar');
+			await goto('/reservation/success');
 			showOTP = false;
 		} catch (error) {
 			console.log(error);
