@@ -105,7 +105,7 @@
 				</div>
 			</div>
 			<div class="flex justify-end mt-8">
-				<button type="submit" class="btn btn-primary">Submit Event</button>
+				<button type="submit" class="btn btn-primary">Add Event</button>
 				<a href="/admin/calendar" class="btn btn-error mx-1 text-white">Cancel</a>
 			</div>
 		</form>

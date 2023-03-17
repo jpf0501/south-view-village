@@ -43,14 +43,18 @@
 				dateCreated: serverTimestamp(),
 				dateModified: serverTimestamp()
 			});
-			toast.success('News added!');
+			toast.success('News entry added!');
 			await goto('/admin/news');
 		} catch (error) {
 			console.log(error);
-			toast.error('Error in adding news!');
+			toast.error('Error in adding news entry!');
 		}
 	}
 </script>
+
+<svelte:head>
+	<title>Add News Form - Southview Homes 3 Admin Panel</title>
+</svelte:head>
 
 <div class="min-h-screen hero bg-base-200">
 	<div class="w-full max-w-4xl p-6 mx-auto shadow-2xl border rounded-xl bg-base-100">
@@ -81,7 +85,7 @@
 				</div>
 			</div>
 			<div class="flex justify-end mt-8">
-				<button type="submit" class="btn btn-primary">Add News</button>
+				<button type="submit" class="btn btn-primary">Add Entry</button>
 				<a href="/admin/news" class="btn btn-error mx-1 text-white">Cancel</a>
 			</div>
 		</form>

@@ -42,7 +42,6 @@
 	let accountsQuery = query(
 		collection(db, 'accounts'),
 		where('paymentHead', '==', true),
-		where('role', '==', 'Resident'),
 		where('paymentStatus', '==', 'Unpaid')
 	);
 	let userFirst, userLast, userID, userEmail, userFee;
@@ -77,7 +76,6 @@
 		accountsQuery = query(
 			collection(db, 'accounts'),
 			where('paymentHead', '==', true),
-			where('role', '==', 'Resident'),
 			where('paymentStatus', '==', 'Unpaid'),
 			orderBy(sortByField, 'asc')
 		);
@@ -90,7 +88,6 @@
 			where(searchByField, '>=', searchByValueCase),
 			where(searchByField, '<=', searchByValueCase + '~'),
 			where('paymentHead', '==', true),
-			where('role', '==', 'Resident'),
 			where('paymentStatus', '==', 'Unpaid')
 		);
 	}
@@ -99,9 +96,6 @@
 		const mailFee = paymentFee;
 		paymentFee = paymentFee + '00';
 		paymentFee = parseFloat(paymentFee);
-		// console.log(paymentID);
-		// console.log(paymentEmail),
-		// console.log(paymentFee);
 		try {
 			const paymentLinkData = await createPaymentLink(
 				'Southview Homes 3 Monthly Dues',
@@ -115,22 +109,19 @@
 				html: `<center><h1><img src="https://ssv.vercel.app/logo.png"> Southview Homes 3</h1>
 				<p style="font-size:12px">SVH3 Clubhouse, San Vicente Road, Brgy., San Vicente, San Pedro, Laguna</p><br/>
 				<p style="font-size:13px; text-decoration:underline">This is an automated message. Do not reply.</p></center>
-				<p>We sent you this notice to inform you on the payment of your unpaid monthly dues for the period of ${currentMonth} ${currentYear}, which amounts to a total of PHP ${mailFee}.00 in total. 
-				sThe above amount and period remains unpaid on the record. Please be informed that the default monthly dues amounting Php 500.00 is our monthly obligation, to fund the subdivision's monthly expenses.
-				<br/>1) Security Guard - 4 head counts
+				<p><br/>We sent you this notice to inform you on the payment of your unpaid monthly dues for the period of ${currentMonth} ${currentYear}, which amounts to a total of PHP ${new Intl.NumberFormat().format(mailFee)}.00 in total. The above amount and period remains unpaid on the record. Please be informed that the purpose of collecting this fee is to fund the subdivision's monthly expenses, which include the following:
+				<br/><br/>
+				1) Security Guard Salary
 				<br/>2) Street Lights
 				<br/>3) Garbage Pick-up
-				<br/>4) Maintenance - 2 head counts
-				<p>You can pay your monthly dues by using the form provided <a href=${checkoutURL}>here</a>.</p>
-				<p>To avoid inconveniences, we greatly appreciate if you could proceed with the payment of your unpaid dues on or before
-				moving forward. Kindly settle your monthly dues obligation before the assigned deadline.
-				Should you have concern on your unpaid dues please contact the HOA officers or send us an inquiry for any other clarifications.
+				<br/>4) Maintenance Salary
+				<p>To avoid inconveniences, we greatly appreciate if you could proceed with the payment of your unpaid dues on or before the appointed deadline. <p>You can pay your monthly dues by using the form provided <a href=${checkoutURL}>here</a>.</p>
+				Should you have any kind of concern regarding your dues, please contact any of the HOA officers or send us an inquiry for any other clarifications.
 				Please disregard this notice if you have settled already the said unpaid dues.
 				Thank you.</p>
 				<p>For other inquiries, feel free give us a call at 8330-4163 / 09063955407. You can also file for an inquiry at our <a href="https://ssv.vercel.app">website</a> or send us an email at <a href="mailto:southviewhomes3mail@gmail.com">southviewhomes3mail@gmail.com</a>.</p>
-				<p>Best regards,<br/>Southview Homes 3 Home Owners Association`
+				<p><br/>Best regards,<br/>Southview Homes 3 Home Owners Association`
 			});
-			// console.log(JSON.stringify(result));
 			showModal = false;
 			toast.success('Payment has been sent!');
 		} catch (error) {
@@ -158,7 +149,6 @@
 		accountsQuery = query(
 			collection(db, 'accounts'),
 			where('paymentHead', '==', true),
-			where('role', '==', 'Resident'),
 			where('paymentStatus', '==', 'Unpaid')
 		);
 		searchByValue = '';
@@ -168,7 +158,6 @@
 		closeConfirmation();
 		const accountQuery = query(
 			collection(db, 'accounts'),
-			where('role', '==', 'Resident'),
 			where('paymentHead', '==', true)
 		);
 		const snapshot = await getDocs(accountQuery);

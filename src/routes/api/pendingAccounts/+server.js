@@ -29,9 +29,9 @@ export async function POST({ request }) {
 			addressLot:createUserRequest.addressBlock,
 			addressStreet:createUserRequest.addressStreet,
 			contactNumber:createUserRequest.contactNumber,
-            role:createUserRequest.role,
+            role: "Resident",
 			email:createUserRequest.email,
-			paymentStatus:createUserRequest.paymentStatus,
+			paymentStatus: 'Unpaid',
 			paymentHead:createUserRequest.paymentHead
 		 })
 		// return json(userRecord);

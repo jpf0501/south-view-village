@@ -37,31 +37,38 @@
 		const lastnameRegex = guest.lastname.length > 0 && /[a-zA-Z]/.test(guest.lastname);
 		// must ba an email
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-		let eventCurrentTimeStamp = new Date(guest.date);
-		let eventTommorowTimeStamp = new Date(guest.date);
+		// let eventCurrentTimeStamp = new Date(guest.date);
+		// eventCurrentTimeStamp.setHours(0);
+		// eventCurrentTimeStamp.setMinutes(0);
+		// eventCurrentTimeStamp.setSeconds(0);
+
+		// let eventTommorowTimeStamp = new Date(guest.date);
+		// eventTommorowTimeStamp.setHours(0);
+		// eventTommorowTimeStamp.setMinutes(0);
+		// eventTommorowTimeStamp.setSeconds(0);
 		// computation to get the next day of guess.date in a date type
-		let eventYear = eventTommorowTimeStamp.getFullYear();
-		let eventMonth = eventTommorowTimeStamp.getMonth();
-		let lastDayOfMonth = new Date(eventYear, eventMonth + 1, 0).getDate();
-		if (eventTommorowTimeStamp.getDate() === lastDayOfMonth) {
-			eventMonth++;
-			eventTommorowTimeStamp.setMonth(eventMonth);
-			eventTommorowTimeStamp.setDate(1);
-			if (eventMonth === 12) {
-				eventYear++;
-				eventTommorowTimeStamp.setFullYear(eventYear);
-			}
-		} else {
-			eventTommorowTimeStamp.setDate(eventTommorowTimeStamp.getDate() + 1);
-		}
+		// let eventYear = eventTommorowTimeStamp.getFullYear();
+		// let eventMonth = eventTommorowTimeStamp.getMonth();
+		// let lastDayOfMonth = new Date(eventYear, eventMonth + 1, 0).getDate();
+		// if (eventTommorowTimeStamp.getDate() === lastDayOfMonth) {
+		// 	eventMonth++;
+		// 	eventTommorowTimeStamp.setMonth(eventMonth);
+		// 	eventTommorowTimeStamp.setDate(1);
+		// 	if (eventMonth === 12) {
+		// 		eventYear++;
+		// 		eventTommorowTimeStamp.setFullYear(eventYear);
+		// 	}
+		// } else {
+		// 	eventTommorowTimeStamp.setDate(eventTommorowTimeStamp.getDate() + 1);
+		// }
 		// console.log(eventCurrentTimeStamp);
 		// console.log(eventTommorowTimeStamp);
-		const bookingsQuery = query(
-			collection(db, 'booking'),
-			where('bookDate', '>=', eventCurrentTimeStamp),
-			where('bookDate', '<', eventTommorowTimeStamp)
-		);
-		const bookingsSnapshot = await getDocs(bookingsQuery);
+		// const bookingsQuery = query(
+		// 	collection(db, 'booking'),
+		// 	where('bookDate', '>=', eventCurrentTimeStamp),
+		// 	where('bookDate', '<', eventTommorowTimeStamp)
+		// );
+		// const bookingsSnapshot = await getDocs(bookingsQuery);
 		errors = {
 			email: !guest.email,
 			firstname: !guest.firstname,
@@ -75,7 +82,7 @@
 			invalidFirstnameRequired: !firstnameRegex,
 			invalidLastnameRequired: !lastnameRegex,
 			invalidEmail: !emailRegex.test(guest.email),
-			dateIsReserved: bookingsSnapshot.docs.length > 0
+			// dateIsReserved: bookingsSnapshot.docs.length > 0
 		};
 		if (Object.values(errors).some((v) => v)) {
 			setTimeout(() => {
@@ -103,22 +110,22 @@
 				dateReserved: guest.dateReserved,
 				dateReviewed: guest.dateReserved
 			});
-			toast.success('Reservation submitted!');
-			await goto('/calendar');
+			toast.success('Reservation entry saved!');
+			await goto('/admin/bookings');
 		} catch (error) {
 			console.log(error);
-			toast.error('Error in submitting reservation!');
+			toast.error('Error in saving entry!');
 		}
 	}
 </script>
 
 <svelte:head>
-	<title>Add Reservation - Southview Homes 3 Admin Panel</title>
+	<title>Add Reservation Form - Southview Homes 3 Admin Panel</title>
 </svelte:head>
 
 <div class="min-h-screen hero bg-base-200">
 	<div class="w-full max-w-4xl p-6 mx-auto shadow-2xl border rounded-xl bg-base-100">
-		<h1 class="text-2xl mt-2">Clubhouse Reservation Form</h1>
+		<h1 class="text-2xl mt-2">Add Reservation Entry Form</h1>
 		<form on:submit|preventDefault={submitHandler}>
 			<div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2">
 				<div class="form-control">
@@ -201,8 +208,8 @@
 					<span class="label-text">Date</span>
 					{#if errors.date}
 						<p class="text-red-500 text-sm italic mb-1">Date is required</p>
-					{:else if errors.dateIsReserved}
-						<p class="text-red-500 text-sm italic mb-1">That date is already reserved</p>
+					<!-- {:else if errors.dateIsReserved}
+						<p class="text-red-500 text-sm italic mb-1">That date is already reserved</p> -->
 					{/if}
 					<input
 						type="date"
@@ -226,7 +233,7 @@
 				</div>
 			</div>
 			<div class="flex justify-end mt-8">
-				<button type="submit" class="btn btn-primary">Submit Schedule</button>
+				<button type="submit" class="btn btn-primary">Add Entry</button>
 				<a href="/admin/bookings" class="btn btn-error mx-1 text-white">Cancel</a>
 			</div>
 		</form>

@@ -43,7 +43,7 @@
 </script>
 
 <svelte:head>
-	<title>Inquiries - Southview Homes 3 Admin Panel</title>
+	<title>Inquiry Response Form - Southview Homes 3 Admin Panel</title>
 </svelte:head>
 
 <div class="min-w-full min-h-full bg-base-200 py-8 px-5">
@@ -114,16 +114,8 @@
 										.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}</td
 							> -->
 							<td>
-								<a href={'/admin/inquiries/edit/' + inquiry.id} class="btn glass text-white"
-									><svg
-										xmlns="http://www.w3.org/2000/svg"
-										width="24"
-										height="24"
-										viewBox="0 0 24 24"
-										><path
-											d="M7.127 22.562l-7.127 1.438 1.438-7.128 5.689 5.69zm1.414-1.414l11.228-11.225-5.69-5.692-11.227 11.227 5.689 5.69zm9.768-21.148l-2.816 2.817 5.691 5.691 2.816-2.819-5.691-5.689z"
-										/></svg
-									></a
+								<a href={'/admin/inquiries/respond/' + inquiry.id} class="btn btn-primary"
+									>Give Response</a
 								>
 							</td>
 						</tr>
@@ -158,11 +150,8 @@
 								.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}
 					</div> -->
 					<div class="card-actions justify-end">
-						<a href={'/admin/inquiries/edit/' + inquiry.id} class="btn glass text-white"
-							><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-								><path
-									d="M7.127 22.562l-7.127 1.438 1.438-7.128 5.689 5.69zm1.414-1.414l11.228-11.225-5.69-5.692-11.227 11.227 5.689 5.69zm9.768-21.148l-2.816 2.817 5.691 5.691 2.816-2.819-5.691-5.689z"
-								/></svg
+						<a href={'/admin/inquiries/respond/' + inquiry.id} class="btn btn-primary"
+							>Give Response
 							></a
 						>
 					</div>

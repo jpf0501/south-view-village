@@ -77,40 +77,35 @@
 
 		if (bookingStatus === 'Approved') {
 			message = `
-            <p>We are pleased to confirm your booking and look forward to welcoming you. If you have any further questions or concerns, please do not hesitate to contact us.</p>
+            <p>We are pleased to confirm your booking and look forward to welcoming you on the date of reservation. If you have any further questions or concerns regarding this decision, please do not hesitate to contact us.</p>
         `;
 		} else if (bookingStatus === 'Disapproved') {
 			message = `
-            <p>Unfortunately, we are unable to approve your booking request at this time. We apologize for any inconvenience this may have caused and encourage you to consider alternative dates or services. If you have any further questions or concerns, please do not hesitate to contact us.</p>
+            <p>Unfortunately, we are unable to approve your booking request at this time. We apologize for any inconvenience this may have caused and encourage you to consider alternative dates or services. If you have any further questions or concerns regarding this decision, please do not hesitate to contact us.</p>
         `;
 		}
-		let date = bookDate
-			.toDate()
-			.toLocaleDateString('en-us', { year: 'numeric', month: 'long', day: 'numeric' });
-		let time = bookDate
-			.toDate()
-			.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' });
+		
+		const date = bookDate.toDate().toLocaleDateString('en-us', {year: 'numeric', month: 'long', day: 'numeric'})
+		const time = bookDate.toDate().toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })
+
 		try {
 			await sendEmail({
 				to: email,
-				subject: 'Southview Homes 3 Booking Status Update',
+				subject: 'Southview Homes 3 Reservation Status Update',
 				html: `<center><h1><img src="https://ssv.vercel.app/logo.png"> Southview Homes 3</h1>
 				<p style="font-size:12px">SVH3 San Vicente Road, Brgy., San Vicente, San Pedro, Laguna</p><br/>
 				<p style="font-size:13px; text-decoration:underline">This is an automated message. Do not reply.</p></center>
-				<p>Booking Status Update</p>
-				<p>Dear ${firstname} ${lastname},</p>
-				<p>Thank you for your recent booking request.</p>
-				<p>We are writing to inform you that your booking request has been <strong>${bookingStatus.toLocaleUpperCase()}</strong>. The details of your booking are as follows:</p>
+				<p><br/>Hello ${firstname} ${lastname},</p>
+				<p>We are writing to inform you that your booking request has been <strong>${bookingStatus.toLocaleUpperCase()}</strong>. As a reminder, the details of your booking are as follows:</p>
 				<ul>
-					<li><strong>Booking ID:</strong> ${id}</li>
-					<li><strong>Service/Event/Reservation:</strong> ${event}</li>
-					<li><strong>Date:</strong> ${date}</li>
-					<li><strong>Time:</strong> ${time}</li>
+					<li><strong>Type of Reservation:</strong> ${event}</li>
+					<li><strong>Date Scheduled:</strong> ${date}</li>
+					<li><strong>Time Scheduled:</strong> ${time}</li>
 				</ul>
 				<p>${message}</p>
-				<p>Thank you for your interest in Soutvhiew Homes 3. We hope to have the opportunity to serve you in the future.</p>
-				<p>Best regards,</p>
-				<p>Soutview Homes 3</p>
+				<p>We hope to have the opportunity to serve you again in the future.</p>
+				<p>For other inquiries, feel free give us a call at 8330-4163 / 09063955407. You can also file for an inquiry at our <a href="https://ssv.vercel.app">website</a> or send us an email at <a href="mailto:southviewhomes3mail@gmail.com">southviewhomes3mail@gmail.com</a>.</p>
+				<p><br/>Best regards,<br/>Southview Homes 3 Home Owners Association</p>
 				`
 			});
 		} catch (error) {
@@ -119,7 +114,7 @@
 		}
 	}
 
-	async function sendPaymentEmail(email, id) {
+	async function sendPaymentEmail(email, id, firstname, lastname, date, event) {
 		try {
 			const paymentLinkData = await createPaymentLink(
 				'Clubhouse Reservation Downpayment',
@@ -129,8 +124,17 @@
 			const checkoutURL = paymentLinkData.data.attributes.checkout_url;
 			const result = await sendEmail({
 				to: email,
-				subject: 'Southview Homes 3 Payment Method',
-				html: `<h1>This is the link for payment for reservation in booking: <a href=${checkoutURL}>Click here</a></h1>`
+				subject: 'Southview Homes 3 Reservation Payment Form',
+				html: `<center><h1><img src="https://ssv.vercel.app/logo.png"> Southview Homes 3</h1>
+				<p style="font-size:12px">SVH3 San Vicente Road, Brgy., San Vicente, San Pedro, Laguna</p><br/>
+				<p style="font-size:13px; text-decoration:underline">This is an automated message. Do not reply.</p></center>
+				<p><br/>Hello ${firstname} ${lastname},</p>
+				<p>Thank you for making a reservation with us. We are delighted to have your interest in filing a reservation for our subdivision's clubhouse. As a reminder, your reservation for ${event} is scheduled for ${date.toDate().toLocaleDateString('en-us', {year: 'numeric', month: 'long', day: 'numeric'})} at ${date.toDate().toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}.</p>
+				<p>To secure your reservation, we kindly request that you complete the payment process by clicking on the payment link below. The payment link will direct you to a payment form where you can enter your payment details and complete the transaction. Please note that your reservation is not confirmed until payment is received.</p>
+				<p>You can access the payment form <a href=${checkoutURL}>here</a>.</p>
+				<p>For other inquiries, feel free give us a call at 8330-4163 / 09063955407. You can also file for an inquiry at our <a href="https://ssv.vercel.app">website</a> or send us an email at <a href="mailto:southviewhomes3mail@gmail.com">southviewhomes3mail@gmail.com</a>.</p>
+				<p><br/>Best regards,<br/>Southview Homes 3 Home Owners Association</p>
+				`
 			});
 			// console.log(JSON.stringify(result));
 			toast.success('Payment has been sent!');
@@ -320,7 +324,7 @@
 										class="btn btn-primary">Mark as Paid</button
 									>
 									<button
-										on:click={sendPaymentEmail(book.email, book.id)}
+										on:click={sendPaymentEmail(book.email, book.id, book.firstNameDisplay, book.lastNameDisplay, book.bookDate, book.eventTypeDisplay)}
 										type="button"
 										class="btn btn-primary">Send Payment</button
 									>
@@ -427,7 +431,7 @@
 								class="btn btn-primary">Mark as Paid</button
 							>
 							<button
-								on:click={sendPaymentEmail(book.email, book.id)}
+								on:click={sendPaymentEmail(book.email, book.id, book.firstNameDisplay, book.lastNameDisplay)}
 								type="button"
 								class="btn btn-primary">Send Payment</button
 							>

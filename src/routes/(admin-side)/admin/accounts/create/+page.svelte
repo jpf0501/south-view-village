@@ -329,7 +329,7 @@
 					</div>
 				</div>
 				<div class="flex justify-end mt-8">
-					<button type="submit" class="btn btn-primary mx-1 px-6">Create</button>
+					<button type="submit" class="btn btn-primary mx-1 px-6">Create Account</button>
 					<a href="/admin/accounts" class="btn btn-error mx-1 px-4 text-white">Cancel</a>
 				</div>
 			</form>
