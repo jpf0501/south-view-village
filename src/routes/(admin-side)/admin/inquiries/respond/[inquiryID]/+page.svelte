@@ -130,7 +130,7 @@
 						type="submit"
 						class="btn btn-primary"
 					>
-						Submit
+						Submit Response
 					</button>
 					<a href="/admin/inquiries" class="btn btn-error mx-1 text-white">Cancel</a>
 					<button on:click={deleteInquiry} type="submit" class="btn btn-warning mx-1 text-white">

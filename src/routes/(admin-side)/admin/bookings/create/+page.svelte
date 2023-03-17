@@ -110,22 +110,22 @@
 				dateReserved: guest.dateReserved,
 				dateReviewed: guest.dateReserved
 			});
-			toast.success('Reservation submitted!');
-			await goto('/calendar');
+			toast.success('Reservation entry saved!');
+			await goto('/admin/bookings');
 		} catch (error) {
 			console.log(error);
-			toast.error('Error in submitting reservation!');
+			toast.error('Error in saving entry!');
 		}
 	}
 </script>
 
 <svelte:head>
-	<title>Add Reservation - Southview Homes 3 Admin Panel</title>
+	<title>Add Reservation Form - Southview Homes 3 Admin Panel</title>
 </svelte:head>
 
 <div class="min-h-screen hero bg-base-200">
 	<div class="w-full max-w-4xl p-6 mx-auto shadow-2xl border rounded-xl bg-base-100">
-		<h1 class="text-2xl mt-2">Clubhouse Reservation Form</h1>
+		<h1 class="text-2xl mt-2">Add Reservation Entry Form</h1>
 		<form on:submit|preventDefault={submitHandler}>
 			<div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2">
 				<div class="form-control">
@@ -233,7 +233,7 @@
 				</div>
 			</div>
 			<div class="flex justify-end mt-8">
-				<button type="submit" class="btn btn-primary">Submit Schedule</button>
+				<button type="submit" class="btn btn-primary">Add Entry</button>
 				<a href="/admin/bookings" class="btn btn-error mx-1 text-white">Cancel</a>
 			</div>
 		</form>

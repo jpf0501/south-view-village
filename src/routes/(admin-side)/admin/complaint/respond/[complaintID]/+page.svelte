@@ -103,7 +103,7 @@
 </script>
 
 <svelte:head>
-	<title>Answer Complaints - Southview Homes 3 Admin Panel</title>
+	<title>Complaint Response Form - Southview Homes 3 Admin Panel</title>
 </svelte:head>
 
 {#if complaint}
@@ -142,7 +142,7 @@
 						type="submit"
 						class="btn btn-primary"
 					>
-						Submit
+						Submit Response
 					</button>
 					<a href="/admin/complaint" class="btn btn-error mx-1 text-white">Cancel</a>
 					<button on:click={deleteComplaint} type="submit" class="btn btn-warning mx-1 text-white">
