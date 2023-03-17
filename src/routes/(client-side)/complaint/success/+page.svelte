@@ -6,9 +6,12 @@
             </svg>  
         </div>
         <div class="text-center">
-            <p class="font-bold pb-12 text-xl">Thank you for your reservation!</p>
-            <p class="pb-14">We are currently processing your reservation and will get in touch using the information you've provided to confirm more details as soon as possible.</p>
-            <a href="/" class="underline">Go Back</a>
+            <p class="font-bold pb-12 text-xl">Thank you for your submission!</p>
+            <p class="pb-14">We have received your complaint and will keep in touch with you to give our response as soon as possible.</p>
+            <div class="flex flex-col">
+                <a href="/complaint" class="underline pb-5">Make Another Complaint</a>
+                <a href="/" class="underline">Go Back</a>
+            </div>
         </div>
     </div>
 </div>

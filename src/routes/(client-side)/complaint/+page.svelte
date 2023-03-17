@@ -26,6 +26,7 @@
 			return;
 		}
 		await sendComplaint();
+		await goto("/complaint/success")
 	}
 
 	async function sendComplaint() {
@@ -43,8 +44,6 @@
 				hadAnswered: false,
 				response: ""
 			});
-			toast.success('Complaint Sent!');
-			complaint = '';
 		} catch (error) {
 			console.log(error);
 			toast.error('Error in sending complaint!');
@@ -57,6 +56,10 @@
 		goto('/');
 	}
 </script>
+
+<svelte:head>
+	<title>Complaint Form - Official Website of Southview Homes 3 Subdivision</title>
+</svelte:head>
 
 {#if user}
 	<div class="min-h-screen hero bg-base-200 py-8">
@@ -142,12 +145,7 @@
 					</div>
 				</div>
 				<div class="flex justify-end mt-8">
-					<button type="submit" class="btn btn-primary">Submit</button>
-					<button
-						type="button"
-						on:click={() => (complaint = '')}
-						class="btn btn-error mx-1 text-white">Clear</button
-					>
+					<button type="submit" class="btn btn-primary">Submit Complaint</button>
 				</div>
 			</form>
 		</div>
