@@ -66,14 +66,15 @@
             <li><a href="/login">Login</a></li>
             <li class="pb-2"><a href="/register">Register</a></li>
         {:else}
-            <p class="text-sm font-semibold px-4 py-3">Hello {userAccount?.firstNameDisplay || '...' }</p>
-            <p class="text-sm font-bold px-4 py-3">
-                Monthly Dues: <span
-                    class={` ${textColor[userAccount?.paymentStatus || 'default' ]} `}
-                    >{userAccount?.paymentStatus || '...'}</span
-                >
-            </p>
+            <p class="text-sm font-semibold px-4 pt-3 pb-5">Hello {userAccount?.firstNameDisplay || '...' }</p>
+            {#if userAccount?.paymentHead === true}
+                <p class="text-sm font-bold px-4 pb-1">Monthly Due Status:</p>
+                <p class="text-sm font-semibold px-4 pb-2{` ${textColor[userAccount?.paymentStatus || 'default' ]} `}">{userAccount?.paymentStatus || '...'}</p>
+            {/if}
             <li><a href="/profile">Profile</a></li>
+            {#if userAccount?.role === 'Admin' }
+                <li><a href="/admin">HOA Dashboard</a></li>
+            {/if}
             <li class="pb-2"><button on:click={logOut}>Logout</button></li>
         {/if}
     </ul>
