@@ -152,8 +152,7 @@
 					<div class="card-actions justify-end">
 						<a href={'/admin/inquiries/respond/' + inquiry.id} class="btn btn-primary"
 							>Give Response
-							></a
-						>
+						</a>
 					</div>
 				</div>
 			</div>
