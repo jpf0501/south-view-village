@@ -36,6 +36,7 @@
 	</div>
 	<p class="pt-4">Copyright © {year} Southview Homes 3</p>
 	<p>All Rights Reserved</p>
+	<p>DEVELOPMENT BRANCH</p>
   </div> 
   <div class="py-5 self-start">
 	<span class="footer-title">Quick Links</span>
