@@ -48,8 +48,8 @@
 		endDate = new Date(`${currentYear + 1}-01-${day}`);
 	} else {
 		// otherwise, set end date to next month
-		let nextMonth = (date.getMonth() + 1).toString().padStart(2, '0');
-		endDate = new Date(`${currentYear}-${nextMonth}-${day}`);
+		
+		endDate = new Date(`${currentYear}-${currentMonth}-${day}`);
 	}
 
 	let listOfStreets = [];
