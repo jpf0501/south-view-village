@@ -122,7 +122,7 @@
 				<div class="bg-blue-500 rounded-lg">
 					<h2 class="text-lg font-bold py-3 px-4">{event.titleDisplay}</h2>
 				</div>
-				<p class="pt-7 px-4">{event.description}</p>
+				<p class="pt-7 px-4" style="white-space:pre-wrap">{event.description}</p>
 			</div>
 		{/each}
 	{/if}
