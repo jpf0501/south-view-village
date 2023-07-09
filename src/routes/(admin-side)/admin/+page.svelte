@@ -155,7 +155,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="flex justify-center">
+	<!-- <div class="flex justify-center">
 		<div class="w-full shadow-2xl border rounded-xl bg-base-100">
 			<div class="p-4">
 				<h1 class="text-2xl mb-8 font-bold pt-6 px-8">Activity Log</h1>
@@ -163,7 +163,7 @@
 				<div class="flex flex-col space-y-8 text-md px-8">
 					<div class="overflow-x-auto">
 						<table class="table">
-						  <!-- head -->
+
 						  <thead>
 							<tr>
 							  <th>Date</th>
@@ -186,6 +186,7 @@
 			</div>
 		</div>
 	</div>
+	-->
 </div>
 	
 	
