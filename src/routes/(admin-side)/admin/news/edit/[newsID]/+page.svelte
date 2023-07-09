@@ -2,6 +2,7 @@
 	import { db } from '$lib/firebase/client';
 	import { getDoc, updateDoc, deleteDoc, doc, serverTimestamp } from 'firebase/firestore';
 	import { goto } from '$app/navigation';
+	import { getNextDate } from '$lib/dateUtils.js';
 	import toast from 'svelte-french-toast';
 
 	/** @type {import('./$types').PageData} */
@@ -10,6 +11,12 @@
 
 	let news = null;
 	let errors = {};
+
+	let today = new Date();
+	let formattedDateMin;
+
+	const { formattedDate: calculatedFormattedDate } = getNextDate(today);
+    formattedDateMin = calculatedFormattedDate;
 
 	async function getNews() {
 		const snapshot = await getDoc(doc(db, 'news', newsID));
@@ -21,7 +28,8 @@
 		errors = {
 			title: !news.titleDisplay,
 			content: !news.content,
-			contentKulang: news.content.length < 10
+			contentKulang: news.content.length < 10,
+			noExpiry: !news.expiration
 		};
 		if (Object.values(errors).some((v) => v)) {
 			setTimeout(() => {
@@ -73,8 +81,9 @@
 		<div class="w-full max-w-4xl p-6 mx-auto shadow-2xl border rounded-xl bg-base-100">
 			<h1 class="text-2xl pb-8">Edit News</h1>
 			<form>
-				<div class="form-control">
-					<span class="pb-3">News Title</span>
+				<div class="form-control flex flex-row justify-between gap-10">
+					<div class="flex flex-col w-full">
+						<span class="pb-3">News Title</span>
 					{#if errors.title}
 						<p class="text-red-500 text-sm italic mb-1">News title is required</p>
 					{/if}
@@ -83,6 +92,19 @@
 						class="input input-bordered p-3 mt-2"
 						bind:value={news.titleDisplay}
 					/>
+					</div>
+					<div class="flex flex-col">
+						<span class="pb-3">Expiration Date</span>
+					{#if errors.noExpiry}
+						<p class="text-red-500 text-sm italic mb-1">Expiration date is required</p>
+					{/if}
+					<input
+						type="date"
+						class="input input-bordered p-3 mt-2"
+						min={formattedDateMin}
+						bind:value={news.expiration}
+					/>
+					</div>
 				</div>
 				<div class="mt-6">
 					<div class="form-control">
