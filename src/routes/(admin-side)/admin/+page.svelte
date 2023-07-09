@@ -1,14 +1,19 @@
 <script>
 	import { db } from '$lib/firebase/client';
 	import {
+		getDoc,
+		doc,
 		getDocs,
 		query,
 		collection,
 		getCountFromServer,
 		where,
 		limit,
-		orderBy
+		orderBy,
+		addDoc,
+		serverTimestamp,
 	} from 'firebase/firestore';
+	import { userStore } from '$lib/store.js';
 
 	let countOfPendingBooks = '';
 	let countOfAccounts = '';
@@ -61,8 +66,8 @@
 	async function getActivityLog() {
 		const logQuery = query(
 			collection(db, 'adminlogs'),
-			limit(20),
-			orderBy('date', 'asc')
+			limit(10),
+			orderBy('date', 'desc')
 			);
 		const adminLogSnapshot = await getDocs(logQuery);
 		listActivityLog = adminLogSnapshot.docs.map((doc) => doc.data());
@@ -73,9 +78,26 @@
 		listOfEvents = eventsSnapshot.docs.map((doc) => doc.data());
 	}
 
+	async function addLog() {
+		const snapshot = await getDoc(doc(db, 'accounts', $userStore.uid));
+		let user = snapshot.data();
+
+		try {
+			await addDoc(collection(db, 'adminlogs'), {
+				activity: user.firstNameDisplay + ", " + user.lastNameDisplay + " viewed Dashboard module.",
+				pageRef: 'Dashboard',
+				date: serverTimestamp()
+			});
+		} catch(err) {
+			console.log(err);
+		}
+	}
+
 	getUpcoming(eventQuery);
 	getCount();
+	addLog();
 	getActivityLog();
+	
 </script>
 
 <svelte:head>
@@ -138,7 +160,7 @@
 			<div class="p-4">
 				<h1 class="text-2xl mb-8 font-bold pt-6 px-8">Activity Log</h1>
 				<p class="divider"></p>
-				<div class="flex flex-col space-y-8 text-md px-8 py-4">
+				<div class="flex flex-col space-y-8 text-md px-8">
 					<div class="overflow-x-auto">
 						<table class="table">
 						  <!-- head -->
@@ -150,13 +172,13 @@
 							</tr>
 						  </thead>
 						  <tbody>
-							<tr>
 							{#each listActivityLog as log}
+							<tr>
 							  <td>{log.date.toDate().toLocaleDateString('en-us', { year: 'numeric', month: 'long', day: 'numeric' })} {log.date.toDate().toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}</td>
 							  <td>{log.activity}</td>
 							  <td>{log.pageRef}</td>
-							{/each}
 							</tr>
+							{/each}
 						  </tbody>
 						</table>
 					  </div>					
