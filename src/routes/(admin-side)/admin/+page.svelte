@@ -14,6 +14,7 @@
 	let countOfAccounts = '';
 	let dueCount = '';
 	let listOfEvents = [];
+	let listActivityLog = [];
 	let dateToday = new Date().toLocaleDateString('fr-CA', {
 		year: 'numeric',
 		month: '2-digit',
@@ -57,6 +58,16 @@
 		}
 	}
 
+	async function getActivityLog() {
+		const logQuery = query(
+			collection(db, 'adminlogs'),
+			limit(20),
+			orderBy('date', 'asc')
+			);
+		const adminLogSnapshot = await getDocs(logQuery);
+		listActivityLog = adminLogSnapshot.docs.map((doc) => doc.data());
+	}
+
 	async function getUpcoming() {
 		const eventsSnapshot = await getDocs(eventQuery);
 		listOfEvents = eventsSnapshot.docs.map((doc) => doc.data());
@@ -64,6 +75,7 @@
 
 	getUpcoming(eventQuery);
 	getCount();
+	getActivityLog();
 </script>
 
 <svelte:head>
@@ -72,67 +84,86 @@
 
 <div class="min-w-full min-h-full bg-base-200 py-8 px-5">
 	<h1 class="text-3xl font-semibold py-2">Dashboard</h1>
-	<div class="flex flex-col md:flex-row pt-4">
-		<div class="basis-1/3 flex flex-col items-center lg:items-end space-y-4 p-5">
-			<div
-				class="w-60 h-40 flex flex-col justify-center items-center overflow-hidden shadow-lg border rounded-xl bg-base-100"
-			>
-				<p class="text-3xl font-semibold">{dueCount}</p>
-				{#if dueCount === 1}
-					<p class="text-md mt-2">Unpaid Resident</p>
-				{:else}
-					<p class="text-md mt-2">Unpaid Residents</p>
-				{/if}
-			</div>
-			<div
-				class="w-60 h-40 flex flex-col justify-center items-center overflow-hidden shadow-lg border rounded-xl bg-base-100"
-			>
-				<p class="text-3xl font-semibold">{countOfPendingBooks}</p>
-				{#if countOfPendingBooks === 1}
-					<p class="text-md mt-2">Pending Reservation</p>
-				{:else}
-					<p class="text-md mt-2">Pending Reservations</p>
-				{/if}
-			</div>
-			<div
-				class="w-60 h-40 flex flex-col justify-center items-center overflow-hidden shadow-lg border rounded-xl bg-base-100"
-			>
-				<p class="text-3xl font-semibold">{countOfAccounts}</p>
-				
-				{#if countOfAccounts === 1}
-					<p class="text-md mt-2">Registered Account</p>
-				{:else}
-					<p class="text-md mt-2">Registered Accounts</p>
-				{/if}
+	<div class="flex flex-row justify-center items-center text-center gap-4 p-5">
+		<div
+			class="w-60 h-40 flex flex-col justify-center items-center overflow-hidden shadow-lg border rounded-xl bg-base-100"
+		>
+		<p class="text-3xl font-semibold">{dueCount}</p>
+		{#if dueCount === 1}
+			<p class="text-md mt-2">Unpaid Resident</p>
+		{:else}
+			<p class="text-md mt-2">Unpaid Residents</p>
+		{/if}
+		</div>
+		<div
+			class="w-60 h-40 flex flex-col justify-center items-center overflow-hidden shadow-lg border rounded-xl bg-base-100"
+		>
+			<p class="text-3xl font-semibold">{countOfPendingBooks}</p>
+			{#if countOfPendingBooks === 1}
+				<p class="text-md mt-2">Pending Reservation</p>
+			{:else}
+				<p class="text-md mt-2">Pending Reservations</p>
+			{/if}
+		</div>
+		<div
+			class="w-60 h-40 flex flex-col justify-center items-center overflow-hidden shadow-lg border rounded-xl bg-base-100"
+		>
+			<p class="text-3xl font-semibold">{countOfAccounts}</p>
+			
+			{#if countOfAccounts === 1}
+				<p class="text-md mt-2">Registered Account</p>
+			{:else}
+				<p class="text-md mt-2">Registered Accounts</p>
+			{/if}
+		</div>
+	</div>
+	<div class="flex justify-center pb-5">
+		<div class="w-full shadow-2xl border rounded-xl bg-base-100">
+			<div class="p-4">
+				<h1 class="text-2xl mb-8 font-bold pt-6 px-8">Upcoming Events</h1>
+				<p class="divider"></p>
+				<div class="flex flex-col space-y-8 text-md px-8 pb-4">
+					{#each listOfEvents as event}
+						<div>
+							<p class="font-semibold text-lg mb-4">{event.titleDisplay}</p>
+							<p>{event.date}</p>
+						</div>
+					{/each}
+				</div>
 			</div>
 		</div>
-		<div class="basis-2/3 flex justify-center p-5">
-			<div class="w-full max-w-3xl shadow-2xl border rounded-xl bg-base-100">
-				<div class="p-4">
-					<h1 class="text-2xl mb-8 font-bold pt-6 px-8">Upcoming Events</h1>
-					<p class="divider"></p>
-					<div class="flex flex-col space-y-8 text-md px-8 py-4">
-						{#each listOfEvents as event}
-							<!-- <div>
-							<p class="font-medium text-md mb-3">Christmas Party</p>
-							<p>Dec 18 3:00 PM</p>
-						</div>
-						<div>
-							<p class="font-medium text-md mb-3">New Years Gathering</p>
-							<p>Dec 31 10:00 PM</p>
-						</div>
-						<div>
-							<p class="font-medium text-md mb-3">Meeting</p>
-							<p>Jan 3 8:00 PM</p>
-						</div> -->
-							<div>
-								<p class="font-semibold text-lg mb-4">{event.titleDisplay}</p>
-								<p>{event.date}</p>
-							</div>
-						{/each}
-					</div>
+	</div>
+	<div class="flex justify-center">
+		<div class="w-full shadow-2xl border rounded-xl bg-base-100">
+			<div class="p-4">
+				<h1 class="text-2xl mb-8 font-bold pt-6 px-8">Activity Log</h1>
+				<p class="divider"></p>
+				<div class="flex flex-col space-y-8 text-md px-8 py-4">
+					<div class="overflow-x-auto">
+						<table class="table">
+						  <!-- head -->
+						  <thead>
+							<tr>
+							  <th>Date</th>
+							  <th>Activity</th>
+							  <th>Module</th>
+							</tr>
+						  </thead>
+						  <tbody>
+							<tr>
+							{#each listActivityLog as log}
+							  <td>{log.date.toDate().toLocaleDateString('en-us', { year: 'numeric', month: 'long', day: 'numeric' })} {log.date.toDate().toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}</td>
+							  <td>{log.activity}</td>
+							  <td>{log.pageRef}</td>
+							{/each}
+							</tr>
+						  </tbody>
+						</table>
+					  </div>					
 				</div>
 			</div>
 		</div>
 	</div>
 </div>
+	
+	
