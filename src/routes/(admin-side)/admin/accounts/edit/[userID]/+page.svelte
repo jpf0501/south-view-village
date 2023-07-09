@@ -1,8 +1,9 @@
 <script>
 	import { db } from '$lib/firebase/client';
-	import { getDocs, query, collection, orderBy, getDoc, updateDoc, doc } from 'firebase/firestore';
+	import { getDocs, query, collection, orderBy, getDoc, updateDoc, doc, addDoc, serverTimestamp } from 'firebase/firestore';
 	import { goto } from '$app/navigation';
 	import toast from 'svelte-french-toast';
+	import { userStore } from '$lib/store.js';
 
 	/** @type {import('./$types').PageData} */
 	export let data;
@@ -53,6 +54,8 @@
 	}
 
 	async function updateUser() {
+		const snapshot = await getDoc(doc(db, 'accounts', $userStore.uid));
+		let userCred = snapshot.data();
 		const isValid = await checkInput();
 		if (!isValid) {
 			toast.error('Form validation failed');
@@ -62,6 +65,11 @@
 		user.lastname = user.lastNameDisplay.trim().toLowerCase();
 		try {
 			await updateDoc(doc(db, 'accounts', userID), user);
+			/*await addDoc(collection(db, 'adminlogs'), {
+				activity: user.firstNameDisplay + ", " + user.lastNameDisplay + " edited account info in Accounts module.",
+				pageRef: 'Account',
+				date: serverTimestamp()
+			});*/
 			toast.success('User has been updated!');
 			await goto('/admin/accounts');
 		} catch (error) {

@@ -95,7 +95,7 @@
 
 	getUpcoming(eventQuery);
 	getCount();
-	addLog();
+	//addLog();
 	getActivityLog();
 	
 </script>
