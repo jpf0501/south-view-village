@@ -1,5 +1,5 @@
 <script>
-	import { getDocs, query, collection, orderBy, where } from 'firebase/firestore';
+	import { getDocs, deleteDoc, query, collection, orderBy, where } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 
 	let listOfNews = [];
@@ -35,6 +35,24 @@
 		}));
 	}
 
+	async function deleteExpiredNews() {
+		const checkExpiredNewsSnapshot = await getDocs(collection(db, 'news'));
+		const currentDate = new Date();
+		checkExpiredNewsSnapshot.forEach(async (doc) => {
+			const expirationDate = doc.data().expiration;
+			const expirationDateObject = new Date(expirationDate);
+			console.log(expirationDateObject);
+			if (expirationDateObject <= currentDate) {
+				try {
+					await deleteDoc(doc.ref);
+				} catch (error) {
+					console.log('Error deleting expired news:', doc.id, error);
+				}
+			}
+		});
+	}
+
+	deleteExpiredNews();
 	$: getNews(newsQuery);
 </script>
 
