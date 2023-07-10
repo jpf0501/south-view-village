@@ -1,6 +1,7 @@
 <script>
 	import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
+	import Committee from './Committee.svelte';
 	import toast from 'svelte-french-toast';
 
 	let inquiry = {
@@ -233,6 +234,10 @@
 	</div>
 </div>
 <!-- end clubhouse card -->
+
+<div>
+	<Committee/>
+</div>
 
 <!-- inquiry -->
 <div class="px-5 py-8">
