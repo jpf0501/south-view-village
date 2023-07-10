@@ -41,7 +41,6 @@
 		checkExpiredNewsSnapshot.forEach(async (doc) => {
 			const expirationDate = doc.data().expiration;
 			const expirationDateObject = new Date(expirationDate);
-			console.log(expirationDateObject);
 			if (expirationDateObject <= currentDate) {
 				try {
 					await deleteDoc(doc.ref);
