@@ -1,9 +1,10 @@
 <script>
 	import { getDocs, query, collection, where } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
+	import PreviousOfficers from './PreviousOfficers.svelte';
 
-	let officers = [];
-	let committees = [];
+	let currentOfficers = [];
+	let currentCommittees = [];
 
 	const officerPositions = ['President', 'Vice President', 'Secretary', 'Treasurer', 'Auditor'];
 	const committeePositions = [
@@ -14,9 +15,13 @@
 		'Social Events Committee'
 	];
 
-	async function getOfficers() {
+	async function getCurrentOfficers() {
 		const officerPromises = officerPositions.map(async (position) => {
-			const officersQuery = query(collection(db, 'committee'), where('position', '==', position));
+			const officersQuery = query(
+				collection(db, 'committee'),
+				where('position', '==', position),
+				where('isCurrentOfficer', '==', true)
+			);
 			const officersSnapshot = await getDocs(officersQuery);
 
 			if (!officersSnapshot.empty) {
@@ -26,12 +31,16 @@
 			}
 		});
 
-		officers = await Promise.all(officerPromises);
+		currentOfficers = await Promise.all(officerPromises);
 	}
 
-	async function getCommittees() {
+	async function getCurrentCommittees() {
 		const committeePromises = committeePositions.map(async (position) => {
-			const committeesQuery = query(collection(db, 'committee'), where('position', '==', position));
+			const committeesQuery = query(
+				collection(db, 'committee'),
+				where('position', '==', position),
+				where('isCurrentOfficer', '==', true)
+			);
 			const committeesSnapshot = await getDocs(committeesQuery);
 
 			if (!committeesSnapshot.empty) {
@@ -45,11 +54,11 @@
 			}
 		});
 
-		committees = await Promise.all(committeePromises);
+		currentCommittees = await Promise.all(committeePromises);
 	}
 
-	getOfficers();
-	getCommittees();
+	getCurrentOfficers();
+	getCurrentCommittees();
 </script>
 
 <svelte:head>
@@ -59,11 +68,11 @@
 <div class="min-w-full min-h-full bg-base-200 py-8 px-5">
 	<div class="flex flex-row justify-between">
 		<h2 class="text-2xl font-semibold mb-3">Committee</h2>
-		<!-- <a href="#" class="btn btn-primary">Change All Committees</a> -->
+		<a href="/admin/committee/new-committees" class="btn btn-primary">Change All Committees</a>
 	</div>
 	<div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-left">
 		<div>
-			{#await officers}
+			{#await currentOfficers}
 				<p>Loading...</p>
 			{:then officersData}
 				{#if officersData.length > 0}
@@ -133,7 +142,7 @@
 			{/await}
 		</div>
 		<div>
-			{#await committees}
+			{#await currentCommittees}
 				<p>Loading...</p>
 			{:then committeesData}
 				{#if committeesData.length > 0}
@@ -209,5 +218,8 @@
 				{/if}
 			{/await}
 		</div>
+	</div>
+	<div>
+		<PreviousOfficers />
 	</div>
 </div>
