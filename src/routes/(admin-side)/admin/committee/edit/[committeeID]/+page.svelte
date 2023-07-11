@@ -119,7 +119,7 @@
 {#if committee}
 	<div class="min-h-screen hero bg-base-200">
 		<div class="w-full max-w-4xl p-6 mx-auto shadow-2xl border rounded-xl bg-base-100">
-			<h1 class="text-2xl pb-8">Edit Committe</h1>
+			<h1 class="text-2xl pb-8">Edit Committee</h1>
 			<h2 class="text-xl mb-8">Position: <strong>{committee.position}</strong></h2>
 			<form class="flex flex-col gap-4">
 				<div class="form-control grid grid-cols-1 md:grid-cols-2 gap-4">

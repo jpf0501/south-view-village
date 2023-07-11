@@ -57,15 +57,51 @@
 </svelte:head>
 
 <div class="min-w-full min-h-full bg-base-200 py-8 px-5">
-	<h1 class="text-3xl font-semibold py-2 mb-3">Committee</h1>
+	<div class="flex flex-row justify-between">
+		<h2 class="text-2xl font-semibold mb-3">Committee</h2>
+		<!-- <a href="#" class="btn btn-primary">Change All Committees</a> -->
+	</div>
 	<div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-left">
 		<div>
-			<h2 class="text-2xl font-semibold mb-3">List of Officers</h2>
 			{#await officers}
 				<p>Loading...</p>
 			{:then officersData}
 				{#if officersData.length > 0}
-					<ul
+					<div class="w-full mx-auto shadow-2xl border rounded-xl bg-base-100 my-5">
+						<div class="overflow-x-auto">
+							<table class="table w-full">
+								<thead>
+									<tr>
+										<th colSpan={3} class="text-lg text-center">List of Officers</th>
+									</tr>
+								</thead>
+								<tbody>
+									{#each officersData as officer}
+										<tr class="hover">
+											<td class="font-bold">{officer.position}:</td>
+											<td>{officer.firstname + ' ' + officer.lastname}</td>
+											<td
+												><a
+													href={'/admin/committee/edit/' + officer.id}
+													class="btn glass text-white"
+													><svg
+														xmlns="http://www.w3.org/2000/svg"
+														width="24"
+														height="24"
+														viewBox="0 0 24 24"
+														><path
+															d="M7.127 22.562l-7.127 1.438 1.438-7.128 5.689 5.69zm1.414-1.414l11.228-11.225-5.69-5.692-11.227 11.227 5.689 5.69zm9.768-21.148l-2.816 2.817 5.691 5.691 2.816-2.819-5.691-5.689z"
+														/></svg
+													></a
+												></td
+											>
+										</tr>
+									{/each}
+								</tbody>
+							</table>
+						</div>
+					</div>
+					<!-- <ul
 						class="text-xl flex flex-col gap-4 shadow-2xl border border-black rounded-md bg-white"
 					>
 						{#each officersData as officer}
@@ -90,19 +126,57 @@
 								</ul>
 							</li>
 						{/each}
-					</ul>
+					</ul> -->
 				{:else}
-					<p>No officer/s found.</p>
+					<p>Loading.</p>
 				{/if}
 			{/await}
 		</div>
 		<div>
-			<h2 class="text-2xl font-semibold mb-3">Head of Committees</h2>
 			{#await committees}
 				<p>Loading...</p>
 			{:then committeesData}
 				{#if committeesData.length > 0}
-					<ul
+					<div class="w-full mx-auto shadow-2xl border rounded-xl bg-base-100 my-5">
+						<div class="overflow-x-auto">
+							<table class="table w-full">
+								<thead>
+									<tr>
+										<th colSpan={3} class="text-lg text-center">List of Committees</th>
+									</tr>
+								</thead>
+								<tbody>
+									{#each committeesData as committee}
+										<tr>
+											<th>{committee.position}:</th>
+										</tr>
+										{#each committee.members as member}
+											<tr class="hover">
+												<td>{member.firstname + ' ' + member.lastname}</td>
+												<td
+													><a
+														href={'/admin/committee/edit/' + member.id}
+														class="btn glass text-white"
+														><svg
+															xmlns="http://www.w3.org/2000/svg"
+															width="24"
+															height="24"
+															viewBox="0 0 24 24"
+															><path
+																d="M7.127 22.562l-7.127 1.438 1.438-7.128 5.689 5.69zm1.414-1.414l11.228-11.225-5.69-5.692-11.227 11.227 5.689 5.69zm9.768-21.148l-2.816 2.817 5.691 5.691 2.816-2.819-5.691-5.689z"
+															/></svg
+														></a
+													></td
+												>
+											</tr>
+										{/each}
+									{/each}
+								</tbody>
+							</table>
+						</div>
+					</div>
+
+					<!-- <ul
 						class="text-xl flex flex-col gap-4 shadow-2xl border border-black rounded-md bg-white "
 					>
 						{#each committeesData as committee}
@@ -129,9 +203,9 @@
 								{/each}
 							</li>
 						{/each}
-					</ul>
-					<!-- {:else}
-					<p>No Committee/s found.</p> -->
+					</ul> -->
+				{:else}
+					<p>Loading...</p>
 				{/if}
 			{/await}
 		</div>
