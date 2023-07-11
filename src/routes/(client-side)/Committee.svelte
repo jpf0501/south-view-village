@@ -1,6 +1,5 @@
 <script>
-	import { getDocs, query, collection, where } from 'firebase/firestore';
-	import { db } from '$lib/firebase/client';
+	import { getCurrentCommittees } from '$lib/getCommittee.js';
 	// import { getStorage, ref, getDownloadURL } from 'firebase/storage';
 
 	// const storage = getStorage();
@@ -19,29 +18,20 @@
 	let communityAwareness = [];
 	let socialEvents = [];
 
-	async function getCommittees(position) {
-		const committeesQuery = query(collection(db, 'committee'), where('position', '==', position));
-		const committeesSnapshot = await getDocs(committeesQuery);
-		const positionData = [];
-
-		committeesSnapshot.forEach((doc) => {
-			positionData.push(doc.data());
-		});
-
-		return positionData;
-	}
-
 	async function loadCommittees() {
-		president = await getCommittees('President');
-		vicePresident = await getCommittees('Vice President');
-		secretary = await getCommittees('Secretary');
-		treasurer = await getCommittees('Treasurer');
-		auditor = await getCommittees('Auditor');
-		convennant = await getCommittees('Covenant and Grievances Committee');
-		sports = await getCommittees('Sports and Wellness Committee');
-		maintenanceAndBeautification = await getCommittees('Maintenance and Beautification Committee');
-		communityAwareness = await getCommittees('Community Awareness Committee');
-		socialEvents = await getCommittees('Social Events Committee');
+		president = await getCurrentCommittees('President', true);
+		vicePresident = await getCurrentCommittees('Vice President', true);
+		secretary = await getCurrentCommittees('Secretary', true);
+		treasurer = await getCurrentCommittees('Treasurer', true);
+		auditor = await getCurrentCommittees('Auditor', true);
+		convennant = await getCurrentCommittees('Covenant and Grievances Committee', true);
+		sports = await getCurrentCommittees('Sports and Wellness Committee', true);
+		maintenanceAndBeautification = await getCurrentCommittees(
+			'Maintenance and Beautification Committee',
+			true
+		);
+		communityAwareness = await getCurrentCommittees('Community Awareness Committee', true);
+		socialEvents = await getCurrentCommittees('Social Events Committee', true);
 
 		// imageUrl = await getDownloadURL(storageRef);
 		// console.log(imageUrl)
@@ -55,6 +45,7 @@
 </svelte:head>
 
 <div class="mx-auto">
+	
 	<h1 class="font-bold text-3xl pt-14 px-8 pb-5">Home Owners Association</h1>
 </div>
 
@@ -268,5 +259,4 @@
 	</div>
 </div>
 <!-- end branches -->
-
 <div class="pb-7" />
