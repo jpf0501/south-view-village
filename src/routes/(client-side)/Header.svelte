@@ -50,7 +50,6 @@
 				tabindex="0"
 				class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
 			>
-				<li><a href="/committee">Committee</a></li>
 				<li><a href="/news">News</a></li>
 				<li><a href="/calendar">Calendar</a></li>
 				<li><a href="/reservation">Reservation</a></li>
@@ -68,7 +67,6 @@
 	</div>
 	<div class="navbar-center hidden lg:flex">
 		<ul class="menu menu-horizontal px-1">
-			<li><a href="/committee">Committee</a></li>
 			<li><a href="/news">News</a></li>
 			<li><a href="/calendar">Calendar</a></li>
 			<li><a href="/reservation">Reservation</a></li>
@@ -79,6 +77,6 @@
 	</div>
 	<div class="navbar-end">
 		<!-- asd -->
-		<AccountButton></AccountButton>
+		<AccountButton />
 	</div>
 </div>
