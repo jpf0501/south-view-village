@@ -192,7 +192,7 @@
 										type="text"
 										placeholder="Juan"
 										class="input input-bordered"
-                                        required
+										required
 										bind:value={newOfficers.President.firstname}
 									/>
 								</div>
@@ -211,7 +211,7 @@
 										type="text"
 										placeholder="Juan"
 										class="input input-bordered"
-                                        required
+										required
 										bind:value={newOfficers.President.lastname}
 									/>
 								</div>
@@ -239,7 +239,7 @@
 										placeholder="Juan"
 										name="fname"
 										class="input input-bordered"
-                                        required
+										required
 										bind:value={newOfficers['Vice President'].firstname}
 									/>
 								</div>
@@ -287,7 +287,7 @@
 										placeholder="Juan"
 										name="fname"
 										class="input input-bordered"
-                                        required
+										required
 										bind:value={newOfficers.Secretary.firstname}
 									/>
 								</div>
@@ -307,7 +307,7 @@
 										placeholder="Juan"
 										name="fname"
 										class="input input-bordered"
-                                        required
+										required
 										bind:value={newOfficers.Secretary.lastname}
 									/>
 								</div>
@@ -335,7 +335,7 @@
 										placeholder="Juan"
 										name="fname"
 										class="input input-bordered"
-                                        required
+										required
 										bind:value={newOfficers.Treasurer.firstname}
 									/>
 								</div>
@@ -355,7 +355,7 @@
 										placeholder="Juan"
 										name="fname"
 										class="input input-bordered"
-                                        required
+										required
 										bind:value={newOfficers.Treasurer.lastname}
 									/>
 								</div>
@@ -383,7 +383,7 @@
 										placeholder="Juan"
 										name="fname"
 										class="input input-bordered"
-                                        required
+										required
 										bind:value={newOfficers.Auditor.firstname}
 									/>
 								</div>
@@ -403,7 +403,7 @@
 										placeholder="Juan"
 										name="fname"
 										class="input input-bordered"
-                                        required
+										required
 										bind:value={newOfficers.Auditor.lastname}
 									/>
 								</div>
@@ -439,7 +439,7 @@
 										type="text"
 										placeholder="Juan"
 										class="input input-bordered"
-                                        required
+										required
 										bind:value={newOfficers['Covenant and Grievances Committee 1'].firstname}
 									/>
 								</div>
@@ -458,7 +458,7 @@
 										type="text"
 										placeholder="Juan"
 										class="input input-bordered"
-                                        required
+										required
 										bind:value={newOfficers['Covenant and Grievances Committee 1'].lastname}
 									/>
 								</div>
@@ -483,7 +483,7 @@
 										placeholder="Juan"
 										name="fname"
 										class="input input-bordered"
-                                        required
+										required
 										bind:value={newOfficers['Covenant and Grievances Committee 2'].firstname}
 									/>
 								</div>
@@ -503,7 +503,7 @@
 										placeholder="Juan"
 										name="fname"
 										class="input input-bordered"
-                                        required
+										required
 										bind:value={newOfficers['Covenant and Grievances Committee 2'].lastname}
 									/>
 								</div>
@@ -530,7 +530,7 @@
 										type="text"
 										placeholder="Juan"
 										class="input input-bordered"
-                                        required
+										required
 										bind:value={newOfficers['Sports and Wellness Committee 1'].firstname}
 									/>
 								</div>
@@ -549,7 +549,7 @@
 										type="text"
 										placeholder="Juan"
 										class="input input-bordered"
-                                        required
+										required
 										bind:value={newOfficers['Sports and Wellness Committee 1'].lastname}
 									/>
 								</div>
@@ -574,7 +574,7 @@
 										placeholder="Juan"
 										name="fname"
 										class="input input-bordered"
-                                        required
+										required
 										bind:value={newOfficers['Sports and Wellness Committee 2'].firstname}
 									/>
 								</div>
@@ -594,7 +594,7 @@
 										placeholder="Juan"
 										name="fname"
 										class="input input-bordered"
-                                        required
+										required
 										bind:value={newOfficers['Sports and Wellness Committee 2'].lastname}
 									/>
 								</div>
@@ -622,7 +622,7 @@
 										placeholder="Juan"
 										name="fname"
 										class="input input-bordered"
-                                        required
+										required
 										bind:value={newOfficers['Maintenance and Beautification Committee'].firstname}
 									/>
 								</div>
@@ -642,7 +642,7 @@
 										placeholder="Juan"
 										name="fname"
 										class="input input-bordered"
-                                        required
+										required
 										bind:value={newOfficers['Maintenance and Beautification Committee'].lastname}
 									/>
 								</div>
@@ -670,7 +670,7 @@
 										placeholder="Juan"
 										name="fname"
 										class="input input-bordered"
-                                        required
+										required
 										bind:value={newOfficers['Community Awareness Committee'].firstname}
 									/>
 								</div>
@@ -690,7 +690,7 @@
 										placeholder="Juan"
 										name="fname"
 										class="input input-bordered"
-                                        required
+										required
 										bind:value={newOfficers['Community Awareness Committee'].lastname}
 									/>
 								</div>
@@ -718,7 +718,7 @@
 										placeholder="Juan"
 										name="fname"
 										class="input input-bordered"
-                                        required
+										required
 										bind:value={newOfficers['Social Events Committee'].firstname}
 									/>
 								</div>
@@ -738,7 +738,7 @@
 										placeholder="Juan"
 										name="fname"
 										class="input input-bordered"
-                                        required
+										required
 										bind:value={newOfficers['Social Events Committee'].lastname}
 									/>
 								</div>
@@ -748,11 +748,10 @@
 							</div>
 						</div>
 					</div>
-
-					<div class="flex justify-end mt-8">
-						<button type="submit" class="btn btn-primary mx-1 px-6">Submit</button>
-						<a href="/admin/committee" class="btn btn-error mx-1 px-4 text-white">Cancel</a>
-					</div>
+				</div>
+				<div class="flex justify-end mt-8">
+					<button type="submit" class="btn btn-primary mx-1 px-6">Submit</button>
+					<a href="/admin/committee" class="btn btn-error mx-1 px-4 text-white">Cancel</a>
 				</div>
 			</div>
 		</div>
