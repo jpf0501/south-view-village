@@ -1,8 +1,9 @@
 <script>
 	import { goto } from '$app/navigation';
 	import { db } from '$lib/firebase/client';
-	import { getDocs, query, collection, orderBy, where } from 'firebase/firestore';
+	import { getDocs, query, collection, orderBy, where, addDoc, getDoc, doc, serverTimestamp } from 'firebase/firestore';
 	import toast from 'svelte-french-toast';
+	import { userStore } from '$lib/store.js';
 
 	let account = {
 		email: '',
@@ -85,6 +86,9 @@
 
 	async function createAccount() {
 		try {
+			const snapshot = await getDoc(doc(db, 'accounts', $userStore.uid));
+			let user = snapshot.data();
+
 			const response = await fetch('/api/accounts', {
 				method: 'POST',
 				body: JSON.stringify({
@@ -105,6 +109,11 @@
 			});
 			const result = await response.json();
 			// console.log(result);
+			/*await addDoc(collection(db, 'adminlogs'), {
+				activity: user.firstNameDisplay + ", " + user.lastNameDisplay + " created account in Accounts module.",
+				pageRef: 'Account',
+				date: serverTimestamp()
+			});*/
 			toast.success('Account created!');
 			await goto('/admin/accounts');
 		} catch (error) {
