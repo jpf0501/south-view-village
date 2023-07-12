@@ -3,6 +3,10 @@
 	import { getDoc, doc, addDoc, serverTimestamp, collection } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { goto } from '$app/navigation';
+	import FirstnameForm from '$lib/FormComponents/FirstnameForm.svelte';
+	import LastnameForm from '$lib/FormComponents/LastnameForm.svelte';
+	import EmailForm from '../../../lib/FormComponents/EmailForm.svelte';
+	import ContactForm from '../../../lib/FormComponents/ContactForm.svelte';
 	import toast from 'svelte-french-toast';
 
 	let user = null;
@@ -26,7 +30,7 @@
 			return;
 		}
 		await sendComplaint();
-		await goto("/complaint/success")
+		await goto('/complaint/success');
 	}
 
 	async function sendComplaint() {
@@ -42,7 +46,7 @@
 				dateSubmitted: serverTimestamp(),
 				dateAnswered: serverTimestamp(),
 				hadAnswered: false,
-				response: ""
+				response: ''
 			});
 		} catch (error) {
 			console.log(error);
@@ -69,64 +73,12 @@
 			</div>
 			<form on:submit={checkInput}>
 				<div class="grid grid-cols-2 gap-6 mt-6 md:grid-cols-2">
-					<div class="form-control">
-						<label for="firstname" class="label">
-							<span class="label-text">First Name</span>
-						</label>
-						<input
-							type="text"
-							placeholder="Juan"
-							name="fname"
-							class="input input-bordered"
-							bind:value={user.firstNameDisplay}
-							disabled
-						/>
-					</div>
-					<div class="form-control">
-						<label for="lastname" class="label">
-							<span class="label-text">Last Name</span>
-						</label>
-						<input
-							type="text"
-							placeholder="Dela Cruz"
-							name="lname"
-							class="input input-bordered"
-							bind:value={user.lastNameDisplay}
-							disabled
-						/>
-					</div>
+					<FirstnameForm bind:value={user.firstNameDisplay} isDisabled={true}/>
+					<LastnameForm bind:value={user.lastNameDisplay} isDisabled={true}/>
 				</div>
 				<div class="grid grid-cols-2 gap-6 mt-6 md:grid-cols-2">
-					<div class="form-control">
-						<label for="firstname" class="label">
-							<span class="label-text">Email</span>
-						</label>
-						<input
-							type="text"
-							placeholder="juandelacruz@gmail.com"
-							name="fname"
-							class="input input-bordered"
-							bind:value={user.email}
-							disabled
-						/>
-					</div>
-					<div class="form-control">
-						<label for="lastname" class="label">
-							<span class="label-text">Contact no:</span>
-						</label>
-						<input
-							type="tel"
-							onkeypress="return event.charCode >= 48 && event.charCode <= 57"
-							minlength="11"
-							maxlength="11"
-							placeholder="09123456789"
-							pattern={String.raw`^(09)\d{9}$`}
-							name="contact"
-							class="input input-bordered"
-							bind:value={user.contactNumber}
-							disabled
-						/>
-					</div>
+					<EmailForm bind:value={user.email} isDisabled={true}/>
+					<ContactForm bind:value={user.contactNumber} isDisabled={true}/>
 				</div>
 				<div class="grid grid-cols-1 mt-6">
 					<div class="form-control">
@@ -134,7 +86,9 @@
 							<span class="label-text">Complaint:</span>
 						</label>
 						{#if error}
-							<p class="text-red-500 text-sm italic mb-1">Complaint must at least be 10 characters</p>
+							<p class="text-red-500 text-sm italic mb-1">
+								Complaint must at least be 10 characters
+							</p>
 						{/if}
 						<textarea
 							class="textarea textarea-bordered h-32 w-full"

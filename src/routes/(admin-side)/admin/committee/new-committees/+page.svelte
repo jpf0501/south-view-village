@@ -4,6 +4,8 @@
 	import { updateDoc, doc } from 'firebase/firestore';
 	import { getCurrentCommitteesID, getCurrentCommittees } from '$lib/getCommittee';
 	import toast from 'svelte-french-toast';
+	import FirstnameForm from '$lib/FormComponents/FirstnameForm.svelte';
+	import LastnameForm from '$lib/FormComponents/LastnameForm.svelte';
 
 	let currentCommittees = {};
 	let previousCommittees = {};
@@ -177,239 +179,36 @@
 								<span class="font-bold">President: </span>
 							</div>
 							<div class="grid grid-cols-2 gap-6 ">
-								<div class="form-control">
-									<label for="fname" class="label">
-										<span class="label-text">Firstname: </span>
-									</label>
-									<!-- {#if errors.firstname}
-                                        <p class="text-red-500 text-sm italic mb-1">First Name is required</p>
-                                    {:else if errors.invalidFirstname}
-                                        <p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
-                                    {:else if errors.invalidFirstnameRequired}
-                                        <p class="text-red-500 text-sm italic mb-1">Firstname must have a letter</p>
-                                    {/if} -->
-									<input
-										type="text"
-										placeholder="Juan"
-										class="input input-bordered"
-										required
-										bind:value={newOfficers.President.firstname}
-									/>
-								</div>
-								<div class="form-control">
-									<label for="fname" class="label">
-										<span class="label-text">Lastname: </span>
-									</label>
-									<!-- {#if errors.firstname}
-                                        <p class="text-red-500 text-sm italic mb-1">First Name is required</p>
-                                    {:else if errors.invalidFirstname}
-                                        <p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
-                                    {:else if errors.invalidFirstnameRequired}
-                                        <p class="text-red-500 text-sm italic mb-1">Firstname must have a letter</p>
-                                    {/if} -->
-									<input
-										type="text"
-										placeholder="Juan"
-										class="input input-bordered"
-										required
-										bind:value={newOfficers.President.lastname}
-									/>
-								</div>
-								<!-- <div>
-                                    <label for="">Image</label>
-                                </div> -->
+								<FirstnameForm bind:value={newOfficers.President.firstname}/>
+								<LastnameForm bind:value={newOfficers.President.lastname}/>
 							</div>
 							<div class="my-2">
 								<span class="font-bold">Vice President: </span>
 							</div>
 							<div class="grid grid-cols-2 gap-6">
-								<div class="form-control">
-									<label for="fname" class="label">
-										<span class="label-text">Firstname: </span>
-									</label>
-									<!-- {#if errors.firstname}
-                                        <p class="text-red-500 text-sm italic mb-1">First Name is required</p>
-                                    {:else if errors.invalidFirstname}
-                                        <p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
-                                    {:else if errors.invalidFirstnameRequired}
-                                        <p class="text-red-500 text-sm italic mb-1">Firstname must have a letter</p>
-                                    {/if} -->
-									<input
-										type="text"
-										placeholder="Juan"
-										name="fname"
-										class="input input-bordered"
-										required
-										bind:value={newOfficers['Vice President'].firstname}
-									/>
-								</div>
-								<div class="form-control">
-									<label for="fname" class="label">
-										<span class="label-text">Lastname: </span>
-									</label>
-									<!-- {#if errors.firstname}
-                                        <p class="text-red-500 text-sm italic mb-1">First Name is required</p>
-                                    {:else if errors.invalidFirstname}
-                                        <p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
-                                    {:else if errors.invalidFirstnameRequired}
-                                        <p class="text-red-500 text-sm italic mb-1">Firstname must have a letter</p>
-                                    {/if} -->
-									<input
-										type="text"
-										placeholder="Juan"
-										name="fname"
-										class="input input-bordered"
-										required
-										bind:value={newOfficers['Vice President'].lastname}
-									/>
-								</div>
-								<!-- <div>
-                                    <label for="">Image</label>
-                                </div> -->
+								<FirstnameForm bind:value={newOfficers['Vice President'].firstname}/>
+								<LastnameForm bind:value={newOfficers['Vice President'].lastname}/>
 							</div>
 							<div class="my-2">
 								<span class="font-bold">Secretary: </span>
 							</div>
 							<div class="grid grid-cols-2 gap-6">
-								<div class="form-control">
-									<label for="fname" class="label">
-										<span class="label-text">Firstname: </span>
-									</label>
-									<!-- {#if errors.firstname}
-                                        <p class="text-red-500 text-sm italic mb-1">First Name is required</p>
-                                    {:else if errors.invalidFirstname}
-                                        <p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
-                                    {:else if errors.invalidFirstnameRequired}
-                                        <p class="text-red-500 text-sm italic mb-1">Firstname must have a letter</p>
-                                    {/if} -->
-									<input
-										type="text"
-										placeholder="Juan"
-										name="fname"
-										class="input input-bordered"
-										required
-										bind:value={newOfficers.Secretary.firstname}
-									/>
-								</div>
-								<div class="form-control">
-									<label for="fname" class="label">
-										<span class="label-text">Lastname: </span>
-									</label>
-									<!-- {#if errors.firstname}
-                                        <p class="text-red-500 text-sm italic mb-1">First Name is required</p>
-                                    {:else if errors.invalidFirstname}
-                                        <p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
-                                    {:else if errors.invalidFirstnameRequired}
-                                        <p class="text-red-500 text-sm italic mb-1">Firstname must have a letter</p>
-                                    {/if} -->
-									<input
-										type="text"
-										placeholder="Juan"
-										name="fname"
-										class="input input-bordered"
-										required
-										bind:value={newOfficers.Secretary.lastname}
-									/>
-								</div>
-								<!-- <div>
-                                    <label for="">Image</label>
-                                </div> -->
+								<FirstnameForm bind:value={newOfficers.Secretary.firstname}/>
+								<LastnameForm bind:value={newOfficers.Secretary.lastname}/>
 							</div>
 							<div class="my-2">
 								<span class="font-bold">Treasurer: </span>
 							</div>
 							<div class="grid grid-cols-2 gap-6">
-								<div class="form-control">
-									<label for="fname" class="label">
-										<span class="label-text">Firstname: </span>
-									</label>
-									<!-- {#if errors.firstname}
-                                        <p class="text-red-500 text-sm italic mb-1">First Name is required</p>
-                                    {:else if errors.invalidFirstname}
-                                        <p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
-                                    {:else if errors.invalidFirstnameRequired}
-                                        <p class="text-red-500 text-sm italic mb-1">Firstname must have a letter</p>
-                                    {/if} -->
-									<input
-										type="text"
-										placeholder="Juan"
-										name="fname"
-										class="input input-bordered"
-										required
-										bind:value={newOfficers.Treasurer.firstname}
-									/>
-								</div>
-								<div class="form-control">
-									<label for="fname" class="label">
-										<span class="label-text">Lastname: </span>
-									</label>
-									<!-- {#if errors.firstname}
-                                        <p class="text-red-500 text-sm italic mb-1">First Name is required</p>
-                                    {:else if errors.invalidFirstname}
-                                        <p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
-                                    {:else if errors.invalidFirstnameRequired}
-                                        <p class="text-red-500 text-sm italic mb-1">Firstname must have a letter</p>
-                                    {/if} -->
-									<input
-										type="text"
-										placeholder="Juan"
-										name="fname"
-										class="input input-bordered"
-										required
-										bind:value={newOfficers.Treasurer.lastname}
-									/>
-								</div>
-								<!-- <div>
-                                    <label for="">Image</label>
-                                </div> -->
+								<FirstnameForm bind:value={newOfficers.Treasurer.firstname}/>
+								<LastnameForm bind:value={newOfficers.Treasurer.lastname}/>
 							</div>
 							<div class="my-2">
 								<span class="font-bold">Auditor: </span>
 							</div>
 							<div class="grid grid-cols-2 gap-6">
-								<div class="form-control">
-									<label for="fname" class="label">
-										<span class="label-text">Firstname: </span>
-									</label>
-									<!-- {#if errors.firstname}
-                                        <p class="text-red-500 text-sm italic mb-1">First Name is required</p>
-                                    {:else if errors.invalidFirstname}
-                                        <p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
-                                    {:else if errors.invalidFirstnameRequired}
-                                        <p class="text-red-500 text-sm italic mb-1">Firstname must have a letter</p>
-                                    {/if} -->
-									<input
-										type="text"
-										placeholder="Juan"
-										name="fname"
-										class="input input-bordered"
-										required
-										bind:value={newOfficers.Auditor.firstname}
-									/>
-								</div>
-								<div class="form-control">
-									<label for="fname" class="label">
-										<span class="label-text">Lastname: </span>
-									</label>
-									<!-- {#if errors.firstname}
-                                        <p class="text-red-500 text-sm italic mb-1">First Name is required</p>
-                                    {:else if errors.invalidFirstname}
-                                        <p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
-                                    {:else if errors.invalidFirstnameRequired}
-                                        <p class="text-red-500 text-sm italic mb-1">Firstname must have a letter</p>
-                                    {/if} -->
-									<input
-										type="text"
-										placeholder="Juan"
-										name="fname"
-										class="input input-bordered"
-										required
-										bind:value={newOfficers.Auditor.lastname}
-									/>
-								</div>
-								<!-- <div>
-                                    <label for="">Image</label>
-                                </div> -->
+								<FirstnameForm bind:value={newOfficers.Auditor.firstname}/>
+								<LastnameForm bind:value={newOfficers.Auditor.lastname}/>
 							</div>
 						</div>
 					</div>
@@ -424,327 +223,44 @@
 								<span class="font-bold">Covenant and Grievances Committee: </span>
 							</div>
 							<div class="grid grid-cols-2 gap-6 ">
-								<div class="form-control">
-									<label for="fname" class="label">
-										<span class="label-text">Firstname: </span>
-									</label>
-									<!-- {#if errors.firstname}
-                                        <p class="text-red-500 text-sm italic mb-1">First Name is required</p>
-                                    {:else if errors.invalidFirstname}
-                                        <p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
-                                    {:else if errors.invalidFirstnameRequired}
-                                        <p class="text-red-500 text-sm italic mb-1">Firstname must have a letter</p>
-                                    {/if} -->
-									<input
-										type="text"
-										placeholder="Juan"
-										class="input input-bordered"
-										required
-										bind:value={newOfficers['Covenant and Grievances Committee 1'].firstname}
-									/>
-								</div>
-								<div class="form-control">
-									<label for="fname" class="label">
-										<span class="label-text">Lastname: </span>
-									</label>
-									<!-- {#if errors.firstname}
-                                        <p class="text-red-500 text-sm italic mb-1">First Name is required</p>
-                                    {:else if errors.invalidFirstname}
-                                        <p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
-                                    {:else if errors.invalidFirstnameRequired}
-                                        <p class="text-red-500 text-sm italic mb-1">Firstname must have a letter</p>
-                                    {/if} -->
-									<input
-										type="text"
-										placeholder="Juan"
-										class="input input-bordered"
-										required
-										bind:value={newOfficers['Covenant and Grievances Committee 1'].lastname}
-									/>
-								</div>
-								<!-- <div>
-                                    <label for="">Image</label>
-                                </div> -->
+								<FirstnameForm bind:value={newOfficers['Covenant and Grievances Committee 1'].firstname}/>
+								<LastnameForm bind:value={newOfficers['Covenant and Grievances Committee 1'].lastname}/>
 							</div>
 							<div class="grid grid-cols-2 gap-6">
-								<div class="form-control">
-									<label for="fname" class="label">
-										<span class="label-text">Firstname: </span>
-									</label>
-									<!-- {#if errors.firstname}
-                                        <p class="text-red-500 text-sm italic mb-1">First Name is required</p>
-                                    {:else if errors.invalidFirstname}
-                                        <p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
-                                    {:else if errors.invalidFirstnameRequired}
-                                        <p class="text-red-500 text-sm italic mb-1">Firstname must have a letter</p>
-                                    {/if} -->
-									<input
-										type="text"
-										placeholder="Juan"
-										name="fname"
-										class="input input-bordered"
-										required
-										bind:value={newOfficers['Covenant and Grievances Committee 2'].firstname}
-									/>
-								</div>
-								<div class="form-control">
-									<label for="fname" class="label">
-										<span class="label-text">Lastname: </span>
-									</label>
-									<!-- {#if errors.firstname}
-                                        <p class="text-red-500 text-sm italic mb-1">First Name is required</p>
-                                    {:else if errors.invalidFirstname}
-                                        <p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
-                                    {:else if errors.invalidFirstnameRequired}
-                                        <p class="text-red-500 text-sm italic mb-1">Firstname must have a letter</p>
-                                    {/if} -->
-									<input
-										type="text"
-										placeholder="Juan"
-										name="fname"
-										class="input input-bordered"
-										required
-										bind:value={newOfficers['Covenant and Grievances Committee 2'].lastname}
-									/>
-								</div>
-								<!-- <div>
-                                    <label for="">Image</label>
-                                </div> -->
+								<FirstnameForm bind:value={newOfficers['Covenant and Grievances Committee 2'].firstname}/>
+								<LastnameForm bind:value={newOfficers['Covenant and Grievances Committee 2'].lastname}/>
 							</div>
 							<div class="my-4">
 								<span class="font-bold">Sports and Wellness Committee: </span>
 							</div>
 							<div class="grid grid-cols-2 gap-6 ">
-								<div class="form-control">
-									<label for="fname" class="label">
-										<span class="label-text">Firstname: </span>
-									</label>
-									<!-- {#if errors.firstname}
-                                        <p class="text-red-500 text-sm italic mb-1">First Name is required</p>
-                                    {:else if errors.invalidFirstname}
-                                        <p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
-                                    {:else if errors.invalidFirstnameRequired}
-                                        <p class="text-red-500 text-sm italic mb-1">Firstname must have a letter</p>
-                                    {/if} -->
-									<input
-										type="text"
-										placeholder="Juan"
-										class="input input-bordered"
-										required
-										bind:value={newOfficers['Sports and Wellness Committee 1'].firstname}
-									/>
-								</div>
-								<div class="form-control">
-									<label for="fname" class="label">
-										<span class="label-text">Lastname: </span>
-									</label>
-									<!-- {#if errors.firstname}
-                                        <p class="text-red-500 text-sm italic mb-1">First Name is required</p>
-                                    {:else if errors.invalidFirstname}
-                                        <p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
-                                    {:else if errors.invalidFirstnameRequired}
-                                        <p class="text-red-500 text-sm italic mb-1">Firstname must have a letter</p>
-                                    {/if} -->
-									<input
-										type="text"
-										placeholder="Juan"
-										class="input input-bordered"
-										required
-										bind:value={newOfficers['Sports and Wellness Committee 1'].lastname}
-									/>
-								</div>
-								<!-- <div>
-                                    <label for="">Image</label>
-                                </div> -->
+								<FirstnameForm bind:value={newOfficers['Sports and Wellness Committee 1'].firstname}/>
+								<LastnameForm bind:value={newOfficers['Sports and Wellness Committee 1'].lastname}/>
 							</div>
 							<div class="grid grid-cols-2 gap-6">
-								<div class="form-control">
-									<label for="fname" class="label">
-										<span class="label-text">Firstname: </span>
-									</label>
-									<!-- {#if errors.firstname}
-                                        <p class="text-red-500 text-sm italic mb-1">First Name is required</p>
-                                    {:else if errors.invalidFirstname}
-                                        <p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
-                                    {:else if errors.invalidFirstnameRequired}
-                                        <p class="text-red-500 text-sm italic mb-1">Firstname must have a letter</p>
-                                    {/if} -->
-									<input
-										type="text"
-										placeholder="Juan"
-										name="fname"
-										class="input input-bordered"
-										required
-										bind:value={newOfficers['Sports and Wellness Committee 2'].firstname}
-									/>
-								</div>
-								<div class="form-control">
-									<label for="fname" class="label">
-										<span class="label-text">Lastname: </span>
-									</label>
-									<!-- {#if errors.firstname}
-                                        <p class="text-red-500 text-sm italic mb-1">First Name is required</p>
-                                    {:else if errors.invalidFirstname}
-                                        <p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
-                                    {:else if errors.invalidFirstnameRequired}
-                                        <p class="text-red-500 text-sm italic mb-1">Firstname must have a letter</p>
-                                    {/if} -->
-									<input
-										type="text"
-										placeholder="Juan"
-										name="fname"
-										class="input input-bordered"
-										required
-										bind:value={newOfficers['Sports and Wellness Committee 2'].lastname}
-									/>
-								</div>
-								<!-- <div>
-                                    <label for="">Image</label>
-                                </div> -->
+								<FirstnameForm bind:value={newOfficers['Sports and Wellness Committee 2'].firstname}/>
+								<LastnameForm bind:value={newOfficers['Sports and Wellness Committee 2'].lastname}/>
 							</div>
 							<div class="my-4">
 								<span class="font-bold">Maintenance and Beautification Committee: </span>
 							</div>
 							<div class="grid grid-cols-2 gap-6">
-								<div class="form-control">
-									<label for="fname" class="label">
-										<span class="label-text">Firstname: </span>
-									</label>
-									<!-- {#if errors.firstname}
-                                        <p class="text-red-500 text-sm italic mb-1">First Name is required</p>
-                                    {:else if errors.invalidFirstname}
-                                        <p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
-                                    {:else if errors.invalidFirstnameRequired}
-                                        <p class="text-red-500 text-sm italic mb-1">Firstname must have a letter</p>
-                                    {/if} -->
-									<input
-										type="text"
-										placeholder="Juan"
-										name="fname"
-										class="input input-bordered"
-										required
-										bind:value={newOfficers['Maintenance and Beautification Committee'].firstname}
-									/>
-								</div>
-								<div class="form-control">
-									<label for="fname" class="label">
-										<span class="label-text">Lastname: </span>
-									</label>
-									<!-- {#if errors.firstname}
-                                        <p class="text-red-500 text-sm italic mb-1">First Name is required</p>
-                                    {:else if errors.invalidFirstname}
-                                        <p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
-                                    {:else if errors.invalidFirstnameRequired}
-                                        <p class="text-red-500 text-sm italic mb-1">Firstname must have a letter</p>
-                                    {/if} -->
-									<input
-										type="text"
-										placeholder="Juan"
-										name="fname"
-										class="input input-bordered"
-										required
-										bind:value={newOfficers['Maintenance and Beautification Committee'].lastname}
-									/>
-								</div>
-								<!-- <div>
-                                    <label for="">Image</label>
-                                </div> -->
+								<FirstnameForm bind:value={newOfficers['Maintenance and Beautification Committee'].firstname}/>
+								<LastnameForm bind:value={newOfficers['Maintenance and Beautification Committee'].lastname}/>
 							</div>
 							<div class="my-4">
 								<span class="font-bold">Community Awareness Committee: </span>
 							</div>
 							<div class="grid grid-cols-2 gap-6">
-								<div class="form-control">
-									<label for="fname" class="label">
-										<span class="label-text">Firstname: </span>
-									</label>
-									<!-- {#if errors.firstname}
-                                        <p class="text-red-500 text-sm italic mb-1">First Name is required</p>
-                                    {:else if errors.invalidFirstname}
-                                        <p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
-                                    {:else if errors.invalidFirstnameRequired}
-                                        <p class="text-red-500 text-sm italic mb-1">Firstname must have a letter</p>
-                                    {/if} -->
-									<input
-										type="text"
-										placeholder="Juan"
-										name="fname"
-										class="input input-bordered"
-										required
-										bind:value={newOfficers['Community Awareness Committee'].firstname}
-									/>
-								</div>
-								<div class="form-control">
-									<label for="fname" class="label">
-										<span class="label-text">Lastname: </span>
-									</label>
-									<!-- {#if errors.firstname}
-                                        <p class="text-red-500 text-sm italic mb-1">First Name is required</p>
-                                    {:else if errors.invalidFirstname}
-                                        <p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
-                                    {:else if errors.invalidFirstnameRequired}
-                                        <p class="text-red-500 text-sm italic mb-1">Firstname must have a letter</p>
-                                    {/if} -->
-									<input
-										type="text"
-										placeholder="Juan"
-										name="fname"
-										class="input input-bordered"
-										required
-										bind:value={newOfficers['Community Awareness Committee'].lastname}
-									/>
-								</div>
-								<!-- <div>
-                                    <label for="">Image</label>
-                                </div> -->
+								<FirstnameForm bind:value={newOfficers['Community Awareness Committee'].firstname}/>
+								<LastnameForm bind:value={newOfficers['Community Awareness Committee'].lastname}/>
 							</div>
 							<div class="my-4">
 								<span class="font-bold">Social Events Committee: </span>
 							</div>
 							<div class="grid grid-cols-2 gap-6">
-								<div class="form-control">
-									<label for="fname" class="label">
-										<span class="label-text">Firstname: </span>
-									</label>
-									<!-- {#if errors.firstname}
-                                        <p class="text-red-500 text-sm italic mb-1">First Name is required</p>
-                                    {:else if errors.invalidFirstname}
-                                        <p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
-                                    {:else if errors.invalidFirstnameRequired}
-                                        <p class="text-red-500 text-sm italic mb-1">Firstname must have a letter</p>
-                                    {/if} -->
-									<input
-										type="text"
-										placeholder="Juan"
-										name="fname"
-										class="input input-bordered"
-										required
-										bind:value={newOfficers['Social Events Committee'].firstname}
-									/>
-								</div>
-								<div class="form-control">
-									<label for="fname" class="label">
-										<span class="label-text">Lastname: </span>
-									</label>
-									<!-- {#if errors.firstname}
-                                        <p class="text-red-500 text-sm italic mb-1">First Name is required</p>
-                                    {:else if errors.invalidFirstname}
-                                        <p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
-                                    {:else if errors.invalidFirstnameRequired}
-                                        <p class="text-red-500 text-sm italic mb-1">Firstname must have a letter</p>
-                                    {/if} -->
-									<input
-										type="text"
-										placeholder="Juan"
-										name="fname"
-										class="input input-bordered"
-										required
-										bind:value={newOfficers['Social Events Committee'].lastname}
-									/>
-								</div>
-								<!-- <div>
-                                    <label for="">Image</label>
-                                </div> -->
+								<FirstnameForm bind:value={newOfficers['Social Events Committee'].firstname}/>
+								<LastnameForm bind:value={newOfficers['Social Events Committee'].lastname}/>
 							</div>
 						</div>
 					</div>
