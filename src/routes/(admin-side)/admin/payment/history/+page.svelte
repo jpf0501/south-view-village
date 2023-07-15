@@ -204,8 +204,24 @@
 		report.text('HOA Treasurer', 171, 268, { align: 'right' });
 		report.addPage();
 		report.autoTable({ margin: { top: 20, bottom: 20 }, html: '#generate-table' });
-		report.save(`Southview-Homes-3-${startDate}-${endDate}-Monthly-Dues-Report.pdf`);
-		toast.success(`Monthly dues report for ${startDate}-${endDate} generated!`);
+		report.save(`Southview_Homes_3_${new Date(startDate).toLocaleDateString('en-US', {
+												month: 'long',
+												day: 'numeric',
+												year: 'numeric'
+											})}-${new Date(endDate).toLocaleDateString('en-US', {
+												month: 'long',
+												day: 'numeric',
+												year: 'numeric'
+											})}_Monthly_Dues_Report.pdf`);
+		toast.success(`Monthly dues report for ${new Date(startDate).toLocaleDateString('en-US', {
+												month: 'long',
+												day: 'numeric',
+												year: 'numeric'
+											})}-${new Date(endDate).toLocaleDateString('en-US', {
+												month: 'long',
+												day: 'numeric',
+												year: 'numeric'
+											})} generated!`);
 	}
 
 	function openGenerate() {
