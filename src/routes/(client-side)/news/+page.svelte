@@ -1,6 +1,7 @@
 <script>
 	import { getDocs, deleteDoc, query, collection, orderBy, limit } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
+	import { dateObjToISO8601 } from '$lib/dateUtils';
 
 	let listOfNews = [];
 	let newsQuery = query(collection(db, 'news'), orderBy('dateCreated', 'desc'), limit(10));
@@ -16,11 +17,11 @@
 	async function deleteExpiredNews() {
 		const checkExpiredNewsSnapshot = await getDocs(collection(db, 'news'));
 		const currentDate = new Date();
+		const currentDateString = dateObjToISO8601(currentDate);
+		// console.log(currentDateString)
 		checkExpiredNewsSnapshot.forEach(async (doc) => {
 			const expirationDate = doc.data().expiration;
-			const expirationDateObject = new Date(expirationDate);
-			console.log(expirationDateObject);
-			if (expirationDateObject <= currentDate) {
+			if (expirationDate <= currentDateString) {
 				try {
 					await deleteDoc(doc.ref);
 				} catch (error) {
