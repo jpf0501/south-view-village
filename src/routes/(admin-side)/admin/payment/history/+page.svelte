@@ -269,7 +269,7 @@ class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden ove
 		{#if errors.ending}
 			<p class="text-red-500 text-sm italic mb-1">End date is required</p>
 		{:else if errors.startCheck}
-			<p class="text-red-500 text-sm italic mb-1">Start date cannot be larger than end date</p>
+			<p class="text-red-500 text-sm italic mb-1">Start date should not be more recent than end date</p>
 		{/if}
 	</div>
 	<div class="flex justify-end px-6 gap-2 py-4">
