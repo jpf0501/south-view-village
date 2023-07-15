@@ -109,8 +109,8 @@
 	async function generateReport() {
 		let generateQuery = query(
 		collection(db, 'payments'),
-		where('paymentTime', '>=', startDate),
-		where('paymentTime', '<', endDate)
+		where('paymentTime', '>=', new Date(startDate)),
+		where('paymentTime', '<', new Date(endDate))
 	);
 
 		const report = new jsPDF();
@@ -169,8 +169,8 @@
 			const residentQuery = query(
 				collection(db, 'payments'),
 				where('addressStreet', '==', street.streetName),
-				where('paymentTime', '>=', startDate),
-				where('paymentTime', '<', endDate)
+				where('paymentTime', '>=', new(startDate)),
+				where('paymentTime', '<', new(endDate))
 			);
 			const residentCountSnapshot = await getCountFromServer(residentQuery);
 			const residentCount = residentCountSnapshot.data().count;
