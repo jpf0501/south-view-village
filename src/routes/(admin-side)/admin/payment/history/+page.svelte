@@ -35,6 +35,7 @@
 	let day = '01';
 	let startDate, endDate;
 	let generatePopUp = false;
+	let errors = {};
 
 	// if (currentMonth === '01') {
 	// 	// if current month is January, set start date to December of last year
@@ -79,6 +80,30 @@
 	async function resetButton() {
 		paymentsQuery = query(collection(db, 'payments'));
 		searchByValue = '';
+	}
+
+	async function checkInput() {
+		errors = {
+			starting: !startDate,
+			ending: !endDate,
+			startCheck: startDate > endDate,
+		};
+		if (Object.values(errors).some((v) => v)) {
+			setTimeout(() => {
+				errors = {};
+			}, 2000);
+			return;
+		}
+		return true;
+	}
+
+	async function submitHandler() {
+		const isValid = await checkInput();
+		if (!isValid) {
+			toast.error('Report generation failed');
+			return;
+		}
+		generateReport();
 	}
 
 	async function generateReport() {
@@ -216,15 +241,23 @@ class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden ove
 			bind:value={startDate}
 			class="mt-6 input input-bordered w-full max-w-xs"
 		/>
+		{#if errors.starting}
+			<p class="text-red-500 text-sm italic mb-1">Start date is required</p>
+		{/if}
 		<p class="mt-6 text-sm text-gray-500">Enter end date of report</p>
 		<input
 			type="date"
 			bind:value={endDate}
 			class="mt-6 input input-bordered w-full max-w-xs"
 		/>
+		{#if errors.ending}
+			<p class="text-red-500 text-sm italic mb-1">End date is required</p>
+		{:else if errors.startCheck}
+			<p class="text-red-500 text-sm italic mb-1">Start date cannot be larger than end date</p>
+		{/if}
 	</div>
 	<div class="flex justify-end px-6 gap-2 py-4">
-		<button class="btn btn-primary" on:click={generateReport}
+		<button class="btn btn-primary" on:click={submitHandler}
 			>Generate Report</button
 		>
 		<button class="btn btn-error text-white" on:click={closeGenerate}>Cancel</button>
