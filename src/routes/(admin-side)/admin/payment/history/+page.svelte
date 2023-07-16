@@ -34,23 +34,25 @@
 	let currentMonth = (date.getMonth() + 1).toString().padStart(2, '0');
 	let day = '01';
 	let startDate, endDate;
+	let generatePopUp = false;
+	let errors = {};
 
-	if (currentMonth === '01') {
-		// if current month is January, set start date to December of last year
-		startDate = new Date(`${previousYear}-12-${day}`);
-	} else {
-		// set start date to last month date
-		startDate = new Date(`${currentYear}-${previousMonth}-${day}`);
-	}
+	// if (currentMonth === '01') {
+	// 	// if current month is January, set start date to December of last year
+	// 	startDate = new Date(`${previousYear}-12-${day}`);
+	// } else {
+	// 	// set start date to last month date
+	// 	startDate = new Date(`${currentYear}-${previousMonth}-${day}`);
+	// }
 
-	if (currentMonth === '12') {
-		// if current month is December, set end date to January of next year
-		endDate = new Date(`${currentYear + 1}-01-${day}`);
-	} else {
-		// otherwise, set end date to next month
+	// if (currentMonth === '12') {
+	// 	// if current month is December, set end date to January of next year
+	// 	endDate = new Date(`${currentYear + 1}-01-${day}`);
+	// } else {
+	// 	// otherwise, set end date to next month
 		
-		endDate = new Date(`${currentYear}-${currentMonth}-${day}`);
-	}
+	// 	endDate = new Date(`${currentYear}-${currentMonth}-${day}`);
+	// }
 
 	let listOfStreets = [];
 	let listOfReports = [];
@@ -59,11 +61,6 @@
 	let searchByField = '';
 	let searchByValue = '';
 	let paymentsQuery = query(collection(db, 'payments'));
-	let generateQuery = query(
-		collection(db, 'payments'),
-		where('paymentTime', '>=', startDate),
-		where('paymentTime', '<', endDate)
-	);
 	let streetQuery = query(collection(db, 'street'), orderBy('streetName', 'asc'));
 
 	async function changeSortBy() {
@@ -85,7 +82,37 @@
 		searchByValue = '';
 	}
 
+	async function checkInput() {
+		errors = {
+			starting: !startDate,
+			ending: !endDate,
+			startCheck: startDate > endDate,
+		};
+		if (Object.values(errors).some((v) => v)) {
+			setTimeout(() => {
+				errors = {};
+			}, 2000);
+			return;
+		}
+		return true;
+	}
+
+	async function submitHandler() {
+		const isValid = await checkInput();
+		if (!isValid) {
+			toast.error('Report generation failed');
+			return;
+		}
+		generateReport();
+	}
+
 	async function generateReport() {
+		let generateQuery = query(
+		collection(db, 'payments'),
+		where('paymentTime', '>=', new Date(startDate)),
+		where('paymentTime', '<', new Date(endDate))
+	);
+
 		const report = new jsPDF();
 
 		let yOffset = 8;
@@ -116,21 +143,20 @@
 			);
 		report.line(10, 34, 200, 34);
 		report.setFont('Times', 'bold').setFontSize(11);
-		if (currentMonth == '01') {
-			report.text(
-				`${monthName[previousMonth - 1]} ${previousYear} Monthly Dues Earnings Report`,
+		report.text(
+				`Total Monthly Dues Payment Report for ${new Date(startDate).toLocaleDateString('en-US', {
+												month: 'long',
+												day: 'numeric',
+												year: 'numeric'
+											})} - ${new Date(endDate).toLocaleDateString('en-US', {
+												month: 'long',
+												day: 'numeric',
+												year: 'numeric'
+											})}`,
 				width / 2,
 				45,
 				{ align: 'center' }
-			);
-		} else {
-			report.text(
-				`${monthName[previousMonth - 1]} ${currentYear} Monthly Dues Earnings Report`,
-				width / 2,
-				45,
-				{ align: 'center' }
-			);
-		}
+		);
 		report.setFontSize(10).text('Total Count of Paid Residents', 18, 62);
 		report.text('Standard Monthly Due Fee', 18, 70);
 		report.text('Resident Count Summary by Street', 18, 78);
@@ -143,8 +169,8 @@
 			const residentQuery = query(
 				collection(db, 'payments'),
 				where('addressStreet', '==', street.streetName),
-				where('paymentTime', '>=', startDate),
-				where('paymentTime', '<', endDate)
+				where('paymentTime', '>=', new Date(startDate)),
+				where('paymentTime', '<', new Date(endDate))
 			);
 			const residentCountSnapshot = await getCountFromServer(residentQuery);
 			const residentCount = residentCountSnapshot.data().count;
@@ -178,25 +204,32 @@
 		report.text('HOA Treasurer', 171, 268, { align: 'right' });
 		report.addPage();
 		report.autoTable({ margin: { top: 20, bottom: 20 }, html: '#generate-table' });
-		if (currentMonth == '01') {
-			report.save(
-				`Southview-Homes-3-${monthName[previousMonth - 1]}-${previousYear}-Monthly-Dues-Report.pdf`
-			);
-		} else {
-			report.save(
-				`Southview-Homes-3-${monthName[previousMonth - 1]}-${currentYear}-Monthly-Dues-Report.pdf`
-			);
-		}
+		report.save(`Southview_Homes_3_${new Date(startDate).toLocaleDateString('en-US', {
+												month: 'long',
+												day: 'numeric',
+												year: 'numeric'
+											})}-${new Date(endDate).toLocaleDateString('en-US', {
+												month: 'long',
+												day: 'numeric',
+												year: 'numeric'
+											})}_Monthly_Dues_Report.pdf`);
+		toast.success(`Monthly dues report for ${new Date(startDate).toLocaleDateString('en-US', {
+												month: 'long',
+												day: 'numeric',
+												year: 'numeric'
+											})} - ${new Date(endDate).toLocaleDateString('en-US', {
+												month: 'long',
+												day: 'numeric',
+												year: 'numeric'
+											})} generated!`);
+	}
 
-		if (currentMonth == '01') {
-			toast.success(
-				`Monthly dues report for ${monthName[previousMonth - 1]} ${previousYear} generated!`
-			);
-		} else {
-			toast.success(
-				`Monthly dues report for ${monthName[previousMonth - 1]} ${currentYear} generated!`
-			);
-		}
+	function openGenerate() {
+		generatePopUp = true;
+	}
+
+	function closeGenerate() {
+		generatePopUp = false;
 	}
 
 	async function getPayments(paymentsQuery) {
@@ -209,6 +242,45 @@
 <svelte:head>
 	<title>Payment History - Southview Homes 3 Admin Panel</title>
 </svelte:head>
+
+{#if generatePopUp}
+<div
+class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto"
+>
+<div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-75" />
+<div class="relative z-50 w-full max-w-md mx-auto bg-white rounded-lg shadow-lg">
+	<div class="p-6">
+		<h2 class="text-lg font-medium">Generate Payment Report</h2>
+		<p class="mt-6 text-sm text-gray-500">Enter starting date of report</p>
+		<input
+			type="date"
+			bind:value={startDate}
+			class="mt-6 input input-bordered w-full max-w-xs"
+		/>
+		{#if errors.starting}
+			<p class="text-red-500 text-sm italic mb-1">Start date is required</p>
+		{/if}
+		<p class="mt-6 text-sm text-gray-500">Enter end date of report</p>
+		<input
+			type="date"
+			bind:value={endDate}
+			class="mt-6 input input-bordered w-full max-w-xs"
+		/>
+		{#if errors.ending}
+			<p class="text-red-500 text-sm italic mb-1">End date is required</p>
+		{:else if errors.startCheck}
+			<p class="text-red-500 text-sm italic mb-1">Start date should not be more recent than end date</p>
+		{/if}
+	</div>
+	<div class="flex justify-end px-6 gap-2 py-4">
+		<button class="btn btn-primary" on:click={submitHandler}
+			>Generate Report</button
+		>
+		<button class="btn btn-error text-white" on:click={closeGenerate}>Cancel</button>
+	</div>
+</div>
+</div>
+{/if}
 
 <table class="hidden" id="generate-table">
 	<thead>
@@ -282,7 +354,7 @@
 			<option value="paymentTime">Payment Date</option>
 		</select>
 
-		<button class="btn btn-primary my-4" on:click={generateReport}>Generate Report</button>
+		<button class="btn btn-primary my-4" on:click={openGenerate}>Generate Report</button>
 	</div>
 
 	<!-- Medium to large screen -->
