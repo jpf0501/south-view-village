@@ -25,6 +25,8 @@ export async function POST({ request }) {
 			firstNameDisplay:createUserRequest.firstNameDisplay,
 			lastname:createUserRequest.lastname, 
 			lastNameDisplay:createUserRequest.lastNameDisplay,
+			middlename:createUserRequest.middlename,
+			middleNameDisplay:createUserRequest.middleNameDisplay,
 			addressBlock:createUserRequest.addressBlock,
 			addressLot:createUserRequest.addressBlock,
 			addressStreet:createUserRequest.addressStreet,
