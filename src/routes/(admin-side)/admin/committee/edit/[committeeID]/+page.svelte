@@ -102,7 +102,7 @@
 			};
 			await updateDoc(committeeRef, data);
 			toast.success('Photo has been deleted!');
-			await goto('/admin/committee');
+			await goto('/admin/committee/edit/' + committeeID);
 		} catch (error) {
 			console.log(error);
 			toast.error('Error in deleting photo!');
@@ -147,43 +147,42 @@
 					</div>
 				</div>
 				<div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-					<div class="flex flex-col gap-4">
+					<div class="flex flex-col gap-4 items-center">
 						<label for="">Current Photo:</label>
 						<img
-							class="border border-black rounded-md w-64 h-48 object-contain p-2"
+							class="border border-black rounded-md w-64 h-48 object-cover	"
 							src={committee.imageURL}
 							alt={committee.position}
 						/>
 					</div>
-					<div>
+					<div class="flex flex-col gap-4 items-center">
 						{#if previewImage}
-							<div class="flex flex-col gap-4">
-								<label for="">Selected Photo:</label>
-								<img
-									class="border border-black rounded-md w-64 h-48 object-contain p-2"
-									src={previewImage}
-									alt="Selected_Photo"
-								/>
-							</div>
+							<label for="" >Selected Photo:</label>
+							<img
+								class="border border-black rounded-md w-64 h-48 object-cover"
+								src={previewImage}
+								alt="Selected_Photo"
+							/>
 						{/if}
 					</div>
 				</div>
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+					<div class="flex flex-row justify-center gap-5 w-full">
+						<button class="btn btn-primary" on:click={openImageInput}>Change Picture</button>
+						<input
+							type="file"
+							accept="image/*"
+							class="hidden"
+							id="imageInput"
+							on:change={handleImageChange}
+						/>
 
-				<div class="flex flex-row items-end justify-between gap-5 w-full px-3">
-					<button class="btn btn-error text-white" type="button" on:click={deletePhoto}
-						>Delete Current Photo</button
-					>
-					<button class="btn btn-primary" on:click={openImageInput}>Change Picture</button>
-					<input
-						type="file"
-						accept="image/*"
-						class="hidden"
-						id="imageInput"
-						on:change={handleImageChange}
-					/>
-
-					
+						<button class="btn btn-error text-white" type="button" on:click={deletePhoto}
+							>Remove Photo</button
+						>
+					</div>
 				</div>
+
 				<!-- <div class="mt-6 grid grid-cols-2">
 					<div class="form-control ">
 						<span class="pb-3">Position</span>

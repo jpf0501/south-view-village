@@ -47,6 +47,9 @@
             <p class="pt-8">{news.content}</p>
         </article>
     </section>
+    <div class="flex flex-row justify-end">
+        <a href="/news" class="btn btn-primary">Back</a>
+    </div>
 </main>
 {/if}
 
