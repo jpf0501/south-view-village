@@ -169,8 +169,8 @@
 			const residentQuery = query(
 				collection(db, 'payments'),
 				where('addressStreet', '==', street.streetName),
-				where('paymentTime', '>=', new(startDate)),
-				where('paymentTime', '<', new(endDate))
+				where('paymentTime', '>=', new Date(startDate)),
+				where('paymentTime', '<', new Date(endDate))
 			);
 			const residentCountSnapshot = await getCountFromServer(residentQuery);
 			const residentCount = residentCountSnapshot.data().count;
@@ -217,7 +217,7 @@
 												month: 'long',
 												day: 'numeric',
 												year: 'numeric'
-											})}-${new Date(endDate).toLocaleDateString('en-US', {
+											})} - ${new Date(endDate).toLocaleDateString('en-US', {
 												month: 'long',
 												day: 'numeric',
 												year: 'numeric'
