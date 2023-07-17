@@ -154,7 +154,7 @@
 					? 'justify-end'
 					: 'justify-start'} "
 			>
-				<img src={picture?.url} class="max-w-xs max-h-32" alt={picture?.name} />
+				<img src={picture?.url} class="max-w-xs max-h-32 mx-2" alt={picture?.name} />
 			</div>
 		{/each}
 		<div

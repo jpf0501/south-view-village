@@ -26,8 +26,8 @@
 		complaintantID,
 		complaintContent
 	) {
-		if(priorityLevel === ""){
-			return
+		if (priorityLevel === '') {
+			return;
 		}
 		try {
 			let convoID = complaintantFirstname + 'COMPLAINT' + complaintID;
@@ -66,6 +66,18 @@
 			<h1 class="text-2xl font-bold mb-4">
 				Complaint by {complaint.firstnameDisplay + ' ' + complaint.lastnameDisplay}
 			</h1>
+			<p>Address: {complaint.address}</p>
+			<p>
+				Date Submitted: {complaint.dateSubmitted.toDate().toLocaleDateString('en-us', {
+					year: 'numeric',
+					month: 'long',
+					day: 'numeric'
+				}) +
+					' at ' +
+					complaint.dateSubmitted
+						.toDate()
+						.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}
+			</p>
 			<div class="flex flex-col mb-6">
 				<span class="text-gray-700 font-bold mb-2">Complaint</span>
 				<div id="noScroll" class="h-40 border rounded-md p-4 overflow-y-scroll">

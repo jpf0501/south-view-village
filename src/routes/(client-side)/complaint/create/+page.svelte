@@ -40,6 +40,7 @@
 				firstnameDisplay: user.firstNameDisplay,
 				lastname: user.lastNameDisplay.toLowerCase(),
 				lastnameDisplay: user.lastNameDisplay,
+				address: "Block " + user.addressBlock + " Lot " + user.addressLot + " " + user.addressStreet + " Street",
 				email: user.email,
 				contactNumber: user.contactNumber,
 				complaint: complaint.trim(),

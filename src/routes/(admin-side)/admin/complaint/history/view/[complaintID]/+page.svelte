@@ -10,6 +10,7 @@
 
 	let complaint = null;
 	let getComplaintID;
+	
 
 	async function getComplaints() {
 		const str = complaintID;
@@ -26,7 +27,7 @@
 			console.log(error);
 			toast.error('Error in getting complaint');
 		}
-	}   
+	}
 
 	getComplaints();
 </script>
@@ -41,6 +42,16 @@
 			<h1 class="text-2xl font-bold mb-4">
 				Complaint by {complaint.firstnameDisplay + ' ' + complaint.lastnameDisplay}
 			</h1>
+			<p>Address: {complaint.address}</p>
+			<p>Date Submitted: {complaint.dateSubmitted.toDate().toLocaleDateString('en-us', {
+				year: 'numeric',
+				month: 'long',
+				day: 'numeric'
+			}) +
+				' at ' +
+				complaint.dateSubmitted
+					.toDate()
+					.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}</p>
 			<form class="w-full">
 				<div class="flex flex-col mb-6">
 					<div class="text-gray-700 font-bold mb-2">Complaint</div>
@@ -48,8 +59,7 @@
 						{complaint.complaint}
 					</div>
 				</div>
-				{complaintID}
-				<Conversation convoID={complaintID} isDisable={true}/>
+				<Conversation convoID={complaintID} isDisable={true} />
 				<div class="flex justify-end gap-3 mt-8">
 					<a href="/admin/complaint" class="btn btn-error mx-1 text-white">Back</a>
 				</div>

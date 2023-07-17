@@ -3,7 +3,6 @@
 	import { getDoc, doc } from 'firebase/firestore';
 	import toast from 'svelte-french-toast';
 	import ConversationClient from './ConversationClient.svelte';
-	
 
 	/** @type {import('./$types').PageData} */
 	export let data;
@@ -39,9 +38,20 @@
 {#if complaint}
 	<div class="min-h-screen bg-gray-100 flex flex-col justify-center items-center">
 		<div class="w-full max-w-4xl p-6 mx-auto shadow-lg rounded-xl bg-white">
-			<h1 class="text-2xl font-bold mb-4">
-				Your Complaint:
-			</h1>
+			<h1 class="text-2xl font-bold mb-4">Your Complaint:</h1>
+			<p>Address: {complaint.address}</p>
+			<p>
+				Date Submitted: {complaint.dateSubmitted.toDate().toLocaleDateString('en-us', {
+					year: 'numeric',
+					month: 'long',
+					day: 'numeric'
+				}) +
+					' at ' +
+					complaint.dateSubmitted
+						.toDate()
+						.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}
+			</p>
+			
 			<form class="w-full">
 				<div class="flex flex-col mb-6">
 					<div class="text-gray-700 font-bold mb-2">Complaint</div>
@@ -49,7 +59,7 @@
 						{complaint.complaint}
 					</div>
 				</div>
-				<ConversationClient {complaintID}/>
+				<ConversationClient {complaintID} />
 				<div class="flex justify-end mt-8">
 					<!-- <button on:click={markAsResolve} type="submit" class="btn btn-primary">
 						Mark as Resolve
