@@ -172,7 +172,7 @@
 </div>
 <div class="flex flex-row items-end justify-end gap-2">
 	{#each selectedPictures as file}
-		<div>
+		<div class="my-2">
 			<img src={file.url} alt={file.name} class="max-w-xs max-h-32" />
 			<!-- <span>{file.name}</span> -->
 		</div>
