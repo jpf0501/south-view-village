@@ -1,21 +1,26 @@
 <script>
-	import { getDocs, query, collection, orderBy, where } from 'firebase/firestore';
+	import { userStore } from '$lib/store';
+	import { onSnapshot, query, collection, orderBy, where } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
+	import OngoingComplaints from './OngoingComplaints.svelte';
 
 	let listOfComplaints = [];
+	let unsubscribe = () => {};
+
 	let sortByField = '';
 	let searchByField = '';
 	let searchByValue = '';
+
 	let complaintQuery = query(
 		collection(db, 'complaints'),
-		where('hadAnswered', '==', false),
+		where('status', '==', 'Pending'),
 		orderBy('dateSubmitted', 'asc')
 	);
 
 	async function changeSortBy() {
 		complaintQuery = query(
 			collection(db, 'complaints'),
-			where('hadAnswered', '==', false),
+			where('status', '==', 'Pending'),
 			orderBy(sortByField, 'asc'),
 			orderBy('dateSubmitted', 'asc')
 		);
@@ -27,7 +32,7 @@
 			collection(db, 'complaints'),
 			where(searchByField, '>=', searchByValueCase),
 			where(searchByField, '<=', searchByValueCase + '~'),
-			where('hadAnswered', '==', false),
+			where('status', '==', 'Pending'),
 			orderBy(searchByField, 'asc'),
 			orderBy('dateSubmitted', 'asc')
 		);
@@ -36,18 +41,17 @@
 	async function resetButton() {
 		complaintQuery = query(
 			collection(db, 'complaints'),
-			where('hadAnswered', '==', false),
+			where('status', '==', 'Pending'),
 			orderBy('dateSubmitted', 'asc')
 		);
 		searchByValue = '';
 	}
 
 	async function getComplaints(complaintQuery) {
-		const complaintsSnapshot = await getDocs(complaintQuery);
-		listOfComplaints = complaintsSnapshot.docs.map((doc) => ({
-			id: doc.id,
-			...doc.data()
-		}));
+		unsubscribe();
+		unsubscribe = onSnapshot(complaintQuery, (querySnapshot) => {
+			listOfComplaints = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+		});
 	}
 
 	$: getComplaints(complaintQuery);
@@ -59,7 +63,11 @@
 
 <div class="min-w-full min-h-full bg-base-200 py-8 px-5">
 	<h1 class="text-3xl font-semibold py-2">Complaints</h1>
+	<div class="flex flex-row justify-end ">
+		<a href="/admin/complaint/history" class="btn btn-primary">History</a>
+	</div>
 	<div class="flex flex-col md:flex-row justify-between">
+		
 		<div class="flex flex-col md:flex-row">
 			<form
 				on:submit|preventDefault={searchComplaints}
@@ -99,6 +107,7 @@
 	<div class="w-full mx-auto shadow-2xl border rounded-xl bg-base-100 my-5 hidden md:block">
 		<div class="overflow-x-auto">
 			<table class="table w-full">
+				<caption class="text-lg font-bold mb-2">List of Pending Complaints</caption>
 				<thead>
 					<tr>
 						<th />
@@ -107,30 +116,24 @@
 						<th class="text-lg">Complaint</th>
 						<!-- <th class="text-lg">Date Inquired</th> -->
 						<th />
+						<!-- <th />	 -->
 					</tr>
 				</thead>
 				<tbody>
 					{#each listOfComplaints as complaint, i}
-						<tr class="hover">
-							<td>{i + 1}</td>
-							<td>{complaint.firstnameDisplay + ' ' + complaint.lastnameDisplay}</td>
-							<td>{complaint.email}</td>
-							<td>{complaint.complaint.substring(0, 50) + '...'}</td>
-							<!-- <td
-								>{inquiry.dateCreated
-									.toDate()
-									.toLocaleDateString('en-us', { year: 'numeric', month: 'long', day: 'numeric' }) +
-									' at ' +
-									inquiry.dateCreated
-										.toDate()
-										.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}</td
-							> -->
-							<td>
-								<a href={'/admin/complaint/respond/' + complaint.id} class="btn btn-primary"
-									>Give Response</a
+						{#if complaint.complaintantID !== $userStore?.uid}
+							<tr class="hover">
+								<td>{i + 1}</td>
+								<td>{complaint.firstnameDisplay + ' ' + complaint.lastnameDisplay}</td>
+								<td>{complaint.email}</td>
+								<td>{complaint.complaint.substring(0, 50) + '...'}</td>
+								<td
+									><a class="btn btn-primary" href={'/admin/complaint/view/' + complaint.id}
+										>View Complaint</a
+									></td
 								>
-							</td>
-						</tr>
+							</tr>
+						{/if}
 					{/each}
 				</tbody>
 			</table>
@@ -140,20 +143,21 @@
 	<!-- Small screen -->
 	<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">
 		{#each listOfComplaints as complaint}
-			<div class="card w-[105%] bg-base-100 shadow-xl">
-				<div class="card-body">
-					<h2 class="card-title mb-2">
-						{complaint.firstnameDisplay + ' ' + complaint.lastnameDisplay}
-					</h2>
-					<div>
-						<span class="my-1 font-bold">Email: </span>
-						{complaint.email}
-					</div>
-					<div>
-						<span class="my-1 font-bold">Complaint: </span>
-						{complaint.complaint.substring(0, 30) + '...'}
-					</div>
-					<!-- <div>
+			{#if complaint.complaintantID !== $userStore?.uid}
+				<div class="card w-[105%] bg-base-100 shadow-xl">
+					<div class="card-body">
+						<h2 class="card-title mb-2">
+							{complaint.firstnameDisplay + ' ' + complaint.lastnameDisplay}
+						</h2>
+						<div>
+							<span class="my-1 font-bold">Email: </span>
+							{complaint.email}
+						</div>
+						<div>
+							<span class="my-1 font-bold">Complaint: </span>
+							{complaint.complaint.substring(0, 30) + '...'}
+						</div>
+						<!-- <div>
 						<span class="my-1 font-bold">Date Inquired:</span>
 						{inquiry.dateCreated
 							.toDate()
@@ -163,13 +167,17 @@
 								.toDate()
 								.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}
 					</div> -->
-					<div class="card-actions justify-end">
-						<a href={'/admin/complaint/respond/' + complaint.id} class="btn btn-primary"
-							>Give Response</a
-						>
+						<div class="card-actions justify-end">
+							<a class="btn btn-primary" href={'/admin/complaint/view/' + complaint.id}
+								>View Complaint</a
+							>
+						</div>
 					</div>
 				</div>
-			</div>
+			{/if}
 		{/each}
+	</div>
+	<div>
+		<OngoingComplaints />
 	</div>
 </div>

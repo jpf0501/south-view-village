@@ -34,7 +34,7 @@
 	getOngoingComplaints();
 </script>
 <div class="flex flex-row justify-end">
-    <a href="/complaint/create" class="btn btn-primary m-2 mx-2">New Complaint</a>
+    <a href="/complaint" class="btn btn-primary mt-2 mx-2">Go Back</a>
 </div>
 <div class="w-full max-w-4xl p-6 mx-auto shadow-2xl border rounded-xl bg-base-100">
   
@@ -64,7 +64,7 @@
 </div>
 
 
-<div class="w-full max-w-4xl p-6 mx-auto shadow-2xl border rounded-xl bg-base-100 mt-5">
+<div class="w-full max-w-4xl p-6 mx-auto shadow-2xl border rounded-xl bg-base-100">
 	<table class="table w-full">
 		<caption class="text-lg font-bold mb-2">List of Pending Complaints</caption>
 		<thead>

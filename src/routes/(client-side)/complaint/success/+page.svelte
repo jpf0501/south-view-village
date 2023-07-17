@@ -9,7 +9,7 @@
             <p class="font-bold pb-12 text-xl">Thank you for your submission!</p>
             <p class="pb-14">We have received your complaint and will keep in touch with you to give our response as soon as possible.</p>
             <div class="flex flex-col">
-                <a href="/complaint" class="underline pb-5">Make Another Complaint</a>
+                <a href="/complaint/create" class="underline pb-5">Make Another Complaint</a>
                 <a href="/" class="underline">Go Back</a>
             </div>
         </div>
