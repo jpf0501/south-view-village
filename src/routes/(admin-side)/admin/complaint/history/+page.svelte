@@ -6,6 +6,7 @@
 
 	let listOfOngoingComplaints = [];
 	let sortByPriorityLevel = '';
+	let sortByStatusField = ""
 	let unsubscribe = () => {};
 
 	let ongoingComplaintsQuery = query(
@@ -21,11 +22,21 @@
 		);
 	}
 
+	async function sortByStatus(){
+		console.log(sortByStatusField)
+		ongoingComplaintsQuery = query(
+			collection(db, 'conversations'),
+			where('status', '==', sortByStatusField),
+		);
+	}
+
 	async function resetButton() {
 		ongoingComplaintsQuery = query(
 			collection(db, 'conversations'),
 			where('status', 'in', statusValues)
 		);
+		sortByStatusField = ""
+		sortByPriorityLevel = ""
 	}
 
 	async function getOngoingComplaints(ongoingComplaintsQuery) {
@@ -45,7 +56,7 @@
 		<div>
 			<select
 				bind:value={sortByPriorityLevel}
-				on:change={changePriorityLevel(ongoingComplaintsQuery)}
+				on:change={changePriorityLevel}
 				class="select select-bordered mb-2 md:mb-0 md:mr-2"
 				required
 			>
@@ -53,6 +64,19 @@
 				<option value="Low">Low</option>
 				<option value="Medium">Medium</option>
 				<option value="High">High</option>
+			</select>
+			<button on:click={resetButton} class="btn btn-primary">Reset</button>
+		</div>
+		<div>
+			<select
+				bind:value={sortByStatusField}
+				on:change={sortByStatus}
+				class="select select-bordered mb-2 md:mb-0 md:mr-2"
+				required
+			>
+				<option value="" disabled selected>Status</option>
+				<option value="Resolved">Resolved</option>
+				<option value="Unresolved">Unresolved</option>
 			</select>
 			<button on:click={resetButton} class="btn btn-primary">Reset</button>
 		</div>
