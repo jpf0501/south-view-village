@@ -2,6 +2,7 @@
 	import { userStore } from '$lib/store';
 	import { onSnapshot, query, collection, orderBy, where } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
+	import { getCountSnapshot } from '$lib/utils';
 	import OngoingComplaints from './OngoingComplaints.svelte';
 
 	let listOfComplaints = [];
@@ -10,6 +11,7 @@
 	let sortByField = '';
 	let searchByField = '';
 	let searchByValue = '';
+	let resultCounts = 0;
 
 	let complaintQuery = query(
 		collection(db, 'complaints'),
@@ -52,6 +54,7 @@
 		unsubscribe = onSnapshot(complaintQuery, (querySnapshot) => {
 			listOfComplaints = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 		});
+		resultCounts = await getCountSnapshot(complaintQuery);
 	}
 
 	$: getComplaints(complaintQuery);
@@ -67,7 +70,6 @@
 		<a href="/admin/complaint/history" class="btn btn-primary">History</a>
 	</div>
 	<div class="flex flex-col md:flex-row justify-between">
-		
 		<div class="flex flex-col md:flex-row">
 			<form
 				on:submit|preventDefault={searchComplaints}
@@ -120,21 +122,27 @@
 					</tr>
 				</thead>
 				<tbody>
-					{#each listOfComplaints as complaint, i}
-						{#if complaint.complaintantID !== $userStore?.uid}
-							<tr class="hover">
-								<td>{i + 1}</td>
-								<td>{complaint.firstnameDisplay + ' ' + complaint.lastnameDisplay}</td>
-								<td>{complaint.email}</td>
-								<td>{complaint.complaint.substring(0, 50) + '...'}</td>
-								<td
-									><a class="btn btn-primary" href={'/admin/complaint/view/' + complaint.id}
-										>View Complaint</a
-									></td
-								>
-							</tr>
-						{/if}
-					{/each}
+					{#if resultCounts === 0}
+						<tr>
+							<td colspan="5" class="text-center py-4"> No Current Complaints </td>
+						</tr>
+					{:else}
+						{#each listOfComplaints as complaint, i}
+							{#if complaint.complaintantID !== $userStore?.uid}
+								<tr class="hover">
+									<td>{i + 1}</td>
+									<td>{complaint.firstnameDisplay + ' ' + complaint.lastnameDisplay}</td>
+									<td>{complaint.email}</td>
+									<td>{complaint.complaint.substring(0, 50) + '...'}</td>
+									<td
+										><a class="btn btn-primary" href={'/admin/complaint/view/' + complaint.id}
+											>View Complaint</a
+										></td
+									>
+								</tr>
+							{/if}
+						{/each}
+					{/if}
 				</tbody>
 			</table>
 		</div>

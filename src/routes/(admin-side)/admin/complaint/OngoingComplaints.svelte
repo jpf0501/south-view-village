@@ -1,9 +1,11 @@
 <script>
 	import { query, collection, where, onSnapshot } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
+	import { getCountSnapshot } from '$lib/utils';
 
 	let listOfOngoingComplaints = [];
 	let sortByPriorityLevel = '';
+	let resultCount = 0;
 	let unsubscribe = () => {};
 
 	let ongoingComplaintsQuery = query(
@@ -31,6 +33,7 @@
 		unsubscribe = onSnapshot(ongoingComplaintsQuery, (querySnapshot) => {
 			listOfOngoingComplaints = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 		});
+		resultCount = await getCountSnapshot(ongoingComplaintsQuery);
 	}
 
 	$: getOngoingComplaints(ongoingComplaintsQuery);
@@ -39,7 +42,7 @@
 <div class="flex flex-row justify-end">
 	<select
 		bind:value={sortByPriorityLevel}
-		on:change={changePriorityLevel(ongoingComplaintsQuery)}
+		on:change={changePriorityLevel}
 		class="select select-bordered mb-2 md:mb-0 md:mr-2"
 		required
 	>
@@ -63,25 +66,32 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each listOfOngoingComplaints as ongoingComplaints, i}
-				<tr class="hover">
-					<td>{i + 1}</td>
-					<td>{ongoingComplaints.complaintantName}</td>
-					<td>{ongoingComplaints.complaintContent.substring(0, 30) + '...'}</td>
-					<td
-						class=" font-bold {ongoingComplaints.priority === 'Low'
-							? 'text-green-500'
-							: ongoingComplaints.priority === 'Medium'
-							? 'text-orange-300'
-							: 'text-red-500'}">{ongoingComplaints.priority}</td
-					>
-					<td
-						><a href="/admin/complaint/respond/{ongoingComplaints.convoID}" class="btn btn-primary"
-							>Goto Convo</a
-						></td
-					>
+			{#if resultCount === 0}
+				<tr>
+					<td colspan="5" class="text-center py-4"> No Current Ongoing Complaints </td>
 				</tr>
-			{/each}
+			{:else}
+				{#each listOfOngoingComplaints as ongoingComplaints, i}
+					<tr class="hover">
+						<td>{i + 1}</td>
+						<td>{ongoingComplaints.complaintantName}</td>
+						<td>{ongoingComplaints.complaintContent.substring(0, 30) + '...'}</td>
+						<td
+							class=" font-bold {ongoingComplaints.priority === 'Low'
+								? 'text-green-500'
+								: ongoingComplaints.priority === 'Medium'
+								? 'text-orange-300'
+								: 'text-red-500'}">{ongoingComplaints.priority}</td
+						>
+						<td
+							><a
+								href="/admin/complaint/respond/{ongoingComplaints.convoID}"
+								class="btn btn-primary">Goto Convo</a
+							></td
+						>
+					</tr>
+				{/each}
+			{/if}
 		</tbody>
 	</table>
 </div>

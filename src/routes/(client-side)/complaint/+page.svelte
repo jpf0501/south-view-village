@@ -2,9 +2,12 @@
 	import { userStore } from '$lib/store';
 	import { query, collection, where, onSnapshot } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
+	// import { getCountSnapshot } from '$lib/utils';
 
 	let listOfOngoingComplaints = [];
 	let listOfPendingComplaints = [];
+	// let resultCountOfOngoingComplaints = 0;
+	// let resultCountOfPendingComplaints = 0;
 	let unsubscribeOngoing = () => {};
 	let unsubscribePending = () => {};
 	async function getOngoingComplaints() {
@@ -17,6 +20,8 @@
 		unsubscribeOngoing = onSnapshot(ongoingComplaintsQuery, (querySnapshot) => {
 			listOfOngoingComplaints = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 		});
+		// resultCountOfOngoingComplaints = await getCountSnapshot(ongoingComplaintsQuery);
+		// console.log(resultCountOfOngoingComplaints)
 	}
 	async function getPendingComplaints() {
 		const pendingComplaintsQuery = query(
@@ -28,6 +33,8 @@
 		unsubscribePending = onSnapshot(pendingComplaintsQuery, (querySnapshot) => {
 			listOfPendingComplaints = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 		});
+		// resultCountOfPendingComplaints = await getCountSnapshot(pendingComplaintsQuery);
+		// console.log(resultCountOfPendingComplaints)
 	}
 
 	getPendingComplaints();

@@ -1,4 +1,5 @@
 import { PUBLIC_PAYMONGO_SECRET_KEY } from '$env/static/public'
+import { getCountFromServer } from 'firebase/firestore';
 
 export const sendEmail = async (
 	mailOptions = {
@@ -40,4 +41,10 @@ export const sendEmail = async (
 			console.log(error)
 		  }
 		
+	}
+
+export async function getCountSnapshot(query){
+	const snapshot = await getCountFromServer(query);
+// console.log('count: ', snapshot.data().count);
+	return snapshot.data().count
 	}

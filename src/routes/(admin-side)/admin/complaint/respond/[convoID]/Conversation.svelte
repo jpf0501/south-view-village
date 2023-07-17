@@ -90,7 +90,7 @@
 			selectedPictures = [];
 			finalPictures = [];
 			scrollConversationToBottom();
-			console.log('Message sent successfully:', newMessageRef.id);
+			// console.log('Message sent successfully:', newMessageRef.id);
 		} catch (error) {
 			console.error('Error sending message:', error);
 		}
@@ -114,7 +114,7 @@
 
 		Promise.all(readerPromises).then((results) => {
 			selectedPictures = results;
-			console.log(selectedPictures);
+			// console.log(selectedPictures);
 		});
 
 		finalPictures = files; // may error dito pero nagana hahaa
