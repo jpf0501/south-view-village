@@ -22,6 +22,8 @@
 	let finalPictures = [];
 	let newMessage = '';
 	let user = null;
+	let selectedImage = '';
+	let isModalOpen = false;
 
 	let unsubscribe = () => {};
 
@@ -150,7 +152,16 @@
 					? 'justify-end'
 					: 'justify-start'} "
 			>
-				<img src={picture?.url} class="max-w-xs max-h-32 mx-2" alt={picture?.name} />
+			<img
+			src={picture?.url}
+			class="max-w-xs max-h-32 mx-2 cursor-pointer"
+			alt={picture?.name}
+			on:keyup={() => {}}
+			on:click={() => {
+				selectedImage = picture?.url;
+				isModalOpen = true;
+			}}
+		/>
 			</div>
 		{/each}
 		<div
@@ -207,6 +218,35 @@
 		<button type="submit" class="w-10 h-10"><img src="/icon-sent.png" alt="" /></button>
 	</form>
 </div>
+
+{#if isModalOpen}
+	<div
+		class="fixed top-0 left-0 flex items-center justify-center w-full h-full bg-black bg-opacity-50" on:keydown={()=>{}}
+		on:click={() => {
+			isModalOpen = false;
+		}}
+	>
+		<div class="flex items-center justify-center">
+			<div
+				class="max-w-md p-4 bg-white rounded-md"
+				on:keydown={()=>{}}
+				on:click={(e) => {
+					e.stopPropagation();
+				}}
+			>
+				<img src={selectedImage} alt="SelectedImage" class="w-full" />
+				<button
+					class="mt-4 px-4 py-2 text-white bg-blue-500 rounded-md"
+					on:click={() => {
+						isModalOpen = false;
+					}}
+				>
+					Close
+				</button>
+			</div>
+		</div>
+	</div>
+{/if}	
 
 <style>
 	/* Hide the scrollbar */
