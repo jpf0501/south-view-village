@@ -103,8 +103,8 @@
 		<div class="flex flex-col md:flex-row items-center justify-center">
 			<div class="card w-96 bg-base-100 shadow-xl m-5">
 				<div class="card-body">
-					<img src={president[0]?.imageURL} alt="President" class="mask mask-circle " />
-					<h2 class="font-bold text-center text-2xlp pt-6">
+					<img src={president[0]?.imageURL} alt="President" class="mask mask-circle h-72" />
+					<h2 class="font-bold text-center text-xl h-14 pt-6">
 						{`${president[0]?.firstnameDisplay} ${president[0]?.lastnameDisplay}`}
 					</h2>
 					<p class="text-center mx-auto pt-4">President</p>
@@ -112,8 +112,8 @@
 			</div>
 			<div class="card w-96 bg-base-100 shadow-xl m-5">
 				<div class="card-body">
-					<img src={vicePresident[0]?.imageURL} alt="Vice President" class="mask mask-circle " />
-					<h2 class="font-bold text-center text-2xl pt-6">
+					<img src={vicePresident[0]?.imageURL} alt="Vice President" class="mask mask-circle h-72" />
+					<h2 class="font-bold text-center text-xl h-14 pt-6">
 						{`${vicePresident[0]?.firstnameDisplay} ${vicePresident[0]?.lastnameDisplay}`}
 					</h2>
 					<p class="text-center mx-auto pt-4">Vice President</p>
@@ -121,8 +121,8 @@
 			</div>
 			<div class="card w-96 bg-base-100 shadow-xl m-5">
 				<div class="card-body">
-					<img src={secretary[0]?.imageURL} alt="Secretary" class="mask mask-circle " />
-					<h2 class="font-bold text-center text-2xl pt-6">
+					<img src={secretary[0]?.imageURL} alt="Secretary" class="mask mask-circle h-72" />
+					<h2 class="font-bold text-center text-xl h-14 pt-6">
 						{`${secretary[0]?.firstnameDisplay} ${secretary[0]?.lastnameDisplay}`}
 					</h2>
 					<p class="text-center mx-auto pt-4">Secretary</p>
@@ -132,8 +132,8 @@
 		<div class="flex flex-col md:flex-row items-center justify-center">
 			<div class="card w-96 bg-base-100 shadow-xl m-5">
 				<div class="card-body">
-					<img src={treasurer[0]?.imageURL} alt="Treasurer" class="mask mask-circle " />
-					<h2 class="font-bold text-center text-2xl pt-6">
+					<img src={treasurer[0]?.imageURL} alt="Treasurer" class="mask mask-circle h-72" />
+					<h2 class="font-bold text-center text-xl h-14 pt-6">
 						{`${treasurer[0]?.firstnameDisplay} ${treasurer[0]?.lastnameDisplay}`}
 					</h2>
 					<p class="text-center mx-auto pt-4">Treasurer</p>
@@ -141,8 +141,8 @@
 			</div>
 			<div class="card w-96 bg-base-100 shadow-xl m-5">
 				<div class="card-body">
-					<img src={auditor[0]?.imageURL} alt="Auditor" class="mask mask-circle " />
-					<h2 class="font-bold text-center text-2xl pt-6">
+					<img src={auditor[0]?.imageURL} alt="Auditor" class="mask mask-circle h-72" />
+					<h2 class="font-bold text-center text-xl h-14 pt-6">
 						{`${auditor[0]?.firstnameDisplay} ${auditor[0]?.lastnameDisplay}`}
 					</h2>
 					<p class="text-center mx-auto pt-4">Auditor</p>
@@ -167,9 +167,9 @@
 					<img
 						src={convennant[0]?.imageURL}
 						alt="Covenant and Grievances Committee"
-						class="mask mask-circle "
+						class="mask mask-circle h-72"
 					/>
-					<h2 class="font-bold text-center text-2xl pt-6">
+					<h2 class="font-bold text-center text-xl h-14 pt-6">
 						{`${convennant[0]?.firstnameDisplay} ${convennant[0]?.lastnameDisplay}`}
 					</h2>
 					<p class="text-center mx-auto pt-4">Covenant and Grievances Committee</p>
@@ -180,9 +180,9 @@
 					<img
 						src={convennant[1]?.imageURL}
 						alt="Covenant and Grievances Committee"
-						class="mask mask-circle "
+						class="mask mask-circle h-72"
 					/>
-					<h2 class="font-bold text-center text-2xl pt-6">
+					<h2 class="font-bold text-center text-xl h-14 pt-6">
 						{`${convennant[1]?.firstnameDisplay} ${convennant[1]?.lastnameDisplay}`}
 					</h2>
 					<p class="text-center mx-auto pt-4">Covenant and Grievances Committee</p>
@@ -193,9 +193,9 @@
 					<img
 						src={sports[0]?.imageURL}
 						alt="Sports and Wellness Committee"
-						class="mask mask-circle "
+						class="mask mask-circle h-72"
 					/>
-					<h2 class="font-bold text-center text-2xl pt-6">
+					<h2 class="font-bold text-center text-xl h-14 pt-6">
 						{`${sports[0]?.firstnameDisplay} ${sports[0]?.lastnameDisplay}`}
 					</h2>
 					<p class="text-center mx-auto pt-4">Sports and Wellness Committee</p>
@@ -206,9 +206,9 @@
 					<img
 						src={sports[1]?.imageURL}
 						alt="Sports and Wellness Committee"
-						class="mask mask-circle "
+						class="mask mask-circle h-72"
 					/>
-					<h2 class="font-bold text-center text-2xl pt-6">
+					<h2 class="font-bold text-center text-xl h-14 pt-6">
 						{`${sports[1]?.firstnameDisplay} ${sports[1]?.lastnameDisplay}`}
 					</h2>
 					<p class="text-center mx-auto pt-4">Sports and Wellness Committee</p>
@@ -221,9 +221,9 @@
 					<img
 						src={maintenanceAndBeautification[0]?.imageURL}
 						alt="Maintenance and Beautification Committee"
-						class="mask mask-circle "
+						class="mask mask-circle h-72"
 					/>
-					<h2 class="font-bold text-center text-2xl pt-6">
+					<h2 class="font-bold text-center text-xl h-14 pt-6">
 						{`${maintenanceAndBeautification[0]?.firstnameDisplay} ${maintenanceAndBeautification[0]?.lastnameDisplay}`}
 					</h2>
 					<p class="text-center mx-auto pt-4">Maintenance and Beautification Committee</p>
@@ -234,9 +234,9 @@
 					<img
 						src={communityAwareness[0]?.imageURL}
 						alt="Community Awareness Committee"
-						class="mask mask-circle "
+						class="mask mask-circle h-72"
 					/>
-					<h2 class="font-bold text-center text-2xl pt-6">
+					<h2 class="font-bold text-center text-xl h-14 pt-6">
 						{`${communityAwareness[0]?.firstnameDisplay} ${communityAwareness[0]?.lastnameDisplay}`}
 					</h2>
 					<p class="text-center mx-auto pt-4">Community Awareness Committee</p>
@@ -247,9 +247,9 @@
 					<img
 						src={socialEvents[0]?.imageURL}
 						alt="Social Events Committee<"
-						class="mask mask-circle "
+						class="mask mask-circle h-72"
 					/>
-					<h2 class="font-bold text-center text-2xl pt-6">
+					<h2 class="font-bold text-center text-xl h-14 pt-6">
 						{`${socialEvents[0]?.firstnameDisplay} ${socialEvents[0]?.lastnameDisplay}`}
 					</h2>
 					<p class="text-center mx-auto pt-4">Social Events Committee</p>
