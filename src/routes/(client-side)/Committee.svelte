@@ -60,14 +60,14 @@
 
 <!-- head -->
 <div class="flex flex-col items-center m-5">
-	<div class="flex flex-col md:flex-row">
+	<div class="flex flex-col items-center md:flex-row ">
 		{#each images?.groupPictureURL || [] as url, index}
 			{#if url !== ''}
 				<div class="m-3">
 					<img
 						src={url}
 						alt="Southview Homes 3 Home Owners Association"
-						class="rounded-lg md:scale-90 shadow-2xl"
+						class="rounded-lg max-h-96 md:scale-90 shadow-2xl"
 					/>
 				</div>
 			{/if}
