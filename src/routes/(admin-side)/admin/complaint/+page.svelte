@@ -11,7 +11,7 @@
 	let sortByField = '';
 	let searchByField = '';
 	let searchByValue = '';
-	let resultCounts = 0;
+	let resultCount = 0;
 
 	let complaintQuery = query(
 		collection(db, 'complaints'),
@@ -54,7 +54,7 @@
 		unsubscribe = onSnapshot(complaintQuery, (querySnapshot) => {
 			listOfComplaints = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 		});
-		resultCounts = await getCountSnapshot(complaintQuery);
+		resultCount = await getCountSnapshot(complaintQuery);
 	}
 
 	$: getComplaints(complaintQuery);
@@ -122,7 +122,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					{#if resultCounts === 0}
+					{#if resultCount === 0}
 						<tr>
 							<td colspan="5" class="text-center py-4"> No Current Complaints </td>
 						</tr>
@@ -150,6 +150,12 @@
 
 	<!-- Small screen -->
 	<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">
+		<h1 class="text-xl font-bold">List of Pending Complaints</h1>
+		{#if resultCount === 0}
+		<div>
+			<span class="text-center py-4"> No Current Ongoing Complaints </span>
+		</div>
+	{:else}
 		{#each listOfComplaints as complaint}
 			{#if complaint.complaintantID !== $userStore?.uid}
 				<div class="card w-[105%] bg-base-100 shadow-xl">
@@ -184,8 +190,9 @@
 				</div>
 			{/if}
 		{/each}
+		{/if}
 	</div>
 	<div>
-		<OngoingComplaints />
+		<OngoingComplaints/>
 	</div>
 </div>

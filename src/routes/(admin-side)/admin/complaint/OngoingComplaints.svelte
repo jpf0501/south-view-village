@@ -1,4 +1,5 @@
 <script>
+	import { userStore } from '$lib/store';
 	import { query, collection, where, onSnapshot } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { getCountSnapshot } from '$lib/utils';
@@ -53,45 +54,90 @@
 	</select>
 	<button on:click={resetButton} class="btn btn-primary">Reset</button>
 </div>
-<div class="mx-auto shadow-2xl border rounded-xl bg-base-100 my-5">
-	<table class="table w-full">
-		<caption class="text-lg font-bold mb-2">List of Ongoing Complaints</caption>
-		<thead>
-			<tr>
-				<th />
-				<th class="text-lg">Name</th>
-				<th class="text-lg">Complaint</th>
-				<th />
-				<th />
-			</tr>
-		</thead>
-		<tbody>
-			{#if resultCount === 0}
+<div class="mx-auto shadow-2xl border rounded-xl bg-base-100 my-5 hidden md:block">
+	<div class="overflow-auto">
+		<table class="table w-full">
+			<caption class="text-lg font-bold mb-2">List of Ongoing Complaints</caption>
+			<thead>
 				<tr>
-					<td colspan="5" class="text-center py-4"> No Current Ongoing Complaints </td>
+					<th />
+					<th class="text-lg">Name</th>
+					<th class="text-lg">Complaint</th>
+					<th />
+					<th />
 				</tr>
-			{:else}
-				{#each listOfOngoingComplaints as ongoingComplaints, i}
-					<tr class="hover">
-						<td>{i + 1}</td>
-						<td>{ongoingComplaints.complaintantName}</td>
-						<td>{ongoingComplaints.complaintContent.substring(0, 30) + '...'}</td>
-						<td
-							class=" font-bold {ongoingComplaints.priority === 'Low'
-								? 'text-green-500'
-								: ongoingComplaints.priority === 'Medium'
-								? 'text-orange-300'
-								: 'text-red-500'}">{ongoingComplaints.priority}</td
-						>
-						<td
-							><a
-								href="/admin/complaint/respond/{ongoingComplaints.convoID}"
-								class="btn btn-primary">Goto Convo</a
-							></td
-						>
+			</thead>
+			<tbody>
+				{#if resultCount === 0}
+					<tr>
+						<td colspan="5" class="text-center py-4"> No Current Ongoing Complaints </td>
 					</tr>
-				{/each}
+				{:else}
+					{#each listOfOngoingComplaints as ongoingComplaints, i}
+						<tr class="hover">
+							<td>{i + 1}</td>
+							<td>{ongoingComplaints.complaintantName}</td>
+							<td>{ongoingComplaints.complaintContent.substring(0, 30) + '...'}</td>
+							<td
+								class=" font-bold {ongoingComplaints.priority === 'Low'
+									? 'text-green-500'
+									: ongoingComplaints.priority === 'Medium'
+									? 'text-orange-300'
+									: 'text-red-500'}">{ongoingComplaints.priority}</td
+							>
+							<td
+								><a
+									href="/admin/complaint/respond/{ongoingComplaints.convoID}"
+									class="btn btn-primary">Goto Convo</a
+								></td
+							>
+						</tr>
+					{/each}
+				{/if}
+			</tbody>
+		</table>
+	</div>
+</div>
+<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">
+	<h1 class="text-xl font-bold">List of Ongoing Complaints</h1>
+	{#if resultCount === 0}
+		<div>
+			<span class="text-center py-4"> No Current Ongoing Complaints </span>
+		</div>
+	{:else}
+		{#each listOfOngoingComplaints as ongoingComplaints}
+			{#if ongoingComplaints.complaintantID !== $userStore?.uid}
+				<div class="card w-[105%] bg-base-100 shadow-xl">
+					<div class="card-body">
+						<h2 class="card-title mb-2">
+							{ongoingComplaints.complaintantName}
+						</h2>
+						<!-- <div>
+							<span class="my-1 font-bold">Email: </span>
+							{ongoingComplaints.email}
+						</div> -->
+						<div>
+							<span class="my-1 font-bold">Complaint: </span>
+							{ongoingComplaints.complaintContent.substring(0, 30) + '...'}
+						</div>
+						<!-- <div>
+					<span class="my-1 font-bold">Date Inquired:</span>
+					{inquiry.dateCreated
+						.toDate()
+						.toLocaleDateString('en-us', { year: 'numeric', month: 'long', day: 'numeric' }) +
+						' at ' +
+						inquiry.dateCreated
+							.toDate()
+							.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}
+				</div> -->
+						<div class="card-actions justify-end">
+							<a class="btn btn-primary" href={'/admin/complaint/respond/' + ongoingComplaints.convoID}
+								>View Complaint</a
+							>
+						</div>
+					</div>
+				</div>
 			{/if}
-		</tbody>
-	</table>
+		{/each}
+	{/if}
 </div>
