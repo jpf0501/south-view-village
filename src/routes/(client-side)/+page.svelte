@@ -92,7 +92,6 @@
 				led with approachable and hardworking people that keep the subdivision in order and
 				residents of Southview Homes 3 tightly-knit together.
 			</p>
-			<a href="/committee" class="btn btn-primary mt-3">Learn More</a>
 		</div>
 	</div>
 </div>
