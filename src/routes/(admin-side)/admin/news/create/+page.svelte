@@ -1,6 +1,7 @@
 <script>
 	import { db } from '$lib/firebase/client';
 	import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+	import { getStorage, ref, getDownloadURL, uploadBytes } from 'firebase/storage';
 	import { goto } from '$app/navigation';
 	import { getNextDate } from '$lib/dateUtils.js';
 	import toast from 'svelte-french-toast';
@@ -9,14 +10,20 @@
 	let formattedDateMin;
 
 	const { formattedDate: calculatedFormattedDate } = getNextDate(today);
-    formattedDateMin = calculatedFormattedDate;
+	formattedDateMin = calculatedFormattedDate;
+
+	const storage = getStorage();
 
 	let news = {
 		title: '',
 		content: '',
+		imageURL: '',
 		expiration: ''
 	};
 	let errors = {};
+	let newImageFile = null;
+	let previewImage = '';
+	let hideImageLabel = false;
 
 	async function submitHandler() {
 		const isValid = await checkInput();
@@ -25,6 +32,28 @@
 			return;
 		}
 		createNews();
+	}
+
+	function handleImageChange(event) {
+		hideImageLabel = true;
+		const file = event.target.files[0];
+		if (file) {
+			newImageFile = file;
+
+			// Read the selected image file and create a URL for preview
+			const reader = new FileReader();
+			reader.onload = (e) => {
+				previewImage = e.target.result;
+			};
+			reader.readAsDataURL(file);
+		}
+	}
+
+	function openImageInput() {
+		const input = document.getElementById('imageInput');
+		if (input) {
+			input.click();
+		}
 	}
 
 	async function checkInput() {
@@ -44,12 +73,26 @@
 	}
 
 	async function createNews() {
+		const uniqueID = generateUniqueId();
+		// console.log(uniqueId);
+		if (newImageFile) {
+			const storageRef = ref(storage, `images/news/${uniqueID}`);
+			const uploadTask = uploadBytes(storageRef, newImageFile);
+
+			const snapshot = await uploadTask;
+			const downloadURL = await getDownloadURL(snapshot.ref);
+
+			// Update the committee with the new image URL
+			news.imageURL = downloadURL;
+		}
 		try {
 			await addDoc(collection(db, 'news'), {
 				title: news.title.trim().toLowerCase(),
 				titleDisplay: news.title.trim(),
 				content: news.content.trim(),
 				expiration: news.expiration,
+				imageURL: news.imageURL,
+				imageURLID: uniqueID,
 				dateCreated: serverTimestamp(),
 				dateModified: serverTimestamp()
 			});
@@ -61,6 +104,12 @@
 		}
 	}
 
+	function generateUniqueId() {
+		const timestamp = Date.now().toString(36); // Convert current timestamp to base 36
+		const randomString = Math.random().toString(36).substring(2, 8); // Generate a random string and extract a substring
+
+		return `${timestamp}-${randomString}`;
+	}
 </script>
 
 <svelte:head>
@@ -91,6 +140,55 @@
 						min={formattedDateMin}
 						bind:value={news.expiration}
 					/>
+				</div>
+			</div>
+			<div class="my-6">
+				<div class="mb-4">
+					<label for="">Image</label>
+				</div>
+				<div>
+					{#if previewImage}
+						<div class="mb-3">
+							<img
+								class="border border-black rounded-md w-64 h-48 object-cover"
+								src={previewImage}
+								alt="Selected_Photo"
+							/>
+						</div>
+					{/if}
+					{#if hideImageLabel === false}
+						<button class="btn btn-primary" type="button" on:click={openImageInput}
+							>Add Image</button
+						>
+						<input
+							type="file"
+							accept="image/*"
+							class="hidden"
+							id="imageInput"
+							on:change={handleImageChange}
+						/>
+					{:else if hideImageLabel === true}
+						<div class="flex flex-row gap-3">
+							<button class="btn btn-primary" type="button" on:click={openImageInput}
+								>Change Image</button
+							>
+							<input
+								type="file"
+								accept="image/*"
+								class="hidden"
+								id="imageInput"
+								on:change={handleImageChange}
+							/>
+							<button
+								class="btn btn-error text-white"
+								type="button"
+								on:click={() => {
+									hideImageLabel = false;
+									previewImage = '';
+								}}>Cancel</button
+							>
+						</div>
+					{/if}
 				</div>
 			</div>
 			<div class="mt-6">

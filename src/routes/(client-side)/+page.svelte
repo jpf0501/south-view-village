@@ -2,7 +2,7 @@
 	import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import Committee from './Committee.svelte';
-	import PreviousOfficers from '../(admin-side)/admin/committee/PreviousOfficers.svelte';
+	// import PreviousOfficers from '../(admin-side)/admin/committee/PreviousOfficers.svelte';
 	import toast from 'svelte-french-toast';
 
 	let inquiry = {
@@ -239,9 +239,9 @@
 <div>
 	<Committee/>
 </div>
-<div>
+<!-- <div>
 	<PreviousOfficers />
-</div>
+</div> -->
 
 <!-- inquiry -->
 <div class="px-5 py-8">
