@@ -176,10 +176,12 @@
 			eventType: bookData.eventType.trim().toLowerCase(),
 			eventTypeDisplay: bookData.eventType,
 			bookDate: new Date(bookData.date + ' ' + bookData.time),
-			endTime: bookData.endTime,
+			endTime: new Date(bookData.date + ' ' + bookData.endTime),
 			dateReserved: bookData.dateReserved,
 			dateReviewed: bookData.dateReserved,
-			isRescheduled: false
+			isRescheduled: false,
+			approvedBy: '',
+			isReviewed: false,
 		};
 
 		try {

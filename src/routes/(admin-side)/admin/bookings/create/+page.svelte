@@ -109,10 +109,12 @@
 				eventType: guest.eventType.trim().toLowerCase(),
 				eventTypeDisplay: guest.eventType,
 				bookDate: new Date(guest.date + ' ' + guest.time),
-				endTime: guest.endTime,
+				endTime: new Date(guest.date + ' ' + guest.endTime),
 				dateReserved: guest.dateReserved,
 				dateReviewed: guest.dateReserved,
-				isRescheduled: false
+				isRescheduled: false,
+				approvedBy: '',
+				isReviewed: false,
 			});
 			toast.success('Reservation entry saved!');
 			await goto('/admin/bookings');
