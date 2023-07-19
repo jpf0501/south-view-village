@@ -2,12 +2,16 @@
 	import { db } from '$lib/firebase/client';
 	import { getDoc, updateDoc, doc } from 'firebase/firestore';
 	import { goto } from '$app/navigation';
+	import { sendEmail } from '$lib/utils';
 	import toast from 'svelte-french-toast';
 	import Conversation from './Conversation.svelte';
 
 	/** @type {import('./$types').PageData} */
 	export let data;
 	const { convoID } = data;
+
+	const unresolvedHTML = `<p>We regret to inform you that despite our efforts, your complaint remains unresolved. We apologize for any inconvenience this may have caused and assure you that we are committed to addressing the issue promptly and finding a satisfactory resolution.</p>`
+	const resolvedHTML = `<p>We are pleased to inform you that your complaint has been resolved to your satisfaction.</p>`			
 
 	let complaint = null;
 	let getComplaintID;
@@ -31,7 +35,7 @@
 	}
 
 	async function changeStatus() {
-		console.log(newStatus);
+		// console.log(newStatus);
 		try {
 			const complaintRef = doc(db, 'complaints', getComplaintID);
 			const data = {
@@ -54,6 +58,23 @@
 			console.log(error);
 			// toast.error('Error in marking complaint as resolved!');
 		}
+		let resultHTML
+		if(newStatus === "Resolved"){
+			resultHTML = resolvedHTML
+		} else if(newStatus === "Unresolved"){
+			resultHTML = unresolvedHTML
+		}
+		await sendEmail({
+			to: complaint.email,
+			subject: 'Southview Homes 3 Complaint',
+			html: `<center><h1><img src="https://ssv.vercel.app/logo.png"> Southview Homes 3</h1>
+				<p style="font-size:12px">SVH3 San Vicente Road, Brgy., San Vicente, San Pedro, Laguna</p><br/>
+				</center>
+				<p>Dear ${complaint.firstnameDisplay} ${complaint.lastnameDisplay},</p>
+				<p>${resultHTML}</p>
+				<p>Best regards,</p>
+				<p>Soutview Homes 3</p>`
+		});
 		goto('/admin/complaint');
 	}
 	getComplaints();
