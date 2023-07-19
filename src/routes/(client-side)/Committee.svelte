@@ -1,11 +1,14 @@
 <script>
 	import { getCurrentCommittees } from '$lib/getCommittee.js';
+	import { db } from '$lib/firebase/client';
+	import { getDoc, doc } from 'firebase/firestore';
 	// import { getStorage, ref, getDownloadURL } from 'firebase/storage';
 
 	// const storage = getStorage();
 	// const storageRef = ref(storage, 'images/committees/president.jpg');
 
 	// let imageUrl;
+	let images;
 
 	let president = [];
 	let vicePresident = [];
@@ -37,6 +40,13 @@
 		// console.log(imageUrl)
 	}
 
+	async function loadGroupPictures() {
+		const snapshot = await getDoc(doc(db, 'images', 'xKD5MysuEl9E0n2ap5Pe'));
+		images = snapshot.data();
+		console.log(images);
+	}
+
+	loadGroupPictures();
 	loadCommittees();
 </script>
 
@@ -45,27 +55,37 @@
 </svelte:head>
 
 <div class="mx-auto">
-	
 	<h1 class="font-bold text-3xl pt-14 px-8 pb-5">Home Owners Association</h1>
 </div>
 
 <!-- head -->
 <div class="flex flex-col items-center m-5">
 	<div class="flex flex-col md:flex-row">
-		<div class="m-3">
+		{#each images?.groupPictureURL || [] as url, index}
+			{#if url !== ''}
+				<div class="m-3">
+					<img
+						src={url}
+						alt="Southview Homes 3 Home Owners Association"
+						class="rounded-lg md:scale-90 shadow-2xl"
+					/>
+				</div>
+			{/if}
+		{/each}
+		<!-- <div class="m-3">
 			<img
 				src="/images/committee/group_photo_1.jpg"
 				alt="Southview Homes 3 Home Owners Association"
 				class="rounded-lg md:scale-90 shadow-2xl"
 			/>
-		</div>
-		<div class="m-3">
+		</div> -->
+		<!-- <div class="m-3">
 			<img
 				src="/images/committee/group_photo_2.jpg"
 				alt="Southview Homes 3 Home Owners Association"
 				class="rounded-lg md:scale-90 shadow-2xl"
 			/>
-		</div>
+		</div> -->
 	</div>
 </div>
 
@@ -112,7 +132,11 @@
 			</div>
 			<div class="card w-96 bg-base-100 shadow-xl m-5">
 				<div class="card-body">
-					<img src={vicePresident[0]?.imageURL} alt="Vice President" class="mask mask-circle h-72" />
+					<img
+						src={vicePresident[0]?.imageURL}
+						alt="Vice President"
+						class="mask mask-circle h-72"
+					/>
 					<h2 class="font-bold text-center text-xl h-14 pt-6">
 						{`${vicePresident[0]?.firstnameDisplay} ${vicePresident[0]?.lastnameDisplay}`}
 					</h2>
