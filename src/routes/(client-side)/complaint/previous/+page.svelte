@@ -2,12 +2,9 @@
 	import { userStore } from '$lib/store';
 	import { query, collection, where, onSnapshot } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
-	// import { getCountSnapshot } from '$lib/utils';
 
 	let listOfOngoingComplaints = [];
 	let listOfPendingComplaints = [];
-	// let resultCountOfOngoingComplaints = 0;
-	// let resultCountOfPendingComplaints = 0;
 	let unsubscribeOngoing = () => {};
 	let unsubscribePending = () => {};
 	async function getOngoingComplaints() {
@@ -20,8 +17,6 @@
 		unsubscribeOngoing = onSnapshot(ongoingComplaintsQuery, (querySnapshot) => {
 			listOfOngoingComplaints = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 		});
-		// resultCountOfOngoingComplaints = await getCountSnapshot(ongoingComplaintsQuery);
-		// console.log(resultCountOfOngoingComplaints)
 	}
 	async function getPendingComplaints() {
 		const pendingComplaintsQuery = query(
@@ -33,15 +28,13 @@
 		unsubscribePending = onSnapshot(pendingComplaintsQuery, (querySnapshot) => {
 			listOfPendingComplaints = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 		});
-		// resultCountOfPendingComplaints = await getCountSnapshot(pendingComplaintsQuery);
-		// console.log(resultCountOfPendingComplaints)
 	}
 
 	getPendingComplaints();
 	getOngoingComplaints();
 </script>
 <div class="flex flex-row justify-end">
-    <a href="/complaint/create" class="btn btn-primary m-2 mx-2">New Complaint</a>
+    <a href="/complaint" class="btn btn-primary mt-2 mx-2">Go Back</a>
 </div>
 <div class="w-full max-w-4xl p-6 mx-auto shadow-2xl border rounded-xl bg-base-100">
   
@@ -71,7 +64,7 @@
 </div>
 
 
-<div class="w-full max-w-4xl p-6 mx-auto shadow-2xl border rounded-xl bg-base-100 mt-5">
+<div class="w-full max-w-4xl p-6 mx-auto shadow-2xl border rounded-xl bg-base-100">
 	<table class="table w-full">
 		<caption class="text-lg font-bold mb-2">List of Pending Complaints</caption>
 		<thead>
