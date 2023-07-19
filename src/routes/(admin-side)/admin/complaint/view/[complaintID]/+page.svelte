@@ -1,10 +1,13 @@
 <script>
 	import { db } from '$lib/firebase/client';
 	import { getDoc, doc, setDoc, updateDoc } from 'firebase/firestore';
-	import toast from 'svelte-french-toast';
+	import { sendEmail } from '$lib/utils';
 	import { goto } from '$app/navigation';
+	import toast from 'svelte-french-toast';
 	export let data;
 	let { complaintID } = data;
+
+	const emailResponse = `We are delighted to inform you that we are fully prepared to engage in a conversation regarding your complaint. Kindly log in to your account and navigate to the "Complaints" section to access the conversation.`;
 
 	let complaint = null;
 	let priorityLevel;
@@ -47,6 +50,18 @@
 				const updateStatusRef = doc(db, 'complaints', complaintID);
 				await updateDoc(updateStatusRef, {
 					status: 'Ongoing'
+				});
+				await sendEmail({
+					to: complaint.email,
+					subject: 'Southview Homes 3 Complaint',
+					html: `<center><h1><img src="https://ssv.vercel.app/logo.png"> Southview Homes 3</h1>
+				<p style="font-size:12px">SVH3 San Vicente Road, Brgy., San Vicente, San Pedro, Laguna</p><br/>
+				</center>
+				<p>Dear ${complaint.firstnameDisplay} ${complaint.lastnameDisplay},</p>
+				<p>${emailResponse}</p>
+			 
+				<p>Best regards,</p>
+				<p>Soutview Homes 3</p>`
 				});
 			} catch (error) {
 				console.log(error);
