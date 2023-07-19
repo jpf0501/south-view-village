@@ -62,7 +62,7 @@
 	let searchByValue = '';
 	let bookingsQuery = query(
 		collection(db, 'booking'),
-		where('status', 'in', ['Approved', 'Disapproved']),
+		where('status', 'in', ['Completed', 'Cancelled', 'Disapproved']),
 		orderBy('dateReviewed', 'desc')
 	);
 
@@ -448,7 +448,7 @@ class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden ove
 										.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}</td
 							>
 							<td>
-								{#if book.status == 'Approved'}
+								{#if book.status == 'Completed'}
 									<td class="p-3 text-sm whitespace-nowrap text-green-500 font-bold"
 										>{book.status}</td
 									>
