@@ -34,6 +34,7 @@
 		eventType: '',
 		date: '',
 		time: '',
+		endTime: '',
 		dateReserved: serverTimestamp()
 	};
 
@@ -118,6 +119,7 @@
 			contactNumber: !bookData.contactNumber,
 			eventType: !bookData.eventType,
 			time: !bookData.time,
+			endTime: !bookData.endTime,
 			date: !bookData.date,
 			invalidFirstname: !regex.test(bookData.firstname),
 			invalidLastname: !regex.test(bookData.lastname),
@@ -174,8 +176,12 @@
 			eventType: bookData.eventType.trim().toLowerCase(),
 			eventTypeDisplay: bookData.eventType,
 			bookDate: new Date(bookData.date + ' ' + bookData.time),
+			endTime: new Date(bookData.date + ' ' + bookData.endTime),
 			dateReserved: bookData.dateReserved,
-			dateReviewed: bookData.dateReserved
+			dateReviewed: bookData.dateReserved,
+			isRescheduled: false,
+			approvedBy: '',
+			isReviewed: false,
 		};
 
 		try {
@@ -394,9 +400,9 @@
 						/>
 					</div>
 					<div class="form-control">
-						<span class="label-text">Time</span>
+						<span class="label-text">Start Time</span>
 						{#if errors.time}
-							<p class="text-red-500 text-sm italic mb-1">Time is required</p>
+							<p class="text-red-500 text-sm italic mb-1">Start time is required</p>
 						{/if}
 						<input
 							type="time"
@@ -404,6 +410,19 @@
 							max="19:00"
 							class="input input-bordered p-3 mt-2"
 							bind:value={bookData.time}
+						/>
+					</div>
+					<div class="form-control">
+						<span class="label-text">End Time</span>
+						{#if errors.endTime}
+							<p class="text-red-500 text-sm italic mb-1">End time is required</p>
+						{/if}
+						<input
+							type="time"
+							min="8:00"
+							max="19:00"
+							class="input input-bordered p-3 mt-2"
+							bind:value={bookData.endTime}
 						/>
 					</div>
 				</div>

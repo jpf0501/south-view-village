@@ -14,6 +14,7 @@
 		addressBlock: '',
 		addressLot: '',
 		addressStreet: '',
+		middlename: '',
 		contactNumber: '',
 		paymentHead: '',
 		status: 'Pending'
@@ -25,6 +26,7 @@
 	let OTP = '';
 	let showOTP = false;
 	let userOTP = '';
+	let middleInitial = false;
 
 	const digits = '0123456789';
 
@@ -56,6 +58,7 @@
 		// must have at least 1 letter
 		const firstnameRegex = account.firstname.length > 0 && /[a-zA-Z]/.test(account.firstname);
 		const lastnameRegex = account.lastname.length > 0 && /[a-zA-Z]/.test(account.lastname);
+		const middlenameRegex = account.middlename.length > 0 && /[a-zA-Z -\u00f1\u00d1]/.test(account.middlename);
 		// must ba an email
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 		const accountsQuery = query(collection(db, 'accounts'), where('email', '==', account.email));
@@ -71,12 +74,15 @@
 			addressLot: !account.addressLot,
 			addressStreet: !account.addressStreet,
 			contactNumber: !account.contactNumber,
+			middlename: middleInitial ? !account.middlename == ' ' : !account.middlename,
 			emailIsUsed: accountsSnapshot.docs.length > 0,
 			invalidEmail: !emailRegex.test(account.email),
 			invalidFirstnameRequired: !firstnameRegex,
 			invalidLastnameRequired: !lastnameRegex,
+			invalidMiddlenameRequired: middleInitial ? !account.middlename == ' ' : !middlenameRegex,
 			invalidFirstname: !regex.test(account.firstname),
 			invalidLastname: !regex.test(account.lastname),
+			invalidMiddlename: !regex.test(account.middlename),
 			passwordKulang: account.password.length < 6,
 			passwordNotMatch: account.password !== account.passwordcheck,
 			paymentHead: account.paymentHead.length === 0
@@ -118,6 +124,8 @@
 				pendingFirstNameDisplay: account.firstname.trim(),
 				pendingLastname: account.lastname.trim().toLowerCase(),
 				pendingLastNameDisplay: account.lastname.trim(),
+				pendingMiddlename: middleInitial ? ' ' : account.middlename.trim().toLowerCase(),
+				pendingMiddleNameDisplay: middleInitial ? ' ' : account.middlename.trim() ,
 				pendingAddressBlock: account.addressBlock,
 				pendingAddressLot: account.addressLot,
 				pendingAddressStreet: account.addressStreet,
@@ -186,7 +194,26 @@
 					<h1 class="text-2xl">Create Account</h1>
 				</div>
 				<form on:submit|preventDefault={submitHandler}>
-					<div class="grid grid-cols-2 gap-6 mt-6 md:grid-cols-2">
+					<div class="grid grid-cols-3 gap-6 mt-6 md:grid-cols-3">
+						<div class="form-control">
+							<label for="lname" class="label">
+								<span class="label-text">Last Name</span>
+							</label>
+							{#if errors.lastname}
+								<p class="text-red-500 text-sm italic mb-1">Last Name is required</p>
+							{:else if errors.invalidLastname}
+								<p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
+							{:else if errors.invalidLastnameRequired}
+								<p class="text-red-500 text-sm italic mb-1">Lastname must have a letter</p>
+							{/if}
+							<input
+								type="text"
+								placeholder="Dela Cruz"
+								name="lname"
+								class="input input-bordered"
+								bind:value={account.lastname}
+							/>
+						</div>
 						<div class="form-control">
 							<label for="fname" class="label">
 								<span class="label-text">First Name</span>
@@ -207,23 +234,38 @@
 							/>
 						</div>
 						<div class="form-control">
-							<label for="lname" class="label">
-								<span class="label-text">Last Name</span>
+							<label for="mname" class="label">
+								<span class="label-text">Middle Name</span>
 							</label>
-							{#if errors.lastname}
-								<p class="text-red-500 text-sm italic mb-1">Last Name is required</p>
-							{:else if errors.invalidLastname}
+							{#if errors.middlename}
+								<p class="text-red-500 text-sm italic mb-1">Middle Name is required</p>
+							{:else if errors.invalidMiddlename}
 								<p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
-							{:else if errors.invalidLastnameRequired}
-								<p class="text-red-500 text-sm italic mb-1">Lastname must have a letter</p>
+							{:else if errors.invalidMiddlenameRequired}
+								<p class="text-red-500 text-sm italic mb-1">Middle name must have a letter</p>
 							{/if}
+							{#if middleInitial == false}
 							<input
 								type="text"
-								placeholder="Dela Cruz"
+								placeholder="Santos"
 								name="lname"
 								class="input input-bordered"
-								bind:value={account.lastname}
+								bind:value={account.middlename}
 							/>
+							{:else}
+							<input
+								type="text"
+								placeholder="Santos"
+								name="lname"
+								class="input input-bordered"
+								disabled
+							/>
+							{/if}
+							
+							<div class="flex items-center mt-5">
+								<input id="checkbox" bind:checked={middleInitial} type="checkbox" class="checkbox checkbox-primary">
+								<label for="checkbox" class="ml-2 text-sm font-medium">No middle name</label>
+							</div>
 						</div>
 					</div>
 					<div class="grid grid-cols-2 gap-6 mt-4 md:grid-cols-5">

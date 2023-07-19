@@ -113,7 +113,7 @@
 					{#each listOfUsers as user, i}
 						<tr class="hover">
 							<td>{i + 1}</td>
-							<td>{user.firstNameDisplay + ' ' + user.lastNameDisplay}</td>
+							<td>{user.firstNameDisplay + ' ' + user.middleNameDisplay + ' ' + user.lastNameDisplay}</td>
 							<td
 								>{'Block ' +
 									user.addressBlock +
@@ -154,7 +154,7 @@
 		{#each listOfUsers as user}
 			<div class="card w-[105%] bg-base-100 shadow-xl">
 				<div class="card-body">
-					<h2 class="card-title mb-2">{user.firstNameDisplay + ' ' + user.lastNameDisplay}</h2>
+					<h2 class="card-title mb-2">{user.firstNameDisplay + ' ' + user.middleNameDisplay + ' ' + user.lastNameDisplay}</h2>
 					<div>
 						<span class="my-1 font-bold">Role:</span>
 						{user.role}

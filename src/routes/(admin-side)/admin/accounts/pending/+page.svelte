@@ -61,6 +61,8 @@
 		firstnameDisplay,
 		lastname,
 		lastnameDisplay,
+		middlename,
+		middleNameDisplay,
 		contactNumber,
 		block,
 		lot,
@@ -75,6 +77,8 @@
 			firstnameDisplay,
 			lastname,
 			lastnameDisplay,
+			middlename,
+			middleNameDisplay,
 			contactNumber,
 			block,
 			lot,
@@ -92,6 +96,8 @@
 		firstnameDisplay,
 		lastname,
 		lastnameDisplay,
+		middlename,
+		middleNameDisplay,
 		contactNumber,
 		block,
 		lot,
@@ -115,6 +121,8 @@
 						firstNameDisplay: firstnameDisplay,
 						lastname: lastname,
 						lastNameDisplay: lastnameDisplay,
+						middlename: middlename,
+						middleNameDisplay: middleNameDisplay,
 						addressBlock: block,
 						addressLot: lot,
 						addressStreet: street,
@@ -263,7 +271,7 @@
 					{#each listOfUsers as user, i}
 						<tr class="hover">
 							<td>{i + 1}</td>
-							<td>{user.pendingFirstNameDisplay + ' ' + user.pendingLastNameDisplay}</td>
+							<td>{user.pendingFirstNameDisplay + ' ' + user.pendingMiddleNameDisplay + ' ' + user.pendingLastNameDisplay}</td>
 							<td
 								>{'Block ' +
 									user.pendingAddressBlock +
@@ -290,11 +298,14 @@
 										user.pendingFirstNameDisplay,
 										user.pendingLastname,
 										user.pendingLastNameDisplay,
+										user.pendingMiddlename,
+										user.pendingMiddleNameDisplay,
 										user.pendingContactNumber,
 										user.pendingAddressBlock,
 										user.pendingAddressLot,
 										user.pendingAddressStreet,
-										user.pendingPaymentHead
+										user.pendingPaymentHead,
+										
 									)}
 								>
 									<button
@@ -322,7 +333,7 @@
 			<div class="card w-[105%] bg-base-100 shadow-xl">
 				<div class="card-body">
 					<h2 class="card-title mb-2">
-						{user.pendingFirstNameDisplay + ' ' + user.pendingLastNameDisplay}
+						{user.pendingFirstNameDisplay + ' ' + user.pendingMiddleNameDisplay + ' ' + user.pendingLastNameDisplay}
 					</h2>
 					<div>
 						<span class="my-1 font-bold">Address:</span>
@@ -356,11 +367,13 @@
 								user.pendingFirstNameDisplay,
 								user.pendingLastname,
 								user.pendingLastNameDisplay,
+								user.pendingMiddlename,
+								user.pendingMiddleNameDisplay,
 								user.pendingContactNumber,
 								user.pendingAddressBlock,
 								user.pendingAddressLot,
 								user.pendingAddressStreet,
-								user.pendingPaymentHead
+								user.pendingPaymentHead,
 							)}
 							class="py-3"
 						>
