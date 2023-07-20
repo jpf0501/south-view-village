@@ -116,6 +116,7 @@
 				approvedBy: '',
 				isReviewed: false,
 			});
+			console.log(new Date(guest.date + ' ' + guest.endTime))
 			toast.success('Reservation entry saved!');
 			await goto('/admin/bookings');
 		} catch (error) {

@@ -452,9 +452,7 @@ class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden ove
 								})}</td>
 							<td>{book.bookDate
 								.toDate()
-								.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })} - {book.endTime
-								.toDate()
-								.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}</td>
+								.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })} - {book.endTime.toDate().toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'})}</td>
 							<!-- <td
 									>{book.dateReserved.toDate().toLocaleDateString('en-us', {
 										year: 'numeric',

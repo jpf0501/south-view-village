@@ -13,6 +13,7 @@
 	let searchByValue = '';
 	let resultCount = 0;
 
+
 	let complaintQuery = query(
 		collection(db, 'complaints'),
 		where('status', '==', 'Pending'),
@@ -122,7 +123,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					{#if resultCount === 0}
+					{#if resultCounts === 0}
 						<tr>
 							<td colspan="5" class="text-center py-4"> No Current Complaints </td>
 						</tr>
@@ -194,5 +195,8 @@
 	</div>
 	<div>
 		<OngoingComplaints/>
+	</div>
+	<div>
+		<OngoingComplaints />
 	</div>
 </div>
