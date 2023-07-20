@@ -58,11 +58,11 @@
 			const storageRef = ref(storage, `images/news/${news.imageURLID}`);
 			const uploadTask = uploadBytes(storageRef, newImageFile);
 
-			// const snapshot = await uploadTask;
-			// const downloadURL = await getDownloadURL(snapshot.ref);
+			const snapshot = await uploadTask;
+			const downloadURL = await getDownloadURL(snapshot.ref);
 
 			// Update the committee with the new image URL
-			// committee.imageURL = downloadURL;
+			news.imageURL = downloadURL;
 		}
 
 		try {
@@ -153,11 +153,13 @@
 					<div class="mb-3">
 						<div class="flex flex-row justify-between">
 							<div class="mb-3">
+								{#if news.imageURL !== ""}
 								<img
 									class="border border-black rounded-md w-64 h-48 object-cover"
 									src={news.imageURL}
 									alt="Selected_Photo"
 								/>
+								{/if}
 							</div>
 							{#if previewImage}
 								<div class="mb-3">
