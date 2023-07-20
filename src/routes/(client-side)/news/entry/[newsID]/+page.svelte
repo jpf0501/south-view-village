@@ -84,13 +84,13 @@
 					</p>
 				</div>
 				<div class="divider" />
-				<div class="flex flex-col justify-between gap-3 md:flex-row overflow-x-auto">
+				<div class="flex flex-col justify-between gap-10 md:flex-row overflow-x-auto">
 					<article class="max-w-7xl text-justify" style="white-space:pre-wrap">
 						<p class="pt-8">{news.content}</p>
 					</article>
 					{#if news.imageURL !== ''}
 						<div>
-							<img src={news.imageURL} alt="news_image" class="max-h-96 max-w-xl" />
+							<img src={news.imageURL} alt="news_image" class="max-h-96 max-w-md" />
 						</div>
 					{/if}
 				</div>
