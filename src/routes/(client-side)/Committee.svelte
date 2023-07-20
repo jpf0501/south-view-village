@@ -43,7 +43,7 @@
 	async function loadGroupPictures() {
 		const snapshot = await getDoc(doc(db, 'images', 'xKD5MysuEl9E0n2ap5Pe'));
 		images = snapshot.data();
-		console.log(images);
+		
 	}
 
 	loadGroupPictures();

@@ -13,7 +13,6 @@
 	let searchByValue = '';
 	let resultCount = 0;
 
-
 	let complaintQuery = query(
 		collection(db, 'complaints'),
 		where('status', '==', 'Pending'),
@@ -123,9 +122,9 @@
 					</tr>
 				</thead>
 				<tbody>
-					{#if resultCounts === 0}
+					{#if resultCount === 0}
 						<tr>
-							<td colspan="5" class="text-center py-4"> No Current Complaints </td>
+							<td colspan="5" class="text-center py-4"> No Current Pending Complaints </td>
 						</tr>
 					{:else}
 						{#each listOfComplaints as complaint, i}
@@ -153,26 +152,26 @@
 	<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">
 		<h1 class="text-xl font-bold">List of Pending Complaints</h1>
 		{#if resultCount === 0}
-		<div>
-			<span class="text-center py-4"> No Current Ongoing Complaints </span>
-		</div>
-	{:else}
-		{#each listOfComplaints as complaint}
-			{#if complaint.complaintantID !== $userStore?.uid}
-				<div class="card w-[105%] bg-base-100 shadow-xl">
-					<div class="card-body">
-						<h2 class="card-title mb-2">
-							{complaint.firstnameDisplay + ' ' + complaint.lastnameDisplay}
-						</h2>
-						<div>
-							<span class="my-1 font-bold">Email: </span>
-							{complaint.email}
-						</div>
-						<div>
-							<span class="my-1 font-bold">Complaint: </span>
-							{complaint.complaint.substring(0, 30) + '...'}
-						</div>
-						<!-- <div>
+			<div>
+				<span class="text-center py-4"> No Current Pending Complaints </span>
+			</div>
+		{:else}
+			{#each listOfComplaints as complaint}
+				{#if complaint.complaintantID !== $userStore?.uid}
+					<div class="card w-[105%] bg-base-100 shadow-xl">
+						<div class="card-body">
+							<h2 class="card-title mb-2">
+								{complaint.firstnameDisplay + ' ' + complaint.lastnameDisplay}
+							</h2>
+							<div>
+								<span class="my-1 font-bold">Email: </span>
+								{complaint.email}
+							</div>
+							<div>
+								<span class="my-1 font-bold">Complaint: </span>
+								{complaint.complaint.substring(0, 30) + '...'}
+							</div>
+							<!-- <div>
 						<span class="my-1 font-bold">Date Inquired:</span>
 						{inquiry.dateCreated
 							.toDate()
@@ -182,19 +181,16 @@
 								.toDate()
 								.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}
 					</div> -->
-						<div class="card-actions justify-end">
-							<a class="btn btn-primary" href={'/admin/complaint/view/' + complaint.id}
-								>View Complaint</a
-							>
+							<div class="card-actions justify-end">
+								<a class="btn btn-primary" href={'/admin/complaint/view/' + complaint.id}
+									>View Complaint</a
+								>
+							</div>
 						</div>
 					</div>
-				</div>
-			{/if}
-		{/each}
+				{/if}
+			{/each}
 		{/if}
-	</div>
-	<div>
-		<OngoingComplaints/>
 	</div>
 	<div>
 		<OngoingComplaints />
