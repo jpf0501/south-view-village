@@ -274,8 +274,9 @@ class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden ove
 	</div>
 	<div class="flex flex-col px-6 gap-2 py-4">
 		{#if bookingDetail.status == 'Pending'}
-		<button class="btn btn-success text-white"
-			on:click={bookStatFunc(bookingDetailId,
+			{#if bookingDetail.paymentStatus == 'Paid'}
+			<button class="btn btn-success text-white"
+				on:click={bookStatFunc(bookingDetailId,
 				bookingDetail.firstNameDisplay,
 				bookingDetail.lastNameDisplay,
 				bookingDetail.email,
@@ -283,7 +284,14 @@ class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden ove
 				bookingDetail.eventTypeDisplay, 
 				'Approved')}
 			>Approve</button
+			>
+			{:else if bookingDetail.paymentStatus == 'Unpaid'}
+			<button class="btn btn-success text-white"
+			disabled
+			>Approve</button
 		>
+			{/if}
+		
 		<button class="btn btn-error text-white" on:click={bookStatFunc(bookingDetailId,
 			bookingDetail.firstNameDisplay,
 			bookingDetail.lastNameDisplay,
