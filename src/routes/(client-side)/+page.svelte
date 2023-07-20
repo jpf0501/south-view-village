@@ -2,7 +2,7 @@
 	import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import Committee from './Committee.svelte';
-	import PreviousOfficers from '../(admin-side)/admin/committee/PreviousOfficers.svelte';
+	// import PreviousOfficers from '../(admin-side)/admin/committee/PreviousOfficers.svelte';
 	import toast from 'svelte-french-toast';
 
 	let inquiry = {
@@ -92,7 +92,6 @@
 				led with approachable and hardworking people that keep the subdivision in order and
 				residents of Southview Homes 3 tightly-knit together.
 			</p>
-			<a href="/committee" class="btn btn-primary mt-3">Learn More</a>
 		</div>
 	</div>
 </div>
@@ -239,9 +238,9 @@
 <div>
 	<Committee/>
 </div>
-<div>
+<!-- <div>
 	<PreviousOfficers />
-</div>
+</div> -->
 
 <!-- inquiry -->
 <div class="px-5 py-8">

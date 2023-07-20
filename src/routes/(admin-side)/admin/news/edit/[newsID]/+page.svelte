@@ -1,6 +1,7 @@
 <script>
 	import { db } from '$lib/firebase/client';
 	import { getDoc, updateDoc, deleteDoc, doc, serverTimestamp } from 'firebase/firestore';
+	import { getStorage, ref, getDownloadURL, uploadBytes } from 'firebase/storage';
 	import { goto } from '$app/navigation';
 	import { getNextDate } from '$lib/dateUtils.js';
 	import toast from 'svelte-french-toast';
@@ -9,14 +10,19 @@
 	export let data;
 	const { newsID } = data;
 
+	const storage = getStorage();
+
 	let news = null;
+	let newImageFile = null;
+	let previewImage = '';
+	let hideImageLabel = false;
 	let errors = {};
 
 	let today = new Date();
 	let formattedDateMin;
 
 	const { formattedDate: calculatedFormattedDate } = getNextDate(today);
-    formattedDateMin = calculatedFormattedDate;
+	formattedDateMin = calculatedFormattedDate;
 
 	async function getNews() {
 		const snapshot = await getDoc(doc(db, 'news', newsID));
@@ -47,6 +53,18 @@
 			return;
 		}
 		news.title = news.titleDisplay.toLowerCase();
+
+		if (newImageFile) {
+			const storageRef = ref(storage, `images/news/${news.imageURLID}`);
+			const uploadTask = uploadBytes(storageRef, newImageFile);
+
+			// const snapshot = await uploadTask;
+			// const downloadURL = await getDownloadURL(snapshot.ref);
+
+			// Update the committee with the new image URL
+			// committee.imageURL = downloadURL;
+		}
+
 		try {
 			news.dateModified = serverTimestamp();
 			await updateDoc(doc(db, 'news', newsID), news);
@@ -69,6 +87,28 @@
 		}
 	}
 
+	function handleImageChange(event) {
+		hideImageLabel = true;
+		const file = event.target.files[0];
+		if (file) {
+			newImageFile = file;
+
+			// Read the selected image file and create a URL for preview
+			const reader = new FileReader();
+			reader.onload = (e) => {
+				previewImage = e.target.result;
+			};
+			reader.readAsDataURL(file);
+		}
+	}
+
+	function openImageInput() {
+		const input = document.getElementById('imageInput');
+		if (input) {
+			input.click();
+		}
+	}
+
 	getNews();
 </script>
 
@@ -84,26 +124,85 @@
 				<div class="form-control flex flex-row justify-between gap-10">
 					<div class="flex flex-col w-full">
 						<span class="pb-3">News Title</span>
-					{#if errors.title}
-						<p class="text-red-500 text-sm italic mb-1">News title is required</p>
-					{/if}
-					<input
-						type="text"
-						class="input input-bordered p-3 mt-2"
-						bind:value={news.titleDisplay}
-					/>
+						{#if errors.title}
+							<p class="text-red-500 text-sm italic mb-1">News title is required</p>
+						{/if}
+						<input
+							type="text"
+							class="input input-bordered p-3 mt-2"
+							bind:value={news.titleDisplay}
+						/>
 					</div>
 					<div class="flex flex-col">
 						<span class="pb-3">Expiration Date</span>
-					{#if errors.noExpiry}
-						<p class="text-red-500 text-sm italic mb-1">Expiration date is required</p>
-					{/if}
-					<input
-						type="date"
-						class="input input-bordered p-3 mt-2"
-						min={formattedDateMin}
-						bind:value={news.expiration}
-					/>
+						{#if errors.noExpiry}
+							<p class="text-red-500 text-sm italic mb-1">Expiration date is required</p>
+						{/if}
+						<input
+							type="date"
+							class="input input-bordered p-3 mt-2"
+							min={formattedDateMin}
+							bind:value={news.expiration}
+						/>
+					</div>
+				</div>
+				<div class="mt-6">
+					<div class="mb-4">
+						<label for="">Image</label>
+					</div>
+					<div class="mb-3">
+						<div class="flex flex-row justify-between">
+							<div class="mb-3">
+								<img
+									class="border border-black rounded-md w-64 h-48 object-cover"
+									src={news.imageURL}
+									alt="Selected_Photo"
+								/>
+							</div>
+							{#if previewImage}
+								<div class="mb-3">
+									<label for="">New Picture:</label>
+									<img
+										class="border border-black rounded-md w-64 h-48 object-cover"
+										src={previewImage}
+										alt="Selected_Photo"
+									/>
+								</div>
+							{/if}
+						</div>
+						{#if hideImageLabel === false}
+							<button class="btn btn-primary" type="button" on:click={openImageInput}
+								>Edit Image</button
+							>
+							<input
+								type="file"
+								accept="image/*"
+								class="hidden"
+								id="imageInput"
+								on:change={handleImageChange}
+							/>
+						{:else if hideImageLabel === true}
+							<div class="flex flex-row gap-3">
+								<button class="btn btn-primary" type="button" on:click={openImageInput}
+									>Change Image</button
+								>
+								<input
+									type="file"
+									accept="image/*"
+									class="hidden"
+									id="imageInput"
+									on:change={handleImageChange}
+								/>
+								<button
+									class="btn btn-error text-white"
+									type="button"
+									on:click={() => {
+										hideImageLabel = false;
+										previewImage = '';
+									}}>Cancel</button
+								>
+							</div>
+						{/if}
 					</div>
 				</div>
 				<div class="mt-6">

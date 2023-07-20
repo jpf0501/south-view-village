@@ -1,107 +1,97 @@
 <script>
 	import { userStore } from '$lib/store';
-	import { getDoc, doc, addDoc, serverTimestamp, collection } from 'firebase/firestore';
+	import { query, collection, where, onSnapshot } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
-	import { goto } from '$app/navigation';
-	import FirstnameForm from '$lib/FormComponents/FirstnameForm.svelte';
-	import LastnameForm from '$lib/FormComponents/LastnameForm.svelte';
-	import EmailForm from '../../../lib/FormComponents/EmailForm.svelte';
-	import ContactForm from '../../../lib/FormComponents/ContactForm.svelte';
-	import toast from 'svelte-french-toast';
+	import PendingComplaintsClient from './PendingComplaintsClient.svelte';
+	// import { getCountSnapshot } from '$lib/utils';
 
-	let user = null;
-	let complaint = '';
-	let error = false;
+	let userID = $userStore.uid;
+	let listOfOngoingComplaints = [];
 
-	async function getUser() {
-		if (!$userStore) {
-			return;
-		}
-		const snapshot = await getDoc(doc(db, 'accounts', $userStore.uid));
-		user = snapshot.data();
+	// let resultCountOfOngoingComplaints = 0;
+	// let resultCountOfPendingComplaints = 0;
+	let unsubscribeOngoing = () => {};
+
+	async function getOngoingComplaints() {
+		const ongoingComplaintsQuery = query(
+			collection(db, 'conversations'),
+			where('status', '==', 'Ongoing'),
+			where('complaintantID', '==', userID)
+		);
+		unsubscribeOngoing();
+		unsubscribeOngoing = onSnapshot(ongoingComplaintsQuery, (querySnapshot) => {
+			listOfOngoingComplaints = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+		});
+		// resultCountOfOngoingComplaints = await getCountSnapshot(ongoingComplaintsQuery);
+		// console.log(resultCountOfOngoingComplaints)
 	}
 
-	async function checkInput() {
-		if (complaint.length < 10) {
-			error = true;
-			setTimeout(() => {
-				error = false;
-			}, 2000);
-			return;
-		}
-		await sendComplaint();
-		await goto('/complaint/success');
-	}
-
-	async function sendComplaint() {
-		try {
-			await addDoc(collection(db, 'complaints'), {
-				firstname: user.firstNameDisplay.toLowerCase(),
-				firstnameDisplay: user.firstNameDisplay,
-				lastname: user.lastNameDisplay.toLowerCase(),
-				lastnameDisplay: user.lastNameDisplay,
-				email: user.email,
-				contactNumber: user.contactNumber,
-				complaint: complaint.trim(),
-				dateSubmitted: serverTimestamp(),
-				dateAnswered: serverTimestamp(),
-				hadAnswered: false,
-				response: ''
-			});
-		} catch (error) {
-			console.log(error);
-			toast.error('Error in sending complaint!');
-		}
-	}
-
-	$: if ($userStore) {
-		getUser();
-	} else if ($userStore === null) {
-		goto('/');
-	}
+	getOngoingComplaints();
 </script>
 
-<svelte:head>
-	<title>Complaint Form - Official Website of Southview Homes 3 Subdivision</title>
-</svelte:head>
-
-{#if user}
-	<div class="min-h-screen hero bg-base-200 py-8">
-		<div class="w-full max-w-4xl p-6 mx-auto shadow-2xl border rounded-xl bg-base-100">
-			<div class="mt-2">
-				<h1 class="text-2xl">Complaint Form</h1>
-			</div>
-			<form on:submit={checkInput}>
-				<div class="grid grid-cols-2 gap-6 mt-6 md:grid-cols-2">
-					<FirstnameForm bind:value={user.firstNameDisplay} isDisabled={true}/>
-					<LastnameForm bind:value={user.lastNameDisplay} isDisabled={true}/>
-				</div>
-				<div class="grid grid-cols-2 gap-6 mt-6 md:grid-cols-2">
-					<EmailForm bind:value={user.email} isDisabled={true}/>
-					<ContactForm bind:value={user.contactNumber} isDisabled={true}/>
-				</div>
-				<div class="grid grid-cols-1 mt-6">
-					<div class="form-control">
-						<label for="complaint" class="label">
-							<span class="label-text">Complaint:</span>
-						</label>
-						{#if error}
-							<p class="text-red-500 text-sm italic mb-1">
-								Complaint must at least be 10 characters
-							</p>
-						{/if}
-						<textarea
-							class="textarea textarea-bordered h-32 w-full"
-							placeholder="Message"
-							style="resize: none;"
-							bind:value={complaint}
-						/>
+<div class="flex flex-row justify-end">
+	<a href="/complaint/create" class="btn btn-primary m-2 mx-2">New Complaint</a>
+</div>
+<div class="w-full max-w-4xl p-6 mx-auto shadow-2xl border rounded-xl bg-base-100">
+	<div class="overflow-auto">
+		<table class="table w-full hidden md:block">
+			<caption class="text-lg font-bold mb-2">List of Ongoing Complaints</caption>
+			<thead>
+				<tr>
+					<th />
+					<th class="text-lg">Complaint</th>
+					<th />
+				</tr>
+			</thead>
+			<tbody>
+				{#each listOfOngoingComplaints as ongoingComplaints, i}
+					<tr class="hover">
+						<td>{i + 1}.</td>
+						<td>{ongoingComplaints.complaintContent.substring(0, 30) + '...'}</td>
+						<td
+							><a
+								href="/complaint/complaintConversation/{ongoingComplaints.convoID}"
+								class="btn btn-primary">Goto Convo</a
+							></td
+						>
+					</tr>
+				{/each}
+			</tbody>
+		</table>
+	</div>
+	<div class="flex flex-col py-8 items-center justify-center mx-auto space-y-3 md:hidden">
+		<h1 class="text-xl font-bold">List of Ongoing Complaints</h1>
+		{#each listOfOngoingComplaints as ongoingComplaints}
+			<div class="card w-[105%] bg-base-100 shadow-xl">
+				<div class="card-body">
+					<!-- <h2 class="card-title mb-2">
+						{ongoingComplaints.complaintantName}
+					</h2> -->
+					<div>
+						<span class="my-1 font-bold">Complaint: </span>
+						{ongoingComplaints.complaintContent.substring(0, 30) + '...'}
+					</div>
+					<!-- <div>
+						<span class="my-1 font-bold">Date Inquired:</span>
+						{inquiry.dateCreated
+							.toDate()
+							.toLocaleDateString('en-us', { year: 'numeric', month: 'long', day: 'numeric' }) +
+							' at ' +
+							inquiry.dateCreated
+								.toDate()
+								.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}
+					</div> -->
+					<div class="card-actions justify-end">
+						<a
+							class="btn btn-primary"
+							href="/complaint/complaintConversation/{ongoingComplaints.convoID}">View Complaint</a
+						>
 					</div>
 				</div>
-				<div class="flex justify-end mt-8">
-					<button type="submit" class="btn btn-primary">Submit Complaint</button>
-				</div>
-			</form>
-		</div>
+			</div>
+		{/each}
 	</div>
-{/if}
+</div>
+<div>
+	<PendingComplaintsClient />
+</div>

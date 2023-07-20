@@ -61,6 +61,48 @@
 		}
 	}
 
+	async function noResponse() {
+		try {
+			await sendEmail({
+				to: inquiry.email,
+				subject: 'Southview Homes 3 Inquiries',
+				html: `<center><h1><img src="https://ssv.vercel.app/logo.png"> Southview Homes 3</h1>
+				<p style="font-size:12px">SVH3 San Vicente Road, Brgy., San Vicente, San Pedro, Laguna</p><br/>
+				</center>
+					<p>Dear ${inquiry.nameDisplay},</p>
+					<p>We would like to extend our heartfelt apologies for the inconvenience caused by our inability to provide a satisfactory response to your inquiry. We genuinely understand the importance of your question and the frustration that comes with not receiving a timely and comprehensive answer.</p>
+
+					<p>While we strive to address all inquiries promptly and effectively, there are circumstances beyond our control that may hinder us from providing the desired information at this moment. It could be due to the complexity of the matter, limited resources, or ongoing developments that require further investigation or consultation.</p> 
+
+					<p>Please be assured that we value your inquiry and understand the significance of your concerns. Our team is actively working to resolve this situation and gather the necessary information to provide you with a meaningful and accurate response. We ask for your patience and understanding as we navigate through these challenges to offer you the assistance you deserve.</p>
+
+					<p>In the meantime, if you have any additional questions or if there's any other way we can assist you, please don't hesitate to let us know. We remain committed to ensuring your satisfaction and will do our utmost to address your concerns as soon as possible.</p>			
+
+					<p>Once again, we deeply apologize for any inconvenience caused by our current inability to answer your inquiry. We appreciate your understanding and look forward to the opportunity to better serve you in the future.</p>
+
+					<p>Best regards,</p>
+
+					<p>Soutview Homes 3</p>`
+			});
+			try {
+				const inquiryRef = doc(db, 'inquiries', inquiryID);
+				const changeData = {
+					hadAnswered: true
+				};
+				await updateDoc(inquiryRef, changeData);
+				goto('/admin/inquiries');
+			} catch (error) {
+				console.log(error);
+				toast.error('Error sending response!');
+			}
+			toast.success('Response sent to email!');
+			goto('/admin/inquiries');
+		} catch (error) {
+			console.log(error);
+			toast.error('Error in sending reponse of the inquiry');
+		}
+	}
+
 	async function sendResponseToEmail(name, email, response) {
 		try {
 			await sendEmail({
@@ -126,18 +168,23 @@
 				</div>
 				<div class="flex justify-end mt-8">
 					<button
-						on:click={submitHandler(inquiry.nameDisplay, inquiry.email,  inquiry.response)}
+						on:click={submitHandler(inquiry.nameDisplay, inquiry.email, inquiry.response)}
 						type="submit"
 						class="btn btn-primary"
 					>
 						Submit Response
 					</button>
 					<a href="/admin/inquiries" class="btn btn-error mx-1 text-white">Cancel</a>
-					<button on:click={deleteInquiry} type="submit" class="btn btn-warning mx-1 text-white">
-						Delete
-					</button>
 				</div>
 			</form>
+			<div class="flex flex-row justify-end my-2">
+				<button on:click={noResponse} type="submit" class="btn btn-error text-white mx-1 ">
+					No Response
+				</button>
+				<button on:click={deleteInquiry} type="submit" class="btn btn-warning mx-1 text-white">
+					Delete
+				</button>
+			</div>
 		</div>
 	</div>
 {/if}

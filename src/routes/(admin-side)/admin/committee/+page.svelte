@@ -1,7 +1,7 @@
 <script>
 	import { getDocs, query, collection, where } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
-	import PreviousOfficers from './PreviousOfficers.svelte';
+	// import PreviousOfficers from './PreviousOfficers.svelte';
 
 	let currentOfficers = [];
 	let currentCommittees = [];
@@ -68,7 +68,10 @@
 <div class="min-w-full min-h-full bg-base-200 py-8 px-5">
 	<div class="flex flex-row justify-between">
 		<h2 class="text-2xl font-semibold mb-3">Committee</h2>
-		<a href="/admin/committee/new-committees" class="btn btn-primary">Change All Committees</a>
+		<div class="flex flex-row gap-2">
+			<a href="/admin/committee/group-picture" class="btn btn-primary">Edit Group Picture</a>
+		<!-- <a href="/admin/committee/new-committees" class="btn btn-primary">Change All Committees</a> -->
+		</div>
 	</div>
 	<div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-left">
 		<div>
@@ -219,7 +222,8 @@
 			{/await}
 		</div>
 	</div>
-	<div>
+	
+	<!-- <div>
 		<PreviousOfficers />
-	</div>
+	</div> -->
 </div>
