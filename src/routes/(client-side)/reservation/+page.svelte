@@ -181,7 +181,7 @@
 			dateReviewed: bookData.dateReserved,
 			isRescheduled: false,
 			approvedBy: '',
-			isReviewed: false,
+			isReviewed: false
 		};
 
 		try {
