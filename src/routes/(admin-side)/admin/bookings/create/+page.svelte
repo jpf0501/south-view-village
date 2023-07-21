@@ -7,13 +7,15 @@
 	const dateMin = new Date(Date.now() + 8.64e7).toLocaleDateString('en-ca');
 	// // const dateMax = new Date(Date.now() + 8.64e7 + 6.048e8 * 2).toLocaleDateString('en-ca');
 
+	let paidBool = false;
+
 	let guest = {
 		firstname: '',
 		lastname: '',
 		email: '',
 		contactNumber: '',
 		status: 'Pending',
-		paymentStatus: 'Unpaid',
+		paymentStatus: '',
 		eventType: '',
 		date: '',
 		time: '',
@@ -105,7 +107,7 @@
 				email: guest.email.trim().toLowerCase(),
 				contactNumber: guest.contactNumber,
 				status: guest.status,
-				paymentStatus: guest.paymentStatus,
+				paymentStatus: paidBool ? 'Paid' : 'Unpaid',
 				eventType: guest.eventType.trim().toLowerCase(),
 				eventTypeDisplay: guest.eventType,
 				bookDate: new Date(guest.date + ' ' + guest.time),
@@ -251,9 +253,16 @@
 						bind:value={guest.endTime}
 					/>
 				</div>
+				<div class="form-control">
+					<div class="flex items-center mt-5">
+						<input id="checkbox" bind:checked={paidBool} type="checkbox" class="checkbox checkbox-primary">
+						<label for="checkbox" class="ml-2 text-sm font-medium">Mark as paid?</label>
+					</div>
+				</div>
 			</div>
 			<div class="flex justify-end mt-8">
 				<button type="submit" class="btn btn-primary">Add Entry</button>
+				<button type="submit" on:click={() => console.log(paidBool)} class="btn btn-primary">Test</button>
 				<a href="/admin/bookings" class="btn btn-error mx-1 text-white">Cancel</a>
 			</div>
 		</form>

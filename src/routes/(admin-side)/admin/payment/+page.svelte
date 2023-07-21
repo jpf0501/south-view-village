@@ -288,31 +288,18 @@
 				<thead>
 					<tr>
 						<th />
+						<th />
 						<th class="text-lg">Name</th>
 						<th class="text-lg">Address</th>
 						<th class="text-lg">Email</th>
 						<th class="text-lg">Contact No.</th>
 						<th class="text-lg">Payment Status</th>
-						<th />
+						
 					</tr>
 				</thead>
 				<tbody>
 					{#each listOfUsers as user, i}
 						<tr class="hover">
-							<td>{i + 1}</td>
-							<td>{user.firstNameDisplay + ' ' + user.lastNameDisplay}</td>
-							<td
-								>{'Block ' +
-									user.addressBlock +
-									' Lot ' +
-									user.addressLot +
-									' ' +
-									user.addressStreet +
-									' Street'}</td
-							>
-							<td>{user.email}</td>
-							<td>{user.contactNumber}</td>
-							<td>{user.paymentStatus}</td>
 							<td>
 								{#if user.paymentStatus == 'Unpaid'}
 									<button
@@ -335,6 +322,21 @@
 									<button type="button" class="btn btn-primary" disabled>Send Payment</button>
 								{/if}
 							</td>
+							<td>{i + 1}</td>
+							<td>{user.firstNameDisplay + ' ' + user.lastNameDisplay}</td>
+							<td
+								>{'Block ' +
+									user.addressBlock +
+									' Lot ' +
+									user.addressLot +
+									' ' +
+									user.addressStreet +
+									' Street'}</td
+							>
+							<td>{user.email}</td>
+							<td>{user.contactNumber}</td>
+							<td>{user.paymentStatus}</td>
+							
 						</tr>
 					{/each}
 				</tbody>
