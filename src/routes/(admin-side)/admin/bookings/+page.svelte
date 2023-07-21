@@ -16,7 +16,7 @@
 	import toast from 'svelte-french-toast';
 	import { userStore } from '$lib/store';
 
-	const dateMin = new Date(Date.now() + 8.64e7).toLocaleDateString('en-ca');
+	const dateMin = new Date(Date.now() + 8.64e7 * 1).toLocaleDateString('en-ca');
 
 	let listOfBooking = [];
 	let sortByField = '';
@@ -347,6 +347,7 @@ class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden ove
 		<p class="mt-6 text-sm text-gray-500">Enter new date of event</p>
 		<input
 			type="date"
+			min={dateMin}
 			bind:value={rebookDate}
 			class="mt-6 input input-bordered w-full max-w-xs"
 		/>
