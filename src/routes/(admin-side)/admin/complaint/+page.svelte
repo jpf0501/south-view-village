@@ -113,11 +113,12 @@
 				<thead>
 					<tr>
 						<th />
+						<th />
 						<th class="text-lg">Name</th>
 						<th class="text-lg">Email</th>
 						<th class="text-lg">Complaint</th>
 						<!-- <th class="text-lg">Date Inquired</th> -->
-						<th />
+						
 						<!-- <th />	 -->
 					</tr>
 				</thead>
@@ -130,15 +131,16 @@
 						{#each listOfComplaints as complaint, i}
 							{#if complaint.complaintantID !== $userStore?.uid}
 								<tr class="hover">
-									<td>{i + 1}</td>
-									<td>{complaint.firstnameDisplay + ' ' + complaint.lastnameDisplay}</td>
-									<td>{complaint.email}</td>
-									<td>{complaint.complaint.substring(0, 50) + '...'}</td>
 									<td
 										><a class="btn btn-primary" href={'/admin/complaint/view/' + complaint.id}
 											>View Complaint</a
 										></td
 									>
+									<td>{i + 1}</td>
+									<td>{complaint.firstnameDisplay + ' ' + complaint.lastnameDisplay}</td>
+									<td>{complaint.email}</td>
+									<td>{complaint.complaint.substring(0, 50) + '...'}</td>
+									
 								</tr>
 							{/if}
 						{/each}

@@ -259,35 +259,18 @@
 				<thead>
 					<tr>
 						<th />
+						<th />
 						<th class="text-lg">Name</th>
 						<th class="text-lg">Address</th>
 						<th class="text-lg">Email</th>
 						<th class="text-lg">Contact No.</th>
 						<th class="text-lg">Payment Head</th>
-						<th />
+						
 					</tr>
 				</thead>
 				<tbody>
 					{#each listOfUsers as user, i}
 						<tr class="hover">
-							<td>{i + 1}</td>
-							<td>{user.pendingFirstNameDisplay + ' ' + user.pendingMiddleNameDisplay + ' ' + user.pendingLastNameDisplay}</td>
-							<td
-								>{'Block ' +
-									user.pendingAddressBlock +
-									' Lot ' +
-									user.pendingAddressLot +
-									' ' +
-									user.pendingAddressStreet +
-									' Street'}</td
-							>
-							<td>{user.pendingEmail}</td>
-							<td>{user.pendingContactNumber}</td>
-							{#if user.pendingPaymentHead}
-								<td class="text-center">Yes</td>
-							{:else}
-								<td class="text-center">No</td>
-							{/if}
 							<td
 								><form
 									on:submit|preventDefault={submitHandler(
@@ -320,6 +303,25 @@
 									>
 								</form></td
 							>
+							<td>{i + 1}</td>
+							<td>{user.pendingFirstNameDisplay + ' ' + user.pendingMiddleNameDisplay + ' ' + user.pendingLastNameDisplay}</td>
+							<td
+								>{'Block ' +
+									user.pendingAddressBlock +
+									' Lot ' +
+									user.pendingAddressLot +
+									' ' +
+									user.pendingAddressStreet +
+									' Street'}</td
+							>
+							<td>{user.pendingEmail}</td>
+							<td>{user.pendingContactNumber}</td>
+							{#if user.pendingPaymentHead}
+								<td class="text-center">Yes</td>
+							{:else}
+								<td class="text-center">No</td>
+							{/if}
+							
 						</tr>
 					{/each}
 				</tbody>
@@ -375,7 +377,7 @@
 								user.pendingAddressStreet,
 								user.pendingPaymentHead,
 							)}
-							class="py-3"
+							class="py-3 flex flex-row justify-end gap-2"
 						>
 							<button
 								on:click={() => (pendingAccountStatus = 'Approved')}

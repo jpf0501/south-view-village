@@ -40,8 +40,9 @@
 			<thead>
 				<tr>
 					<th />
-					<th class="text-lg">Complaint</th>
 					<th />
+					<th class="text-lg">Complaint</th>
+					
 				</tr>
 			</thead>
 			<tbody>
@@ -52,14 +53,14 @@
 				{:else}
 					{#each listOfOngoingComplaints as ongoingComplaints, i}
 						<tr class="hover">
-							<td>{i + 1}.</td>
-							<td>{ongoingComplaints.complaintContent.substring(0, 30) + '...'}</td>
 							<td
 								><a
 									href="/complaint/complaintConversation/{ongoingComplaints.convoID}"
-									class="btn btn-primary">Goto Convo</a
+									class="btn btn-primary">View Complaint</a
 								></td
 							>
+							<td>{i + 1}.</td>
+							<td>{ongoingComplaints.complaintContent.substring(0, 30) + '...'}</td>
 						</tr>
 					{/each}
 				{/if}
