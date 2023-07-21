@@ -428,6 +428,8 @@ class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden ove
 			<table class="table w-full">
 				<thead>
 					<tr>
+						<th></th>
+						<th></th>
 						<th />
 						<th class="text-lg">Name</th>
 						<th class="text-lg">Email Address</th>
@@ -440,13 +442,28 @@ class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden ove
 						<th class="text-lg">Payment Status</th>
 						<th class="text-lg">Last Approved/Disapproved By</th>
 						<th class="text-lg">Is Rescheduled?</th>
-						<th></th>
-						<th></th>
 					</tr>
 				</thead>
 				<tbody>
 					{#each listOfBooking as book, i}
 						<tr class="hover">
+							<td><button type="button" class="btn btn-primary" on:click={openBooking(book.id)}>View Details</button></td>
+							<td>
+								{#if book.paymentStatus === 'Unpaid'}
+									<!-- <button
+										on:click={() => ([showPopUp, markID] = [true, book.id])}
+										type="button"
+										class="btn btn-primary">Mark as Paid</button
+									> -->
+									<button
+										on:click={sendPaymentEmail(book.email, book.id, book.firstNameDisplay, book.lastNameDisplay, book.bookDate, book.eventTypeDisplay)}
+										type="button"
+										class="btn btn-primary">Send Payment</button
+									>
+								{:else}
+									<button type="button" class="btn btn-primary" disabled>Send Payment</button>
+								{/if}
+							</td>
 							<td>{i + 1}</td>
 							<td>{book.firstNameDisplay + ' ' + book.lastNameDisplay}</td>
 							<td>{book.email}</td>
@@ -517,23 +534,7 @@ class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden ove
 									{/if}
 								</form></td
 							> -->
-							<td><button type="button" class="btn btn-primary" on:click={openBooking(book.id)}>View Details</button></td>
-							<td>
-								{#if book.paymentStatus === 'Unpaid'}
-									<!-- <button
-										on:click={() => ([showPopUp, markID] = [true, book.id])}
-										type="button"
-										class="btn btn-primary">Mark as Paid</button
-									> -->
-									<button
-										on:click={sendPaymentEmail(book.email, book.id, book.firstNameDisplay, book.lastNameDisplay, book.bookDate, book.eventTypeDisplay)}
-										type="button"
-										class="btn btn-primary">Send Payment</button
-									>
-								{:else}
-									<button type="button" class="btn btn-primary" disabled>Send Payment</button>
-								{/if}
-							</td>
+							
 						</tr>
 					{/each}
 				</tbody>
