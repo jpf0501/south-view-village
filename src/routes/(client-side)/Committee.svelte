@@ -35,9 +35,6 @@
 		);
 		communityAwareness = await getCurrentCommittees('Community Awareness Committee', true);
 		socialEvents = await getCurrentCommittees('Social Events Committee', true);
-
-		// imageUrl = await getDownloadURL(storageRef);
-		// console.log(imageUrl)
 	}
 
 	async function loadGroupPictures() {

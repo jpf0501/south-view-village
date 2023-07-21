@@ -61,10 +61,11 @@
 			<thead>
 				<tr>
 					<th />
+					<th />
 					<th class="text-lg">Name</th>
 					<th class="text-lg">Complaint</th>
 					<th />
-					<th />
+					
 				</tr>
 			</thead>
 			<tbody>
@@ -75,6 +76,12 @@
 				{:else}
 					{#each listOfOngoingComplaints as ongoingComplaints, i}
 						<tr class="hover">
+							<td
+								><a
+									href="/admin/complaint/respond/{ongoingComplaints.convoID}"
+									class="btn btn-primary">Goto Convo</a
+								></td
+							>
 							<td>{i + 1}</td>
 							<td>{ongoingComplaints.complaintantName}</td>
 							<td>{ongoingComplaints.complaintContent.substring(0, 30) + '...'}</td>
@@ -85,12 +92,7 @@
 									? 'text-orange-300'
 									: 'text-red-500'}">{ongoingComplaints.priority}</td
 							>
-							<td
-								><a
-									href="/admin/complaint/respond/{ongoingComplaints.convoID}"
-									class="btn btn-primary">Goto Convo</a
-								></td
-							>
+							
 						</tr>
 					{/each}
 				{/if}

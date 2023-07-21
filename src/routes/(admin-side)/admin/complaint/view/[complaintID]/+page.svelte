@@ -4,6 +4,7 @@
 	import { sendEmail } from '$lib/utils';
 	import { goto } from '$app/navigation';
 	import toast from 'svelte-french-toast';
+	import Confirmation from '../../../../../../lib/Components/Confirmation.svelte';
 	export let data;
 	let { complaintID } = data;
 
@@ -11,6 +12,32 @@
 
 	let complaint = null;
 	let priorityLevel;
+	let confirmation = false;
+	let confirmationText
+
+	function handleAssist() {
+		if (priorityLevel === '') {
+			toast.error('Select priority level first');
+			return;
+		}
+		confirmationText = `Are you sure you want to assist this complaint with ${priorityLevel.toUpperCase()} priority level?`
+		confirmation = true;
+	}
+
+	async function confirmSubmit() {
+		confirmation = false;
+		await generateConvoID(
+			complaint.firstnameDisplay,
+			complaint.lastnameDisplay,
+			complaintID,
+			complaint.complaintantID,
+			complaint.complaint
+		);
+	}
+
+	async function cancelSubmit() {
+		confirmation = false;
+	}
 
 	async function getComplaints() {
 		try {
@@ -75,6 +102,8 @@
 	getComplaints();
 </script>
 
+<Confirmation show={confirmation} onConfirm={confirmSubmit} onCancel={cancelSubmit} {confirmationText}/>
+
 {#if complaint}
 	<div class="min-h-screen bg-gray-100 flex flex-col justify-center items-center">
 		<div class="w-full max-w-4xl p-6 mx-auto shadow-lg rounded-xl bg-white">
@@ -99,17 +128,7 @@
 					{complaint.complaint}
 				</div>
 				<div class="flex flex-row justify-end gap-3 mt-5">
-					<form
-						action=""
-						class="flex flex-row gap-3"
-						on:submit={generateConvoID(
-							complaint.firstnameDisplay,
-							complaint.lastnameDisplay,
-							complaintID,
-							complaint.complaintantID,
-							complaint.complaint
-						)}
-					>
+					<form action="" class="flex flex-row gap-3">
 						<div class="flex flex-row">
 							<label for="priorityLevel" class="label font-bold">Priority Level:</label>
 							<select
@@ -126,7 +145,7 @@
 							</select>
 						</div>
 
-						<button class="btn btn-primary" type="submit">Assist</button>
+						<button class="btn btn-primary" type="button" on:click={handleAssist}>Assist</button>
 					</form>
 					<a href="/admin/complaint" class="btn btn-error text-white">Back</a>
 				</div>

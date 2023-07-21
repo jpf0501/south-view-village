@@ -7,11 +7,14 @@
 	import LastnameForm from '$lib/FormComponents/LastnameForm.svelte';
 	import EmailForm from '$lib/FormComponents/EmailForm.svelte';
 	import ContactForm from '$lib/FormComponents/ContactForm.svelte';
+	import Confirmation from '../../../../lib/Components/Confirmation.svelte';
 	import toast from 'svelte-french-toast';
 
 	let user = null;
 	let complaint = '';
 	let error = false;
+	let confirmation = false;
+
 
 	async function getUser() {
 		if (!$userStore) {
@@ -29,9 +32,20 @@
 			}, 2000);
 			return;
 		}
-		await sendComplaint();
-		await goto('/complaint/success');
+		confirmation = true;
 	}
+
+	async function confirmSubmit() {
+    // User clicked "Confirm" in the modal
+    confirmation = false; // Hide the modal
+    await sendComplaint();
+    await goto('/complaint/success');
+  }	
+
+  async function cancelSubmit() {
+    // User clicked "Cancel" in the modal
+    confirmation = false; // Hide the modal
+  }
 
 	async function sendComplaint() {
 		try {
@@ -64,6 +78,9 @@
 <svelte:head>
 	<title>Complaint Form - Official Website of Southview Homes 3 Subdivision</title>
 </svelte:head>
+
+<Confirmation show={confirmation} onConfirm={confirmSubmit} onCancel={cancelSubmit} />
+
 <div class="flex flex-row justify-end bg-base-200 pt-2">
 	<a href="/complaint/" class="btn btn-primary">Go Back</a>
 </div>

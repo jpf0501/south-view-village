@@ -4,6 +4,7 @@
 	import Committee from './Committee.svelte';
 	// import PreviousOfficers from '../(admin-side)/admin/committee/PreviousOfficers.svelte';
 	import toast from 'svelte-french-toast';
+	import Confirmation from '../../lib/Components/Confirmation.svelte';
 
 	let inquiry = {
 		name: '',
@@ -12,6 +13,7 @@
 	};
 
 	let errors = {};
+	let confirmation = false;
 
 	async function checkInput() {
 		const regex = /^[a-zA-Z -]*$/;
@@ -32,6 +34,7 @@
 			}, 2000);
 			return;
 		}
+
 		return true;
 	}
 
@@ -41,6 +44,12 @@
 			toast.error('Form validation failed');
 			return;
 		}
+		confirmation = true;
+		
+	}
+
+	async function confirmSubmit() {
+		confirmation = false; 
 		try {
 			await addDoc(collection(db, 'inquiries'), {
 				name: inquiry.name.trim().toLowerCase(),
@@ -61,6 +70,10 @@
 			console.log(error);
 			toast.error('Error in sending inquiry!');
 		}
+	}
+
+	async function cancelSubmit() {
+		confirmation = false; 
 	}
 </script>
 
@@ -236,13 +249,14 @@
 <!-- end clubhouse card -->
 
 <div>
-	<Committee/>
+	<Committee />
 </div>
 <!-- <div>
 	<PreviousOfficers />
 </div> -->
 
 <!-- inquiry -->
+<Confirmation show={confirmation} onConfirm={confirmSubmit} onCancel={cancelSubmit} />
 <div class="px-5 py-8">
 	<div class="text-center">
 		<h1 class="text-2xl font-bold pt-8 pb-4">Have an Inquiry?</h1>
@@ -254,6 +268,7 @@
 			>southviewhomes3mail@gmail.com</a
 		>.
 	</div>
+
 	<form on:submit|preventDefault={inquiryHandler}>
 		<div class="form-control w-full max-w-xl pt-6 pb-4 mx-auto">
 			<div class="flex flex-row py-5 gap-3">

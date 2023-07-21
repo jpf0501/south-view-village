@@ -142,7 +142,11 @@
 	</div>
 	<div class="w-full mx-auto shadow-2xl border rounded-xl bg-base-100 my-5">
 		<div class="overflow-x-auto">
-			<h2 class="text-xl font-semibold m-2 mx-3">Edit Picture</h2>
+			<div class="flex flex-row justify-between">
+				<h2 class="text-xl font-semibold my-2 mx-3">Edit Picture</h2>
+				<span class="mx-3 my-2 text-sm">Note: Max of 2 picture</span>
+			</div>
+
 			<div class="flex flex-row justify-around py-4">
 				{#each images?.groupPictureURL || [] as url, index}
 					{#if url !== ''}
@@ -215,7 +219,7 @@
 						on:change={handleImageChange2}
 					/>
 					<button
-						on:click={() => (showAddPicture = !showAddPicture, previewImage = null)}
+						on:click={() => ((showAddPicture = !showAddPicture), (previewImage = null))}
 						class="btn btn-error text-white">Cancel</button
 					>
 				{/if}

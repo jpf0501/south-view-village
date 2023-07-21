@@ -90,8 +90,6 @@
 								<tbody>
 									{#each officersData as officer}
 										<tr class="hover">
-											<td class="font-bold">{officer.position}:</td>
-											<td>{officer.firstname + ' ' + officer.lastname}</td>
 											<td
 												><a
 													href={'/admin/committee/edit/' + officer.id}
@@ -107,6 +105,9 @@
 													></a
 												></td
 											>
+											<td class="font-bold">{officer.position}:</td>
+											<td>{officer.firstname + ' ' + officer.lastname}</td>
+											
 										</tr>
 									{/each}
 								</tbody>
@@ -160,11 +161,11 @@
 								<tbody>
 									{#each committeesData as committee}
 										<tr>
+											<th></th>
 											<th>{committee.position}:</th>
 										</tr>
 										{#each committee.members as member}
 											<tr class="hover">
-												<td>{member.firstname + ' ' + member.lastname}</td>
 												<td
 													><a
 														href={'/admin/committee/edit/' + member.id}
@@ -180,6 +181,8 @@
 														></a
 													></td
 												>
+												<td>{member.firstname + ' ' + member.lastname}</td>
+												
 											</tr>
 										{/each}
 									{/each}

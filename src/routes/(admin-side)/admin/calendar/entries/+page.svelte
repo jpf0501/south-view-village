@@ -85,20 +85,16 @@
 				<tr>
 					<th />
 					<th />
+					<th />
 					<th class="text-lg">Title</th>
 					<th class="text-lg">Description</th>
 					<th class="text-lg">Date</th>
-					<th />
+					
 				</tr>
 			</thead>
 			<tbody>
 				{#each listOfEvents as event, i}
 					<tr class="hover">
-						<td>{i + 1}</td>
-						<td />
-						<td>{event.titleDisplay.substring(0, 20) + '...'}</td>
-						<td>{event.description.substring(0, 50) + '...'}</td>
-						<td>{event.date}</td>
 						<td>
 							<a href={'/admin/calendar/entries/edit/' + event.id} class="btn glass text-white"
 								><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -108,6 +104,12 @@
 								></a
 							>
 						</td>
+						<td>{i + 1}</td>
+						<td />
+						<td>{event.titleDisplay.substring(0, 20) + '...'}</td>
+						<td>{event.description.substring(0, 50) + '...'}</td>
+						<td>{event.date}</td>
+						
 					</tr>
 				{/each}
 			</tbody>
