@@ -5,6 +5,7 @@
 	import { sendEmail } from '$lib/utils';
 	import toast from 'svelte-french-toast';
 	import Conversation from './Conversation.svelte';
+	import Confirmation from '../../../../../../lib/Components/Confirmation.svelte';
 
 	/** @type {import('./$types').PageData} */
 	export let data;
@@ -16,6 +17,21 @@
 	let complaint = null;
 	let getComplaintID;
 	let newStatus;
+	let confirmation = false;
+	let confirmationText
+
+	function handleAssist() {
+		confirmation = true;
+	}
+	
+	async function confirmSubmit() {
+		confirmation = false;
+		await changeStatus()
+	}
+
+	async function cancelSubmit() {
+		confirmation = false;
+	}
 
 	async function getComplaints() {
 		const str = convoID;
@@ -84,6 +100,8 @@
 	<title>Complaint Response Form - Southview Homes 3 Admin Panel</title>
 </svelte:head>
 
+<Confirmation show={confirmation} onConfirm={confirmSubmit} onCancel={cancelSubmit} {confirmationText}/>
+
 {#if complaint}
 	<div class="min-h-screen bg-gray-100 flex flex-col justify-center items-center">
 		<div class="w-full max-w-4xl p-6 mx-auto shadow-lg rounded-xl bg-white">
@@ -114,7 +132,8 @@
 					<button
 						on:click={() => {
 							newStatus = 'Resolved';
-							changeStatus();
+							confirmationText = "Mark as RESOLVED?"
+							handleAssist() ;
 						}}
 						type="button"
 						class="btn btn-primary"
@@ -124,7 +143,8 @@
 					<button
 						on:click={() => {
 							newStatus = 'Unresolved';
-							changeStatus();
+							confirmationText = "Mark as UNRESOLVED?"
+							handleAssist();
 						}}
 						type="button"
 						class="btn btn-error text-white"
