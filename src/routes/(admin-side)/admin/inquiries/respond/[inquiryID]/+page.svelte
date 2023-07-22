@@ -22,6 +22,7 @@
 			toast.error('Form validation failed');
 			return;
 		}
+		confirmationText = 'Are you sure you want to send the response?';
 		handleWhat = 'Send Response';
 		confirmation = true;
 	}

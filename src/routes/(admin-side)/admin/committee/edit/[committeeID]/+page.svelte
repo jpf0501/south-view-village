@@ -4,6 +4,7 @@
 	import { getStorage, ref, getDownloadURL, uploadBytes } from 'firebase/storage';
 	import { goto } from '$app/navigation';
 	import toast from 'svelte-french-toast';
+	import Confirmation from '../../../../../../lib/Components/Confirmation.svelte';
 
 	/** @type {import('./$types').PageData} */
 	export let data;
@@ -19,6 +20,35 @@
 
 	let newImageFile = null;
 	let previewImage = '';
+	let confirmation = false;
+	let confirmationText;
+	let handleWhat
+
+	function handleUpdateCommittee() {
+		confirmation = true;
+		handleWhat = "Update"
+		confirmationText = 'Do you want to save changes?';
+	}
+
+	function handleDeletePhoto(){
+		confirmation = true;
+		handleWhat = "Delete"
+		confirmationText = 'Do you want to remove photo?';
+	}
+
+	async function confirmSubmit() {
+		confirmation = false; 
+		if(handleWhat === 'Update'){
+			await updateCommittee()
+		} else if(handleWhat === 'Delete'){
+			await deletePhoto()
+		}
+		
+	}
+
+	async function cancelSubmit() {
+		confirmation = false; 
+	}
 
 	function handleImageChange(event) {
 		const file = event.target.files[0];
@@ -116,6 +146,8 @@
 	<title>Edit Committee - Southview Homes 3 Admin Panel</title>
 </svelte:head>
 
+<Confirmation show={confirmation} onConfirm={confirmSubmit} onCancel={cancelSubmit} {confirmationText}/>
+
 {#if committee}
 	<div class="min-h-screen hero bg-base-200">
 		<div class="w-full max-w-4xl p-6 mx-auto shadow-2xl border rounded-xl bg-base-100">
@@ -157,7 +189,7 @@
 					</div>
 					<div class="flex flex-col gap-4 items-center">
 						{#if previewImage}
-							<label for="" >Selected Photo:</label>
+							<label for="">Selected Photo:</label>
 							<img
 								class="border border-black rounded-md w-64 h-48 object-cover"
 								src={previewImage}
@@ -177,7 +209,7 @@
 							on:change={handleImageChange}
 						/>
 
-						<button class="btn btn-error text-white" type="button" on:click={deletePhoto}
+						<button class="btn btn-error text-white" type="button" on:click={handleDeletePhoto}
 							>Remove Photo</button
 						>
 					</div>
@@ -207,7 +239,9 @@
 					</div>
 				</div> -->
 				<div class="flex justify-end mt-8">
-					<button on:click={updateCommittee} type="submit" class="btn btn-primary">Save</button>
+					<button on:click={handleUpdateCommittee} type="submit" class="btn btn-primary"
+						>Save</button
+					>
 					<a href="/admin/committee" class="btn btn-error mx-1 text-white">Cancel</a>
 				</div>
 			</form>
