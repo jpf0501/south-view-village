@@ -155,7 +155,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="flex justify-center">
+	<!-- <div class="flex justify-center">
 		<div class="w-full shadow-2xl border rounded-xl bg-base-100">
 			<div class="p-4">
 				<h1 class="text-2xl mb-8 font-bold pt-6 px-8">Activity Log</h1>
@@ -185,7 +185,7 @@
 				</div>
 			</div>
 		</div>
-	</div>
+	</div> -->
 	
 </div>
 	

@@ -142,11 +142,11 @@
 					status: 'Disapproved'
 				};
 				await updateDoc(pendingAccountsRef, data);
-				await addDoc(collection(db, 'adminlogs'), {
-					activity: user.firstNameDisplay + " " + user.lastNameDisplay + " disapproved account creation request in Accounts module.",
-					pageRef: 'Account',
-					date: serverTimestamp()
-				});
+				// await addDoc(collection(db, 'adminlogs'), {
+				// 	activity: user.firstNameDisplay + " " + user.lastNameDisplay + " disapproved account creation request in Accounts module.",
+				// 	pageRef: 'Account',
+				// 	date: serverTimestamp()
+				// });
 				toast.success('Account disapproved!');
 			} catch (error) {
 				console.log(error);

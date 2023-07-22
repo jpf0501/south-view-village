@@ -113,11 +113,11 @@
 
 		try {
 			await updateDoc(doc(db, 'accounts', userID), user);
-			await addDoc(collection(db, 'adminlogs'), {
-				activity: user.firstNameDisplay + " " + user.lastNameDisplay + " edited account info in Accounts module.",
-				pageRef: 'Account',
-				date: serverTimestamp()
-			});
+			// await addDoc(collection(db, 'adminlogs'), {
+			// 	activity: user.firstNameDisplay + " " + user.lastNameDisplay + " edited account info in Accounts module.",
+			// 	pageRef: 'Account',
+			// 	date: serverTimestamp()
+			// });
 			toast.success('User has been updated!');
 			await goto('/admin/accounts');
 		} catch (error) {
