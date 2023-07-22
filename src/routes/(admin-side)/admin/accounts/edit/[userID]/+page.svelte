@@ -98,6 +98,7 @@
 	async function updateUser() {
 		const snapshot = await getDoc(doc(db, 'accounts', $userStore.uid));
 		let userCred = snapshot.data();
+
 		const isValid = await checkInput();
 		if (!isValid) {
 			toast.error('Form validation failed');
@@ -112,11 +113,11 @@
 
 		try {
 			await updateDoc(doc(db, 'accounts', userID), user);
-			/*await addDoc(collection(db, 'adminlogs'), {
-				activity: user.firstNameDisplay + ", " + user.lastNameDisplay + " edited account info in Accounts module.",
+			await addDoc(collection(db, 'adminlogs'), {
+				activity: user.firstNameDisplay + " " + user.lastNameDisplay + " edited account info in Accounts module.",
 				pageRef: 'Account',
 				date: serverTimestamp()
-			});*/
+			});
 			toast.success('User has been updated!');
 			await goto('/admin/accounts');
 		} catch (error) {
@@ -126,8 +127,15 @@
 	}
 
 	async function deleteUser() {
+		const snapshot = await getDoc(doc(db, 'accounts', $userStore.uid));
+		let userCred = snapshot.data();
 		try {
 			await fetch('/api/accounts/', { method: 'DELETE', body: JSON.stringify({ uid: userID }) });
+			await addDoc(collection(db, 'adminlogs'), {
+				activity: userCred.firstNameDisplay + " " + userCred.lastNameDisplay + " deleted account in Accounts module.",
+				pageRef: 'Account',
+				date: serverTimestamp()
+			});
 			toast.success('User deleted!');
 			await goto('/admin/accounts');
 		} catch (error) {
