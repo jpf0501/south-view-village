@@ -70,7 +70,7 @@
 		const order = sortByField === 'bookDate' ? 'desc' : 'asc';
 		bookingsQuery = query(
 			collection(db, 'booking'),
-			where('status', 'in', ['Approved', 'Disapproved', 'Cancelled']),
+			where('status', 'in', ['Completed', 'Disapproved', 'Cancelled']),
 			orderBy(sortByField, order),
 			orderBy('dateReviewed', 'desc')
 		);
@@ -81,7 +81,7 @@
 			collection(db, 'booking'),
 			sortByStatus
 				? where('status', '==', sortByStatus)
-				: where('status', 'in', ['Approved', 'Disapproved', 'Cancelled']),
+				: where('status', 'in', ['Completed', 'Disapproved', 'Cancelled']),
 			orderBy('dateReviewed', 'desc')
 		);
 	}
@@ -93,7 +93,7 @@
 			where(searchByField, '>=', searchByValueCase),
 			where(searchByField, '<=', searchByValueCase + '~'),
 			orderBy(searchByField, 'asc'),
-			where('status', 'in', ['Approved', 'Disapproved', 'Cancelled']),
+			where('status', 'in', ['Completed', 'Disapproved', 'Cancelled']),
 			orderBy('dateReviewed', 'desc')
 		);
 	}
@@ -101,7 +101,7 @@
 	async function resetButton() {
 		bookingsQuery = query(
 			collection(db, 'booking'),
-			where('status', 'in', ['Approved', 'Disapproved', 'Cancelled']),
+			where('status', 'in', ['Completed', 'Disapproved', 'Cancelled']),
 			orderBy('dateReviewed', 'desc')
 		);
 		searchByValue = '';
@@ -110,9 +110,10 @@
 	async function generateReport() {
 	let generateQuery = query(
 		collection(db, 'booking'),
-		where('status', '==', 'Approved'),
+		where('status', 'in', ['Approved', 'Disapproved', 'Cancelled', 'Completed']),
+		where('paymentStatus', '==', 'Paid',),
 		where('dateReviewed', '>=', new Date(startDate)),
-		where('dateReviewed', '<', new Date(endDate))
+		where('dateReviewed', '<', new Date(endDate)),
 	);
 		const report = new jsPDF();
 
@@ -122,14 +123,42 @@
 		let approvedQuery = query(
 			collection(db, 'booking'),
 			where('status', '==', 'Approved'),
+			where('paymentStatus', '==', 'Paid'),
+			where('dateReviewed', '>=', new Date(startDate)),
+			where('dateReviewed', '<', new Date(endDate))
+		);
+		let disapprovedQuery = query(
+			collection(db, 'booking'),
+			where('status', '==', 'Disapproved'),
+			where('paymentStatus', '==', 'Paid'),
+			where('dateReviewed', '>=', new Date(startDate)),
+			where('dateReviewed', '<', new Date(endDate))
+		);
+		let cancelledQuery = query(
+			collection(db, 'booking'),
+			where('status', '==', 'Cancelled'),
+			where('paymentStatus', '==', 'Paid'),
+			where('dateReviewed', '>=', new Date(startDate)),
+			where('dateReviewed', '<', new Date(endDate))
+		);
+		let completedQuery = query(
+			collection(db, 'booking'),
+			where('status', '==', 'Completed'),
+			where('paymentStatus', '==', 'Paid'),
 			where('dateReviewed', '>=', new Date(startDate)),
 			where('dateReviewed', '<', new Date(endDate))
 		);
 
 		let entrySnapshotCount = await getCountFromServer(generateQuery);
 		let approvedSnapshotCount = await getCountFromServer(approvedQuery);
+		let disapprovedSnapshotCount = await getCountFromServer(disapprovedQuery);
+		let	cancelledSnapshotCount = await getCountFromServer(cancelledQuery);
+		let completedSnapshotCount = await getCountFromServer(completedQuery);
 		let entryCount = entrySnapshotCount.data().count;
 		let approvedCount = approvedSnapshotCount.data().count;
+		let disapprovedCount = disapprovedSnapshotCount.data().count;
+		let cancelledCount = cancelledSnapshotCount.data().count;
+		let completedCount = completedSnapshotCount.data().count;
 		let totalEarnings = 500 * entryCount;
 		let width = report.internal.pageSize.getWidth();
 
@@ -163,14 +192,17 @@
 			{ align: 'center' }
 		);
 
-		report.setFontSize(10).text('Total Number of Reservations', 18, 75);
+		report.setFontSize(10).text('Total Number of Paid Reservations', 18, 75);
 		report.text('Reservation Fee', 18, 83);
-		report.text('Reservation Record Numbers', 18, 91);
-		report.text('Total Earned Amount', 18, 135); // 125
+		report.text('Paid Reservation Number Breakdown', 18, 91);
+		report.text('Total Earned Amount', 18, 140); // 125
 		report.text('Signed By', 168, 235, { align: 'right' });
 		report.setFont('Times', 'normal').text('Approved Reservations', 27, 101);
+		report.setFont('Times', 'normal').text('Disapproved Reservations', 27, 109);
+		report.setFont('Times', 'normal').text('Cancelled Reservations', 27, 117);
+		report.setFont('Times', 'normal').text('Completed Reservations', 27, 125);
 		if (entryCount === 1) {
-			report.text(`${entryCount} Records`, 190, 75, { align: 'right' });
+			report.text(`${entryCount} Record`, 190, 75, { align: 'right' });
 		} else {
 			report.text(`${entryCount} Records`, 190, 75, { align: 'right' });
 		}
@@ -182,8 +214,29 @@
 		} else {
 			report.text(`${approvedCount} Entries`, 190, 101, { align: 'right' });
 		}
-		report.text(`PHP ${totalEarnings}.00`, 190, 135, { align: 'right' });
-		report.line(18, 128, 190, 128);
+		if (disapprovedCount === 0) {
+			report.text('No Entries', 190, 109, { align: 'right' });
+		} else if (disapprovedCount === 1) {
+			report.text(`${disapprovedCount} Entry`, 190, 109, { align: 'right' });
+		} else {
+			report.text(`${disapprovedCount} Entries`, 190, 109, { align: 'right' });
+		}
+		if (cancelledCount === 0) {
+			report.text('No Entries', 190, 117, { align: 'right' });
+		} else if (cancelledCount === 1) {
+			report.text(`${cancelledCount} Entry`, 190, 117, { align: 'right' });
+		} else {
+			report.text(`${cancelledCount} Entries`, 190, 117, { align: 'right' });
+		}
+		if (completedCount === 0) {
+			report.text('No Entries', 190, 125, { align: 'right' });
+		} else if (completedCount === 1) {
+			report.text(`${completedCount} Entry`, 190, 125, { align: 'right' });
+		} else {
+			report.text(`${completedCount} Entries`, 190, 125, { align: 'right' });
+		}
+		report.text(`PHP ${totalEarnings}.00`, 190, 140, { align: 'right' });
+		report.line(18, 132, 190, 132);
 		report.line(130, 250, 190, 250);
 		report.text('HOA Treasurer', 171, 258, { align: 'right' });
 		report.addPage();
@@ -303,10 +356,11 @@ class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden ove
 			<!-- <th class="text-lg">Email Address</th>
 			<th class="text-lg">Contact Number</th> -->
 			<th class="text-lg">Type of Event</th>
-			<th class="text-lg">Date and Time</th>
-			<th class="text-lg">Booking Status</th>
-			<!-- <th class="text-lg">Date Reviewed</th> -->
+			<th class="text-lg">Date</th>
+			<th class="text-lg">Time</th>
+			<th class="text-lg">Status</th>
 			<th class="text-lg">Amount Paid</th>
+			<!-- <th class="text-lg">Date Reviewed</th> -->
 		</tr>
 	</thead>
 	<tbody>
@@ -318,21 +372,22 @@ class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden ove
 				<!-- <td>{book.contactNumber}</td> -->
 				<td>{book.eventTypeDisplay}</td>
 				<td
-					>{book.bookDate.toDate().toLocaleDateString('en-us', {
-						year: 'numeric',
-						month: 'long',
-						day: 'numeric'
-					}) +
-						' ' +
-						book.bookDate
-							.toDate()
-							.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}</td
-				>
+								>{book.bookDate.toDate().toLocaleDateString('en-us', {
+									year: 'numeric',
+									month: 'long',
+									day: 'numeric'
+								})}</td>
+				<td>{book.bookDate
+					.toDate()
+					.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })} - {book.endTime.toDate()
+					.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}</td>
 				<td>
 					{#if book.status == 'Approved'}
 						<td class="p-3 text-sm whitespace-nowrap text-green-500 font-bold">{book.status}</td>
 					{:else if book.status == 'Disapproved'}
 						<td class="p-3 text-sm whitespace-nowrap text-red-500 font-bold">{book.status}</td>
+					{:else if book.status == 'Completed'}
+						<td class="p-3 text-sm whitespace-nowrap text-green-500 font-bold">{book.status}</td>
 					{:else if book.status == 'Cancelled'}
 						<td class="p-3 text-sm whitespace-nowrap text-red-500 font-bold">{book.status}</td>
 					{:else if book.status == 'Pending'}
@@ -421,10 +476,14 @@ class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden ove
 						<th class="text-lg">Name</th>
 						<th class="text-lg">Email Address</th>
 						<th class="text-lg">Contact Number</th>
-						<th class="text-lg">Type of Event</th>
-						<th class="text-lg">Date and Time</th>
-						<th class="text-lg">Booking Status</th>
+						<th class="text-lg">Event Type</th>
+						<th class="text-lg">Date</th>
+						<th class="text-lg">Time</th>
+						<th class="text-lg">Status</th>
+						<th class="text-lg">Payment Status</th>
+						<th class="text-lg">Last Approved/Disapproved By</th>
 						<th class="text-lg">Date Reviewed</th>
+						<th class="text-lg">Is Rescheduled?</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -436,17 +495,14 @@ class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden ove
 							<td>{book.email}</td>
 							<td>{book.contactNumber}</td>
 							<td>{book.eventTypeDisplay}</td>
-							<td
-								>{book.bookDate.toDate().toLocaleDateString('en-us', {
+							<td>{book.bookDate.toDate().toLocaleDateString('en-us', {
 									year: 'numeric',
 									month: 'long',
 									day: 'numeric'
-								}) +
-									' at ' +
-									book.bookDate
-										.toDate()
-										.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}</td
-							>
+								})}</td>
+							<td>{book.bookDate
+								.toDate()
+								.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })} - {book.endTime.toDate().toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'})}</td>
 							<td>
 								{#if book.status == 'Completed'}
 									<td class="p-3 text-sm whitespace-nowrap text-green-500 font-bold"
@@ -462,6 +518,8 @@ class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden ove
 									<td class="p-3 text-sm whitespace-nowrap">{book.status}</td>
 								{/if}
 							</td>
+							<td>{book.paymentStatus}</td>
+							<td>{book.approvedBy ? book.approvedBy : "N/A"}</td>
 							<td
 								>{book.dateReviewed.toDate().toLocaleDateString('en-us', {
 									year: 'numeric',
@@ -473,6 +531,7 @@ class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden ove
 										.toDate()
 										.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}</td
 							>
+							<td>{book.isRescheduled ? "Yes" : "No"}</td>
 						</tr>
 						<!-- {/if} -->
 					{/each}
