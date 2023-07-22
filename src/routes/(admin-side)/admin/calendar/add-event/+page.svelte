@@ -3,6 +3,7 @@
 	import { db } from '$lib/firebase/client';
 	import { goto } from '$app/navigation';
 	import toast from 'svelte-french-toast';
+	import Confirmation from '../../../../../lib/Components/Confirmation.svelte';
 
 	// const dateMin = new Date(Date.now() + 8.64e7).toLocaleDateString('en-ca');
 	// const dateMax = new Date(Date.now() + 8.64e7 + 6.048e8 * 2).toLocaleDateString('en-ca');
@@ -14,16 +15,26 @@
 	};
 
 	let errors = {};
+	let confirmation = false;
+	let confirmationText;
 
-	const dateMin = new Date(Date.now() + 8.64e7 * 1).toLocaleDateString('en-ca');
-
-	async function submitHandler() {
+	async function handleSubmit() {
 		const isValid = await checkInput();
 		if (!isValid) {
 			toast.error('Form validation failed');
 			return;
 		}
-		addEvent();
+		confirmationText = `Do you want to create event "${event.title}"`;
+		confirmation = true;
+	}
+
+	async function confirmSubmit() {
+		confirmation = false;
+		await addEvent()
+	}
+
+	async function cancelSubmit() {
+		confirmation = false;
 	}
 
 	async function checkInput() {
@@ -63,10 +74,12 @@
 	<title>Add Event - Southview Homes 3 Admin Panel</title>
 </svelte:head>
 
+<Confirmation show={confirmation} onConfirm={confirmSubmit} onCancel={cancelSubmit} {confirmationText}/>
+
 <div class="min-h-screen hero bg-base-200">
 	<div class="w-full max-w-4xl p-6 mx-auto shadow-2xl border rounded-xl bg-base-100">
 		<h1 class="text-2xl mt-2">Add Event Form</h1>
-		<form on:submit|preventDefault={submitHandler}>
+		<form>
 			<div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2">
 				<div class="form-control">
 					<span class="pb-3">Event Title</span>
@@ -86,7 +99,6 @@
 					{/if}
 					<input
 						type="date"
-						min={dateMin}
 						class="input input-bordered p-3 mt-2"
 						bind:value={event.date}
 					/>
@@ -108,7 +120,7 @@
 				</div>
 			</div>
 			<div class="flex justify-end mt-8">
-				<button type="submit" class="btn btn-primary">Add Event</button>
+				<button on:click={handleSubmit} type="button" class="btn btn-primary">Add Event</button>
 				<a href="/admin/calendar" class="btn btn-error mx-1 text-white">Cancel</a>
 			</div>
 		</form>

@@ -263,7 +263,6 @@ class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden ove
 		<p class="mt-6 text-sm text-gray-500">Enter end date of report</p>
 		<input
 			type="date"
-			min={startDate}
 			bind:value={endDate}
 			class="mt-6 input input-bordered w-full max-w-xs"
 		/>

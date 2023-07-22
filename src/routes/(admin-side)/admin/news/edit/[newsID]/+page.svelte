@@ -5,6 +5,7 @@
 	import { goto } from '$app/navigation';
 	import { getNextDate } from '$lib/dateUtils.js';
 	import toast from 'svelte-french-toast';
+	import Confirmation from '../../../../../../lib/Components/Confirmation.svelte';
 
 	/** @type {import('./$types').PageData} */
 	export let data;
@@ -17,12 +18,47 @@
 	let previewImage = '';
 	let hideImageLabel = false;
 	let errors = {};
+	let confirmation = false;
+	let confirmationText;
+	let handleWhat;
+
 
 	let today = new Date();
 	let formattedDateMin;
 
 	const { formattedDate: calculatedFormattedDate } = getNextDate(today);
 	formattedDateMin = calculatedFormattedDate;
+
+	
+	async function handleNewsUpdate() {
+		const isValid = await checkInput();
+		if (!isValid) {
+			toast.error('Form validation failed');
+			return;
+		}
+		handleWhat = 'Update';
+		confirmationText = `Do you want to save changes in this news "${news.title}"`;
+		confirmation = true;
+	}
+
+	async function handleNewsDelete() {
+		handleWhat = 'Delete';
+		confirmationText = `Do you want to delete this news "${news.title}"`;
+		confirmation = true;
+	}
+
+	async function confirmSubmit() {
+		confirmation = false;
+		if (handleWhat === 'Update') {
+			await updateNews();
+		} else if (handleWhat === 'Delete') {
+			await deleteNews();
+		}
+	}
+
+	async function cancelSubmit() {
+		confirmation = false;
+	}
 
 	async function getNews() {
 		const snapshot = await getDoc(doc(db, 'news', newsID));
@@ -116,6 +152,7 @@
 	<title>Edit News - Southview Homes 3 Admin Panel</title>
 </svelte:head>
 
+<Confirmation show={confirmation} onConfirm={confirmSubmit} onCancel={cancelSubmit} {confirmationText}/>
 {#if news}
 	<div class="min-h-screen hero bg-base-200">
 		<div class="w-full max-w-4xl p-6 mx-auto shadow-2xl border rounded-xl bg-base-100">
@@ -153,12 +190,12 @@
 					<div class="mb-3">
 						<div class="flex flex-row justify-between">
 							<div class="mb-3">
-								{#if news.imageURL !== ""}
-								<img
-									class="border border-black rounded-md w-64 h-48 object-cover"
-									src={news.imageURL}
-									alt="Selected_Photo"
-								/>
+								{#if news.imageURL !== ''}
+									<img
+										class="border border-black rounded-md w-64 h-48 object-cover"
+										src={news.imageURL}
+										alt="Selected_Photo"
+									/>
 								{/if}
 							</div>
 							{#if previewImage}
@@ -225,9 +262,9 @@
 					</div>
 				</div>
 				<div class="flex justify-end mt-8">
-					<button on:click={updateNews} type="submit" class="btn btn-primary">Save</button>
+					<button on:click={handleNewsUpdate} type="submit" class="btn btn-primary">Save</button>
 					<a href="/admin/news" class="btn btn-error mx-1 text-white">Cancel</a>
-					<button on:click={deleteNews} type="submit" class="btn btn-warning mx-1 text-white"
+					<button on:click={handleNewsDelete} type="submit" class="btn btn-warning mx-1 text-white"
 						>Delete</button
 					>
 				</div>

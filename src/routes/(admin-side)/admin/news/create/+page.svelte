@@ -5,6 +5,7 @@
 	import { goto } from '$app/navigation';
 	import { getNextDate } from '$lib/dateUtils.js';
 	import toast from 'svelte-french-toast';
+	import Confirmation from '../../../../../lib/Components/Confirmation.svelte';
 
 	let today = new Date();
 	let formattedDateMin;
@@ -24,15 +25,28 @@
 	let newImageFile = null;
 	let previewImage = '';
 	let hideImageLabel = false;
+	let confirmation = false;
+	let confirmationText;
 
-	async function submitHandler() {
+	async function handleSubmit() {
 		const isValid = await checkInput();
 		if (!isValid) {
 			toast.error('Form validation failed');
 			return;
 		}
-		createNews();
+		confirmationText = `Do you want to create news "${news.title}"`;
+		confirmation = true;
 	}
+
+	async function confirmSubmit() {
+		confirmation = false;
+		await createNews();
+	}
+
+	async function cancelSubmit() {
+		confirmation = false;
+	}
+
 
 	function handleImageChange(event) {
 		hideImageLabel = true;
@@ -116,10 +130,11 @@
 	<title>Add News Form - Southview Homes 3 Admin Panel</title>
 </svelte:head>
 
+<Confirmation show={confirmation} onConfirm={confirmSubmit} onCancel={cancelSubmit} {confirmationText}/>
 <div class="min-h-screen hero bg-base-200">
 	<div class="w-full max-w-4xl p-6 mx-auto shadow-2xl border rounded-xl bg-base-100">
 		<h1 class="text-2xl pb-8">Add News</h1>
-		<form on:submit|preventDefault={submitHandler}>
+		<form>
 			<div class="form-control flex flex-row gap-10 justify-between">
 				<div class="flex flex-col w-full">
 					<span class="pb-3">News Title</span>
@@ -209,7 +224,7 @@
 				</div>
 			</div>
 			<div class="flex justify-end mt-8">
-				<button type="submit" class="btn btn-primary">Add Entry</button>
+				<button on:click={handleSubmit} type="button" class="btn btn-primary">Add Entry</button>
 				<a href="/admin/news" class="btn btn-error mx-1 text-white">Cancel</a>
 			</div>
 		</form>

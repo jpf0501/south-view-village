@@ -90,7 +90,7 @@
 			<div class="mt-2">
 				<h1 class="text-2xl">Complaint Form</h1>
 			</div>
-			<form on:submit={checkInput}>
+			<form >
 				<div class="grid grid-cols-2 gap-6 mt-6 md:grid-cols-2">
 					<FirstnameForm bind:value={user.firstNameDisplay} isDisabled={true} />
 					<LastnameForm bind:value={user.lastNameDisplay} isDisabled={true} />
@@ -118,7 +118,7 @@
 					</div>
 				</div>
 				<div class="flex justify-end mt-8">
-					<button type="submit" class="btn btn-primary">Submit Complaint</button>
+					<button type="button" on:click={checkInput} class="btn btn-primary">Submit Complaint</button>
 				</div>
 			</form>
 		</div>

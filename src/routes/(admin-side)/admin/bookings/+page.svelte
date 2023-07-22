@@ -16,7 +16,7 @@
 	import toast from 'svelte-french-toast';
 	import { userStore } from '$lib/store';
 
-	const dateMin = new Date(Date.now() + 8.64e7 * 1).toLocaleDateString('en-ca');
+	const dateMin = new Date(Date.now() + 8.64e7).toLocaleDateString('en-ca');
 
 	let listOfBooking = [];
 	let sortByField = '';
@@ -64,7 +64,7 @@
 		console.log(user.firstNameDisplay + ' ' + user.lastNameDisplay)
 	}
 
-	async function bookStatFunc(id, firstname, lastname, email, bookDate, event, bookStatus, endTime) {
+	async function bookStatFunc(id, firstname, lastname, email, bookDate, event, bookStatus) {
 		const bookRef = doc(db, 'booking', id);
 		try {
 			data = {
@@ -80,34 +80,25 @@
 			console.log(error);
 			toast.error('Error in updating a booking!');
 		}
-		sendUpdateToEmail(id, firstname, lastname, email, bookDate, event, bookStatus, endTime);
+		//sendUpdateToEmail(id, firstname, lastname, email, bookDate, event);
 		bookingDetailPopup = false;
 	}
 
-	async function sendUpdateToEmail(id, firstname, lastname, email, bookDate, event, bookStatus, endTime) {
+	async function sendUpdateToEmail(id, firstname, lastname, email, bookDate, event) {
 		let message;
 
-		if (bookStatus === 'Approved') {
+		if (bookingStatus === 'Approved') {
 			message = `
             <p>We are pleased to confirm your booking and look forward to welcoming you on the date of reservation. If you have any further questions or concerns regarding this decision, please do not hesitate to contact us.</p>
         `;
-		} else if (bookStatus === 'Disapproved') {
+		} else if (bookingStatus === 'Disapproved') {
 			message = `
             <p>Unfortunately, we are unable to approve your booking request at this time. We apologize for any inconvenience this may have caused and encourage you to consider alternative dates or services. If you have any further questions or concerns regarding this decision, please do not hesitate to contact us.</p>
-        `;
-		} else if (bookStatus === 'Completed') {
-			message = `
-            <p>We congratulate you for a successful event and we are honored that you have chosen our clubhouse as the venue. If you have any further questions or would like to book for another event in the future, please do not hesitate to contact us.</p>
-        `;
-		} else if (bookStatus === 'Cancelled') {
-			message = `
-			<p>Unfortunately, we are unable to approve your booking request at this time. We apologize for any inconvenience this may have caused and encourage you to consider alternative dates or services. If you have any further questions or concerns regarding this decision, please do not hesitate to contact us.</p>
         `;
 		}
 		
 		const date = bookDate.toDate().toLocaleDateString('en-us', {year: 'numeric', month: 'long', day: 'numeric'})
 		const time = bookDate.toDate().toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })
-		const end = endTime.toDate().toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })
 
 		try {
 			await sendEmail({
@@ -117,11 +108,11 @@
 				<p style="font-size:12px">SVH3 San Vicente Road, Brgy., San Vicente, San Pedro, Laguna</p><br/>
 				<p style="font-size:13px; text-decoration:underline">This is an automated message. Do not reply.</p></center>
 				<p><br/>Hello ${firstname} ${lastname},</p>
-				<p>We are writing to inform you that your booking request has been <strong>${bookStatus.toLocaleUpperCase()}</strong>. As a reminder, the details of your booking are as follows:</p>
+				<p>We are writing to inform you that your booking request has been <strong>${bookingStatus.toLocaleUpperCase()}</strong>. As a reminder, the details of your booking are as follows:</p>
 				<ul>
 					<li><strong>Type of Reservation:</strong> ${event}</li>
 					<li><strong>Date Scheduled:</strong> ${date}</li>
-					<li><strong>Time Scheduled:</strong> ${time}-${end}</li>
+					<li><strong>Time Scheduled:</strong> ${time}</li>
 				</ul>
 				<p>${message}</p>
 				<p>We hope to have the opportunity to serve you again in the future.</p>
@@ -135,7 +126,7 @@
 		}
 	}
 
-	async function sendPaymentEmail(email, id, firstname, lastname, date, event, endTime) {
+	async function sendPaymentEmail(email, id, firstname, lastname, date, event) {
 		try {
 			const paymentLinkData = await createPaymentLink(
 				'Clubhouse Reservation Downpayment',
@@ -150,10 +141,9 @@
 				<p style="font-size:12px">SVH3 San Vicente Road, Brgy., San Vicente, San Pedro, Laguna</p><br/>
 				<p style="font-size:13px; text-decoration:underline">This is an automated message. Do not reply.</p></center>
 				<p><br/>Hello ${firstname} ${lastname},</p>
-				<p>Thank you for making a reservation with us. We are delighted to have your interest in filing a reservation for our subdivision's clubhouse. As a reminder, your reservation for ${event} is scheduled for ${date.toDate().toLocaleDateString('en-us', {year: 'numeric', month: 'long', day: 'numeric'})} at ${date.toDate().toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}-${endTime.toDate().toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}.</p>
+				<p>Thank you for making a reservation with us. We are delighted to have your interest in filing a reservation for our subdivision's clubhouse. As a reminder, your reservation for ${event} is scheduled for ${date.toDate().toLocaleDateString('en-us', {year: 'numeric', month: 'long', day: 'numeric'})} at ${date.toDate().toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}.</p>
 				<p>To secure your reservation, we kindly request that you complete the payment process by clicking on the payment link below. The payment link will direct you to a payment form where you can enter your payment details and complete the transaction. Please note that your reservation is not confirmed until payment is received.</p>
 				<p>You can access the payment form <a href=${checkoutURL}>here</a>.</p>
-				<p><b><u>Please be advised that all payments for transactions that involve the reservation of Southview Homes 3 Clubhouse are NON-REFUNDABLE unless stated otherwise by the administration.</u></b></p>
 				<p>For other inquiries, feel free give us a call at 8330-4163 / 09063955407. You can also file for an inquiry at our <a href="https://ssv.vercel.app">website</a> or send us an email at <a href="mailto:southviewhomes3mail@gmail.com">southviewhomes3mail@gmail.com</a>.</p>
 				<p><br/>Best regards,<br/>Southview Homes 3 Home Owners Association</p>
 				`
@@ -284,33 +274,23 @@ class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden ove
 	</div>
 	<div class="flex flex-col px-6 gap-2 py-4">
 		{#if bookingDetail.status == 'Pending'}
-			{#if bookingDetail.paymentStatus == 'Paid'}
-			<button class="btn btn-success text-white"
-				on:click={bookStatFunc(bookingDetailId,
+		<button class="btn btn-success text-white"
+			on:click={bookStatFunc(bookingDetailId,
 				bookingDetail.firstNameDisplay,
 				bookingDetail.lastNameDisplay,
 				bookingDetail.email,
 				bookingDetail.bookDate,
-				bookingDetail.eventTypeDisplay,
-				'Approved',
-				bookingDetail.endTime)}
-			>Approve</button
-			>
-			{:else if bookingDetail.paymentStatus == 'Unpaid'}
-			<button class="btn btn-success text-white"
-			disabled
+				bookingDetail.eventTypeDisplay, 
+				'Approved')}
 			>Approve</button
 		>
-			{/if}
-		
 		<button class="btn btn-error text-white" on:click={bookStatFunc(bookingDetailId,
 			bookingDetail.firstNameDisplay,
 			bookingDetail.lastNameDisplay,
 			bookingDetail.email,
 			bookingDetail.bookDate,
 			bookingDetail.eventTypeDisplay, 
-			'Disapproved',
-			bookingDetail.endTime, )}
+			'Disapproved')}
 			>Disapprove</button
 		>
 			{#if bookingDetail.paymentStatus == "Unpaid"}
@@ -326,8 +306,7 @@ class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden ove
 			bookingDetail.email,
 			bookingDetail.bookDate,
 			bookingDetail.eventTypeDisplay, 
-			'Completed',
-			bookingDetail.endTime, )}
+			'Completed')}
 			>Mark as Completed</button
 		>
 		<button class="btn btn-error text-white" on:click={openRebooking(bookingDetailId)}
@@ -339,8 +318,7 @@ class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden ove
 			bookingDetail.email,
 			bookingDetail.bookDate,
 			bookingDetail.eventTypeDisplay, 
-			'Cancelled',
-			bookingDetail.endTime, )}
+			'Cancelled')}
 			>Cancel Booking</button
 		>
 		{/if}
@@ -361,7 +339,6 @@ class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden ove
 		<p class="mt-6 text-sm text-gray-500">Enter new date of event</p>
 		<input
 			type="date"
-			min={dateMin}
 			bind:value={rebookDate}
 			class="mt-6 input input-bordered w-full max-w-xs"
 		/>
@@ -443,8 +420,6 @@ class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden ove
 			<table class="table w-full">
 				<thead>
 					<tr>
-						<th></th>
-						<th></th>
 						<th />
 						<th class="text-lg">Name</th>
 						<th class="text-lg">Email Address</th>
@@ -457,28 +432,13 @@ class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden ove
 						<th class="text-lg">Payment Status</th>
 						<th class="text-lg">Last Approved/Disapproved By</th>
 						<th class="text-lg">Is Rescheduled?</th>
+						<th></th>
+						<th></th>
 					</tr>
 				</thead>
 				<tbody>
 					{#each listOfBooking as book, i}
 						<tr class="hover">
-							<td><button type="button" class="btn btn-primary" on:click={openBooking(book.id)}>View Details</button></td>
-							<td>
-								{#if book.paymentStatus === 'Unpaid'}
-									<!-- <button
-										on:click={() => ([showPopUp, markID] = [true, book.id])}
-										type="button"
-										class="btn btn-primary">Mark as Paid</button
-									> -->
-									<button
-										on:click={sendPaymentEmail(book.email, book.id, book.firstNameDisplay, book.lastNameDisplay, book.bookDate, book.eventTypeDisplay, book.endTime)}
-										type="button"
-										class="btn btn-primary">Send Payment</button
-									>
-								{:else}
-									<button type="button" class="btn btn-primary" disabled>Send Payment</button>
-								{/if}
-							</td>
 							<td>{i + 1}</td>
 							<td>{book.firstNameDisplay + ' ' + book.lastNameDisplay}</td>
 							<td>{book.email}</td>
@@ -549,7 +509,23 @@ class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden ove
 									{/if}
 								</form></td
 							> -->
-							
+							<td><button type="button" class="btn btn-primary" on:click={openBooking(book.id)}>View Details</button></td>
+							<td>
+								{#if book.paymentStatus === 'Unpaid'}
+									<!-- <button
+										on:click={() => ([showPopUp, markID] = [true, book.id])}
+										type="button"
+										class="btn btn-primary">Mark as Paid</button
+									> -->
+									<button
+										on:click={sendPaymentEmail(book.email, book.id, book.firstNameDisplay, book.lastNameDisplay, book.bookDate, book.eventTypeDisplay)}
+										type="button"
+										class="btn btn-primary">Send Payment</button
+									>
+								{:else}
+									<button type="button" class="btn btn-primary" disabled>Send Payment</button>
+								{/if}
+							</td>
 						</tr>
 					{/each}
 				</tbody>
