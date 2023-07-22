@@ -262,7 +262,7 @@
 			</div>
 			<div class="flex justify-end mt-8">
 				<button type="submit" class="btn btn-primary">Add Entry</button>
-				<button type="submit" on:click={() => console.log(paidBool)} class="btn btn-primary">Test</button>
+				<!-- <button type="submit" on:click={() => console.log(paidBool)} class="btn btn-primary">Test</button> -->
 				<a href="/admin/bookings" class="btn btn-error mx-1 text-white">Cancel</a>
 			</div>
 		</form>
