@@ -15,6 +15,8 @@
 
 	let errors = {};
 
+	const dateMin = new Date(Date.now() + 8.64e7 * 1).toLocaleDateString('en-ca');
+
 	async function submitHandler() {
 		const isValid = await checkInput();
 		if (!isValid) {
@@ -84,6 +86,7 @@
 					{/if}
 					<input
 						type="date"
+						min={dateMin}
 						class="input input-bordered p-3 mt-2"
 						bind:value={event.date}
 					/>
