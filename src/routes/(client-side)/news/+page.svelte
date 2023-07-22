@@ -1,6 +1,7 @@
 <script>
-	import { getDocs, query, collection, orderBy, limit } from 'firebase/firestore';
+	import { getDocs, deleteDoc, query, collection, orderBy, limit } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
+	import { dateObjToISO8601 } from '$lib/dateUtils';
 
 	let listOfNews = [];
 	let newsQuery = query(collection(db, 'news'), orderBy('dateCreated', 'desc'), limit(10));
@@ -12,6 +13,25 @@
 			...doc.data()
 		}));
 	}
+
+	async function deleteExpiredNews() {
+		const checkExpiredNewsSnapshot = await getDocs(collection(db, 'news'));
+		const currentDate = new Date();
+		const currentDateString = dateObjToISO8601(currentDate);
+		// console.log(currentDateString)
+		checkExpiredNewsSnapshot.forEach(async (doc) => {
+			const expirationDate = doc.data().expiration;
+			if (expirationDate <= currentDateString) {
+				try {
+					await deleteDoc(doc.ref);
+				} catch (error) {
+					console.log('Error deleting expired news:', doc.id, error);
+				}
+			}
+		});
+	}
+
+	deleteExpiredNews();
 
 	getNews(newsQuery);
 </script>
@@ -49,23 +69,19 @@
 										</svg>
 										<h1
 											class="tooltip"
-											data-tip="{news.dateCreated
-												.toDate()
-												.toLocaleDateString('en-US', {
-													month: 'long',
-													day: 'numeric',
-													year: 'numeric'
-												})} {news.dateCreated
+											data-tip="{news.dateCreated.toDate().toLocaleDateString('en-US', {
+												month: 'long',
+												day: 'numeric',
+												year: 'numeric'
+											})} {news.dateCreated
 												.toDate()
 												.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}"
 										>
-											{news.dateCreated
-												.toDate()
-												.toLocaleDateString('en-US', {
-													month: 'long',
-													day: 'numeric',
-													year: 'numeric'
-												})}
+											{news.dateCreated.toDate().toLocaleDateString('en-US', {
+												month: 'long',
+												day: 'numeric',
+												year: 'numeric'
+											})}
 										</h1>
 									</div>
 								</div>
@@ -80,6 +96,10 @@
 						</section>
 					</td>
 				</tr>
+			{:else}
+				<div class="flex flex-row justify-center items-center text-2xl h-96">
+					<span>No News</span>
+				</div>
 			{/each}
 		</tbody>
 	</table>

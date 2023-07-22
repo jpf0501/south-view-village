@@ -30,8 +30,11 @@
 {#if !show }
 	<LoadingScreen/>
 {:else}
+<body class="bg-base-200">
 	<Header/>
 	<div class="pt-16">
 		<slot/>
 	</div>
+</body>
+	
 {/if}

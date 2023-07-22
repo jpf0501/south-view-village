@@ -89,17 +89,23 @@
 				<thead>
 					<tr>
 						<th />
+						<th />
 						<th class="text-lg">Name</th>
 						<th class="text-lg">Email</th>
 						<th class="text-lg">Inquiry</th>
 						<!-- <th class="text-lg">Date Inquired</th> -->
-						<th />
+						
 					</tr>
 				</thead>
 
 				<tbody>
 					{#each listOfInquiry as inquiry, i}
 						<tr class="hover">
+							<td>
+								<a href={'/admin/inquiries/respond/' + inquiry.id} class="btn btn-primary"
+									>Give Response</a
+								>
+							</td>
 							<td>{i + 1}</td>
 							<td>{inquiry.nameDisplay}</td>
 							<td>{inquiry.email}</td>
@@ -113,11 +119,7 @@
 										.toDate()
 										.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}</td
 							> -->
-							<td>
-								<a href={'/admin/inquiries/respond/' + inquiry.id} class="btn btn-primary"
-									>Give Response</a
-								>
-							</td>
+							
 						</tr>
 					{/each}
 				</tbody>

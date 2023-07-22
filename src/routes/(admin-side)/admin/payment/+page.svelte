@@ -7,7 +7,9 @@
 		where,
 		updateDoc,
 		doc,
-		getDocs
+		addDoc,
+		getDocs,
+		serverTimestamp
 	} from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
@@ -49,7 +51,8 @@
 	let unsubscribe = () => {};
 
 	let showPopUpForMarkAsPaid = false;
-	let markID = '';
+	let userInfo;
+	let markFee = 0;
 
 	function openModal(firstName, lastName, email, id) {
 		userFirst = firstName;
@@ -109,7 +112,9 @@
 				html: `<center><h1><img src="https://ssv.vercel.app/logo.png"> Southview Homes 3</h1>
 				<p style="font-size:12px">SVH3 Clubhouse, San Vicente Road, Brgy., San Vicente, San Pedro, Laguna</p><br/>
 				<p style="font-size:13px; text-decoration:underline">This is an automated message. Do not reply.</p></center>
-				<p><br/>We sent you this notice to inform you on the payment of your unpaid monthly dues for the period of ${currentMonth} ${currentYear}, which amounts to a total of PHP ${new Intl.NumberFormat().format(mailFee)}.00 in total. The above amount and period remains unpaid on the record. Please be informed that the purpose of collecting this fee is to fund the subdivision's monthly expenses, which include the following:
+				<p><br/>We sent you this notice to inform you on the payment of your unpaid monthly dues for the period of ${currentMonth} ${currentYear}, which amounts to a total of PHP ${new Intl.NumberFormat().format(
+					mailFee
+				)}.00 in total. The above amount and period remains unpaid on the record. Please be informed that the purpose of collecting this fee is to fund the subdivision's monthly expenses, which include the following:
 				<br/><br/>
 				1) Security Guard Salary
 				<br/>2) Street Lights
@@ -130,9 +135,16 @@
 		}
 	}
 
-	async function markAsPaid(id) {
+	async function markAsPaid() {
+		// console.log(userInfo.id)
+		// console.log(userInfo.contactNumber)
+		//acount table
+		if ((markFee < 500)) {
+			toast.error('Invalid Mark Fee');
+			return;
+		}
 		try {
-			const accountRef = doc(db, 'accounts', id);
+			const accountRef = doc(db, 'accounts', userInfo.id);
 			const data = {
 				paymentStatus: 'Paid'
 			};
@@ -142,6 +154,26 @@
 		} catch (error) {
 			console.log(error);
 			toast.error('Error in marking account as paid!');
+		}
+		//////payment table
+		try {
+			const newMarkFee = markFee * 100;
+			await addDoc(collection(db, 'payments'), {
+				addressBlock: userInfo.addressBlock,
+				addressLot: userInfo.addressLot,
+				addressStreet: userInfo.addressStreet,
+				contact: userInfo.contactNumber,
+				email: userInfo.email,
+				firstName: userInfo.firstname,
+				firstNameDisplay: userInfo.firstNameDisplay,
+				lastName: userInfo.lastname,
+				lastNameDisplay: userInfo.lastNameDisplay,
+				paymentFee: newMarkFee,
+				paymentTime: serverTimestamp()
+			});
+		} catch (error) {
+			console.log(error);
+			toast.error('Error in marking account payment as paid!');
 		}
 	}
 
@@ -156,10 +188,7 @@
 
 	async function resetStatus() {
 		closeConfirmation();
-		const accountQuery = query(
-			collection(db, 'accounts'),
-			where('paymentHead', '==', true)
-		);
+		const accountQuery = query(collection(db, 'accounts'), where('paymentHead', '==', true));
 		const snapshot = await getDocs(accountQuery);
 		for (let i = 0; i < snapshot.docs.length; i++) {
 			const docRef = doc(db, 'accounts', snapshot.docs[i].id);
@@ -316,7 +345,10 @@
 							<td>
 								{#if user.paymentStatus == 'Unpaid'}
 									<button
-										on:click={() => ([showPopUpForMarkAsPaid, markID] = [true, user.id])}
+										on:click={() => {
+											showPopUpForMarkAsPaid = true;
+											userInfo = user;
+										}}
 										type="button"
 										class="btn btn-primary">Mark as Paid</button
 									>
@@ -369,7 +401,10 @@
 					<div class="card-actions justify-end">
 						{#if user.paymentStatus == 'Unpaid'}
 							<button
-								on:click={() => ([showPopUpForMarkAsPaid, markID] = [true, user.id])}
+								on:click={() => {
+									showPopUpForMarkAsPaid = true;
+									userInfo = user;
+								}}
 								type="button"
 								class="btn btn-primary">Mark as Paid</button
 							>
@@ -394,7 +429,6 @@
 	</div>
 </div>
 
-
 <!-- Pop-up for confirmation of mark as paid -->
 {#if showPopUpForMarkAsPaid}
 	<div
@@ -405,8 +439,15 @@
 			<div class="p-6">
 				<h2 class="text-lg font-medium">Are you sure you want to mark this as paid?</h2>
 			</div>
+			<p class="mt-6 mx-3 text-sm text-gray-500">Enter payment fee (in Philippine peso)</p>
+			<input
+				type="number"
+				placeholder="Enter amount"
+				bind:value={markFee}
+				class="mt-6 mx-3 input input-bordered w-full max-w-xs"
+			/>
 			<div class="flex justify-end px-6 gap-2 py-4">
-				<button class="btn btn-primary" on:click={markAsPaid(markID)}>Yes</button>
+				<button class="btn btn-primary" on:click={markAsPaid}>Yes</button>
 				<button class="btn btn-error text-white" on:click={() => (showPopUpForMarkAsPaid = false)}
 					>No</button
 				>

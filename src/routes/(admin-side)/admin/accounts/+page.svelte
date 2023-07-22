@@ -95,13 +95,14 @@
 				<thead>
 					<tr>
 						<th />
+						<th />
 						<th class="text-lg">Name</th>
 						<th class="text-lg">Address</th>
 						<th class="text-lg">Email</th>
 						<th class="text-lg">Contact No.</th>
 						<th class="text-lg">Role</th>
 						<th />
-						<th />
+						
 					</tr>
 				</thead>
 				<!-- {#if noResult}
@@ -112,21 +113,6 @@
 				<tbody>
 					{#each listOfUsers as user, i}
 						<tr class="hover">
-							<td>{i + 1}</td>
-							<td>{user.firstNameDisplay + ' ' + user.lastNameDisplay}</td>
-							<td
-								>{'Block ' +
-									user.addressBlock +
-									' Lot ' +
-									user.addressLot +
-									' ' +
-									user.addressStreet +
-									' Street'}</td
-							>
-							<td>{user.email}</td>
-							<td>{user.contactNumber}</td>
-							<td>{user.role}</td>
-							<td />
 							<td
 								><a href={'/admin/accounts/edit/' + user.id} class="btn glass text-white"
 									><svg
@@ -140,6 +126,22 @@
 									></a
 								></td
 							>
+							<td>{i + 1}</td>
+							<td>{user.firstNameDisplay + ' ' + user.middleNameDisplay + ' ' + user.lastNameDisplay}</td>
+							<td
+								>{'Block ' +
+									user.addressBlock +
+									' Lot ' +
+									user.addressLot +
+									' ' +
+									user.addressStreet +
+									' Street'}</td
+							>
+							<td>{user.email}</td>
+							<td>{user.contactNumber}</td>
+							<td>{user.role}</td>
+							<td />
+							
 						</tr>
 					{/each}
 				</tbody>
@@ -154,7 +156,7 @@
 		{#each listOfUsers as user}
 			<div class="card w-[105%] bg-base-100 shadow-xl">
 				<div class="card-body">
-					<h2 class="card-title mb-2">{user.firstNameDisplay + ' ' + user.lastNameDisplay}</h2>
+					<h2 class="card-title mb-2">{user.firstNameDisplay + ' ' + user.middleNameDisplay + ' ' + user.lastNameDisplay}</h2>
 					<div>
 						<span class="my-1 font-bold">Role:</span>
 						{user.role}

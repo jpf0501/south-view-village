@@ -6,6 +6,7 @@
 		updateDoc,
 		doc,
 		where,
+		getDoc,
 		orderBy,
 		serverTimestamp
 	} from 'firebase/firestore';
@@ -13,28 +14,33 @@
 	import { onDestroy } from 'svelte';
 	import { createPaymentLink, sendEmail } from '$lib/utils';
 	import toast from 'svelte-french-toast';
+	import { userStore } from '$lib/store';
+
+	const dateMin = new Date(Date.now() + 8.64e7).toLocaleDateString('en-ca');
 
 	let listOfBooking = [];
 	let sortByField = '';
 	let searchByField = '';
 	let searchByValue = '';
 	let bookingStatus = '';
+	let bookingDetail = '';
 	let bookingsQuery = query(
 		collection(db, 'booking'),
-		where('status', '==', 'Pending'),
+		where('status', 'in', ['Pending', 'Approved']),
 		orderBy('dateReserved', 'asc')
 	);
 
 	let unsubscribe = () => {};
 
-	let showPopUp = false;
-	let markID = '';
+	let showPopUp, bookingDetailPopup, reservationPopup = false;
+	let bookingDetailId, markID, rebookDate, rebookStartTime, rebookEndTime, bookingForScheduleId, user = '';
+	let data = {};
 
 	async function changeSortBy() {
 		const order = sortByField === 'bookDate' ? 'desc' : 'asc';
 		bookingsQuery = query(
 			collection(db, 'booking'),
-			where('status', '==', 'Pending'),
+			where('status', 'in', ['Pending', 'Approved']),
 			orderBy(sortByField, order),
 			orderBy('dateReserved', 'asc')
 		);
@@ -47,29 +53,35 @@
 			where(searchByField, '>=', searchByValueCase),
 			orderBy(searchByField, 'asc'),
 			where(searchByField, '<=', searchByValueCase + '~'),
-			where('status', '==', 'Pending'),
+			where('status', 'in', ['Pending', 'Approved']),
 			orderBy('dateReserved', 'asc')
 		);
 	}
 
-	async function approvalHandler(id, firstname, lastname, email, bookDate, event) {
-		changeStatus(id);
-		sendUpdateToEmail(id, firstname, lastname, email, bookDate, event);
+	async function getUser() {
+		const snapshot = await getDoc(doc(db, 'accounts', $userStore.uid));
+		user = snapshot.data();
+		console.log(user.firstNameDisplay + ' ' + user.lastNameDisplay)
 	}
 
-	async function changeStatus(id) {
+	async function bookStatFunc(id, firstname, lastname, email, bookDate, event, bookStatus) {
+		const bookRef = doc(db, 'booking', id);
 		try {
-			const bookRef = doc(db, 'booking', id);
-			const data = {
-				status: bookingStatus,
-				dateReviewed: serverTimestamp()
+			data = {
+				status: bookStatus,
+				dateReviewed: serverTimestamp(),
+				isReviewed: true,
+				approvedBy: user.firstNameDisplay + ' ' + user.lastNameDisplay
+				
 			};
 			await updateDoc(bookRef, data);
-			toast.success('Booking request has been ' + bookingStatus.toLowerCase() + ' !');
+			toast.success('Booking request has been ' + bookStatus.toLowerCase() + ' !');
 		} catch (error) {
 			console.log(error);
 			toast.error('Error in updating a booking!');
 		}
+		//sendUpdateToEmail(id, firstname, lastname, email, bookDate, event);
+		bookingDetailPopup = false;
 	}
 
 	async function sendUpdateToEmail(id, firstname, lastname, email, bookDate, event) {
@@ -144,12 +156,34 @@
 		}
 	}
 
+	async function openBooking(id) {
+		const snapshot = await getDoc(doc(db, 'booking', id));
+		bookingDetailId = snapshot.id;
+		bookingDetail = snapshot.data();
+		bookingDetailPopup = true;
+		//console.log(bookingDetailId, bookingDetail.lastNameDisplay)
+	}
+
+	function closeBooking() {
+		bookingDetailPopup = false;
+	}
+
+	function openRebooking(id) {
+		bookingForScheduleId = id;
+		reservationPopup = true;
+	}
+
+	function closeRebooking() {
+		reservationPopup = false;
+	}
+
 	async function markAsPaid(id) {
 		try {
 			const bookRef = doc(db, 'booking', id);
 			const data = {
 				paymentStatus: 'Paid'
 			};
+			bookingDetailPopup = false;
 			showPopUp = false;
 			await updateDoc(bookRef, data);
 			toast.success('Booking mark as paid!');
@@ -175,13 +209,166 @@
 		});
 	}
 
+	async function rescheduleBooking(id) {
+		// console.log(id, rebookDate, rebookStartTime, rebookEndTime)
+		// console.log(new Date(rebookDate + ' ' + rebookStartTime))
+		try {
+			const bookRef = doc(db, 'booking', id);
+			const data = {
+				bookDate: new Date(rebookDate + ' ' + rebookStartTime),
+				endTime: new Date(rebookDate + ' ' + rebookEndTime),
+				isRescheduled: true,
+			};
+			bookingDetailPopup = false;
+			showPopUp = false;
+			await updateDoc(bookRef, data);
+			toast.success('Successfully rescheduled event!');
+			reservationPopup = false;
+			bookingDetailPopup = false;
+		} catch (error) {
+			console.log(error);
+			toast.error('Error in rescheduling event!');
+			reservationPopup = false;
+			bookingDetailPopup = false;
+		}
+	}
+
 	onDestroy(() => unsubscribe());
 	$: setUpRealtimeListener(bookingsQuery);
+	getUser()
 </script>
 
 <svelte:head>
 	<title>Booking Requests - Southview Homes 3 Admin Panel</title>
 </svelte:head>
+
+{#if bookingDetailPopup}
+<div
+class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto"
+>
+<div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-75" />
+<div class="relative z-50 w-full max-w-2xl mx-auto bg-white rounded-lg shadow-lg">
+	<div class="p-6">
+		<h2 class="text-lg font-medium">Reservation Details</h2>
+		<div class="divider"></div>
+		<p class="mt-6 text-sm">NAME     |     {bookingDetail.firstNameDisplay + ' ' + bookingDetail.lastNameDisplay}</p>
+		<p class="mt-6 text-sm">EMAIL ADDRESS     |     {bookingDetail.email}</p>
+		<p class="mt-6 text-sm">CONTACT NO.    |     {bookingDetail.contactNumber}</p>
+		<p class="mt-6 text-sm">EVENT TYPE    |     {bookingDetail.eventTypeDisplay}</p>
+		<p class="mt-6 text-sm">DATE & TIME     |     {bookingDetail.dateReserved.toDate().toLocaleDateString('en-us', {
+			year: 'numeric',
+			month: 'long',
+			day: 'numeric'})} {bookingDetail.bookDate
+								.toDate()
+								.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })} - {bookingDetail.endTime
+								.toDate()
+								.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}</p>
+		<p class="mt-6 text-sm">DATE REVIEWED     |     {bookingDetail.dateReviewed && bookingDetail.isReviewed? bookingDetail.dateReviewed.toDate().toLocaleDateString('en-us', {
+			year: 'numeric',
+			month: 'long',
+			day: 'numeric'}) : "N/A"}</p>
+			<p class="mt-6 text-sm">STATUS     |     {bookingDetail.status}</p>
+		<p class="mt-6 text-sm">PAYMENT STATUS     |     {bookingDetail.paymentStatus}</p>
+		<p class="mt-6 text-sm">LAST APPROVED/DISAPPROVED BY     |     {bookingDetail.approvedBy ? bookingDetail.approvedBy : "N/A"}</p>
+		<p class="mt-6 text-sm">IS RESCHEDULED?     |     {bookingDetail.isRescheduled ? "Yes" : "No"}</p>
+	</div>
+	<div class="flex flex-col px-6 gap-2 py-4">
+		{#if bookingDetail.status == 'Pending'}
+		<button class="btn btn-success text-white"
+			on:click={bookStatFunc(bookingDetailId,
+				bookingDetail.firstNameDisplay,
+				bookingDetail.lastNameDisplay,
+				bookingDetail.email,
+				bookingDetail.bookDate,
+				bookingDetail.eventTypeDisplay, 
+				'Approved')}
+			>Approve</button
+		>
+		<button class="btn btn-error text-white" on:click={bookStatFunc(bookingDetailId,
+			bookingDetail.firstNameDisplay,
+			bookingDetail.lastNameDisplay,
+			bookingDetail.email,
+			bookingDetail.bookDate,
+			bookingDetail.eventTypeDisplay, 
+			'Disapproved')}
+			>Disapprove</button
+		>
+			{#if bookingDetail.paymentStatus == "Unpaid"}
+				<button class="btn btn-accent text-white" on:click={markAsPaid(bookingDetailId)}
+				>Mark as Paid</button
+				>
+			{/if}
+		{/if}
+		{#if bookingDetail.status == 'Approved'}
+		<button class="btn btn-success text-white" on:click={bookStatFunc(bookingDetailId,
+			bookingDetail.firstNameDisplay,
+			bookingDetail.lastNameDisplay,
+			bookingDetail.email,
+			bookingDetail.bookDate,
+			bookingDetail.eventTypeDisplay, 
+			'Completed')}
+			>Mark as Completed</button
+		>
+		<button class="btn btn-error text-white" on:click={openRebooking(bookingDetailId)}
+			>Reschedule Event</button
+		>
+		<button class="btn btn-accent text-white" on:click={bookStatFunc(bookingDetailId,
+			bookingDetail.firstNameDisplay,
+			bookingDetail.lastNameDisplay,
+			bookingDetail.email,
+			bookingDetail.bookDate,
+			bookingDetail.eventTypeDisplay, 
+			'Cancelled')}
+			>Cancel Booking</button
+		>
+		{/if}
+		<button class="btn btn-primary text-white" on:click={closeBooking}>Close</button>
+	</div>
+</div>
+</div>
+{/if}
+
+{#if reservationPopup}
+<div
+class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto"
+>
+<div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-75" />
+<div class="relative z-50 w-full max-w-md mx-auto bg-white rounded-lg shadow-lg">
+	<div class="p-6">
+		<h2 class="text-lg font-medium">Reschedule Reservation</h2>
+		<p class="mt-6 text-sm text-gray-500">Enter new date of event</p>
+		<input
+			type="date"
+			bind:value={rebookDate}
+			class="mt-6 input input-bordered w-full max-w-xs"
+		/>
+		<!-- <p>{bookingForScheduleId}</p> -->
+		<p class="mt-6 text-sm text-gray-500">Enter new starting time of event</p>
+		<input
+			type="time"
+			min="8:00"
+			max="19:00"
+			bind:value={rebookStartTime}
+			class="mt-6 input input-bordered w-full max-w-xs"
+		/>
+		<p class="mt-6 text-sm text-gray-500">Enter new ending time of event</p>
+		<input
+			type="time"
+			min="8:00"
+			max="19:00"
+			bind:value={rebookEndTime}
+			class="mt-6 input input-bordered w-full max-w-xs"
+		/>
+	</div>
+	<div class="flex justify-end px-6 gap-2 py-4">
+		<button class="btn btn-primary" on:click={rescheduleBooking(bookingForScheduleId)}
+			>Reschedule Booking</button
+		>
+		<button class="btn btn-error text-white" on:click={closeRebooking}>Cancel</button>
+	</div>
+</div>
+</div>
+{/if}
 
 <div class="min-w-full min-h-full bg-base-200 py-8 px-5">
 	<h1 class="text-3xl font-semibold py-2">Bookings</h1>
@@ -230,18 +417,23 @@
 	<!-- Medium to large screen -->
 	<div class="w-full mx-auto shadow-2xl border rounded-xl bg-base-100 my-5 hidden md:block">
 		<div class="overflow-x-auto">
-			<table class="table w-full ">
+			<table class="table w-full">
 				<thead>
 					<tr>
 						<th />
 						<th class="text-lg">Name</th>
-						<th class="text-lg">Email</th>
+						<th class="text-lg">Email Address</th>
 						<th class="text-lg">Contact Number</th>
-						<th class="text-lg">Type of Event</th>
-						<th class="text-lg">Date and Time</th>
+						<th class="text-lg">Event Type</th>
+						<th class="text-lg">Date</th>
+						<th class="text-lg">Time</th>
+						<th class="text-lg">Status</th>
 						<!-- <th class="text-lg">Date Reserved</th> -->
 						<th class="text-lg">Payment Status</th>
-						<th colspan="2" />
+						<th class="text-lg">Last Approved/Disapproved By</th>
+						<th class="text-lg">Is Rescheduled?</th>
+						<th></th>
+						<th></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -257,12 +449,10 @@
 									year: 'numeric',
 									month: 'long',
 									day: 'numeric'
-								}) +
-									' at ' +
-									book.bookDate
-										.toDate()
-										.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}</td
-							>
+								})}</td>
+							<td>{book.bookDate
+								.toDate()
+								.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })} - {book.endTime.toDate().toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'})}</td>
 							<!-- <td
 									>{book.dateReserved.toDate().toLocaleDateString('en-us', {
 										year: 'numeric',
@@ -274,8 +464,11 @@
 											.toDate()
 											.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}</td
 								> -->
-							<td class="text-center">{book.paymentStatus}</td>
-							<td
+							<td>{book.status}</td>
+							<td>{book.paymentStatus}</td>
+							<td>{book.approvedBy ? book.approvedBy : "N/A"}</td>
+							<td>{book.isRescheduled ? "Yes" : "No"}</td>
+							<!-- <td
 								><form
 									on:submit|preventDefault={approvalHandler(
 										book.id,
@@ -315,21 +508,21 @@
 										>
 									{/if}
 								</form></td
-							>
+							> -->
+							<td><button type="button" class="btn btn-primary" on:click={openBooking(book.id)}>View Details</button></td>
 							<td>
 								{#if book.paymentStatus === 'Unpaid'}
-									<button
+									<!-- <button
 										on:click={() => ([showPopUp, markID] = [true, book.id])}
 										type="button"
 										class="btn btn-primary">Mark as Paid</button
-									>
+									> -->
 									<button
 										on:click={sendPaymentEmail(book.email, book.id, book.firstNameDisplay, book.lastNameDisplay, book.bookDate, book.eventTypeDisplay)}
 										type="button"
 										class="btn btn-primary">Send Payment</button
 									>
 								{:else}
-									<button type="button" class="btn btn-primary" disabled>Mark as Paid</button>
 									<button type="button" class="btn btn-primary" disabled>Send Payment</button>
 								{/if}
 							</td>
@@ -384,61 +577,21 @@
 						{book.paymentStatus}
 					</div>
 					<div>
-						<form
-							on:submit|preventDefault={approvalHandler(
-								book.id,
-								book.firstNameDisplay,
-								book.lastNameDisplay,
-								book.email,
-								book.bookDate,
-								book.eventTypeDisplay
-							)}
-							class="py-3"
-						>
-							{#if book.paymentStatus == 'Unpaid'}
+							<button type="button" class="btn btn-primary" on:click={openBooking(book.id)}>View Details</button>
+								{#if book.paymentStatus === 'Unpaid'}
+								<!-- <button
+									on:click={() => ([showPopUp, markID] = [true, book.id])}
+									type="button"
+									class="btn btn-primary">Mark as Paid</button
+								> -->
 								<button
-									on:click={() => (bookingStatus = 'Approved')}
-									type="submit"
-									class="btn btn-success text-white"
-									disabled>Approve</button
+									on:click={sendPaymentEmail(book.email, book.id, book.firstNameDisplay, book.lastNameDisplay, book.bookDate, book.eventTypeDisplay)}
+									type="button"
+									class="btn btn-primary">Send Payment</button
 								>
 							{:else}
-								<button
-									on:click={() => (bookingStatus = 'Approved')}
-									type="submit"
-									class="btn btn-success text-white">Approve</button
-								>
+								<button type="button" class="btn btn-primary" disabled>Send Payment</button>
 							{/if}
-							{#if book.paymentStatus == 'Paid'}
-								<button
-									on:click={() => (bookingStatus = 'Disapproved')}
-									type="submit"
-									class="btn btn-error text-white"
-									disabled>Dissaprove</button
-								>
-							{:else}
-								<button
-									on:click={() => (bookingStatus = 'Disapproved')}
-									type="submit"
-									class="btn btn-error text-white">Dissaprove</button
-								>
-							{/if}
-						</form>
-						{#if book.paymentStatus === 'Unpaid'}
-							<button
-								on:click={() => ([showPopUp, markID] = [true, book.id])}
-								type="button"
-								class="btn btn-primary">Mark as Paid</button
-							>
-							<button
-								on:click={sendPaymentEmail(book.email, book.id, book.firstNameDisplay, book.lastNameDisplay)}
-								type="button"
-								class="btn btn-primary">Send Payment</button
-							>
-						{:else}
-							<button type="button" class="btn btn-primary" disabled>Mark as Paid</button>
-							<button type="button" class="btn btn-primary" disabled>Send Payment</button>
-						{/if}
 					</div>
 				</div>
 			</div>

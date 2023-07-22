@@ -17,6 +17,7 @@
 		eventType: '',
 		date: '',
 		time: '',
+		endTime: '',
 		dateReserved: serverTimestamp()
 	};
 	let errors = {};
@@ -76,6 +77,7 @@
 			contactNumber: !guest.contactNumber,
 			eventType: !guest.eventType,
 			time: !guest.time,
+			endTime: !guest.endTime,
 			date: !guest.date,
 			invalidFirstname: !regex.test(guest.firstname),
 			invalidLastname: !regex.test(guest.lastname),
@@ -107,9 +109,14 @@
 				eventType: guest.eventType.trim().toLowerCase(),
 				eventTypeDisplay: guest.eventType,
 				bookDate: new Date(guest.date + ' ' + guest.time),
+				endTime: new Date(guest.date + ' ' + guest.endTime),
 				dateReserved: guest.dateReserved,
-				dateReviewed: guest.dateReserved
+				dateReviewed: guest.dateReserved,
+				isRescheduled: false,
+				approvedBy: '',
+				isReviewed: false,
 			});
+			console.log(new Date(guest.date + ' ' + guest.endTime))
 			toast.success('Reservation entry saved!');
 			await goto('/admin/bookings');
 		} catch (error) {
@@ -219,9 +226,9 @@
 					/>
 				</div>
 				<div class="form-control">
-					<span class="label-text">Time</span>
+					<span class="label-text">Start Time</span>
 					{#if errors.time}
-						<p class="text-red-500 text-sm italic mb-1">Time is required</p>
+						<p class="text-red-500 text-sm italic mb-1">Start time is required</p>
 					{/if}
 					<input
 						type="time"
@@ -229,6 +236,19 @@
 						max="19:00"
 						class="input input-bordered p-3 mt-2"
 						bind:value={guest.time}
+					/>
+				</div>
+				<div class="form-control">
+					<span class="label-text">End Time</span>
+					{#if errors.endTime}
+						<p class="text-red-500 text-sm italic mb-1">End time is required</p>
+					{/if}
+					<input
+						type="time"
+						min="8:00"
+						max="19:00"
+						class="input input-bordered p-3 mt-2"
+						bind:value={guest.endTime}
 					/>
 				</div>
 			</div>

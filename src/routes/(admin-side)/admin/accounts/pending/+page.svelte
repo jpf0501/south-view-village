@@ -13,6 +13,7 @@
 	import { sendEmail } from '$lib/utils';
 	import { onDestroy } from 'svelte';
 	import toast from 'svelte-french-toast';
+	import Confirmation from '../../../../../lib/Components/Confirmation.svelte';
 
 	let listOfUsers = [];
 	let sortByField = '';
@@ -24,8 +25,35 @@
 	);
 
 	let pendingAccountStatus = '';
+	let confirmation = false;
+	let confirmationText;
+	let accountInfo;
 
 	let unsubscribe = () => {};
+
+	async function handleApprovedAccount(user) {
+		accountInfo = user;
+		pendingAccountStatus = 'Approved';
+		confirmationText = `Do you want to approved the account creation of "${accountInfo.pendingFirstNameDisplay} ${accountInfo.pendingLastNameDisplay}"`;
+		confirmation = true;
+	}
+
+	async function handleDisapprovedAccount(user) {
+		accountInfo = user;
+		pendingAccountStatus = 'Disapproved';
+		confirmationText = `Do you want to disapproved the account creation of "${accountInfo.pendingFirstNameDisplay} ${accountInfo.pendingLastNameDisplay}"`;
+		confirmation = true;
+	}
+
+	async function confirmSubmit() {
+		confirmation = false;
+		await approval();
+		await sendUpdateAccountStatusToEmail();
+	}
+
+	async function cancelSubmit() {
+		confirmation = false;
+	}
 
 	async function changeSortBy() {
 		pendingAccountsQuery = query(
@@ -53,54 +81,13 @@
 		searchByValue = '';
 	}
 
-	async function submitHandler(
-		id,
-		email,
-		password,
-		firstname,
-		firstnameDisplay,
-		lastname,
-		lastnameDisplay,
-		contactNumber,
-		block,
-		lot,
-		street,
-		paymentHead
-	) {
-		approval(
-			id,
-			email,
-			password,
-			firstname,
-			firstnameDisplay,
-			lastname,
-			lastnameDisplay,
-			contactNumber,
-			block,
-			lot,
-			street,
-			paymentHead
-		);
-		sendUpdateAccountStatusToEmail(email, firstnameDisplay, lastnameDisplay);
-	}
-
-	async function approval(
-		id,
-		email,
-		password,
-		firstname,
-		firstnameDisplay,
-		lastname,
-		lastnameDisplay,
-		contactNumber,
-		block,
-		lot,
-		street,
-		paymentHead
-	) {
+	async function approval() {
 		if (pendingAccountStatus === 'Approved') {
 			try {
-				const accountsQuery = query(collection(db, 'accounts'), where('email', '==', email));
+				const accountsQuery = query(
+					collection(db, 'accounts'),
+					where('email', '==', accountInfo.pendingEmail)
+				);
 				const accountsSnapshot = await getDocs(accountsQuery);
 				if (accountsSnapshot.docs.length > 0) {
 					toast.error('Email already exists!');
@@ -109,22 +96,24 @@
 				const response = await fetch('/api/pendingAccounts', {
 					method: 'POST',
 					body: JSON.stringify({
-						email: email,
-						password: password,
-						firstname: firstname,
-						firstNameDisplay: firstnameDisplay,
-						lastname: lastname,
-						lastNameDisplay: lastnameDisplay,
-						addressBlock: block,
-						addressLot: lot,
-						addressStreet: street,
-						contactNumber: contactNumber,
-						paymentHead: paymentHead
+						email: accountInfo.pendingEmail,
+						password: accountInfo.pendingPassword,
+						firstname: accountInfo.pendingFirstname,
+						firstNameDisplay: accountInfo.pendingFirstNameDisplay,
+						lastname: accountInfo.pendingLastname,
+						lastNameDisplay: accountInfo.pendingLastNameDisplay,
+						middlename: accountInfo.pendingMiddlename,
+						middleNameDisplay: accountInfo.pendingMiddleNameDisplay,
+						addressBlock: accountInfo.pendingAddressBlock,
+						addressLot: accountInfo.pendingAddressLot,
+						addressStreet: accountInfo.pendingAddressStreet,
+						contactNumber: accountInfo.pendingContactNumber,
+						paymentHead: accountInfo.pendingPaymentHead
 					})
 				});
 				const result = await response.json();
 				// console.log(result);
-				const pendingAccountsRef = doc(db, 'pendingAccounts', id);
+				const pendingAccountsRef = doc(db, 'pendingAccounts', accountInfo.id);
 				const data = {
 					status: 'Approved'
 				};
@@ -136,7 +125,7 @@
 			}
 		} else if (pendingAccountStatus === 'Disapproved') {
 			try {
-				const pendingAccountsRef = doc(db, 'pendingAccounts', id);
+				const pendingAccountsRef = doc(db, 'pendingAccounts', accountInfo.id);
 				const data = {
 					status: 'Disapproved'
 				};
@@ -149,7 +138,7 @@
 		}
 	}
 
-	async function sendUpdateAccountStatusToEmail(email, firstname, lastname) {
+	async function sendUpdateAccountStatusToEmail() {
 		let message;
 
 		if (pendingAccountStatus === 'Approved') {
@@ -163,13 +152,13 @@
 		}
 		try {
 			await sendEmail({
-				to: email,
+				to: accountInfo.pendingEmail,
 				subject: 'Southview Homes 3 Account Approval Status',
 				html: `<center><h1><img src="https://ssv.vercel.app/logo.png"> Southview Homes 3</h1>
 				<p style="font-size:12px">SVH3 San Vicente Road, Brgy., San Vicente, San Pedro, Laguna</p><br/>
 				<p style="font-size:13px; text-decoration:underline">This is an automated message. Do not reply.</p></center>
 				<p>Account Status Update</p>
-				<p>Dear ${firstname} ${lastname},</p>
+				<p>Dear ${accountInfo.pendingFirstNameDisplay} ${accountInfo.pendingLastNameDisplay},</p>
 				<p>We have reviewed your account application and are writing to inform you of your account approval status.</p>
 				<p>${message}</p>
 				<p>If you have any questions or concerns, please do not hesitate to contact us. We are always here to help.</p>
@@ -199,6 +188,7 @@
 	<title>Pending Accounts - Southview Homes 3 Admin Panel</title>
 </svelte:head>
 
+<Confirmation show={confirmation} onConfirm={confirmSubmit} onCancel={cancelSubmit} {confirmationText}/>
 <div class="min-w-full min-h-full bg-base-200 py-8 px-5">
 	<h1 class="text-3xl font-semibold py-2">Account Approval</h1>
 	<div class="flex flex-col md:flex-row justify-between">
@@ -251,19 +241,39 @@
 				<thead>
 					<tr>
 						<th />
+						<th />
 						<th class="text-lg">Name</th>
 						<th class="text-lg">Address</th>
 						<th class="text-lg">Email</th>
 						<th class="text-lg">Contact No.</th>
 						<th class="text-lg">Payment Head</th>
-						<th />
 					</tr>
 				</thead>
 				<tbody>
 					{#each listOfUsers as user, i}
 						<tr class="hover">
+							<td
+								><form>
+									<button
+										on:click={handleApprovedAccount(user)}
+										type="button"
+										class="btn btn-success text-white">Approve</button
+									>
+									<button
+										on:click={handleDisapprovedAccount(user)}
+										type="button"
+										class="btn btn-error text-white">Dissaprove</button
+									>
+								</form></td
+							>
 							<td>{i + 1}</td>
-							<td>{user.pendingFirstNameDisplay + ' ' + user.pendingLastNameDisplay}</td>
+							<td
+								>{user.pendingFirstNameDisplay +
+									' ' +
+									user.pendingMiddleNameDisplay +
+									' ' +
+									user.pendingLastNameDisplay}</td
+							>
 							<td
 								>{'Block ' +
 									user.pendingAddressBlock +
@@ -280,35 +290,6 @@
 							{:else}
 								<td class="text-center">No</td>
 							{/if}
-							<td
-								><form
-									on:submit|preventDefault={submitHandler(
-										user.id,
-										user.pendingEmail,
-										user.pendingPassword,
-										user.pendingFirstname,
-										user.pendingFirstNameDisplay,
-										user.pendingLastname,
-										user.pendingLastNameDisplay,
-										user.pendingContactNumber,
-										user.pendingAddressBlock,
-										user.pendingAddressLot,
-										user.pendingAddressStreet,
-										user.pendingPaymentHead
-									)}
-								>
-									<button
-										on:click={() => (pendingAccountStatus = 'Approved')}
-										type="submit"
-										class="btn btn-success text-white">Approve</button
-									>
-									<button
-										on:click={() => (pendingAccountStatus = 'Disapproved')}
-										type="submit"
-										class="btn btn-error text-white">Dissaprove</button
-									>
-								</form></td
-							>
 						</tr>
 					{/each}
 				</tbody>
@@ -322,7 +303,11 @@
 			<div class="card w-[105%] bg-base-100 shadow-xl">
 				<div class="card-body">
 					<h2 class="card-title mb-2">
-						{user.pendingFirstNameDisplay + ' ' + user.pendingLastNameDisplay}
+						{user.pendingFirstNameDisplay +
+							' ' +
+							user.pendingMiddleNameDisplay +
+							' ' +
+							user.pendingLastNameDisplay}
 					</h2>
 					<div>
 						<span class="my-1 font-bold">Address:</span>
@@ -347,30 +332,14 @@
 						{user.pendingEmail}
 					</div>
 					<div>
-						<form
-							on:submit|preventDefault={submitHandler(
-								user.id,
-								user.pendingEmail,
-								user.pendingPassword,
-								user.pendingFirstname,
-								user.pendingFirstNameDisplay,
-								user.pendingLastname,
-								user.pendingLastNameDisplay,
-								user.pendingContactNumber,
-								user.pendingAddressBlock,
-								user.pendingAddressLot,
-								user.pendingAddressStreet,
-								user.pendingPaymentHead
-							)}
-							class="py-3"
-						>
+						<form class="py-3 flex flex-row justify-end gap-2">
 							<button
-								on:click={() => (pendingAccountStatus = 'Approved')}
+								on:click={handleApprovedAccount(user)}
 								type="submit"
 								class="btn btn-success text-white">Approve</button
 							>
 							<button
-								on:click={() => (pendingAccountStatus = 'Disapproved')}
+								on:click={handleDisapprovedAccount(user)}
 								type="submit"
 								class="btn btn-error text-white">Dissaprove</button
 							>

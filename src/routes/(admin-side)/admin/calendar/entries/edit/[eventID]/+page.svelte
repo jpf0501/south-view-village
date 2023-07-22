@@ -3,6 +3,7 @@
 	import { getDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
 	import { goto } from '$app/navigation';
 	import toast from 'svelte-french-toast';
+	import Confirmation from '../../../../../../../lib/Components/Confirmation.svelte';
 
 	/** @type {import('./$types').PageData} */
 	export let data;
@@ -10,6 +11,40 @@
 
 	let event = null;
 	let errors = {};
+	let confirmation = false;
+	let confirmationText;
+	let handleWhat
+
+	async function handleEventUpdate() {
+		const isValid = await checkInput();
+		if (!isValid) {
+			toast.error('Form validation failed');
+			return;
+		}
+		handleWhat = "Update"
+		confirmationText = `Do you want to save changes in this event "${event.title}"`;
+		confirmation = true;
+	}
+
+	async function handleEventDelete() {
+		handleWhat = "Delete"
+		confirmationText = `Do you want to delete this event "${event.title}"`;
+		confirmation = true;
+	}
+
+	async function confirmSubmit() {
+		confirmation = false;
+		if(handleWhat === "Update"){
+			await updateEvent()
+		} else if(handleWhat === "Delete"){
+			await deleteEvent()
+		}
+	}
+
+	async function cancelSubmit() {
+		confirmation = false;
+	}
+
 
 	async function getEvent() {
 		const snapshot = await getDoc(doc(db, 'event', eventID));
@@ -68,6 +103,8 @@
 	<title>Edit Event - Southview Homes 3 Admin Panel</title>
 </svelte:head>
 
+<Confirmation show={confirmation} onConfirm={confirmSubmit} onCancel={cancelSubmit} {confirmationText}/>
+
 {#if event}
 	<div class="min-h-screen hero bg-base-200">
 		<div class="w-full max-w-4xl p-6 mx-auto shadow-2xl border rounded-xl bg-base-100">
@@ -110,9 +147,9 @@
 				</div>
 			</div>
 			<div class="flex justify-end mt-8">
-				<button type="submit" on:click={updateEvent} class="btn btn-primary">Save</button>
+				<button type="submit" on:click={handleEventUpdate} class="btn btn-primary">Save</button>
 				<a href="/admin/calendar/entries/" class="btn btn-error mx-1 text-white">Cancel</a>
-				<button type="button" on:click={deleteEvent} class="btn btn-warning text-white"
+				<button type="button" on:click={handleEventDelete} class="btn btn-warning text-white"
 					>Delete</button
 				>
 			</div>

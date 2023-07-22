@@ -1,8 +1,18 @@
 <script>
 	import { goto } from '$app/navigation';
 	import { db } from '$lib/firebase/client';
-	import { getDocs, query, collection, orderBy, where } from 'firebase/firestore';
+	import {
+		getDocs,
+		query,
+		collection,
+		orderBy,
+		where,
+		getDoc,
+		doc,
+	} from 'firebase/firestore';
 	import toast from 'svelte-french-toast';
+	import { userStore } from '$lib/store.js';
+	import Confirmation from '../../../../../lib/Components/Confirmation.svelte';
 
 	let account = {
 		email: '',
@@ -10,6 +20,7 @@
 		passwordcheck: '',
 		firstname: '',
 		lastname: '',
+		middlename: '',
 		addressBlock: '',
 		addressLot: '',
 		addressStreet: '',
@@ -21,6 +32,9 @@
 	let errors = {};
 	let streetQuery = query(collection(db, 'street'), orderBy('streetName', 'asc'));
 	let listOfStreets = [];
+	let middleInitial = false;
+	let confirmation = false;
+	let confirmationText;
 
 	const blockValue = Array.from({ length: 23 }, (_, i) => ({
 		value: i + 1
@@ -30,25 +44,40 @@
 		value: i + 1
 	}));
 
-	async function getStreet() {
-		const streetSnapshot = await getDocs(streetQuery);
-		listOfStreets = streetSnapshot.docs.map((doc) => doc.data());
-	}
-
-	async function submitHandler() {
+	async function handleSubmit() {
 		const isValid = await checkInput();
 		if (!isValid) {
 			toast.error('Form validation failed');
 			return;
 		}
-		createAccount();
+		confirmationText = `Do you want to create account "${account.firstname} ${account.lastname}"`;
+		confirmation = true;
 	}
+
+	async function confirmSubmit() {
+		confirmation = false;
+		await createAccount()
+	}
+
+	async function cancelSubmit() {
+		confirmation = false;
+	}
+
+	async function getStreet() {
+		const streetSnapshot = await getDocs(streetQuery);
+		listOfStreets = streetSnapshot.docs.map((doc) => doc.data());
+	}
+
 
 	async function checkInput() {
 		const regex = /^[a-zA-Z -]*$/;
 		// must have at least 1 letter
-		const firstnameRegex = account.firstname.length > 0 && /[a-zA-Z]/.test(account.firstname);
-		const lastnameRegex = account.lastname.length > 0 && /[a-zA-Z]/.test(account.lastname);
+		const firstnameRegex =
+			account.firstname.length > 0 && /[a-zA-Z -\u00f1\u00d1]/.test(account.firstname);
+		const lastnameRegex =
+			account.lastname.length > 0 && /[a-zA-Z -\u00f1\u00d1]/.test(account.lastname);
+		const middlenameRegex =
+			account.middlename.length > 0 && /[a-zA-Z -\u00f1\u00d1]/.test(account.middlename);
 		// must ba an email
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 		const accountsQuery = query(collection(db, 'accounts'), where('email', '==', account.email));
@@ -59,6 +88,7 @@
 			passwordcheck: !account.passwordcheck,
 			firstname: !account.firstname,
 			lastname: !account.lastname,
+			middlename: middleInitial ? !account.middlename == ' ' : !account.middlename,
 			addressBlock: !account.addressBlock,
 			addressLot: !account.addressLot,
 			addressStreet: !account.addressStreet,
@@ -69,8 +99,10 @@
 			invalidEmail: !emailRegex.test(account.email),
 			invalidFirstnameRequired: !firstnameRegex,
 			invalidLastnameRequired: !lastnameRegex,
+			invalidMiddlenameRequired: middleInitial ? !account.middlename == ' ' : !middlenameRegex,
 			invalidFirstname: !regex.test(account.firstname),
 			invalidLastname: !regex.test(account.lastname),
+			invalidMiddlename: !regex.test(account.middlename),
 			passwordKulang: account.password.length < 6,
 			passwordNotMatch: account.password !== account.passwordcheck
 		};
@@ -85,6 +117,9 @@
 
 	async function createAccount() {
 		try {
+			const snapshot = await getDoc(doc(db, 'accounts', $userStore.uid));
+			let user = snapshot.data();
+
 			const response = await fetch('/api/accounts', {
 				method: 'POST',
 				body: JSON.stringify({
@@ -92,6 +127,8 @@
 					password: account.password,
 					firstname: account.firstname.trim().toLowerCase(),
 					firstNameDisplay: account.firstname.trim(),
+					middlename: middleInitial ? ' ' : account.middlename.trim().toLowerCase(),
+					middleNameDisplay: middleInitial ? ' ' : account.middlename.trim(),
 					lastname: account.lastname.trim().toLowerCase(),
 					lastNameDisplay: account.lastname.trim(),
 					addressBlock: account.addressBlock,
@@ -105,6 +142,11 @@
 			});
 			const result = await response.json();
 			// console.log(result);
+			/*await addDoc(collection(db, 'adminlogs'), {
+				activity: user.firstNameDisplay + ", " + user.lastNameDisplay + " created account in Accounts module.",
+				pageRef: 'Account',
+				date: serverTimestamp()
+			});*/
 			toast.success('Account created!');
 			await goto('/admin/accounts');
 		} catch (error) {
@@ -120,14 +162,34 @@
 	<title>Create Account - Southview Homes 3 Admin Panel</title>
 </svelte:head>
 
+<Confirmation show={confirmation} onConfirm={confirmSubmit} onCancel={cancelSubmit} {confirmationText}/>
 <main>
 	<div class="min-h-screen hero bg-base-200 py-8">
 		<div class="w-full max-w-4xl p-6 mx-auto shadow-2xl border rounded-xl bg-base-100">
 			<div class="mt-2">
 				<h1 class="text-2xl">Create Account</h1>
 			</div>
-			<form on:submit|preventDefault={submitHandler}>
+			<form>
 				<div class="grid grid-cols-2 gap-6 mt-6 md:grid-cols-3">
+					<div class="form-control">
+						<label for="lname" class="label">
+							<span class="label-text">Last Name</span>
+						</label>
+						{#if errors.lastname}
+							<p class="text-red-500 text-sm italic mb-1">Last Name is required</p>
+						{:else if errors.invalidLastname}
+							<p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
+						{:else if errors.invalidLastnameRequired}
+							<p class="text-red-500 text-sm italic mb-1">Lastname must have a letter</p>
+						{/if}
+						<input
+							type="text"
+							placeholder="Dela Cruz"
+							name="lname"
+							class="input input-bordered"
+							bind:value={account.lastname}
+						/>
+					</div>
 					<div class="form-control">
 						<label for="fname" class="label">
 							<span class="label-text">First Name</span>
@@ -148,26 +210,46 @@
 						/>
 					</div>
 					<div class="form-control">
-						<label for="lname" class="label">
-							<span class="label-text">Last Name</span>
+						<label for="mname" class="label">
+							<span class="label-text">Middle Name</span>
 						</label>
-						{#if errors.lastname}
-							<p class="text-red-500 text-sm italic mb-1">Last Name is required</p>
-						{:else if errors.invalidLastname}
+						{#if errors.middlename}
+							<p class="text-red-500 text-sm italic mb-1">Middle Name is required</p>
+						{:else if errors.invalidMiddlename}
 							<p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
-						{:else if errors.invalidLastnameRequired}
-							<p class="text-red-500 text-sm italic mb-1">Lastname must have a letter</p>
+						{:else if errors.invalidMiddlenameRequired}
+							<p class="text-red-500 text-sm italic mb-1">Middle name must have a letter</p>
 						{/if}
-						<input
-							type="text"
-							placeholder="Dela Cruz"
-							name="lname"
-							class="input input-bordered"
-							bind:value={account.lastname}
-						/>
+						{#if middleInitial == false}
+							<input
+								type="text"
+								placeholder="Santos"
+								name="lname"
+								class="input input-bordered"
+								bind:value={account.middlename}
+							/>
+						{:else}
+							<input
+								type="text"
+								placeholder="Santos"
+								name="lname"
+								class="input input-bordered"
+								disabled
+							/>
+						{/if}
+
+						<div class="flex items-center mt-5">
+							<input
+								id="checkbox"
+								bind:checked={middleInitial}
+								type="checkbox"
+								class="checkbox checkbox-primary"
+							/>
+							<label for="checkbox" class="ml-2 text-sm font-medium">No middle name</label>
+						</div>
 					</div>
 				</div>
-				<div class="grid grid-cols-2 gap-6 mt-4 md:grid-cols-5">
+				<div class="grid grid-cols-2 gap-6 mt-1 md:grid-cols-5">
 					<div class="form-control">
 						<label for="Block" class="label">
 							<span class="label-text">Block</span>
@@ -329,7 +411,9 @@
 					</div>
 				</div>
 				<div class="flex justify-end mt-8">
-					<button type="submit" class="btn btn-primary mx-1 px-6">Create Account</button>
+					<button on:click={handleSubmit} type="button" class="btn btn-primary mx-1 px-6"
+						>Create Account</button
+					>
 					<a href="/admin/accounts" class="btn btn-error mx-1 px-4 text-white">Cancel</a>
 				</div>
 			</form>
