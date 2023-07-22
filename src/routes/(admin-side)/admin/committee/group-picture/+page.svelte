@@ -1,9 +1,10 @@
 <script>
 	import { db } from '$lib/firebase/client';
-	import { getDoc, doc, updateDoc, query, collection, where } from 'firebase/firestore';
-	import { getStorage, ref, getDownloadURL, uploadBytes } from 'firebase/storage';
+	import { getDoc, doc, updateDoc} from 'firebase/firestore';
+	import { getStorage, ref, uploadBytes } from 'firebase/storage';
 	import toast from 'svelte-french-toast';
 	import { goto } from '$app/navigation';
+	import Confirmation from '../../../../../lib/Components/Confirmation.svelte';
 
 	const storage = getStorage();
 
@@ -13,6 +14,10 @@
 	let newImageFiles = [];
 	let previewImages = [];
 	let numberOfEmptyStrings = 0;
+	let confirmation = false;
+	let confirmationText;
+	let handleWhat;
+	let imageIndex;
 
 	let showAddPicture = true;
 
@@ -20,6 +25,32 @@
 		'https://firebasestorage.googleapis.com/v0/b/svh3-web.appspot.com/o/path%2Fto%2FgroupPictures%2F0?alt=media&token=ec2aac02-d2ed-485c-b726-593861c8e1a7';
 	const picture2URL =
 		'https://firebasestorage.googleapis.com/v0/b/svh3-web.appspot.com/o/path%2Fto%2FgroupPictures%2F1?alt=media&token=32e586d2-cc80-42ad-9bc3-4479cf8f6053';
+
+	async function handleUpdatePicture() {
+		confirmationText = `Are you sure you want to save changes?`;
+		handleWhat = 'Update';
+		confirmation = true;
+	}
+
+	async function handleDeletePhoto(index) {
+		confirmationText = `Are you sure you want to remove the photo?`;
+		handleWhat = 'Delete Photo';
+		confirmation = true;
+		imageIndex = index;
+	}
+
+	async function confirmSubmit() {
+		confirmation = false;
+		if (handleWhat === 'Update') {
+			await updatePicture();
+		} else if (handleWhat === 'Delete Photo') {
+			await deletePhoto();
+		}
+	}
+
+	async function cancelSubmit() {
+		confirmation = false;
+	}
 
 	async function handleImageChange(event, index) {
 		const file = event.target.files[0];
@@ -111,7 +142,8 @@
 		}
 	}
 
-	async function deletePhoto(index) {
+	async function deletePhoto() {
+		const index = imageIndex;
 		const pictureRef = doc(db, 'images', 'xKD5MysuEl9E0n2ap5Pe');
 		const snapshot = await getDoc(pictureRef);
 		const data = snapshot.data();
@@ -136,6 +168,13 @@
 	loadGroupPictures();
 </script>
 
+<Confirmation
+	show={confirmation}
+	onConfirm={confirmSubmit}
+	onCancel={cancelSubmit}
+	{confirmationText}
+/>
+
 <div class="min-w-full min-h-full bg-base-200 py-8 px-5">
 	<div class="flex flex-row justify-between">
 		<h1 class="text-2xl font-semibold mb-3">Group Picture</h1>
@@ -157,7 +196,7 @@
 									<button class="btn btn-primary" on:click={() => openImageInput(index)}
 										>Change Picture</button
 									>
-									<button class="btn btn-error text-white" on:click={() => deletePhoto(index)}
+									<button class="btn btn-error text-white" on:click={() => handleDeletePhoto(index)}
 										>Delete Photo</button
 									>
 									<input
@@ -225,9 +264,9 @@
 				{/if}
 			{/if}
 			<div class="flex flex-row justify-end mt-8 p-3">
-				<div class="flex flex-row">
-					<button on:click={updatePicture} type="submit" class="btn btn-primary">Save</button>
-					<a href="/admin/committee" class="btn btn-error mx-1 text-white">Cancel</a>
+				<div class="flex flex-row gap-2">
+					<button on:click={handleUpdatePicture} type="button" class="btn btn-primary">Save</button>
+					<a href="/admin/committee" class="btn btn-error text-white">Cancel</a>
 				</div>
 			</div>
 		</div>
