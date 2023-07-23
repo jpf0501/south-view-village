@@ -4,6 +4,7 @@
 	import { getStorage, ref, getDownloadURL, uploadBytes } from 'firebase/storage';
 	import { goto } from '$app/navigation';
 	import { getNextDate } from '$lib/dateUtils.js';
+	import { addLog } from '$lib/logs'
 	import toast from 'svelte-french-toast';
 	import Confirmation from '../../../../../lib/Components/Confirmation.svelte';
 
@@ -110,6 +111,7 @@
 				dateCreated: serverTimestamp(),
 				dateModified: serverTimestamp()
 			});
+			addLog(`"Created news - ${news.title}"`,"News")
 			toast.success('News entry added!');
 			await goto('/admin/news');
 		} catch (error) {

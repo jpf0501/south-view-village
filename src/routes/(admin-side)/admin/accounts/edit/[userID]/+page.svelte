@@ -127,7 +127,7 @@
 		try {
 			await updateDoc(doc(db, 'accounts', userID), user);
 			toast.success('User has been updated!');
-			addLog(`"Update account of ${initialFirstname} ${initialLastname}"`, "Account")
+			addLog(`"Update account of ${initialFirstname} ${initialLastname}"`, "Accounts")
 			await goto('/admin/accounts');
 		} catch (error) {
 			console.log(error);
@@ -140,7 +140,7 @@
 		let userCred = snapshot.data();
 		try {
 			await fetch('/api/accounts/', { method: 'DELETE', body: JSON.stringify({ uid: userID }) });
-			addLog(`"Delete account of ${user.firstNameDisplay} ${user.lastNameDisplay}"`, "Account")
+			addLog(`"Delete account of ${user.firstNameDisplay} ${user.lastNameDisplay}"`, "Accounts")
 			toast.success('User deleted!');
 			await goto('/admin/accounts');
 		} catch (error) {

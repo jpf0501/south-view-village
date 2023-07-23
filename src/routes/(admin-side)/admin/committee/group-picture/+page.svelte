@@ -2,6 +2,7 @@
 	import { db } from '$lib/firebase/client';
 	import { getDoc, doc, updateDoc} from 'firebase/firestore';
 	import { getStorage, ref, uploadBytes } from 'firebase/storage';
+	import { addLog } from '$lib/logs'
 	import toast from 'svelte-french-toast';
 	import { goto } from '$app/navigation';
 	import Confirmation from '../../../../../lib/Components/Confirmation.svelte';
@@ -83,7 +84,7 @@
 					await uploadBytes(storageRef, file);
 				}
 			}
-
+			addLog(`"Update group picture/s of Committees"`,"Committee")
 			toast.success('Pictures updated successfully!');
 			await goto('/admin/committee');
 		} catch (error) {
@@ -113,6 +114,7 @@
 				}
 			}
 			await updateDoc(pictureRef, data);
+			addLog(`"Added a photo in the group picture of Committees"`,"Committee")
 			toast.success('Photo has been added!');
 			await goto('/admin/committee/');
 		} catch (error) {
@@ -149,6 +151,7 @@
 		const data = snapshot.data();
 		data.groupPictureURL[index] = '';
 		await updateDoc(pictureRef, data);
+		addLog(`"Deleted a picture in the group pictures of Committee"`,"Committee")
 		toast.success('Photo has been deleted!');
 		await goto('/admin/committee/');
 	}

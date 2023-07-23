@@ -4,6 +4,7 @@
 	import { getStorage, ref, getDownloadURL, uploadBytes } from 'firebase/storage';
 	import { goto } from '$app/navigation';
 	import { getNextDate } from '$lib/dateUtils.js';
+	import { addLog } from '$lib/logs';
 	import toast from 'svelte-french-toast';
 	import Confirmation from '../../../../../../lib/Components/Confirmation.svelte';
 
@@ -21,6 +22,7 @@
 	let confirmation = false;
 	let confirmationText;
 	let handleWhat;
+	let initialNews
 
 
 	let today = new Date();
@@ -63,6 +65,7 @@
 	async function getNews() {
 		const snapshot = await getDoc(doc(db, 'news', newsID));
 		news = snapshot.data();
+		initialNews = news.titleDisplay
 		news.title = news.titleDisplay;
 	}
 
@@ -104,6 +107,7 @@
 		try {
 			news.dateModified = serverTimestamp();
 			await updateDoc(doc(db, 'news', newsID), news);
+			addLog(`"Update news of ${initialNews}"`, "News")
 			toast.success('News details updated!');
 			await goto('/admin/news');
 		} catch (error) {
@@ -116,6 +120,7 @@
 		try {
 			await deleteDoc(doc(db, 'news', newsID), news);
 			toast.success('News deleted!');
+			addLog(`"Delete news of ${initialNews}"`, "News")
 			await goto('/admin/news');
 		} catch (error) {
 			console.log(error);

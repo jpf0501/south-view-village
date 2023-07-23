@@ -1,8 +1,6 @@
 <script>
 	import { db } from '$lib/firebase/client';
 	import {
-		getDoc,
-		doc,
 		getDocs,
 		query,
 		collection,
@@ -10,10 +8,8 @@
 		where,
 		limit,
 		orderBy,
-		addDoc,
-		serverTimestamp
 	} from 'firebase/firestore';
-	import { userStore } from '$lib/store.js';
+	
 
 	let countOfPendingBooks = '';
 	let countOfAccounts = '';

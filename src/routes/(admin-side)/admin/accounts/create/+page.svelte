@@ -11,8 +11,8 @@
 		doc,
 	} from 'firebase/firestore';
 	import { addLog } from '$lib/logs'
-	import toast from 'svelte-french-toast';
 	import { userStore } from '$lib/store.js';
+	import toast from 'svelte-french-toast';
 	import Confirmation from '../../../../../lib/Components/Confirmation.svelte';
 
 	let account = {
@@ -143,7 +143,7 @@
 			});
 			const result = await response.json();
 			//activity logs
-			addLog(`"Created account - ${account.firstname} ${account.lastname}"`,"Account")
+			addLog(`"Created account - ${account.firstname} ${account.lastname}"`,"Accounts")
 			toast.success('Account created!');
 			await goto('/admin/accounts');
 		} catch (error) {

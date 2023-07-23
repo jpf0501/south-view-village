@@ -14,10 +14,11 @@
 	} from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { sendEmail } from '$lib/utils';
+	import { addLog } from '$lib/logs'
 	import { onDestroy } from 'svelte';
 	import toast from 'svelte-french-toast';
 	import Confirmation from '../../../../../lib/Components/Confirmation.svelte';
-	import { userStore } from '$lib/store.js';
+	
 
 	let listOfUsers = [];
 	let sortByField = '';
@@ -86,8 +87,6 @@
 	}
 
 	async function approval() {
-		const snapshot = await getDoc(doc(db, 'accounts', $userStore.uid));
-		let user = snapshot.data();
 
 		if (pendingAccountStatus === 'Approved') {
 			try {
@@ -125,11 +124,7 @@
 					status: 'Approved'
 				};
 				await updateDoc(pendingAccountsRef, data);
-				await addDoc(collection(db, 'adminlogs'), {
-					activity: user.firstNameDisplay + " " + user.lastNameDisplay + " approved account creation request in Accounts module.",
-					pageRef: 'Account',
-					date: serverTimestamp()
-				});
+				addLog(`"Approved account - ${accountInfo.pendingFirstNameDisplay} ${accountInfo.pendingLastNameDisplay}, Email: ${accountInfo.pendingEmail}"`,"Pending Accounts")
 				toast.success('Account approved!');
 			} catch (error) {
 				console.log(error);
@@ -142,11 +137,7 @@
 					status: 'Disapproved'
 				};
 				await updateDoc(pendingAccountsRef, data);
-				await addDoc(collection(db, 'adminlogs'), {
-					activity: user.firstNameDisplay + " " + user.lastNameDisplay + " disapproved account creation request in Accounts module.",
-					pageRef: 'Account',
-					date: serverTimestamp()
-				});
+				addLog(`"Disapproved account - ${accountInfo.pendingFirstNameDisplay} ${accountInfo.pendingLastNameDisplay}, Email: ${accountInfo.pendingEmail}"`,"Pending Accounts")
 				toast.success('Account disapproved!');
 			} catch (error) {
 				console.log(error);

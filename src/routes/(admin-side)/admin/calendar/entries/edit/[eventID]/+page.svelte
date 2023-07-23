@@ -1,6 +1,7 @@
 <script>
 	import { db } from '$lib/firebase/client';
 	import { getDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
+	import { addLog } from '$lib/logs'
 	import { goto } from '$app/navigation';
 	import toast from 'svelte-french-toast';
 	import Confirmation from '../../../../../../../lib/Components/Confirmation.svelte';
@@ -14,6 +15,7 @@
 	let confirmation = false;
 	let confirmationText;
 	let handleWhat
+	let initialEvent
 
 	async function handleEventUpdate() {
 		const isValid = await checkInput();
@@ -49,7 +51,9 @@
 	async function getEvent() {
 		const snapshot = await getDoc(doc(db, 'event', eventID));
 		event = snapshot.data();
+		initialEvent = event.titleDisplay
 		event.title = event.titleDisplay;
+
 	}
 
 	async function checkInput() {
@@ -77,6 +81,7 @@
 		event.title = event.titleDisplay.toLowerCase();
 		try {
 			await updateDoc(doc(db, 'event', eventID), event);
+			addLog(`"Update event of ${initialEvent}"`, "Events")
 			toast.success('Event details updated!');
 			await goto('/admin/calendar/entries/');
 		} catch (error) {
@@ -88,6 +93,7 @@
 	async function deleteEvent() {
 		try {
 			await deleteDoc(doc(db, 'event', eventID), event);
+			addLog(`"Delete event of ${initialEvent}"`, "Events")
 			toast.success('Event deleted!');
 			await goto('/admin/calendar/entries/');
 		} catch (error) {
