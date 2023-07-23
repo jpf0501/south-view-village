@@ -11,6 +11,8 @@
 	import { jsPDF } from 'jspdf';
 	import 'jspdf-autotable';
 	import toast from 'svelte-french-toast';
+	import Papa from 'papaparse';
+	
 
 	const monthName = [
 		'January',
@@ -36,8 +38,8 @@
 	let startDate, endDate;
 	let generatePopUp, reportPreview = false;
 	let errors = {}
-	let report;
-	let pdfUri;
+	// report variables
+	let report, docType, reportUri, csvData;
 
 	// if (currentMonth === '01') {
 	// 	// if current month is January, set start date to December of last year
@@ -111,7 +113,7 @@
 
 	async function generateReport() {
 	report = new jsPDF();
-	pdfUri = '';
+	reportUri = '';
 	let generateQuery = query(
 		collection(db, 'booking'),
 		where('status', 'in', ['Approved', 'Disapproved', 'Cancelled', 'Completed']),
@@ -244,7 +246,7 @@
 		report.text('HOA Treasurer', 171, 258, { align: 'right' });
 		report.addPage();
 		report.autoTable({ margin: { top: 20, bottom: 20 }, html: '#generate-table' });
-		pdfUri = report.output('datauristring');
+		reportUri = report.output('datauristring');
 		toast.success(
 			`Reservation report for ${new Date(startDate).toLocaleDateString('en-US', {
 												month: 'long',
@@ -272,6 +274,44 @@
 		);
 	}
 
+	async function saveAsCsv() {
+		const blob = new Blob([csvData], { type: 'text/csv' });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+    	a.href = url;
+    	a.download = `Southview_Homes_3_${new Date(startDate).toLocaleDateString('en-US', {
+												month: 'long',
+												day: 'numeric',
+												year: 'numeric'
+											})}-${new Date(endDate).toLocaleDateString('en-US', {
+												month: 'long',
+												day: 'numeric',
+												year: 'numeric'
+											})}_Reservation_Report.csv`
+    	a.click();
+
+		URL.revokeObjectURL(url);
+	}
+
+	async function generateCSV() {
+	reportUri = '';
+	csvData = ''
+		let generateQuery = query(
+			collection(db, 'booking'),
+			where('status', 'in', ['Approved', 'Disapproved', 'Cancelled', 'Completed']),
+			where('paymentStatus', '==', 'Paid',),
+			where('dateReviewed', '>=', new Date(startDate)),
+			where('dateReviewed', '<', new Date(endDate)),
+		);
+
+		const generateSnapshot = await getDocs(generateQuery);
+		let csvReport = generateSnapshot.docs.map((doc) => doc.data());
+
+		csvData = Papa.unparse(csvReport)
+
+		//console.log(csvData);
+	}
+
 
 	async function getBookingsHitory(bookingsQuery) {
 		const bookingsSnapshot = await getDocs(bookingsQuery);
@@ -283,6 +323,7 @@
 			starting: !startDate,
 			ending: !endDate,
 			startCheck: startDate > endDate,
+			docType: !docType
 		};
 		if (Object.values(errors).some((v) => v)) {
 			setTimeout(() => {
@@ -299,8 +340,23 @@
 			toast.error('Report generation failed');
 			return;
 		}
-		generateReport();
-		openPreview();
+		if (docType == "pdf"){
+			generateReport();
+			openPreview();
+		}
+		else if (docType == "csv"){
+			generateCSV()
+			openPreview();
+		}
+		if (docType == "xls"){
+			//generateReport("xls log");
+			console.log("hi xls")
+		}
+		if (docType == "docx"){
+			console.log("hi docx")
+			//generateReport("docx log");
+		}
+		
 	}
 
 	function openGenerate() {
@@ -354,6 +410,20 @@ class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden ove
 		{:else if errors.startCheck}
 			<p class="text-red-500 text-sm italic mb-1">Start date should not be more recent than end date</p>
 		{/if}
+		<p class="mt-6 text-sm text-gray-500">Select document type to generate</p>
+		<select
+			bind:value={docType}
+			class="mt-6 input input-bordered w-full max-w-xs"
+		>
+			<option value="pdf">PDF</option>
+			<option value="csv">CSV</option>
+			<option value="xls">XLS</option>
+			<option value="docx">DOCX</option>
+		</select>
+
+		{#if errors.docType}
+			<p class="text-red-500 text-sm italic mb-1">Document type is required</p>
+		{/if}
 	</div>
 	<div class="flex justify-end px-6 gap-2 py-4">
 		<button class="btn btn-primary" on:click={submitHandler}
@@ -375,8 +445,12 @@ class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden ove
 		<h2 class="text-lg font-medium">Booking Payment Report Preview</h2>
 		<div class="divider mt-3 mb-5"></div>
 		<!-- svelte-ignore a11y-missing-attribute -->
-		{#if pdfUri}
-			<iframe id="pdfIframe" src={pdfUri} frameborder="2" width="100%" height="500px"></iframe>
+		{#if reportUri}
+			<iframe id="pdfIframe" src={reportUri} frameborder="2" width="100%" height="500px"></iframe>
+		{:else if !reportUri && docType == "csv"}
+			<div class="flex flex-row gap-2 justify-center text-center m-48">
+				Preview is not available for this file type (.csv)
+			</div>
 		{:else}
 			<div class="flex flex-row gap-2 justify-center text-center m-48">
 				<span class="loading loading-spinner loading-md"></span>Loading...
@@ -384,14 +458,18 @@ class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden ove
 		{/if}
 	</div>
 	<div class="flex justify-end px-6 gap-2 py-4">
-		{#if pdfUri}
+		{#if reportUri && docType == "pdf"}
 		<button class="btn btn-primary" on:click={saveAsPdf}
 		>Save as PDF</button
 	>
-		{:else}
+		{:else if !reportUri && docType == "pdf"}
 		<button class="btn btn-primary" on:click={saveAsPdf} disabled
 		>Save as PDF</button
 	>
+		{:else if !reportUri && docType == "csv"}
+			<button class="btn btn-primary" on:click={saveAsCsv}
+			>Save as CSV</button
+		>
 		{/if}
 		
 		<button class="btn btn-error text-white" on:click={closePreview}>Close</button>

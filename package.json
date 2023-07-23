@@ -36,6 +36,7 @@
 		"jspdf": "^2.5.1",
 		"jspdf-autotable": "^3.5.29",
 		"nodemailer": "^6.9.3",
+		"papaparse": "^5.4.1",
 		"svelte-french-toast": "^1.1.0",
 		"svelte-simple-modal": "^1.6.1"
 	}
