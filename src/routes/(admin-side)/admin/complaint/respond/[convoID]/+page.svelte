@@ -3,6 +3,7 @@
 	import { getDoc, updateDoc, doc } from 'firebase/firestore';
 	import { goto } from '$app/navigation';
 	import { sendEmail } from '$lib/utils';
+	import { addLog } from '$lib/logs'
 	import toast from 'svelte-french-toast';
 	import Conversation from './Conversation.svelte';
 	import Confirmation from '../../../../../../lib/Components/Confirmation.svelte';
@@ -80,6 +81,7 @@
 		} else if(newStatus === "Unresolved"){
 			resultHTML = unresolvedHTML
 		}
+		addLog(`"Mark complaint as ${newStatus} - ${complaint.firstnameDisplay} ${complaint.lastnameDisplay}"`,"Complaints")
 		await sendEmail({
 			to: complaint.email,
 			subject: 'Southview Homes 3 Complaint',

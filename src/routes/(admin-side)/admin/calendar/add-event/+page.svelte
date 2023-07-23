@@ -1,6 +1,7 @@
 <script>
 	import { addDoc, collection } from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
+	import { addLog } from '$lib/logs'
 	import { goto } from '$app/navigation';
 	import toast from 'svelte-french-toast';
 	import Confirmation from '../../../../../lib/Components/Confirmation.svelte';
@@ -61,6 +62,7 @@
 				description: event.description.trim(),
 				date: event.date
 			});
+			addLog(`"Created event - ${event.title}"`,"Events")
 			toast.success('Event added!');
 			await goto('/admin/calendar');
 		} catch (error) {

@@ -10,8 +10,9 @@
 		getDoc,
 		doc,
 	} from 'firebase/firestore';
-	import toast from 'svelte-french-toast';
+	import { addLog } from '$lib/logs'
 	import { userStore } from '$lib/store.js';
+	import toast from 'svelte-french-toast';
 	import Confirmation from '../../../../../lib/Components/Confirmation.svelte';
 
 	let account = {
@@ -141,12 +142,8 @@
 				})
 			});
 			const result = await response.json();
-			// console.log(result);
-			/*await addDoc(collection(db, 'adminlogs'), {
-				activity: user.firstNameDisplay + ", " + user.lastNameDisplay + " created account in Accounts module.",
-				pageRef: 'Account',
-				date: serverTimestamp()
-			});*/
+			//activity logs
+			addLog(`"Created account - ${account.firstname} ${account.lastname}"`,"Accounts")
 			toast.success('Account created!');
 			await goto('/admin/accounts');
 		} catch (error) {

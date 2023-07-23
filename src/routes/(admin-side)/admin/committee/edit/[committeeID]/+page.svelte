@@ -2,6 +2,7 @@
 	import { db } from '$lib/firebase/client';
 	import { getDoc, updateDoc, doc } from 'firebase/firestore';
 	import { getStorage, ref, getDownloadURL, uploadBytes } from 'firebase/storage';
+	import { addLog } from '$lib/logs';
 	import { goto } from '$app/navigation';
 	import toast from 'svelte-french-toast';
 	import Confirmation from '../../../../../../lib/Components/Confirmation.svelte';
@@ -116,6 +117,7 @@
 
 			// Update the committee details in the Firestore database
 			await updateDoc(doc(db, 'committee', committeeID), committee);
+			addLog(`"Update the ${committee.position} profile"`, "Committee")
 			toast.success('Committee details updated!');
 			await goto('/admin/committee');
 		} catch (error) {
@@ -131,6 +133,7 @@
 				imageURL: noPhotoURL
 			};
 			await updateDoc(committeeRef, data);
+			addLog(`"Remove photo of ${committee.position}"`, "Committee")
 			toast.success('Photo has been deleted!');
 			await goto('/admin/committee/edit/' + committeeID);
 		} catch (error) {
