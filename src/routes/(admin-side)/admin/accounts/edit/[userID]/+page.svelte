@@ -1,9 +1,18 @@
 <script>
 	import { db } from '$lib/firebase/client';
-	import { getDocs, query, collection, orderBy, getDoc, updateDoc, doc, addDoc, serverTimestamp } from 'firebase/firestore';
+	import {
+		getDocs,
+		query,
+		collection,
+		orderBy,
+		getDoc,
+		updateDoc,
+		doc,
+	} from 'firebase/firestore';
 	import { goto } from '$app/navigation';
-	import toast from 'svelte-french-toast';
 	import { userStore } from '$lib/store.js';
+	import { addLog } from '$lib/logs';
+	import toast from 'svelte-french-toast';
 	import Confirmation from '../../../../../../lib/Components/Confirmation.svelte';
 
 	/** @type {import('./$types').PageData} */
@@ -17,7 +26,9 @@
 	let middlePrevious = '';
 	let confirmation = false;
 	let confirmationText;
-	let handleWhat
+	let handleWhat;
+	let initialFirstname
+	let initialLastname
 
 	let errors = {};
 
@@ -35,23 +46,23 @@
 			toast.error('Form validation failed');
 			return;
 		}
-		handleWhat = "Update"
+		handleWhat = 'Update';
 		confirmationText = `Do you want to save changes in this account "${user.firstNameDisplay} ${user.lastNameDisplay}"`;
 		confirmation = true;
 	}
 
 	async function handleAccountDelete() {
-		handleWhat = "Delete"
+		handleWhat = 'Delete';
 		confirmationText = `Do you want to delete this account "${user.firstNameDisplay} ${user.lastNameDisplay}"`;
 		confirmation = true;
 	}
 
 	async function confirmSubmit() {
 		confirmation = false;
-		if(handleWhat === "Update"){
-			await updateUser()
-		} else if(handleWhat === "Delete"){
-			await deleteUser()
+		if (handleWhat === 'Update') {
+			await updateUser();
+		} else if (handleWhat === 'Delete') {
+			await deleteUser();
 		}
 	}
 
@@ -62,11 +73,13 @@
 	async function getUser() {
 		const snapshot = await getDoc(doc(db, 'accounts', userID));
 		user = snapshot.data();
+		initialFirstname = user.firstNameDisplay
+		initialLastname = user.lastNameDisplay
 		user.firstname = user.firstNameDisplay;
 		user.lastname = user.lastNameDisplay;
 		user.middlename = user.middleNameDisplay;
-		middleInitial = (user.middlename == ' ') ? true : false
-		console.log(user.middlename)
+		middleInitial = user.middlename == ' ' ? true : false;
+		console.log(user.middlename);
 	}
 
 	async function getStreet() {
@@ -107,18 +120,14 @@
 		user.firstname = user.firstNameDisplay.trim().toLowerCase();
 		user.lastname = user.lastNameDisplay.trim().toLowerCase();
 		user.middlename = user.middleNameDisplay.trim().toLowerCase();
-		user.firstNameDisplay = user.firstNameDisplay.trim()
-		user.lastNameDisplay = user.lastNameDisplay.trim()
-		user.middleNameDisplay = user.middleNameDisplay.trim()
+		user.firstNameDisplay = user.firstNameDisplay.trim();
+		user.lastNameDisplay = user.lastNameDisplay.trim();
+		user.middleNameDisplay = user.middleNameDisplay.trim();
 
 		try {
 			await updateDoc(doc(db, 'accounts', userID), user);
-			await addDoc(collection(db, 'adminlogs'), {
-				activity: user.firstNameDisplay + " " + user.lastNameDisplay + " edited account info in Accounts module.",
-				pageRef: 'Account',
-				date: serverTimestamp()
-			});
 			toast.success('User has been updated!');
+			addLog(`"Update account of ${initialFirstname} ${initialLastname}"`, "Account")
 			await goto('/admin/accounts');
 		} catch (error) {
 			console.log(error);
@@ -131,11 +140,7 @@
 		let userCred = snapshot.data();
 		try {
 			await fetch('/api/accounts/', { method: 'DELETE', body: JSON.stringify({ uid: userID }) });
-			await addDoc(collection(db, 'adminlogs'), {
-				activity: userCred.firstNameDisplay + " " + userCred.lastNameDisplay + " deleted account in Accounts module.",
-				pageRef: 'Account',
-				date: serverTimestamp()
-			});
+			addLog(`"Delete account of ${user.firstNameDisplay} ${user.lastNameDisplay}"`, "Account")
 			toast.success('User deleted!');
 			await goto('/admin/accounts');
 		} catch (error) {
@@ -146,11 +151,11 @@
 
 	async function middleHandler() {
 		if (!middleInitial) {
-			middleInitial = true
+			middleInitial = true;
 			middlePrevious = user.middleNameDisplay;
 			user.middleNameDisplay = ' ';
 		} else {
-			middleInitial = false
+			middleInitial = false;
 			middlePrevious = user.middleNameDisplay;
 			user.middleNameDisplay = user.middlename;
 		}
@@ -164,7 +169,12 @@
 	<title>Edit Account - Southview Homes 3 Admin Panel</title>
 </svelte:head>
 
-<Confirmation show={confirmation} onConfirm={confirmSubmit} onCancel={cancelSubmit} {confirmationText}/>
+<Confirmation
+	show={confirmation}
+	onConfirm={confirmSubmit}
+	onCancel={cancelSubmit}
+	{confirmationText}
+/>
 {#if user}
 	<main>
 		<form class="min-h-screen hero bg-base-200">
@@ -213,24 +223,30 @@
 							<p class="text-red-500 text-sm italic mb-1">Only letters and '-'</p>
 						{/if}
 						{#if middleInitial == false}
-						<input
-							type="text"
-							placeholder="Santos"
-							name="lname"
-							class="input input-bordered"
-							bind:value={user.middleNameDisplay}
-						/>
+							<input
+								type="text"
+								placeholder="Santos"
+								name="lname"
+								class="input input-bordered"
+								bind:value={user.middleNameDisplay}
+							/>
 						{:else}
-						<input
-							type="text"
-							placeholder="Santos"
-							name="lname"
-							class="input input-bordered"
-							disabled
-						/>
+							<input
+								type="text"
+								placeholder="Santos"
+								name="lname"
+								class="input input-bordered"
+								disabled
+							/>
 						{/if}
 						<div class="flex items-center mt-5">
-							<input id="checkbox" checked={middleInitial} on:click={middleHandler} type="checkbox" class="checkbox checkbox-primary">
+							<input
+								id="checkbox"
+								checked={middleInitial}
+								on:click={middleHandler}
+								type="checkbox"
+								class="checkbox checkbox-primary"
+							/>
 							<label for="checkbox" class="ml-2 text-sm font-medium">No middle name</label>
 						</div>
 					</div>
@@ -327,10 +343,14 @@
 					</div>
 				</div>
 				<div class="flex justify-end mt-8">
-					<button on:click={handleAccountUpdate} type="button" class="btn btn-primary mx-1 px-5">Save</button>
+					<button on:click={handleAccountUpdate} type="button" class="btn btn-primary mx-1 px-5"
+						>Save</button
+					>
 					<a href="/admin/accounts" class="btn btn-error mx-1 px-4 text-white">Cancel</a>
-					<button on:click={handleAccountDelete} type="button" class="btn btn-warning mx-1 text-white"
-						>Delete</button
+					<button
+						on:click={handleAccountDelete}
+						type="button"
+						class="btn btn-warning mx-1 text-white">Delete</button
 					>
 				</div>
 			</div>

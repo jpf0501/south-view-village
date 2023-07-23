@@ -9,9 +9,8 @@
 		where,
 		getDoc,
 		doc,
-		addDoc,
-		serverTimestamp,
 	} from 'firebase/firestore';
+	import { addLog } from '$lib/logs'
 	import toast from 'svelte-french-toast';
 	import { userStore } from '$lib/store.js';
 	import Confirmation from '../../../../../lib/Components/Confirmation.svelte';
@@ -143,12 +142,8 @@
 				})
 			});
 			const result = await response.json();
-			// console.log(result);
-			await addDoc(collection(db, 'adminlogs'), {
-				activity: user.firstNameDisplay + " " + user.lastNameDisplay + " created account in Accounts module.",
-				pageRef: 'Account',
-				date: serverTimestamp()
-			});
+			//activity logs
+			addLog(`"Created account - ${account.firstname} ${account.lastname}"`,"Account")
 			toast.success('Account created!');
 			await goto('/admin/accounts');
 		} catch (error) {

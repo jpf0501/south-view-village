@@ -11,7 +11,7 @@
 		limit,
 		orderBy,
 		addDoc,
-		serverTimestamp,
+		serverTimestamp
 	} from 'firebase/firestore';
 	import { userStore } from '$lib/store.js';
 
@@ -64,11 +64,7 @@
 	}
 
 	async function getActivityLog() {
-		const logQuery = query(
-			collection(db, 'adminlogs'),
-			limit(10),
-			orderBy('date', 'desc')
-			);
+		const logQuery = query(collection(db, 'adminlogs'), limit(10), orderBy('date', 'desc'));
 		const adminLogSnapshot = await getDocs(logQuery);
 		listActivityLog = adminLogSnapshot.docs.map((doc) => doc.data());
 	}
@@ -97,7 +93,6 @@
 	getCount();
 	//addLog();
 	getActivityLog();
-	
 </script>
 
 <svelte:head>
@@ -110,12 +105,12 @@
 		<div
 			class="w-60 h-40 flex flex-col justify-center items-center overflow-hidden shadow-lg border rounded-xl bg-base-100"
 		>
-		<p class="text-3xl font-semibold">{dueCount}</p>
-		{#if dueCount === 1}
-			<p class="text-md mt-2">Unpaid Resident</p>
-		{:else}
-			<p class="text-md mt-2">Unpaid Residents</p>
-		{/if}
+			<p class="text-3xl font-semibold">{dueCount}</p>
+			{#if dueCount === 1}
+				<p class="text-md mt-2">Unpaid Resident</p>
+			{:else}
+				<p class="text-md mt-2">Unpaid Residents</p>
+			{/if}
 		</div>
 		<div
 			class="w-60 h-40 flex flex-col justify-center items-center overflow-hidden shadow-lg border rounded-xl bg-base-100"
@@ -131,7 +126,7 @@
 			class="w-60 h-40 flex flex-col justify-center items-center overflow-hidden shadow-lg border rounded-xl bg-base-100"
 		>
 			<p class="text-3xl font-semibold">{countOfAccounts}</p>
-			
+
 			{#if countOfAccounts === 1}
 				<p class="text-md mt-2">Registered Account</p>
 			{:else}
@@ -163,30 +158,39 @@
 				<div class="flex flex-col space-y-8 text-md px-8">
 					<div class="overflow-x-auto">
 						<table class="table">
-
-						  <thead>
-							<tr>
-							  <th>Date</th>
-							  <th>Activity</th>
-							  <th>Module</th>
-							</tr>
-						  </thead>
-						  <tbody>
-							{#each listActivityLog as log}
-							<tr>
-							  <td>{log.date.toDate().toLocaleDateString('en-us', { year: 'numeric', month: 'long', day: 'numeric' })} {log.date.toDate().toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}</td>
-							  <td>{log.activity}</td>
-							  <td>{log.pageRef}</td>
-							</tr>
-							{/each}
-						  </tbody>
+							<thead>
+								<tr>
+									<th>Admin</th>
+									<th>Date</th>
+									<th>Activity</th>
+									<th>Module</th>
+								</tr>
+							</thead>
+							<tbody>
+								{#each listActivityLog as log}
+									<tr>
+										<td>{log.user}</td>
+										<td
+											>{log.date
+												.toDate()
+												.toLocaleDateString('en-us', {
+													year: 'numeric',
+													month: 'long',
+													day: 'numeric'
+												})}
+											{log.date
+												.toDate()
+												.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' })}</td
+										>
+										<td>{log.activity}</td>
+										<td>{log.pageRef}</td>
+									</tr>
+								{/each}
+							</tbody>
 						</table>
-					  </div>					
+					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-	
 </div>
-	
-	
