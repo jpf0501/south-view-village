@@ -34,8 +34,10 @@
 	let currentMonth = (date.getMonth() + 1).toString().padStart(2, '0');
 	let day = '01';
 	let startDate, endDate;
-	let generatePopUp = false;
+	let generatePopUp, reportPreview = false;
 	let errors = {}
+	let report;
+	let pdfUri;
 
 	// if (currentMonth === '01') {
 	// 	// if current month is January, set start date to December of last year
@@ -108,6 +110,8 @@
 	}
 
 	async function generateReport() {
+	report = new jsPDF();
+	pdfUri = '';
 	let generateQuery = query(
 		collection(db, 'booking'),
 		where('status', 'in', ['Approved', 'Disapproved', 'Cancelled', 'Completed']),
@@ -115,7 +119,6 @@
 		where('dateReviewed', '>=', new Date(startDate)),
 		where('dateReviewed', '<', new Date(endDate)),
 	);
-		const report = new jsPDF();
 
 		const generateSnapshot = await getDocs(generateQuery);
 		listOfReports = generateSnapshot.docs.map((doc) => doc.data());
@@ -241,17 +244,7 @@
 		report.text('HOA Treasurer', 171, 258, { align: 'right' });
 		report.addPage();
 		report.autoTable({ margin: { top: 20, bottom: 20 }, html: '#generate-table' });
-		report.save(
-				`Southview_Homes_3_${new Date(startDate).toLocaleDateString('en-US', {
-												month: 'long',
-												day: 'numeric',
-												year: 'numeric'
-											})}-${new Date(endDate).toLocaleDateString('en-US', {
-												month: 'long',
-												day: 'numeric',
-												year: 'numeric'
-											})}_Reservation_Report.pdf`
-		);
+		pdfUri = report.output('datauristring');
 		toast.success(
 			`Reservation report for ${new Date(startDate).toLocaleDateString('en-US', {
 												month: 'long',
@@ -264,6 +257,21 @@
 											})} generated!`
 		);
 	}
+
+	async function saveAsPdf() {
+		report.save(
+				`Southview_Homes_3_${new Date(startDate).toLocaleDateString('en-US', {
+												month: 'long',
+												day: 'numeric',
+												year: 'numeric'
+											})}-${new Date(endDate).toLocaleDateString('en-US', {
+												month: 'long',
+												day: 'numeric',
+												year: 'numeric'
+											})}_Reservation_Report.pdf`
+		);
+	}
+
 
 	async function getBookingsHitory(bookingsQuery) {
 		const bookingsSnapshot = await getDocs(bookingsQuery);
@@ -292,6 +300,7 @@
 			return;
 		}
 		generateReport();
+		openPreview();
 	}
 
 	function openGenerate() {
@@ -300,6 +309,14 @@
 
 	function closeGenerate() {
 		generatePopUp = false;
+	}
+
+	function openPreview() {
+		reportPreview = true;
+	}
+
+	function closePreview() {
+		reportPreview = false;
 	}
 
 	$: getBookingsHitory(bookingsQuery);
@@ -343,6 +360,41 @@ class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden ove
 			>Generate Report</button
 		>
 		<button class="btn btn-error text-white" on:click={closeGenerate}>Cancel</button>
+	</div>
+</div>
+</div>
+{/if}
+
+{#if reportPreview}
+<div
+class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto"
+>
+<div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-75" />
+<div class="relative z-50 w-full max-w-2xl mx-auto bg-white rounded-lg shadow-lg">
+	<div class="p-6">
+		<h2 class="text-lg font-medium">Booking Payment Report Preview</h2>
+		<div class="divider mt-3 mb-5"></div>
+		<!-- svelte-ignore a11y-missing-attribute -->
+		{#if pdfUri}
+			<iframe id="pdfIframe" src={pdfUri} frameborder="2" width="100%" height="500px"></iframe>
+		{:else}
+			<div class="flex flex-row gap-2 justify-center text-center m-48">
+				<span class="loading loading-spinner loading-md"></span>Loading...
+			</div>
+		{/if}
+	</div>
+	<div class="flex justify-end px-6 gap-2 py-4">
+		{#if pdfUri}
+		<button class="btn btn-primary" on:click={saveAsPdf}
+		>Save as PDF</button
+	>
+		{:else}
+		<button class="btn btn-primary" on:click={saveAsPdf} disabled
+		>Save as PDF</button
+	>
+		{/if}
+		
+		<button class="btn btn-error text-white" on:click={closePreview}>Close</button>
 	</div>
 </div>
 </div>
