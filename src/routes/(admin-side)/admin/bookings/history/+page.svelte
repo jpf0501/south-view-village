@@ -5,7 +5,7 @@
 		collection,
 		orderBy,
 		where,
-		getCountFromServer
+		getCountFromServer,
 	} from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { jsPDF } from 'jspdf';
@@ -260,11 +260,6 @@
 		);
 	}
 
-	async function generateDocx() {
-		generateReport();
-
-	}
-
 	async function saveAsPdf() {
 		report.save(
 				`Southview_Homes_3_${new Date(startDate).toLocaleDateString('en-US', {
@@ -322,7 +317,34 @@
 		);
 
 		const generateSnapshot = await getDocs(generateQuery);
-		let csvReport = generateSnapshot.docs.map((doc) => doc.data());
+		let csvReport = generateSnapshot.docs.map((doc) => {
+			const data = doc.data()
+			const bookDate = data.bookDate.toDate();
+			const endTime = data.endTime.toDate();
+			const dateReviewed = data.dateReviewed.toDate();
+			return {
+				fullName: data.firstNameDisplay + " " + data.lastNameDisplay, 
+				email: data.email,
+				contactNumber: data.contactNumber,
+				eventType: data.eventType,
+				bookDate: bookDate.toLocaleDateString('en-us', {
+									year: 'numeric',
+									month: 'long',
+									day: 'numeric'
+								}),
+				time: bookDate.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' }) + " - " + endTime.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' }), 
+				status: data.status,
+				paymentStatus: data.paymentStatus,
+				lastApprover: data.approvedBy ? data.approvedBy : "N/A",
+				dateReviwed: dateReviewed.toLocaleDateString('en-us', {
+									year: 'numeric',
+									month: 'long',
+									day: 'numeric'
+								}) + " at " + dateReviewed.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' }),
+				isRescheduled: data.isRescheduled ? 'Yes' : 'No',
+			}	
+		}
+		);
 
 		csvData = Papa.unparse(csvReport)
 
@@ -342,7 +364,33 @@
 		);
 
 		const generateSnapshot = await getDocs(generateQuery);
-		let xlsxReport = generateSnapshot.docs.map((doc) => doc.data());
+		let xlsxReport = generateSnapshot.docs.map((doc) => {
+			const data = doc.data()
+			const bookDate = data.bookDate.toDate();
+			const endTime = data.endTime.toDate();
+			const dateReviewed = data.dateReviewed.toDate();
+			return {
+				fullName: data.firstNameDisplay + " " + data.lastNameDisplay, 
+				email: data.email,
+				contactNumber: data.contactNumber,
+				eventType: data.eventType,
+				bookDate: bookDate.toLocaleDateString('en-us', {
+									year: 'numeric',
+									month: 'long',
+									day: 'numeric'
+								}),
+				time: bookDate.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' }) + " - " + endTime.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' }), 
+				status: data.status,
+				paymentStatus: data.paymentStatus,
+				lastApprover: data.approvedBy ? data.approvedBy : "N/A",
+				dateReviwed: dateReviewed.toLocaleDateString('en-us', {
+									year: 'numeric',
+									month: 'long',
+									day: 'numeric'
+								}) + " at " + dateReviewed.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' }),
+				isRescheduled: data.isRescheduled ? 'Yes' : 'No',
+			}	
+		});
 
 		const ws = XLSX.utils.json_to_sheet(xlsxReport);
 		wb = XLSX.utils.book_new();
@@ -392,8 +440,8 @@
 			openPreview();
 		}
 		if (docType == "docx"){
+			generateDocx();
 			console.log("hi docx")
-			//generateReport("docx log");
 		}
 		
 	}
