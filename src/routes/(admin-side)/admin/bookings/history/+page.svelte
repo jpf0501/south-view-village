@@ -12,8 +12,8 @@
 	import 'jspdf-autotable';
 	import toast from 'svelte-french-toast';
 	import Papa from 'papaparse';
-	
-
+	import * as XLSX from 'xlsx';
+ 
 	const monthName = [
 		'January',
 		'February',
@@ -39,7 +39,7 @@
 	let generatePopUp, reportPreview = false;
 	let errors = {}
 	// report variables
-	let report, docType, reportUri, csvData;
+	let report, docType, reportUri, csvData, wb;
 
 	// if (currentMonth === '01') {
 	// 	// if current month is January, set start date to December of last year
@@ -293,6 +293,18 @@
 		URL.revokeObjectURL(url);
 	}
 
+	async function saveAsXlsx() {
+		XLSX.writeFile(wb, `Southview_Homes_3_${new Date(startDate).toLocaleDateString('en-US', {
+												month: 'long',
+												day: 'numeric',
+												year: 'numeric'
+											})}-${new Date(endDate).toLocaleDateString('en-US', {
+												month: 'long',
+												day: 'numeric',
+												year: 'numeric'
+											})}_Reservation_Report.xlsx`);
+	}
+
 	async function generateCSV() {
 	reportUri = '';
 	csvData = ''
@@ -310,6 +322,28 @@
 		csvData = Papa.unparse(csvReport)
 
 		//console.log(csvData);
+	}
+
+	async function generateXlsx() {
+		reportUri = '';
+		wb = '';
+
+		let generateQuery = query(
+			collection(db, 'booking'),
+			where('status', 'in', ['Approved', 'Disapproved', 'Cancelled', 'Completed']),
+			where('paymentStatus', '==', 'Paid',),
+			where('dateReviewed', '>=', new Date(startDate)),
+			where('dateReviewed', '<', new Date(endDate)),
+		);
+
+		const generateSnapshot = await getDocs(generateQuery);
+		let xlsxReport = generateSnapshot.docs.map((doc) => doc.data());
+
+		const ws = XLSX.utils.json_to_sheet(xlsxReport);
+		wb = XLSX.utils.book_new();
+		XLSX.utils.book_append_sheet(wb, ws, 'Data');
+
+		//console.log('Data exported');
 	}
 
 
@@ -349,8 +383,8 @@
 			openPreview();
 		}
 		if (docType == "xls"){
-			//generateReport("xls log");
-			console.log("hi xls")
+			generateXlsx();
+			openPreview();
 		}
 		if (docType == "docx"){
 			console.log("hi docx")
@@ -417,7 +451,7 @@ class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden ove
 		>
 			<option value="pdf">PDF</option>
 			<option value="csv">CSV</option>
-			<option value="xls">XLS</option>
+			<option value="xls">XLSX</option>
 			<option value="docx">DOCX</option>
 		</select>
 
@@ -447,9 +481,9 @@ class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden ove
 		<!-- svelte-ignore a11y-missing-attribute -->
 		{#if reportUri}
 			<iframe id="pdfIframe" src={reportUri} frameborder="2" width="100%" height="500px"></iframe>
-		{:else if !reportUri && docType == "csv"}
+		{:else if !reportUri && docType == "csv" || !reportUri && docType == "xls"}
 			<div class="flex flex-row gap-2 justify-center text-center m-48">
-				Preview is not available for this file type (.csv)
+				Preview is not available for this file type ({(docType == "csv") ? '.csv' : (docType == "xls") ? '.xlsx' : 'unknown'})
 			</div>
 		{:else}
 			<div class="flex flex-row gap-2 justify-center text-center m-48">
@@ -468,6 +502,10 @@ class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden ove
 	>
 		{:else if !reportUri && docType == "csv"}
 			<button class="btn btn-primary" on:click={saveAsCsv}
+			>Save as CSV</button
+		>
+		{:else if !reportUri && docType == "xls"}
+			<button class="btn btn-primary" on:click={saveAsXlsx}
 			>Save as CSV</button
 		>
 		{/if}
