@@ -260,6 +260,11 @@
 		);
 	}
 
+	async function generateDocx() {
+		generateReport();
+
+	}
+
 	async function saveAsPdf() {
 		report.save(
 				`Southview_Homes_3_${new Date(startDate).toLocaleDateString('en-US', {
@@ -500,13 +505,9 @@ class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden ove
 		<button class="btn btn-primary" on:click={saveAsPdf} disabled
 		>Save as PDF</button
 	>
-		{:else if !reportUri && docType == "csv"}
-			<button class="btn btn-primary" on:click={saveAsCsv}
-			>Save as CSV</button
-		>
-		{:else if !reportUri && docType == "xls"}
-			<button class="btn btn-primary" on:click={saveAsXlsx}
-			>Save as CSV</button
+		{:else if !reportUri && docType == "csv" || !reportUri && docType == "xls"} 
+			<button class="btn btn-primary" on:click={(docType == "csv") ? saveAsCsv() : (docType == "xls") ? saveAsXlsx() : null}
+			>Save as {(docType == "csv") ? 'CSV' : (docType == "xls") ? 'XLSX' : 'unknown'}</button
 		>
 		{/if}
 		
