@@ -12,6 +12,7 @@
 		serverTimestamp
 	} from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
+	import { addLog } from '$lib/logs';
 	import { onDestroy } from 'svelte';
 	import { createPaymentLink, sendEmail } from '$lib/utils';
 	import toast from 'svelte-french-toast';
@@ -128,6 +129,7 @@
 				<p><br/>Best regards,<br/>Southview Homes 3 Home Owners Association`
 			});
 			showModal = false;
+			addLog(`"Sent payment link - ${paymentEmail}" - Amount: ${paymentFee} pesos`, 'Payments');
 			toast.success('Payment has been sent!');
 		} catch (error) {
 			console.log(error);
@@ -150,6 +152,7 @@
 			};
 			showPopUpForMarkAsPaid = false;
 			await updateDoc(accountRef, data);
+			addLog(`"Mark as paid - ${userInfo.firstNameDisplay} ${userInfo.lastNameDisplay} - Amount: ${markFee} pesos"`, 'Payments');
 			toast.success('Account mark as paid!');
 		} catch (error) {
 			console.log(error);
@@ -194,6 +197,7 @@
 			const docRef = doc(db, 'accounts', snapshot.docs[i].id);
 			await updateDoc(docRef, { paymentStatus: 'Unpaid' });
 		}
+		addLog(`"Reset all payment status"`, 'Payments');
 		toast.success('All payment status has been reset!');
 	}
 
