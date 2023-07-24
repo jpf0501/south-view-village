@@ -2,8 +2,9 @@
 	import { db } from '$lib/firebase/client';
 	import { getDoc, updateDoc, doc, deleteDoc } from 'firebase/firestore';
 	import { goto } from '$app/navigation';
-	import toast from 'svelte-french-toast';
+	import { addLog } from '$lib/logs'
 	import { sendEmail } from '$lib/utils';
+	import toast from 'svelte-french-toast';
 	import Confirmation from '../../../../../../lib/Components/Confirmation.svelte';
 
 	/** @type {import('./$types').PageData} */
@@ -89,6 +90,7 @@
 				response: response
 			};
 			await updateDoc(inquiryRef, changeData);
+			addLog(`"Answered inquiry of ${inquiry.name}, Email: ${inquiry.email}"`,"Inquiry")
 			goto('/admin/inquiries');
 		} catch (error) {
 			console.log(error);
@@ -153,6 +155,7 @@
 					hadAnswered: true
 				};
 				await updateDoc(inquiryRef, changeData);
+				addLog(`"Answered no response in inquiry of ${inquiry.name}, Email: ${inquiry.email}"`,"Inquiry")
 				goto('/admin/inquiries');
 			} catch (error) {
 				console.log(error);
@@ -170,6 +173,7 @@
 		try {
 			await deleteDoc(doc(db, 'inquiries', inquiryID), inquiry);
 			toast.success('Inquiry deleted!');
+			addLog(`"Deleted inquiry of ${inquiry.name}, Email: ${inquiry.email}"`,"Inquiry")
 			await goto('/admin/inquiries');
 		} catch (error) {
 			console.log(error);

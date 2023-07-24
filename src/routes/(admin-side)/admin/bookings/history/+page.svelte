@@ -5,13 +5,17 @@
 		collection,
 		orderBy,
 		where,
-		getCountFromServer
+		getCountFromServer,
 	} from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { jsPDF } from 'jspdf';
+	import { addLog } from '$lib/logs';
 	import 'jspdf-autotable';
 	import toast from 'svelte-french-toast';
-
+	import Papa from 'papaparse';
+	import * as XLSX from 'xlsx';
+	import Chart from 'chart.js/auto';
+ 
 	const monthName = [
 		'January',
 		'February',
@@ -34,8 +38,10 @@
 	let currentMonth = (date.getMonth() + 1).toString().padStart(2, '0');
 	let day = '01';
 	let startDate, endDate;
-	let generatePopUp = false;
+	let generatePopUp, reportPreview = false;
 	let errors = {}
+	// report variables
+	let report, docType, reportUri, csvData, wb;
 
 	// if (currentMonth === '01') {
 	// 	// if current month is January, set start date to December of last year
@@ -108,6 +114,8 @@
 	}
 
 	async function generateReport() {
+	report = new jsPDF();
+	reportUri = '';
 	let generateQuery = query(
 		collection(db, 'booking'),
 		where('status', 'in', ['Approved', 'Disapproved', 'Cancelled', 'Completed']),
@@ -115,7 +123,6 @@
 		where('dateReviewed', '>=', new Date(startDate)),
 		where('dateReviewed', '<', new Date(endDate)),
 	);
-		const report = new jsPDF();
 
 		const generateSnapshot = await getDocs(generateQuery);
 		listOfReports = generateSnapshot.docs.map((doc) => doc.data());
@@ -163,6 +170,36 @@
 		let width = report.internal.pageSize.getWidth();
 
 		totalEarnings = Number(totalEarnings.toFixed(2)).toLocaleString();
+
+		// const data = {
+  		// 	labels: [
+    	// 		'Red',
+    	// 		'Blue',
+    	// 		'Yellow'
+  		// 	],
+  		// 	datasets: [{
+    	// 		label: 'My First Dataset',
+    	// 			data: [300, 50, 100],
+    	// 			backgroundColor: [
+      	// 				'rgb(255, 99, 132)',
+      	// 				'rgb(54, 162, 235)',
+      	// 				'rgb(255, 205, 86)'
+    	// 			],
+    	// 		hoverOffset: 4
+  		// 	}]
+		// };
+
+		// const config = {
+		// 	type: 'pie',
+  		// 	data: data,
+		// };
+		
+
+		// const ctx = document.getElementById('myChart').getContext('2d');
+    	// const myChart = new Chart(ctx, config);
+
+		// const canvas = document.getElementById('myChart');
+      	// const chartImage = canvas.toDataURL('image/jpeg', 1.0);
 
 		report.addImage('/logo.png', 'PNG', 68, 12, 11, 7);
 		report.setFont('Times', 'bold').text('Southview Homes 3', 84, 18);
@@ -239,19 +276,11 @@
 		report.line(18, 132, 190, 132);
 		report.line(130, 250, 190, 250);
 		report.text('HOA Treasurer', 171, 258, { align: 'right' });
+		// report.addPage();
+		// report.addImage(chartImage, 'JPEG', 10, 10, 190, 90); // Adjust position and size as needed
 		report.addPage();
 		report.autoTable({ margin: { top: 20, bottom: 20 }, html: '#generate-table' });
-		report.save(
-				`Southview_Homes_3_${new Date(startDate).toLocaleDateString('en-US', {
-												month: 'long',
-												day: 'numeric',
-												year: 'numeric'
-											})}-${new Date(endDate).toLocaleDateString('en-US', {
-												month: 'long',
-												day: 'numeric',
-												year: 'numeric'
-											})}_Reservation_Report.pdf`
-		);
+		reportUri = report.output('datauristring');
 		toast.success(
 			`Reservation report for ${new Date(startDate).toLocaleDateString('en-US', {
 												month: 'long',
@@ -265,6 +294,146 @@
 		);
 	}
 
+	async function saveAsPdf() {
+		report.save(
+				`Southview_Homes_3_${new Date(startDate).toLocaleDateString('en-US', {
+												month: 'long',
+												day: 'numeric',
+												year: 'numeric'
+											})}-${new Date(endDate).toLocaleDateString('en-US', {
+												month: 'long',
+												day: 'numeric',
+												year: 'numeric'
+											})}_Reservation_Report.pdf`
+		);
+	}
+
+	async function saveAsCsv() {
+		const blob = new Blob([csvData], { type: 'text/csv' });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+    	a.href = url;
+    	a.download = `Southview_Homes_3_${new Date(startDate).toLocaleDateString('en-US', {
+												month: 'long',
+												day: 'numeric',
+												year: 'numeric'
+											})}-${new Date(endDate).toLocaleDateString('en-US', {
+												month: 'long',
+												day: 'numeric',
+												year: 'numeric'
+											})}_Reservation_Report.csv`
+    	a.click();
+
+		URL.revokeObjectURL(url);
+	}
+
+	async function saveAsXlsx() {
+		XLSX.writeFile(wb, `Southview_Homes_3_${new Date(startDate).toLocaleDateString('en-US', {
+												month: 'long',
+												day: 'numeric',
+												year: 'numeric'
+											})}-${new Date(endDate).toLocaleDateString('en-US', {
+												month: 'long',
+												day: 'numeric',
+												year: 'numeric'
+											})}_Reservation_Report.xlsx`);
+	}
+
+	async function generateCSV() {
+	reportUri = '';
+	csvData = ''
+		let generateQuery = query(
+			collection(db, 'booking'),
+			where('status', 'in', ['Approved', 'Disapproved', 'Cancelled', 'Completed']),
+			where('paymentStatus', '==', 'Paid',),
+			where('dateReviewed', '>=', new Date(startDate)),
+			where('dateReviewed', '<', new Date(endDate)),
+		);
+
+		const generateSnapshot = await getDocs(generateQuery);
+		let csvReport = generateSnapshot.docs.map((doc) => {
+			const data = doc.data()
+			const bookDate = data.bookDate.toDate();
+			const endTime = data.endTime.toDate();
+			const dateReviewed = data.dateReviewed.toDate();
+			return {
+				fullName: data.firstNameDisplay + " " + data.lastNameDisplay, 
+				email: data.email,
+				contactNumber: data.contactNumber,
+				eventType: data.eventType,
+				bookDate: bookDate.toLocaleDateString('en-us', {
+									year: 'numeric',
+									month: 'long',
+									day: 'numeric'
+								}),
+				time: bookDate.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' }) + " - " + endTime.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' }), 
+				status: data.status,
+				paymentStatus: data.paymentStatus,
+				lastApprover: data.approvedBy ? data.approvedBy : "N/A",
+				dateReviwed: dateReviewed.toLocaleDateString('en-us', {
+									year: 'numeric',
+									month: 'long',
+									day: 'numeric'
+								}) + " at " + dateReviewed.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' }),
+				isRescheduled: data.isRescheduled ? 'Yes' : 'No',
+			}	
+		}
+		);
+
+		csvData = Papa.unparse(csvReport)
+
+		//console.log(csvData);
+	}
+
+	async function generateXlsx() {
+		reportUri = '';
+		wb = '';
+
+		let generateQuery = query(
+			collection(db, 'booking'),
+			where('status', 'in', ['Approved', 'Disapproved', 'Cancelled', 'Completed']),
+			where('paymentStatus', '==', 'Paid',),
+			where('dateReviewed', '>=', new Date(startDate)),
+			where('dateReviewed', '<', new Date(endDate)),
+		);
+
+		const generateSnapshot = await getDocs(generateQuery);
+		let xlsxReport = generateSnapshot.docs.map((doc) => {
+			const data = doc.data()
+			const bookDate = data.bookDate.toDate();
+			const endTime = data.endTime.toDate();
+			const dateReviewed = data.dateReviewed.toDate();
+			return {
+				fullName: data.firstNameDisplay + " " + data.lastNameDisplay, 
+				email: data.email,
+				contactNumber: data.contactNumber,
+				eventType: data.eventType,
+				bookDate: bookDate.toLocaleDateString('en-us', {
+									year: 'numeric',
+									month: 'long',
+									day: 'numeric'
+								}),
+				time: bookDate.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' }) + " - " + endTime.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' }), 
+				status: data.status,
+				paymentStatus: data.paymentStatus,
+				lastApprover: data.approvedBy ? data.approvedBy : "N/A",
+				dateReviwed: dateReviewed.toLocaleDateString('en-us', {
+									year: 'numeric',
+									month: 'long',
+									day: 'numeric'
+								}) + " at " + dateReviewed.toLocaleTimeString('en-us', { hour: '2-digit', minute: '2-digit' }),
+				isRescheduled: data.isRescheduled ? 'Yes' : 'No',
+			}	
+		});
+
+		const ws = XLSX.utils.json_to_sheet(xlsxReport);
+		wb = XLSX.utils.book_new();
+		XLSX.utils.book_append_sheet(wb, ws, 'Data');
+
+		//console.log('Data exported');
+	}
+
+
 	async function getBookingsHitory(bookingsQuery) {
 		const bookingsSnapshot = await getDocs(bookingsQuery);
 		listOfBooking = bookingsSnapshot.docs.map((doc) => doc.data());
@@ -275,6 +444,7 @@
 			starting: !startDate,
 			ending: !endDate,
 			startCheck: startDate > endDate,
+			docType: !docType
 		};
 		if (Object.values(errors).some((v) => v)) {
 			setTimeout(() => {
@@ -291,7 +461,19 @@
 			toast.error('Report generation failed');
 			return;
 		}
-		generateReport();
+		if (docType == "pdf"){
+			generateReport();
+			openPreview();
+		}
+		else if (docType == "csv"){
+			generateCSV()
+			openPreview();
+		}
+		if (docType == "xls"){
+			generateXlsx();
+			openPreview();
+		}
+		addLog(`"Generate Bookings Report - ${startDate} - ${endDate}"`, 'Bookings');
 	}
 
 	function openGenerate() {
@@ -302,12 +484,22 @@
 		generatePopUp = false;
 	}
 
+	function openPreview() {
+		reportPreview = true;
+	}
+
+	function closePreview() {
+		reportPreview = false;
+	}
+
 	$: getBookingsHitory(bookingsQuery);
 </script>
 
 <svelte:head>
 	<title>Booking History - Southview Homes 3 Admin Panel</title>
 </svelte:head>
+
+<!-- <canvas id="myChart" class="hidden" width="400" height="200"></canvas> -->
 
 {#if generatePopUp}
 <div
@@ -337,12 +529,68 @@ class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden ove
 		{:else if errors.startCheck}
 			<p class="text-red-500 text-sm italic mb-1">Start date should not be more recent than end date</p>
 		{/if}
+		<p class="mt-6 text-sm text-gray-500">Select document type to generate</p>
+		<select
+			bind:value={docType}
+			class="mt-6 input input-bordered w-full max-w-xs"
+		>
+			<option value="pdf">PDF</option>
+			<option value="csv">CSV</option>
+			<option value="xls">XLSX</option>
+		</select>
+
+		{#if errors.docType}
+			<p class="text-red-500 text-sm italic mb-1">Document type is required</p>
+		{/if}
 	</div>
 	<div class="flex justify-end px-6 gap-2 py-4">
 		<button class="btn btn-primary" on:click={submitHandler}
 			>Generate Report</button
 		>
 		<button class="btn btn-error text-white" on:click={closeGenerate}>Cancel</button>
+	</div>
+</div>
+</div>
+{/if}
+
+{#if reportPreview}
+<div
+class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto"
+>
+<div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-75" />
+<div class="relative z-50 w-full max-w-2xl mx-auto bg-white rounded-lg shadow-lg">
+	<div class="p-6">
+		<h2 class="text-lg font-medium">Booking Payment Report Preview</h2>
+		<div class="divider mt-3 mb-5"></div>
+		<!-- svelte-ignore a11y-missing-attribute -->
+		{#if reportUri}
+			<iframe id="pdfIframe" src={reportUri} frameborder="2" width="100%" height="500px"></iframe>
+		{:else if !reportUri && docType == "csv" || !reportUri && docType == "xls"}
+			<div class="flex flex-row gap-2 justify-center text-center m-48">
+				Preview is not available for this file type ({(docType == "csv") ? '.csv' : (docType == "xls") ? '.xlsx' : 'unknown'})
+			</div>
+		{:else}
+			<div class="flex flex-row gap-2 justify-center text-center m-48">
+				<span class="loading loading-spinner loading-md"></span>Loading...
+			</div>
+		{/if}
+	</div>
+	<div class="flex justify-end px-6 gap-2 py-4">
+		{#if reportUri && docType == "pdf"}
+		<button class="btn btn-primary" on:click={saveAsPdf}
+		>Save as PDF</button
+	>
+		{:else if !reportUri && docType == "pdf"}
+		<button class="btn btn-primary" on:click={saveAsPdf} disabled
+		>Save as PDF</button
+	>
+		{:else if !reportUri && docType == "csv" || !reportUri && docType == "xls"} 
+			<button class="btn btn-primary" on:click={(docType == "csv") ? saveAsCsv() : (docType == "xls") ? saveAsXlsx() : null}
+			>Save as {(docType == "csv") ? 'CSV' : (docType == "xls") ? 'XLSX' : 'unknown'}</button
+		>
+		{/if}
+		
+		<button class="btn btn-error text-white" on:click={closePreview}>Close</button>
 	</div>
 </div>
 </div>

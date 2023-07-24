@@ -2,6 +2,7 @@
 	import { db } from '$lib/firebase/client';
 	import { getDoc, doc, setDoc, updateDoc } from 'firebase/firestore';
 	import { sendEmail } from '$lib/utils';
+	import { addLog } from '$lib/logs'
 	import { goto } from '$app/navigation';
 	import toast from 'svelte-french-toast';
 	import Confirmation from '../../../../../../lib/Components/Confirmation.svelte';
@@ -78,6 +79,7 @@
 				await updateDoc(updateStatusRef, {
 					status: 'Ongoing'
 				});
+				addLog(`"Start to assist the complaint of - ${complaint.firstnameDisplay} ${complaint.lastnameDisplay}"`,"Complaints")
 				await sendEmail({
 					to: complaint.email,
 					subject: 'Southview Homes 3 Complaint',

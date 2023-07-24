@@ -8,9 +8,12 @@
 		getDocs
 	} from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
+	import { addLog } from '$lib/logs';
 	import { jsPDF } from 'jspdf';
 	import 'jspdf-autotable';
 	import toast from 'svelte-french-toast';
+	import Papa from 'papaparse';
+	import * as XLSX from 'xlsx';
 
 	const monthName = [
 		'January',
@@ -34,8 +37,10 @@
 	let currentMonth = (date.getMonth() + 1).toString().padStart(2, '0');
 	let day = '01';
 	let startDate, endDate;
-	let generatePopUp = false;
+	let generatePopUp, reportPreview = false;
 	let errors = {};
+	// report variables
+	let report, docType, reportUri, csvData, wb;
 
 	// if (currentMonth === '01') {
 	// 	// if current month is January, set start date to December of last year
@@ -103,17 +108,29 @@
 			toast.error('Report generation failed');
 			return;
 		}
-		generateReport();
+		if (docType == "pdf"){
+			generateReport();
+			openPreview();
+		}
+		else if (docType == "csv"){
+			generateCSV()
+			openPreview();
+		}
+		if (docType == "xls"){
+			generateXlsx();
+			openPreview();
+		}
+		addLog(`"Generate Payments Report - ${startDate} - ${endDate}"`, 'Payments');
 	}
 
 	async function generateReport() {
+	report = new jsPDF();
+	reportUri = '';
 		let generateQuery = query(
 		collection(db, 'payments'),
 		where('paymentTime', '>=', new Date(startDate)),
 		where('paymentTime', '<', new Date(endDate))
 	);
-
-		const report = new jsPDF();
 
 		let yOffset = 8;
 		let y = 87;
@@ -204,15 +221,7 @@
 		report.text('HOA Treasurer', 171, 268, { align: 'right' });
 		report.addPage();
 		report.autoTable({ margin: { top: 20, bottom: 20 }, html: '#generate-table' });
-		report.save(`Southview_Homes_3_${new Date(startDate).toLocaleDateString('en-US', {
-												month: 'long',
-												day: 'numeric',
-												year: 'numeric'
-											})}-${new Date(endDate).toLocaleDateString('en-US', {
-												month: 'long',
-												day: 'numeric',
-												year: 'numeric'
-											})}_Monthly_Dues_Report.pdf`);
+		reportUri = report.output('datauristring');
 		toast.success(`Monthly dues report for ${new Date(startDate).toLocaleDateString('en-US', {
 												month: 'long',
 												day: 'numeric',
@@ -224,12 +233,131 @@
 											})} generated!`);
 	}
 
+	async function saveAsPdf() {
+		report.save(`Southview_Homes_3_${new Date(startDate).toLocaleDateString('en-US', {
+												month: 'long',
+												day: 'numeric',
+												year: 'numeric'
+											})}-${new Date(endDate).toLocaleDateString('en-US', {
+												month: 'long',
+												day: 'numeric',
+												year: 'numeric'
+											})}_Monthly_Dues_Report.pdf`);
+	}
+
+	async function saveAsCsv() {
+		const blob = new Blob([csvData], { type: 'text/csv' });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+    	a.href = url;
+    	a.download = `Southview_Homes_3_${new Date(startDate).toLocaleDateString('en-US', {
+												month: 'long',
+												day: 'numeric',
+												year: 'numeric'
+											})}-${new Date(endDate).toLocaleDateString('en-US', {
+												month: 'long',
+												day: 'numeric',
+												year: 'numeric'
+											})}_Monthly_Dues_Report.csv`
+    	a.click();
+
+		URL.revokeObjectURL(url);
+	}
+
+	async function saveAsXlsx() {
+		XLSX.writeFile(wb, `Southview_Homes_3_${new Date(startDate).toLocaleDateString('en-US', {
+												month: 'long',
+												day: 'numeric',
+												year: 'numeric'
+											})}-${new Date(endDate).toLocaleDateString('en-US', {
+												month: 'long',
+												day: 'numeric',
+												year: 'numeric'
+											})}_Monthly_Dues_Report.xlsx`);
+	}
+
 	function openGenerate() {
 		generatePopUp = true;
 	}
 
 	function closeGenerate() {
 		generatePopUp = false;
+	}
+
+	function openPreview() {
+		reportPreview = true;
+	}
+
+	function closePreview() {
+		reportPreview = false;
+	}
+
+	async function generateCSV() {
+	reportUri = '';
+	csvData = ''
+	let generateQuery = query(
+		collection(db, 'payments'),
+		where('paymentTime', '>=', new Date(startDate)),
+		where('paymentTime', '<', new Date(endDate))
+	);
+
+		const generateSnapshot = await getDocs(generateQuery);
+		let csvReport = generateSnapshot.docs.map((doc) => {
+			const data = doc.data()
+			const paymentTime = data.paymentTime.toDate();
+			return {
+				fullName: data.firstNameDisplay + " " + data.lastNameDisplay,
+				address: "Block " + data.addressBlock + " Lot " + data.addressLot + " " + data.addressStreet + " Street",
+				email: data.email,
+				contactNumber: "0" + data.contact,
+				paymentDate: paymentTime.toLocaleDateString('en-us', {
+									year: 'numeric',
+									month: 'long',
+									day: 'numeric'
+								}),
+				amount: new Intl.NumberFormat().format(data.paymentFee / 100)
+			}	
+		}
+		);
+
+		csvData = Papa.unparse(csvReport)
+
+		//console.log(csvData);
+	}
+
+	async function generateXlsx() {
+		reportUri = '';
+		wb = '';
+
+		let generateQuery = query(
+		collection(db, 'payments'),
+		where('paymentTime', '>=', new Date(startDate)),
+		where('paymentTime', '<', new Date(endDate))
+	);
+
+		const generateSnapshot = await getDocs(generateQuery);
+		let xlsxReport = generateSnapshot.docs.map((doc) => {
+			const data = doc.data()
+			const paymentTime = data.paymentTime.toDate();
+			return {
+				fullName: data.firstNameDisplay + " " + data.lastNameDisplay,
+				address: "Block " + data.addressBlock + " Lot " + data.addressLot + " " + data.addressStreet + " Street",
+				email: data.email,
+				contactNumber: "0" + data.contact,
+				paymentDate: paymentTime.toLocaleDateString('en-us', {
+									year: 'numeric',
+									month: 'long',
+									day: 'numeric'
+								}),
+				amount: new Intl.NumberFormat().format(data.paymentFee / 100)
+			}
+		});
+
+		const ws = XLSX.utils.json_to_sheet(xlsxReport);
+		wb = XLSX.utils.book_new();
+		XLSX.utils.book_append_sheet(wb, ws, 'Data');
+
+		//console.log('Data exported');
 	}
 
 	async function getPayments(paymentsQuery) {
@@ -271,12 +399,64 @@ class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden ove
 		{:else if errors.startCheck}
 			<p class="text-red-500 text-sm italic mb-1">Start date should not be more recent than end date</p>
 		{/if}
+		<p class="mt-6 text-sm text-gray-500">Select document type to generate</p>
+		<select
+			bind:value={docType}
+			class="mt-6 input input-bordered w-full max-w-xs"
+		>
+			<option value="pdf">PDF</option>
+			<option value="csv">CSV</option>
+			<option value="xls">XLSX</option>
+		</select>
 	</div>
 	<div class="flex justify-end px-6 gap-2 py-4">
 		<button class="btn btn-primary" on:click={submitHandler}
 			>Generate Report</button
 		>
 		<button class="btn btn-error text-white" on:click={closeGenerate}>Cancel</button>
+	</div>
+</div>
+</div>
+{/if}
+
+{#if reportPreview}
+<div
+class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto"
+>
+<div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-75" />
+<div class="relative z-50 w-full max-w-2xl mx-auto bg-white rounded-lg shadow-lg">
+	<div class="p-6">
+		<h2 class="text-lg font-medium">Booking Payment Report Preview</h2>
+		<div class="divider mt-3 mb-5"></div>
+		<!-- svelte-ignore a11y-missing-attribute -->
+		{#if reportUri}
+			<iframe id="pdfIframe" src={reportUri} frameborder="2" width="100%" height="500px"></iframe>
+		{:else if !reportUri && docType == "csv" || !reportUri && docType == "xls"}
+			<div class="flex flex-row gap-2 justify-center text-center m-48">
+				Preview is not available for this file type ({(docType == "csv") ? '.csv' : (docType == "xls") ? '.xlsx' : 'unknown'})
+			</div>
+		{:else}
+			<div class="flex flex-row gap-2 justify-center text-center m-48">
+				<span class="loading loading-spinner loading-md"></span>Loading...
+			</div>
+		{/if}
+	</div>
+	<div class="flex justify-end px-6 gap-2 py-4">
+		{#if reportUri && docType == "pdf"}
+		<button class="btn btn-primary" on:click={saveAsPdf}
+		>Save as PDF</button
+	>
+		{:else if !reportUri && docType == "pdf"}
+		<button class="btn btn-primary" on:click={saveAsPdf} disabled
+		>Save as PDF</button
+	>
+		{:else if !reportUri && docType == "csv" || !reportUri && docType == "xls"} 
+			<button class="btn btn-primary" on:click={(docType == "csv") ? saveAsCsv() : (docType == "xls") ? saveAsXlsx() : null}
+			>Save as {(docType == "csv") ? 'CSV' : (docType == "xls") ? 'XLSX' : 'unknown'}</button
+		>
+		{/if}
+		
+		<button class="btn btn-error text-white" on:click={closePreview}>Close</button>
 	</div>
 </div>
 </div>

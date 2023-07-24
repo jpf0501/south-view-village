@@ -13,6 +13,7 @@
 	import { db } from '$lib/firebase/client';
 	import { onDestroy } from 'svelte';
 	import { createPaymentLink, sendEmail } from '$lib/utils';
+	import { addLog } from '$lib/logs';
 	import toast from 'svelte-french-toast';
 	import { userStore } from '$lib/store';
 
@@ -75,6 +76,7 @@
 				
 			};
 			await updateDoc(bookRef, data);
+			addLog(`"Update booking status to ${bookStatus} - ${event}"`, 'Bookings');
 			toast.success('Booking request has been ' + bookStatus.toLowerCase() + ' !');
 		} catch (error) {
 			console.log(error);
@@ -149,6 +151,7 @@
 				`
 			});
 			// console.log(JSON.stringify(result));
+			addLog(`"Sent payment link - ${event} - ${firstname} ${lastname}"`, 'Bookings');
 			toast.success('Payment has been sent!');
 		} catch (error) {
 			console.log(error);
@@ -186,6 +189,7 @@
 			bookingDetailPopup = false;
 			showPopUp = false;
 			await updateDoc(bookRef, data);
+			addLog(`"Mark as paid - ${bookingDetail.eventTypeDisplay} of ${bookingDetail.firstNameDisplay} ${bookingDetail.lastNameDisplay}"`, 'Bookings');
 			toast.success('Booking mark as paid!');
 		} catch (error) {
 			console.log(error);
@@ -222,6 +226,7 @@
 			bookingDetailPopup = false;
 			showPopUp = false;
 			await updateDoc(bookRef, data);
+			addLog(`"Resecheduled booking - ${bookingDetail.eventTypeDisplay} - ${bookingDetail.firstNameDisplay} ${bookingDetail.lastNameDisplay}"`, 'Bookings');
 			toast.success('Successfully rescheduled event!');
 			reservationPopup = false;
 			bookingDetailPopup = false;

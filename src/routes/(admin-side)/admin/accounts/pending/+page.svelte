@@ -7,13 +7,18 @@
 		where,
 		doc,
 		updateDoc,
-		getDocs
+		getDocs,
+		getDoc,
+		addDoc,
+		serverTimestamp,
 	} from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { sendEmail } from '$lib/utils';
+	import { addLog } from '$lib/logs'
 	import { onDestroy } from 'svelte';
 	import toast from 'svelte-french-toast';
 	import Confirmation from '../../../../../lib/Components/Confirmation.svelte';
+	
 
 	let listOfUsers = [];
 	let sortByField = '';
@@ -82,6 +87,7 @@
 	}
 
 	async function approval() {
+
 		if (pendingAccountStatus === 'Approved') {
 			try {
 				const accountsQuery = query(
@@ -118,6 +124,7 @@
 					status: 'Approved'
 				};
 				await updateDoc(pendingAccountsRef, data);
+				addLog(`"Approved account - ${accountInfo.pendingFirstNameDisplay} ${accountInfo.pendingLastNameDisplay}, Email: ${accountInfo.pendingEmail}"`,"Pending Accounts")
 				toast.success('Account approved!');
 			} catch (error) {
 				console.log(error);
@@ -130,6 +137,7 @@
 					status: 'Disapproved'
 				};
 				await updateDoc(pendingAccountsRef, data);
+				addLog(`"Disapproved account - ${accountInfo.pendingFirstNameDisplay} ${accountInfo.pendingLastNameDisplay}, Email: ${accountInfo.pendingEmail}"`,"Pending Accounts")
 				toast.success('Account disapproved!');
 			} catch (error) {
 				console.log(error);

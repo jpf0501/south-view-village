@@ -1,17 +1,10 @@
 <script>
 	import { goto } from '$app/navigation';
 	import { db } from '$lib/firebase/client';
-	import {
-		getDocs,
-		query,
-		collection,
-		orderBy,
-		where,
-		getDoc,
-		doc,
-	} from 'firebase/firestore';
-	import toast from 'svelte-french-toast';
+	import { getDocs, query, collection, orderBy, where, getDoc, doc } from 'firebase/firestore';
+	import { addLog } from '$lib/logs';
 	import { userStore } from '$lib/store.js';
+	import toast from 'svelte-french-toast';
 	import Confirmation from '../../../../../lib/Components/Confirmation.svelte';
 
 	let account = {
@@ -56,7 +49,7 @@
 
 	async function confirmSubmit() {
 		confirmation = false;
-		await createAccount()
+		await createAccount();
 	}
 
 	async function cancelSubmit() {
@@ -67,7 +60,6 @@
 		const streetSnapshot = await getDocs(streetQuery);
 		listOfStreets = streetSnapshot.docs.map((doc) => doc.data());
 	}
-
 
 	async function checkInput() {
 		const regex = /^[a-zA-Z -]*$/;
@@ -141,12 +133,8 @@
 				})
 			});
 			const result = await response.json();
-			// console.log(result);
-			/*await addDoc(collection(db, 'adminlogs'), {
-				activity: user.firstNameDisplay + ", " + user.lastNameDisplay + " created account in Accounts module.",
-				pageRef: 'Account',
-				date: serverTimestamp()
-			});*/
+			//activity logs
+			addLog(`"Created account - ${account.firstname} ${account.lastname}"`, 'Accounts');
 			toast.success('Account created!');
 			await goto('/admin/accounts');
 		} catch (error) {
@@ -162,7 +150,12 @@
 	<title>Create Account - Southview Homes 3 Admin Panel</title>
 </svelte:head>
 
-<Confirmation show={confirmation} onConfirm={confirmSubmit} onCancel={cancelSubmit} {confirmationText}/>
+<Confirmation
+	show={confirmation}
+	onConfirm={confirmSubmit}
+	onCancel={cancelSubmit}
+	{confirmationText}
+/>
 <main>
 	<div class="min-h-screen hero bg-base-200 py-8">
 		<div class="w-full max-w-4xl p-6 mx-auto shadow-2xl border rounded-xl bg-base-100">
