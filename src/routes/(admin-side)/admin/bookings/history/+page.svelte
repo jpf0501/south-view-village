@@ -473,7 +473,7 @@
 			generateXlsx();
 			openPreview();
 		}
-		addLog(`"Generate Report - ${startDate} - ${endDate}"`, 'Bookings');
+		addLog(`"Generate Bookings Report - ${startDate} - ${endDate}"`, 'Bookings');
 	}
 
 	function openGenerate() {

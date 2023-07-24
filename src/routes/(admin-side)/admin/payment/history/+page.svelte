@@ -8,6 +8,7 @@
 		getDocs
 	} from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
+	import { addLog } from '$lib/logs';
 	import { jsPDF } from 'jspdf';
 	import 'jspdf-autotable';
 	import toast from 'svelte-french-toast';
@@ -119,6 +120,7 @@
 			generateXlsx();
 			openPreview();
 		}
+		addLog(`"Generate Payments Report - ${startDate} - ${endDate}"`, 'Payments');
 	}
 
 	async function generateReport() {
