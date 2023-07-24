@@ -9,6 +9,7 @@
 	} from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
 	import { jsPDF } from 'jspdf';
+	import { addLog } from '$lib/logs';
 	import 'jspdf-autotable';
 	import toast from 'svelte-french-toast';
 	import Papa from 'papaparse';
@@ -472,7 +473,7 @@
 			generateXlsx();
 			openPreview();
 		}
-		
+		addLog(`"Generate Report - ${startDate} - ${endDate}"`, 'Bookings');
 	}
 
 	function openGenerate() {
