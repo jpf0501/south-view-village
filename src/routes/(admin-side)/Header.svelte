@@ -10,7 +10,7 @@
 		try {
 			await signOut(auth);
 			toast.success('Signed Out!')
-			goto('/');
+			goto('/login');
 		} catch (error) {
 			console.log(error);
 			toast.error('Error in Signing Out!');

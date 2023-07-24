@@ -1,25 +1,83 @@
 <script>
 	import { auth } from '$lib/firebase/client.js';
 	import { signInWithEmailAndPassword } from 'firebase/auth';
+	import { db } from '$lib/firebase/client';
+	import { getDocs, query, collection, where } from 'firebase/firestore';
+	import { sendEmail } from '$lib/utils';
 	import { goto } from '$app/navigation';
 	import toast from 'svelte-french-toast';
 
 	let user = '';
 	let password = '';
+	let remainingTime = 0;
+	let loginAttempts = 0;
+	let remainingAttempts = 6;
+	let loginDisabled = false;
 
 	async function submitHandler() {
-		// console.log(user),
-		// console.log(password)
+		const accountsQuery = query(collection(db, 'accounts'), where('email', '==', user));
+		const accountsSnapshot = await getDocs(accountsQuery);
+
+		if (loginDisabled) {
+			if (remainingTime > 0) {
+				toast.error(`Login is temporarily disabled. Please try again in ${remainingTime} seconds.`);
+			} else {
+				toast.error('Login is temporarily disabled. Please try again later.');
+			}
+			password = '';
+			return;
+		}
+
 		try {
 			const cred = await signInWithEmailAndPassword(auth, user, password);
 			toast.success('Login Success!');
 			goto('/admin');
 		} catch (error) {
+			// console.log(user);
+			// console.log(password);
 			console.log(error);
 			if (error.code === 'auth/network-request-failed') {
 				toast.error('Network error. Please check your internet connection.');
+			} else if (error.code === 'auth/too-many-requests') {
+				toast.error(
+					'Access to this account has been temporarily disabled due to many failed login attempts. You can immediately restore it by resetting your password or you can try again later.'
+				);
 			} else {
-				toast.error('Invalid email or password.');
+				loginAttempts++;
+				remainingAttempts = 6 - loginAttempts;
+				toast.error(`Invalid email or password. ${remainingAttempts} attempts left.`);
+				if (loginAttempts >= 6) {
+					loginDisabled = true;
+					remainingTime = 60;
+					const timer = setInterval(() => {
+						remainingTime--;
+						if (remainingTime <= 0) {
+							clearInterval(timer);
+							loginDisabled = false;
+							loginAttempts = 0;
+							remainingAttempts = 5;
+						}
+					}, 1000);
+				}
+
+				if (remainingAttempts === 0) {
+					if (accountsSnapshot.docs.length > 0) {
+						await sendEmail({
+							to: user,
+							subject: 'Southview Homes 3 - Unauthorized Login Attempt on your Account',
+							html: `<center><h1><img src="https://ssv.vercel.app/logo.png"> Southview Homes 3</h1>
+				<p style="font-size:12px">SVH3 San Vicente Road, Brgy., San Vicente, San Pedro, Laguna</p><br/>
+				<p style="font-size:13px; text-decoration:underline">This is an automated message. Do not reply.</p></center>
+				<p>Unathorized Login</p>
+				<p>Dear Resident,</p>
+				<p>Someone is trying to access your account. Kindly check and update your account to avoid unwanted access to your account.</p>
+				<p>Best regards,</p>
+				<p>Soutview Homes 3</p>
+				`
+						});
+					}
+				}
+				password = '';
 			}
 		}
 	}
