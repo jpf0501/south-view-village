@@ -439,10 +439,6 @@
 			generateXlsx();
 			openPreview();
 		}
-		if (docType == "docx"){
-			generateDocx();
-			console.log("hi docx")
-		}
 		
 	}
 
@@ -505,7 +501,6 @@ class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden ove
 			<option value="pdf">PDF</option>
 			<option value="csv">CSV</option>
 			<option value="xls">XLSX</option>
-			<option value="docx">DOCX</option>
 		</select>
 
 		{#if errors.docType}
