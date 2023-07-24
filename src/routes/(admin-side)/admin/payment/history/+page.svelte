@@ -426,7 +426,7 @@ class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden ove
 <div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-75" />
 <div class="relative z-50 w-full max-w-2xl mx-auto bg-white rounded-lg shadow-lg">
 	<div class="p-6">
-		<h2 class="text-lg font-medium">Booking Payment Report Preview</h2>
+		<h2 class="text-lg font-medium">Monthly Dues Payment Report Preview</h2>
 		<div class="divider mt-3 mb-5"></div>
 		<!-- svelte-ignore a11y-missing-attribute -->
 		{#if reportUri}
