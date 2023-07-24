@@ -13,7 +13,7 @@
 		const role = snapshot.get("role")
 		const isAdmin = "Admin" === role
 		if (!isAdmin) {
-			await goto("/")
+			await goto("/profile")
 		} else {
 			show = true;
 		}
