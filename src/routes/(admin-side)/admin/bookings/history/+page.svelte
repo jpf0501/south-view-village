@@ -13,6 +13,7 @@
 	import toast from 'svelte-french-toast';
 	import Papa from 'papaparse';
 	import * as XLSX from 'xlsx';
+	import Chart from 'chart.js/auto';
  
 	const monthName = [
 		'January',
@@ -169,6 +170,36 @@
 
 		totalEarnings = Number(totalEarnings.toFixed(2)).toLocaleString();
 
+		// const data = {
+  		// 	labels: [
+    	// 		'Red',
+    	// 		'Blue',
+    	// 		'Yellow'
+  		// 	],
+  		// 	datasets: [{
+    	// 		label: 'My First Dataset',
+    	// 			data: [300, 50, 100],
+    	// 			backgroundColor: [
+      	// 				'rgb(255, 99, 132)',
+      	// 				'rgb(54, 162, 235)',
+      	// 				'rgb(255, 205, 86)'
+    	// 			],
+    	// 		hoverOffset: 4
+  		// 	}]
+		// };
+
+		// const config = {
+		// 	type: 'pie',
+  		// 	data: data,
+		// };
+		
+
+		// const ctx = document.getElementById('myChart').getContext('2d');
+    	// const myChart = new Chart(ctx, config);
+
+		// const canvas = document.getElementById('myChart');
+      	// const chartImage = canvas.toDataURL('image/jpeg', 1.0);
+
 		report.addImage('/logo.png', 'PNG', 68, 12, 11, 7);
 		report.setFont('Times', 'bold').text('Southview Homes 3', 84, 18);
 		report
@@ -244,6 +275,8 @@
 		report.line(18, 132, 190, 132);
 		report.line(130, 250, 190, 250);
 		report.text('HOA Treasurer', 171, 258, { align: 'right' });
+		// report.addPage();
+		// report.addImage(chartImage, 'JPEG', 10, 10, 190, 90); // Adjust position and size as needed
 		report.addPage();
 		report.autoTable({ margin: { top: 20, bottom: 20 }, html: '#generate-table' });
 		reportUri = report.output('datauristring');
@@ -464,6 +497,8 @@
 <svelte:head>
 	<title>Booking History - Southview Homes 3 Admin Panel</title>
 </svelte:head>
+
+<!-- <canvas id="myChart" class="hidden" width="400" height="200"></canvas> -->
 
 {#if generatePopUp}
 <div
