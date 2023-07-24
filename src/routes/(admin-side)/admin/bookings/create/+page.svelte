@@ -1,6 +1,7 @@
 <script>
-	import { addDoc, collection, serverTimestamp, getDocs, query, where } from 'firebase/firestore';
+	import { addDoc, collection, serverTimestamp} from 'firebase/firestore';
 	import { db } from '$lib/firebase/client';
+	import { addLog } from '$lib/logs';
 	import { goto } from '$app/navigation';
 	import toast from 'svelte-french-toast';
 
@@ -117,6 +118,7 @@
 				isReviewed: false,
 			});
 			console.log(new Date(guest.date + ' ' + guest.endTime))
+			addLog(`Created bookings - "${guest.eventType} - ${guest.firstname} ${guest.lastname}"`, 'Bookings');
 			toast.success('Reservation entry saved!');
 			await goto('/admin/bookings');
 		} catch (error) {
