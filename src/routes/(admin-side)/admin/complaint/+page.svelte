@@ -109,7 +109,7 @@
 	<div class="w-full mx-auto shadow-2xl border rounded-xl bg-base-100 my-5 hidden md:block">
 		<div class="overflow-x-auto">
 			<table class="table w-full">
-				<caption class="text-lg font-bold mb-2">List of Pending Complaints</caption>
+				<caption class="text-lg font-bold mt-7 mb-5">List of Pending Complaints</caption>
 				<thead>
 					<tr>
 						<th />

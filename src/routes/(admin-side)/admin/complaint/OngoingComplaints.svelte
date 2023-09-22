@@ -57,7 +57,7 @@
 <div class="mx-auto shadow-2xl border rounded-xl bg-base-100 my-5 hidden md:block">
 	<div class="overflow-auto">
 		<table class="table w-full">
-			<caption class="text-lg font-bold mb-2">List of Ongoing Complaints</caption>
+			<caption class="text-lg font-bold mt-7 mb-5">List of Ongoing Complaints</caption>
 			<thead>
 				<tr>
 					<th />
@@ -79,7 +79,7 @@
 							<td
 								><a
 									href="/admin/complaint/respond/{ongoingComplaints.convoID}"
-									class="btn btn-primary">Goto Convo</a
+									class="btn btn-primary">View Conversation</a
 								></td
 							>
 							<td>{i + 1}</td>
