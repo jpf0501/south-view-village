@@ -119,7 +119,7 @@
 							<td
 								><a
 									href={'/admin/complaint/history/view/' + ongoingComplaints.convoID}
-									class="btn btn-primary">Goto Convo</a
+									class="btn btn-primary">View Conversation</a
 								></td
 							>
 						</tr>

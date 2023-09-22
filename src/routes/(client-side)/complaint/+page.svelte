@@ -29,7 +29,7 @@
 	getOngoingComplaints();
 </script>
 
-<div class="flex flex-row justify-end">
+<div class="flex flex-row justify-end mt-4">
 	<a href="/complaint/create" class="btn btn-primary m-2 mx-2">New Complaint</a>
 </div>
 
@@ -98,6 +98,6 @@
 	</div>
 </div>
 
-<div>
+<div class="mb-14">
 	<PendingComplaintsClient />
 </div>

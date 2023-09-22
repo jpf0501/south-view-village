@@ -38,7 +38,7 @@
 
 {#if complaint}
 	<div class="min-h-screen bg-gray-100 flex flex-col justify-center items-center">
-		<div class="w-full max-w-4xl p-6 mx-auto shadow-lg rounded-xl bg-white">
+		<div class="w-full max-w-4xl p-6 mx-auto shadow-lg rounded-xl bg-white mt-10 mb-8">
 			<h1 class="text-2xl font-bold mb-4">
 				Complaint by {complaint.firstnameDisplay + ' ' + complaint.lastnameDisplay}
 			</h1>
